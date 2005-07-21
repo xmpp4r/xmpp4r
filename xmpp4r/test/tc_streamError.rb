@@ -7,10 +7,6 @@ require 'socket'
 require 'xmpp4r/stream'
 include Jabber
 
-module Jabber
-  DEBUG = false
-end
-
 class ConnectionErrorTest < Test::Unit::TestCase
   def test_connectionError
     @conn, @server = IO.pipe

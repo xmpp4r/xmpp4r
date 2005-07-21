@@ -7,10 +7,6 @@ require 'socket'
 require 'xmpp4r/stream'
 include Jabber
 
-module Jabber
-  DEBUG = false
-end
-
 class StreamTest < Test::Unit::TestCase
   def setup
     @conn, @server = IO.pipe

@@ -9,10 +9,6 @@ require 'io/wait'
 require 'xmpp4r/stream'
 include Jabber
 
-module Jabber
-  DEBUG = false
-end
-
 class StreamSendTest < Test::Unit::TestCase
   def setup
     @tmpfile = Tempfile::new("StreamSendTest")
