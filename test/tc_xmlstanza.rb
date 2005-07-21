@@ -7,10 +7,6 @@ require 'socket'
 require 'xmpp4r/xmlstanza'
 include Jabber
 
-module Jabber
-  DEBUG = false
-end
-
 class XMLStanzaTest < Test::Unit::TestCase
 
   def test_from

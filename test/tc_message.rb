@@ -7,10 +7,6 @@ require 'socket'
 require 'xmpp4r/message'
 include Jabber
 
-module Jabber
-  DEBUG = false
-end
-
 class MessageTest < Test::Unit::TestCase
   def test_create
     x = Message::new()

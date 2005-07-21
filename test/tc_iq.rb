@@ -8,10 +8,6 @@ require 'xmpp4r/iq'
 require 'xmpp4r/jid'
 include Jabber
 
-module Jabber
-  DEBUG = false
-end
-
 class IqTest < Test::Unit::TestCase
   def test_create
     x = Iq::new()

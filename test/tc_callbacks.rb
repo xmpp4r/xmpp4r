@@ -9,10 +9,6 @@ require 'xmpp4r/xmlelement'
 
 include Jabber
 
-module Jabber
-  DEBUG = false
-end
-
 class CallbacksTest < Test::Unit::TestCase
   def test_test1
     called = 0
