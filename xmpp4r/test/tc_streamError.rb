@@ -4,7 +4,7 @@ $:.unshift '../lib'
 
 require 'test/unit'
 require 'socket'
-require 'xmpp4r/stream'
+require 'xmpp4r'
 include Jabber
 
 class ConnectionErrorTest < Test::Unit::TestCase
@@ -47,8 +47,8 @@ class ConnectionErrorTest < Test::Unit::TestCase
     @stream.on_exception { error = true }
     @server.puts('<stream:stream>')
     assert(!error)
-    @server.puts('<blop/>')
-    sleep 0.01
+    @server.puts('</blop>')
+    sleep 0.1
     assert(error)
     @server.close
     @stream.close

@@ -2,16 +2,22 @@
 
 $:.unshift '../lib'
 
+require 'tempfile'
 require 'test/unit'
 require 'socket'
-require 'xmpp4r/stream'
+require 'xmpp4r'
 include Jabber
 
 class StreamTest < Test::Unit::TestCase
   def setup
-    @conn, @server = IO.pipe
+    @tmpfile = Tempfile::new("StreamSendTest")
+    @tmpfilepath = @tmpfile.path()
+    @tmpfile.unlink
+    @servlisten = UNIXServer::new(@tmpfilepath)
+    thServer = Thread.new { @server = @servlisten.accept }
+    @iostream = UNIXSocket::new(@tmpfilepath)
     @stream = Stream::new(false)
-    @stream.start(@conn)
+    @stream.start(@iostream)
   end
 
   def teardown
@@ -28,6 +34,7 @@ class StreamTest < Test::Unit::TestCase
     assert(!called)
     @server.puts('<stream:stream>')
     @server.flush
+    sleep 0.1
     assert(!called)
     @stream.process
     assert(called)
