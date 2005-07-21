@@ -1,0 +1,30 @@
+#  XMPP4R - XMPP Library for Ruby
+#  Copyright (C) 2004 Lucas Nussbaum <lucas@lucas-nussbaum.net>
+#  Released under GPL v2 or later
+
+module Jabber
+  ##
+  # a callback class
+  class Callback
+
+    # The Callback's priority
+    attr_reader :priority
+
+    # The Callback's reference, using for deleting purposes
+    attr_reader :ref
+
+    # The Callback's block to execute 
+    attr_reader :block
+
+    ##
+    # Create a new callback
+    # priority:: [Integer] the callback's priority. The higher, the sooner it
+    #   will be executed
+    # ref:: [String] The callback's reference
+    def initialize(priority = 0, ref = nil, block = Proc::new {})
+      @priority = priority
+      @ref = ref
+      @block = block
+    end
+  end
+end
