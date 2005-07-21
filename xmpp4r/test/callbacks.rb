@@ -1,0 +1,72 @@
+#!/usr/bin/ruby
+
+$:.unshift '../lib'
+
+require 'test/unit'
+require 'socket'
+require 'xmpp4r/callbacklist'
+require 'xmpp4r/xmlelement'
+
+include Jabber
+
+module Jabber
+  DEBUG = false
+end
+
+class CallbacksTest < Test::Unit::TestCase
+  def test_test1
+    called = 0
+    cb = Callback::new(5, "toto", Proc::new { called += 1 })
+    assert_equal(5, cb.priority)
+    assert_equal("toto", cb.ref)
+    cb.block.call
+    assert_equal(1, called)
+    cb.block.call
+    assert_equal(2, called)
+  end
+
+  def test_callbacklist1
+    cbl = CallbackList::new
+    called1 = false
+    called2 = false
+    called3 = false
+    called4 = false
+    mycbhandler = Proc.new { called3 = true }
+    cbl.add(5, "ref1") { called1 = true }
+    cbl.add(7, "ref1") { |e| called2 = true ; e.consume }
+    cbl.add(9, "ref1", mycbhandler)
+    cbl.add(11, "ref1") { called4 = true }
+    xmlelement = XMLElement::new('message')
+    assert(cbl.process(xmlelement))
+    assert(!called1)
+    assert(called2)
+    assert(called3)
+    assert(called4)
+  end
+
+  def test_callbacklist2
+    cbl = CallbackList::new
+    assert(0, cbl.length)
+    cbl.add(5, "ref1") { called1 = true }
+    assert(1, cbl.length)
+    cbl.add(7, "ref2") { |e| called2 = true ; e.consume }
+    assert(2, cbl.length)
+    cbl.delete("ref2")
+    assert(1, cbl.length)
+    cbl.add(9, "ref3") { called3 = true }
+    assert(2, cbl.length)
+  end
+
+  def test_callbacklist3
+    cbl = CallbackList::new
+    assert_raise(NoBlockError) { cbl.add(2, "ref") }
+  end
+
+  def test_callbacklist4
+    cbl = CallbackList::new
+    cbl.add(5, "ref1") {  }
+    cbl.add(7, "ref1") {  }
+    xmlelement = XMLElement::new('message')
+    assert(!cbl.process(xmlelement))
+   end
+end
