@@ -36,7 +36,7 @@ module Jabber
       @StanzaQueue = []
       @StanzaQueueMutex = Mutex::new
       @threadBlocks = {}
-      @pollCounter = 10
+#      @pollCounter = 10
       @waitingThread = nil
       @wakeupThread = nil
     end
@@ -56,16 +56,16 @@ module Jabber
           exit
         end
       }
-      @pollThread = Thread.new do
-        begin
-        poll
-        rescue
-          puts "Exception caught in Poll thread, dumping backtrace and" +
-            " exiting...\n" + $!.exception + "\n"
-          puts $!.backtrace
-          exit
-        end
-      end
+#      @pollThread = Thread.new do
+#        begin
+#        poll
+#        rescue
+#          puts "Exception caught in Poll thread, dumping backtrace and" +
+#            " exiting...\n" + $!.exception + "\n"
+#          puts $!.backtrace
+#          exit
+#        end
+#      end
       @status = CONNECTED
     end
 
@@ -370,7 +370,7 @@ module Jabber
     # Closes the connection to the Jabber service
     def close
       @parserThread.kill if @parserThread
-      @pollThread.kill
+#      @pollThread.kill
       @fd.close if @fd
       @status = DISCONNECTED
     end

@@ -6,7 +6,7 @@ require 'test/unit'
 require 'socket'
 require 'tempfile'
 require 'io/wait'
-require 'xmpp4r/stream'
+require 'xmpp4r'
 include Jabber
 
 class StreamSendTest < Test::Unit::TestCase
