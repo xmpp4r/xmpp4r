@@ -46,6 +46,15 @@ module Jabber
     end
 
     ##
+    # Create a new Iq stanza with a query child
+    def Iq.new_query(type = nil, to = nil)
+      iq = Iq::new(type, to)
+      query = Element::new('query')
+      iq.add(query)
+      iq
+    end
+
+    ##
     # Create a new jabber:iq:auth set Stanza.
     def Iq.new_authset(jid, password)
       iq = Iq::new('set')
