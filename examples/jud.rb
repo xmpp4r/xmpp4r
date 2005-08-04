@@ -352,8 +352,8 @@ def registerandreply(jabconnection, iq, jid, ifields)
       end
     end
     # let's build the query
-    q1 = "INSERT INTO jud (jid"
-    q2 = ") VALUES ('" + Mysql::quote(jid.to_s) + "'"
+    q1 = "INSERT INTO jud (jid, update_jid, update_ts"
+    q2 = ") VALUES ('" + Mysql::quote(jid.to_s) + "', '" + Mysql::quote(iq.to.to_s) + "', NOW()"
     fields.each do |k, v|
       q1 += ", #{k}"
       q2 += ", '#{v}'"
