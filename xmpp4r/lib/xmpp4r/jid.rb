@@ -7,6 +7,8 @@ module Jabber
   # The JID class represents a Jabber Identifier as described by 
   # RFC3920 section 3.1.
   class JID
+    include Comparable
+
     attr_reader :node, :domain, :resource
 
     ##
@@ -60,6 +62,10 @@ module Jabber
     def strip!
       @resource = nil
       self
+    end
+
+    def <=>(o)
+      to_s <=> o.to_s
     end
   end
 end
