@@ -6,7 +6,7 @@
 $:.unshift '../lib'
 
 require 'optparse'
-require 'xmpp4r/client'
+require 'xmpp4r'
 include Jabber
 
 # settings
