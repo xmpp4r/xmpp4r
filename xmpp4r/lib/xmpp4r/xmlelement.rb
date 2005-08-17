@@ -19,6 +19,16 @@ module Jabber
     end
 
     ##
+    # import this element's childs and attributes
+    def import(xmlelement)
+      add_attributes(xmlelement.attributes)
+      xmlelement.each { |i| add_element(i) unless i.class == REXML::Text }
+      xmlelement.texts.each { |t| add_text(t) }
+      self
+    end
+
+
+    ##
     # Makes some changes to the structure of an XML element to help
     # it respect the specification. For example, in a message, we should
     # have <subject/> < <body/> < { rest of tags }

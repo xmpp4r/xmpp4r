@@ -10,15 +10,6 @@ module Jabber
   class XMLStanza < XMLElement
 
     ##
-    # import this stanzas' childs and attributes
-    def import(xmlstanza)
-      add_attributes(xmlstanza.attributes)
-      xmlstanza.each { |i| add_element(i) unless i.class == REXML::Text }
-      xmlstanza.texts.each { |t| add_text(t) }
-      self
-    end
-
-    ##
     # get the to attribute
     #
     # return:: [String] the element's to attribute
