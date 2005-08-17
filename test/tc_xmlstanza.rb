@@ -5,6 +5,7 @@ $:.unshift '../lib'
 require 'test/unit'
 require 'socket'
 require 'xmpp4r/xmlstanza'
+require 'xmpp4r/iq'
 include Jabber
 
 class XMLStanzaTest < Test::Unit::TestCase
@@ -43,5 +44,26 @@ class XMLStanzaTest < Test::Unit::TestCase
     assert_equal("blop", x.type)
     x.type = "tada"
     assert_equal("tada", x.type)
+  end
+
+  def test_import
+    x = XMLStanza::new("iq")
+    x.id = "heya"
+    q = x.add_element("query")
+    q.add_namespace("about:blank")
+    q.add_element("b").text = "I am b"
+    q.add_text("I am text")
+    q.add_element("a").add_attribute("href", "http://home.gna.org/xmpp4r/")
+    x.add_text("yow")
+    x.add_element("query")
+
+    x_s = x.to_s
+    iq = Iq.import(x)
+    iq_s = iq.to_s
+    
+    assert_equal(x.id, iq.id)
+    assert_equal(q, iq.query)
+    assert_equal(x_s, iq_s)
+    assert_equal(q.namespace, iq.queryns)
   end
 end

@@ -57,4 +57,17 @@ class JIDTest < Test::Unit::TestCase
     assert_equal('l@domain.fr/res',JID::new('l','domain.fr','res').to_s)
     assert_equal('domain.fr/res',JID::new(nil,'domain.fr','res').to_s)
   end
+
+  def test_equal
+    assert_equal(JID::new('domain.fr'), JID::new('domain.fr'))
+    assert_equal(JID::new('l@domain.fr'), JID::new('l@domain.fr'))
+    assert_equal(JID::new('l@domain.fr/res'), JID::new('l@domain.fr/res'))
+  end
+
+  def test_hash
+    h = {}
+    j = JID::new('l@domain.fr/res')
+    h[j] = 'a'
+    assert_equal(h[j], h[JID::new('l@domain.fr/res')])
+  end
 end
