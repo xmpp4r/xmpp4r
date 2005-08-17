@@ -64,6 +64,20 @@ module Jabber
       self
     end
 
+    ##
+    # Returns an hash value
+    def hash
+      return to_s.hash
+    end
+
+    ##
+    # compare to another JID
+    def eql?(o)
+      to_s.eql?(o.to_s)
+    end
+    
+    ##
+    # Compare two JIDs
     def <=>(o)
       to_s <=> o.to_s
     end
