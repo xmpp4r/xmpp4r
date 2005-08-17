@@ -14,7 +14,7 @@ module Jabber
     #
     # return:: [String] the element's to attribute
     def to
-      (a = attribute('to')).nil? ? a : a.value
+      (a = attribute('to')).nil? ? a : JID::new(a.value)
     end
 
     ##
@@ -22,7 +22,7 @@ module Jabber
     #
     # v:: [String] the value to set
     def to= (v)
-      add_attribute('to', v)
+      add_attribute('to', v.to_s)
     end
 
     ##
@@ -30,7 +30,7 @@ module Jabber
     #
     # v:: [String] the value to set
     def set_to(v)
-      add_attribute('to', v)
+      add_attribute('to', v.to_s)
       self
     end
 
@@ -39,7 +39,7 @@ module Jabber
     #
     # return:: [String] the element's from attribute
     def from
-      (a = attribute('from')).nil? ? a : a.value
+      (a = attribute('from')).nil? ? a : JID::new(a.value)
     end
 
     ##
@@ -47,7 +47,7 @@ module Jabber
     #
     # v:: [String] the value from set
     def from= (v)
-      add_attribute('from', v)
+      add_attribute('from', v.to_s)
     end
 
     ##
@@ -55,7 +55,7 @@ module Jabber
     #
     # v:: [String] the value from set
     def set_from(v)
-      add_attribute('from', v)
+      add_attribute('from', v.to_s)
       self
     end
 
