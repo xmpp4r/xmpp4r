@@ -14,18 +14,18 @@ class XMLStanzaTest < Test::Unit::TestCase
     x = XMLStanza::new("message")
     assert_equal(nil, x.from)
     assert_equal(x, x.set_from("blop"))
-    assert_equal("blop", x.from)
+    assert_equal("blop", x.from.to_s)
     x.from = "tada"
-    assert_equal("tada", x.from)
+    assert_equal("tada", x.from.to_s)
   end
 
   def test_to
     x = XMLStanza::new("message")
     assert_equal(nil, x.to)
     assert_equal(x, x.set_to("blop"))
-    assert_equal("blop", x.to)
+    assert_equal("blop", x.to.to_s)
     x.to = "tada"
-    assert_equal("tada", x.to)
+    assert_equal("tada", x.to.to_s)
   end
 
   def test_id
