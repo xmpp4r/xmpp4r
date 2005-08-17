@@ -5,6 +5,7 @@
 require 'rexml/document'
 require 'xmpp4r/xmlstanza'
 require 'xmpp4r/jid'
+require 'digest/sha1'
 include REXML
 
 module Jabber
@@ -62,6 +63,19 @@ module Jabber
       query.add_namespace('jabber:iq:auth')
       query.add(Element::new('username').add_text(jid.node))
       query.add(Element::new('password').add_text(password))
+      query.add(Element::new('resource').add_text(jid.resource)) if not jid.resource.nil?
+      iq.add(query)
+      iq
+    end
+
+    ##
+    # Create a new jabber:iq:auth set Stanza for Digest authentication
+    def Iq.new_authset_digest(jid, session_id, password)
+      iq = Iq::new('set')
+      query = Element::new('query')
+      query.add_namespace('jabber:iq:auth')
+      query.add(Element::new('username').add_text(jid.node))
+      query.add(Element::new('digest').add_text(Digest::SHA1.new(session_id + password).hexdigest))
       query.add(Element::new('resource').add_text(jid.resource)) if not jid.resource.nil?
       iq.add(query)
       iq

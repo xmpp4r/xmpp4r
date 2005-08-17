@@ -37,10 +37,18 @@ module Jabber
     ##
     # Send auth with given password and wait for result
     # password:: [String] the password
+    # digest:: [Boolean] use Digest authentication
     # return:: [Boolean] true if auth was successful
-    def auth(password)
+    def auth(password, digest=true)
+      authset = nil
+      if digest
+        authset = Iq::new_authset_digest(@jid, @streamid.to_s, password)
+      else
+	authset = Iq::new_authset(@jid, password)
+      end
+
       res = false
-      send(Iq::new_authset(@jid, password)) { |r|
+      send(authset) { |r|
         if r.kind_of?(Iq) and r.type == 'result'
           res = true
           r.consume

@@ -13,7 +13,7 @@ module Jabber
     # import this stanzas' childs and attributes
     def import(xmlstanza)
       add_attributes(xmlstanza.attributes)
-      xmlstanza.each { |i| add_element(i) }
+      xmlstanza.each { |i| add_element(i) unless i.class == REXML::Text }
       xmlstanza.texts.each { |t| add_text(t) }
       self
     end

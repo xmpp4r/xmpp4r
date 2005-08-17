@@ -39,6 +39,7 @@ module Jabber
 #      @pollCounter = 10
       @waitingThread = nil
       @wakeupThread = nil
+      @streamid = nil
     end
 
     ##
@@ -114,6 +115,9 @@ module Jabber
     def receive(element)
       Jabber::DEBUG && puts("RECEIVED:\n#{element.to_s}")
       case element.name
+      when 'stream'
+        stanza = element
+	@streamid = element.attribute("id").value
       when 'message'
         stanza = Message::import(element)
       when 'iq'
