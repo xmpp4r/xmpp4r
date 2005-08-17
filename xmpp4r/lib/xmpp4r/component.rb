@@ -33,7 +33,6 @@ module Jabber
       @jid = jid
       @server_address = server_address
       @server_port = server_port
-      @streamid = nil
     end
     
     ##
@@ -42,8 +41,7 @@ module Jabber
       super
       send("<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:component:accept' to='#{@jid}'>") { |e|
         if e.name == 'stream'
-          e.consume
-          @streamid = e.attribute('id').value
+	   e.consume
         end
       }
       self
