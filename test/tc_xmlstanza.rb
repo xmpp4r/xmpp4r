@@ -57,13 +57,11 @@ class XMLStanzaTest < Test::Unit::TestCase
     x.add_text("yow")
     x.add_element("query")
 
-    x_s = x.to_s
     iq = Iq.import(x)
-    iq_s = iq.to_s
     
     assert_equal(x.id, iq.id)
     assert_equal(q.to_s, iq.query.to_s)
-    assert_equal(x_s, iq_s)
+    assert_equal(x.to_s, iq.to_s)
     assert_equal(q.namespace, iq.queryns)
   end
 end
