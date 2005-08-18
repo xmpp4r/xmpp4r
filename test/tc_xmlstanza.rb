@@ -62,7 +62,7 @@ class XMLStanzaTest < Test::Unit::TestCase
     iq_s = iq.to_s
     
     assert_equal(x.id, iq.id)
-    assert_equal(q, iq.query)
+    assert_equal(q.to_s, iq.query.to_s)
     assert_equal(x_s, iq_s)
     assert_equal(q.namespace, iq.queryns)
   end
