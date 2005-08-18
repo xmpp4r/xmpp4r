@@ -22,10 +22,9 @@ module Jabber
   class Presence < XMLStanza
     ##
     # Create presence stanza
-    # ito:: [JID] Initial to attribute
-    # ishow:: [String] Initial Availability Status
-    # istatus:: [String] Initial status message
-    # ipriority:: [Fixnum] Initial priority value
+    # show:: [String] Initial Availability Status
+    # status:: [String] Initial status message
+    # priority:: [Fixnum] Initial priority value
     def initialize(show=nil, status=nil, priority=nil)
       super("presence")
       set_show(show)
