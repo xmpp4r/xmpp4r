@@ -26,12 +26,11 @@ module Jabber
     # ishow:: [String] Initial Availability Status
     # istatus:: [String] Initial status message
     # ipriority:: [Fixnum] Initial priority value
-    def initialize(ito=nil, ishow=nil, istatus=nil, ipriority=nil)
+    def initialize(show=nil, status=nil, priority=nil)
       super("presence")
-      set_to(ito) unless ito.nil?
-      set_show(ishow)
-      set_status(istatus)
-      set_priority(ipriority)
+      set_show(show)
+      set_status(status)
+      set_priority(priority)
     end
 
     ##
