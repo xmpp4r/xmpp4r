@@ -19,11 +19,20 @@ module Jabber
     end
 
     ##
-    # import this element's childs and attributes
+    # import this element's children and attributes
     def import(xmlelement)
-      add_attributes(xmlelement.attributes)
-      xmlelement.each { |i| add_element(i) unless i.class == REXML::Text }
-      xmlelement.texts.each { |t| add_text(t) }
+      if @name and @name != xmlelement.name
+        raise "Trying to import an #{xmlelement.name} to a #{@name} !"
+      end
+      add_attributes(xmlelement.attributes.clone)
+      @context = xmlelement.context
+      xmlelement.each do |e|
+        if e.kind_of? REXML::Element
+          add(e.deep_clone)
+        else
+          add(e.clone)
+        end
+      end
       self
     end
 
