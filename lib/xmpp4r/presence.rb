@@ -8,17 +8,6 @@ module Jabber
   ##
   # The presence class is used to construct presence messages to 
   # send to the Jabber service.
-  #
-  # Note that the 'type' attribute is valid for this stanza too and
-  # is handled by the XMLStanza class. Valid strings are:
-  # * error
-  # * probe
-  # * subscribe
-  # * subscribed
-  # * unavailable
-  # * unsubscribe
-  # * unsubscribed
-  # See RFC3921 - 2.2.1. for explanation.
   class Presence < XMLStanza
     ##
     # Create presence stanza
@@ -40,32 +29,95 @@ module Jabber
     end
 
     ##
+    # Get type of presence
+    #
+    # result:: [Symbol] or [Nil] Possible values are:
+    # * :error
+    # * :probe
+    # * :subscribe
+    # * :subscribed
+    # * :unavailable
+    # * :unsubscribe
+    # * :unsubscribed
+    # See RFC3921 - 2.2.1. for explanation.
+    def type
+      case super
+        when 'error' then :error
+        when 'probe' then :probe
+        when 'subscribe' then :subscribe
+        when 'subscribed' then :subscribed
+        when 'unavailable' then :unavailable
+        when 'unsubscribe' then :unsubscribe
+        when 'unsubscribed' then :unsubscribed
+        else nil
+      end
+    end
+
+    ##
+    # Set type of presence
+    # val:: [Symbol] See type for possible subscription types
+    def type=(val)
+      case val
+        when :error then super('error')
+        when :probe then super('probe')
+        when :subscribe then super('subscribe')
+        when :subscribed then super('subscribed')
+        when :unavailable then super('unavailable')
+        when :unsubscribe then super('unsubscribe')
+        when :unsubscribed then super('unsubscribed')
+        else super(nil)
+      end
+    end
+
+    ##
+    # Set type of presence (chaining-friendly)
+    def set_type(val)
+      self.type = val
+      self
+    end
+
+    ##
     # Get Availability Status (RFC3921 - 5.2)
+    # result:: [Symbol] or [Nil] Valid values according to RFC3921:
+    # * nil (Online, no <show/> element)
+    # * :away
+    # * :chat (Free for chat)
+    # * :dnd (Do not disturb)
+    # * :xa (Extended away)
     def show
-      each_element('show') { |show| return(show.text) }
-      nil
+      text = nil
+      each_element('show') { |show| text = show.text }
+      case text
+        when 'away' then :away
+        when 'chat' then :chat
+        when 'dnd' then :dnd
+        when 'xa' then :xa
+        else nil
+      end
     end
 
     ##
     # Set Availability Status
-    #
-    # Valid values according to RFC3921:
-    # * nil (Online, no <show/> element)
-    # * "away"
-    # * "chat" (Free for chat)
-    # * "dnd" (Do not disturb)
-    # * "xa" (Extended away)
+    # val:: [Symbol] or [Nil] See show for explanation
     def show=(val)
       xe = nil
       each_element('show') { |show| xe = show }
       if xe.nil?
         xe = add_element('show')
       end
-      
-      if val.nil?
+
+      case val
+        when :away then text = 'away'
+        when :chat then text = 'chat'
+        when :dnd then text = 'dnd'
+        when :xa then text = 'xa'
+        else text = nil
+      end
+
+      if text.nil?
         delete_element(xe)
       else
-        xe.text = val
+        xe.text = text
       end
     end
 
@@ -116,6 +168,8 @@ module Jabber
 
     ##
     # Set presence priority
+    # val:: [Integer] Priority value between -128 and +127
+    # (RFC3921 - 2.2.2.3.)
     def priority=(val)
       xe = nil
       each_element('priority') { |prio| xe = prio }
@@ -126,7 +180,7 @@ module Jabber
       if val.nil?
         delete_element(xe)
       else
-        xe.text = val
+        xe.text = val.to_s
       end
     end
 
