@@ -10,9 +10,9 @@ module Jabber
   #
   # You must do 'client.send(Iq.new_rosterget)' or else you will
   # have nothing to put in receive_iq()
-  class Roster < XMLElement
+  class RosterQuery < XMLElement
     ##
-    # Create a new Roster
+    # Create a new <query xmlns='jabber:iq:roster'/>
     # stream:: [Stream] Stream to handle
     def initialize
       super('query')
@@ -20,11 +20,11 @@ module Jabber
     end
 
     ##
-    # Create new Roster from XMLElement
+    # Create new RosterQuery from XMLElement
     # (mostly <iq><query>...</query></iq>)
     # item:: [XMLElement] iq.query to import
-    def Roster.import(query)
-      Roster::new.import(query)
+    def RosterQuery.import(query)
+      RosterQuery::new.import(query)
     end
 
     ##
@@ -33,7 +33,10 @@ module Jabber
     # Converts <item/> elements to RosterItem
     def add(element)
       if element.name == 'item'
-        super(RosterItem::import(element))
+        item = RosterItem::import(element)
+        # XPath injection here?
+        delete_element("item[@jid='#{item.jid}']")
+        super(item)
       else
         super(element)
       end
@@ -141,42 +144,60 @@ module Jabber
     ##
     # Set JID of roster item
     def jid=(val)
-      attributes['jid'] = val.to_s
+      attributes['jid'] = val.nil? ? nil : val.to_s
     end
 
     ##
     # Get subscription type of roster item
+    # result:: [Symbol] or [Nil] The following values are valid according to RFC3921:
+    # * :both
+    # * :from
+    # * :none
+    # * :remove
+    # * :to
     def subscription
-      attributes['subscription']
+      case attributes['subscription']
+        when 'both' then :both
+        when 'from' then :from
+        when 'none' then :none
+        when 'remove' then :remove
+        when 'to' then :to
+        else nil
+      end
     end
 
     ##
     # Set subscription type of roster item
-    #
-    # The following values are valid according to RFC3921 - 2.2.1.:
-    # * unavailable
-    # * subscribe
-    # * subscribed
-    # * unsubscribe
-    # * unsubscribed
-    # * probe
-    # * error
+    # val:: [Symbol] or [Nil] See subscription for possible Symbols
     def subscription=(val)
-      attributes['subscription'] = val
+      case val
+        when :both then attributes['subscription'] = 'both'
+        when :from then attributes['subscription'] = 'from'
+        when :none then attributes['subscription'] = 'none'
+        when :remove then attributes['subscription'] = 'remove'
+        when :to then attributes['subscription'] = 'to'
+        else attributes['subscription'] = nil
+      end
     end
 
     ##
     # Get if asking for subscription
-    # result:: [String] Mostly nil or 'subscribe'
+    # result:: [Symbol] nil or :subscribe
     def ask
-      attributes['ask']
+      case attributes['ask']
+        when 'subscribe' then :subscribe
+        else nil
+      end
     end
 
     ##
     # Set if asking for subscription
-    # val:: [String] Should be nil or 'subscribe'
+    # val:: [Symbol] nil or :subscribe
     def ask=(val)
-      attributes['ask'] = val
+      case val
+        when :subscribe then attributes['ask'] = 'subscribe'
+        else attributes['ask'] = nil
+      end
     end
 
     ##
