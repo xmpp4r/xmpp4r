@@ -10,6 +10,9 @@ module Jabber
   #
   # You must do 'client.send(Iq.new_rosterget)' or else you will
   # have nothing to put in receive_iq()
+  #
+  # You must require 'xmpp4r/rosterquery' to use this class
+  # as its functionality is not needed for a working XMPP implementation.
   class RosterQuery < XMLElement
     ##
     # Create a new <query xmlns='jabber:iq:roster'/>
@@ -33,14 +36,13 @@ module Jabber
     # Converts <item/> elements to RosterItem
     def add(element)
       if element.name == 'item'
-        item = RosterItem::import(element)
+        item = RosterItem::new.import(element)
         # XPath injection here?
         delete_element("item[@jid='#{item.jid}']")
         super(item)
       else
         super(element)
       end
-      element
     end
 
     ##
