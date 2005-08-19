@@ -3,7 +3,7 @@
 $:.unshift '../lib'
 
 require 'xmpp4r'
-require 'xmpp4r/roster'
+require 'xmpp4r/rosterquery'
 
 # Command line argument checking
 
@@ -24,7 +24,7 @@ cl.auth(ARGV[1]) or raise "Auth failed"
 
 # The roster instance
 
-roster = Jabber::Roster.new
+roster = Jabber::RosterQuery.new
 
 # <iq/> callback to feed the roster instance
 # and output the roster afterwards
