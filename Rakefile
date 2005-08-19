@@ -22,6 +22,7 @@ end
 
 task :doctoweb => [:rdoc] do |t|
    # copies the rdoc to the CVS repository for xmpp4r website
+	# repository is in $CVSDIR (default: ~/dev/xmpp4r-web)
    sh "./doctoweb.bash"
 end
 
