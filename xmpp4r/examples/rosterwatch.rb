@@ -14,6 +14,8 @@ end
 
 # Building up the connection
 
+#Jabber::DEBUG = true
+
 jid = Jabber::JID.new(ARGV[0])
 
 cl = Jabber::Client.new(jid, false)
@@ -43,7 +45,7 @@ cl.add_iq_callback { |iq|
 cl.add_presence_callback { |pres|
   item = roster[pres.from]
   unless item.nil?
-    puts "#{item.iname} (#{pres.from}) #{pres.show} (#{pres.priority.to_s}): #{pres.status.inspect}"
+    puts "#{item.iname} (#{pres.from}) #{pres.show} (#{pres.priority}): #{pres.status.inspect}"
   else
     # Probably only your other resources
     puts "Not in roster: #{pres.from} #{pres.show} (#{pres.priority.to_s}): #{pres.status.inspect}"

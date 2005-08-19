@@ -17,19 +17,25 @@ class PresenceTest < Test::Unit::TestCase
     assert_equal(nil, x.status)
     assert_equal(nil, x.priority)
 
-    x = Presence::new(JID::new("lucas@linux.ensimag.fr"), "away", "I am away", 23)
+    x = Presence::new(:away, "I am away", 23)
     assert_equal("presence", x.name)
-    assert_equal("lucas@linux.ensimag.fr", x.to.to_s)
-    assert_equal("away", x.show)
+    assert_equal(:away, x.show)
+    assert_equal("away", x.show.to_s)
     assert_equal("I am away", x.status)
     assert_equal(23, x.priority)
   end
 
   def test_show
     x = Presence::new()
-    assert_equal(nil, x.status)
+    assert_equal(nil, x.show)
     x.show = "a"
-    assert_equal("a", x.show)
+    assert_equal(nil, x.show)
+    x.show = :notaway
+    assert_equal(nil, x.show)
+    x.show = 'away'
+    assert_equal(nil, x.show)
+    x.show = :away
+    assert_equal(:away, x.show)
     x.each_element('show') { |e| assert(e.class == REXML::Element, "<show/> is not REXML::Element") }
     x.show = nil
     assert_equal(nil, x.show)
@@ -46,7 +52,7 @@ class PresenceTest < Test::Unit::TestCase
     x.each_element('status') { |e| assert(e.class == REXML::Element, "<status/> is not REXML::Element") }
     x.status = nil
     assert_equal(nil, x.status)
-    x.each_element('status') { |e| assert(true, "<status/> exists after 'show=nil'") }
+    x.each_element('status') { |e| assert(true, "<status/> exists after 'status=nil'") }
     x.status = nil
     assert_equal(nil, x.status)
   end
@@ -61,24 +67,28 @@ class PresenceTest < Test::Unit::TestCase
     assert_equal(5, x.priority)
     x.priority = nil
     assert_equal(nil, x.priority)
+    x.each_element('priority') { |e| assert(true, "<priority/> exists after 'priority=nil'") }
   end
 
   def test_type
     x = Presence::new()
     assert_equal(nil, x.type)
-    x.type = "delete"
-    assert_equal("delete", x.type)
+    x.type = :delete
+    assert_equal(nil, x.type)
     x.type = nil
     assert_equal(nil, x.type)
-    x.each_element('type') { |e| assert(true, "<type/> exists after 'show=nil'") }
     x.type = nil
     assert_equal(nil, x.type)
+    [:error, :probe, :subscribe, :subscribed, :unavailable, :unsubscribe, :unsubscribed].each { |type|
+      x.type = type
+      assert_equal(type, x.type)
+    }
   end
 
   def test_chaining
     x = Presence::new()
-    x.set_show("xa").set_status("Plundering the fridge.").set_priority(0)
-    assert_equal("xa", x.show)
+    x.set_show(:xa).set_status("Plundering the fridge.").set_priority(0)
+    assert_equal(:xa, x.show)
     assert_equal("Plundering the fridge.", x.status)
     assert_equal(0, x.priority)
   end
