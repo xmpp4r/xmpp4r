@@ -49,9 +49,9 @@ module Jabber
 
     ##
     # Add an element to the Iq stanza
-    # xmlelement:: [XMLElement] Element to add. <query/> elements will be converted to IqQuery
+    # xmlelement:: [REXML::Element] Element to add. <query/> elements will be converted to IqQuery
     def add(xmlelement)
-      if xmlelement.kind_of?(XMLElement) && (xmlelement.name == 'query')
+      if xmlelement.kind_of?(REXML::Element) && (xmlelement.name == 'query')
         super(IqQuery::import(xmlelement))
       else
         super(xmlelement)

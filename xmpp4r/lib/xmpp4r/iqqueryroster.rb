@@ -74,9 +74,9 @@ module Jabber
     # Update roster by <iq/> stanza
     # (to be fed by an iq_callback)
     # iq:: [Iq] Containing new roster
-    # filter:: [Boolean] If false import non-roster results too
+    # filter:: [Boolean] If false import non-roster-like results too
     def receive_iq(iq, filter=true)
-      if filter && ((iq.type != 'result') || (iq.queryns != 'jabber:iq:roster'))
+      if filter && (((iq.type != 'set') && (iq.type != 'result')) || (iq.queryns != 'jabber:iq:roster'))
         return
       end
 
@@ -113,7 +113,7 @@ module Jabber
     end
 
     ##
-    # Create new RosterItem from XMLElement
+    # Create new RosterItem from REXML::Element
     def RosterItem.import(item)
       RosterItem::new.import(item)
     end
