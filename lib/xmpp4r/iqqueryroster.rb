@@ -2,32 +2,26 @@
 #  Copyright (C) 2005 Stephan Maka <stephan@spaceboyz.net>
 #  Released under GPL v2 or later
 
+require 'xmpp4r/iqquery'
+
 module Jabber
   ##
   # Class for handling roster updates
-  #
-  # Supports reading only
   #
   # You must do 'client.send(Iq.new_rosterget)' or else you will
   # have nothing to put in receive_iq()
   #
   # You must require 'xmpp4r/rosterquery' to use this class
   # as its functionality is not needed for a working XMPP implementation.
-  class RosterQuery < XMLElement
+  # This will make [IqQuery] convert all Queries with namespace 'jabber:iq:roster'
+  # to [IqQueryRoster]
+  class IqQueryRoster < IqQuery
     ##
     # Create a new <query xmlns='jabber:iq:roster'/>
     # stream:: [Stream] Stream to handle
     def initialize
-      super('query')
+      super
       add_namespace('jabber:iq:roster')
-    end
-
-    ##
-    # Create new RosterQuery from XMLElement
-    # (mostly <iq><query>...</query></iq>)
-    # item:: [XMLElement] iq.query to import
-    def RosterQuery.import(query)
-      RosterQuery::new.import(query)
     end
 
     ##
@@ -35,7 +29,7 @@ module Jabber
     #
     # Converts <item/> elements to RosterItem
     def add(element)
-      if element.name == 'item'
+      if element.kind_of?(REXML::Element) && (element.name == 'item')
         item = RosterItem::new.import(element)
         # XPath injection here?
         delete_element("item[@jid='#{item.jid}']")
@@ -227,4 +221,6 @@ module Jabber
       }
     end
   end
+
+  IqQuery.add_namespace('jabber:iq:roster', IqQueryRoster)
 end

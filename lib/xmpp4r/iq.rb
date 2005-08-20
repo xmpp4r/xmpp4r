@@ -5,6 +5,7 @@
 require 'rexml/document'
 require 'xmpp4r/xmlstanza'
 require 'xmpp4r/jid'
+require 'xmpp4r/iqquery.rb'
 require 'digest/sha1'
 include REXML
 
@@ -44,6 +45,17 @@ module Jabber
     def Iq.import(xmlstanza)
       # TODO : clean up. The should be a better way.
       Iq::new.import(xmlstanza)
+    end
+
+    ##
+    # Add an element to the Iq stanza
+    # xmlelement:: [XMLElement] Element to add. <query/> elements will be converted to IqQuery
+    def add(xmlelement)
+      if xmlelement.kind_of?(XMLElement) && (xmlelement.name == 'query')
+        super(IqQuery::import(xmlelement))
+      else
+        super(xmlelement)
+      end
     end
 
     ##

@@ -169,6 +169,8 @@ module Jabber
     ##
     # Set presence priority
     # val:: [Integer] Priority value between -128 and +127
+    #
+    # *Warning:* negative values make you receive no subscription requests etc.
     # (RFC3921 - 2.2.2.3.)
     def priority=(val)
       xe = nil
