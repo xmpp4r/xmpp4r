@@ -1,6 +1,17 @@
-#  XMPP4R - XMPP Library for Ruby
-#  Copyright (C) 2004 Lucas Nussbaum <lucas@lucas-nussbaum.net>
-#  Released under GPL v2 or later
+#  XMPP4R - XMPP Library for Ruby Copyright (C) 2004 Lucas Nussbaum
+#  <lucas@lucas-nussbaum.net> Released under GPL v2 or later
+#
+# ---- =Callbacks management and priority
+#
+# Callbacks are managed by the class CallbackList. When they are added, a
+# priority (just a number or anything Comparable with other priorities) is
+# specified. The biggest the priority is, the earliest the callback will be
+# considered.
+#
+# Additionally, callbacks can "consume" elements. If a callback "consume" an
+# element, further Callbacks aren't considered. Rationale: some callbacks need
+# to be called only to "watch" elements (think of an "XML console" feature)
+# without blocking further callbacks from being considered.
 
 require 'xmpp4r/callback'
 
