@@ -42,6 +42,11 @@ class PresenceTest < Test::Unit::TestCase
     x.each_element('show') { |e| assert(true, "<show/> exists after 'show=nil'") }
     x.show = nil
     assert_equal(nil, x.show)
+
+    showelement = XMLElement.new('show')
+    showelement.text = 'chat'
+    x.add(showelement)
+    assert_equal(:chat, x.show)
   end
 
   def test_status

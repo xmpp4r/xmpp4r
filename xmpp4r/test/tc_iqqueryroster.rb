@@ -3,21 +3,31 @@
 $:.unshift '../lib'
 
 require 'test/unit'
-require 'xmpp4r'
-require 'xmpp4r/rosterquery'
+require 'xmpp4r/iqqueryroster'
+# Just the bare minimum:
+require 'xmpp4r/jid'
+require 'xmpp4r/iq'
 include Jabber
 
-class RosterQueryTest < Test::Unit::TestCase
+class IqQueryRosterTest < Test::Unit::TestCase
   def test_create
-    r = RosterQuery::new
+    r = IqQueryRoster::new
     assert_equal('jabber:iq:roster', r.namespace)
     assert_equal(r.to_a.size, 0)
     assert_equal(r.to_a, [])
     assert_equal(r.to_s, "<query xmlns='jabber:iq:roster'/>")
   end
 
+  def test_import
+    iq = Iq::new
+    q = XMLElement::new('query')
+    q.add_namespace('jabber:iq:roster')
+    iq.add(q)
+    assert_equal(IqQueryRoster, iq.query.class)
+  end
+
   def test_items
-    r = RosterQuery::new
+    r = IqQueryRoster::new
     r.add(RosterItem.new)
     r.add(RosterItem.new(JID.new('a@b/d'), 'ABC', :none, :subscribe)).groups = ['a']
     itemstr = "<item jid='astro@spaceboyz.net' name='Astro' subscribtion='both'>" \
@@ -46,7 +56,7 @@ class RosterQueryTest < Test::Unit::TestCase
   end
 
   def test_dupitems
-    r = RosterQuery::new
+    r = IqQueryRoster::new
     jid = JID::new('a@b')
     ri = RosterItem::new(jid, 'ab')
     r.add(ri)
