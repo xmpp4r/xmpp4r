@@ -25,7 +25,7 @@ class IqTest < Test::Unit::TestCase
     query = Element::new('query')
     query.add_namespace('jabber:iq:auth')
     x.add(query)
-    assert_equal(query, x.query)
+    assert_equal(query.to_s, x.query.to_s)
     assert_equal('jabber:iq:auth', x.queryns)
   end
 end

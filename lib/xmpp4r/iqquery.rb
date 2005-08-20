@@ -11,13 +11,17 @@ module Jabber
   class IqQuery < XMLElement
     @@namespace_classes = {}
 
+    ##
+    # Initialize a <query/> element
+    #
+    # Does nothing more than setting the element's name to 'query'
     def initialize
       super("query")
     end
 
     ##
     # Create a new iq from query
-    # xmlelement:: [XMLElement] to import, will be automatically converted if namespace appropriate
+    # xmlelement:: [REXML::Element] to import, will be automatically converted if namespace appropriate
     def IqQuery.import(xmlelement)
       if @@namespace_classes.has_key?(xmlelement.namespace)
         @@namespace_classes[xmlelement.namespace]::new.import(xmlelement)
@@ -27,7 +31,7 @@ module Jabber
     end
 
     ##
-    # Add a class by namespace for automatic IqQuery conversion (see Iq.Query.import)
+    # Add a class by namespace for automatic IqQuery conversion (see IqQuery.import)
     # ns:: [String] Namespace (e.g. 'jabber:iq:roster')
     # queryclass:: [IqQuery] Query class derived from IqQuery
     def IqQuery.add_namespace(ns, queryclass)
