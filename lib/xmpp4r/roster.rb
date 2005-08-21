@@ -11,9 +11,8 @@ module Jabber
   # A class to track Roster and Presence updates
   class Roster
     ##
-    # vCard pool
+    # [Hash] with [JID] keys and [IqVcard] values,
     # mostly filled by results to request_vcard()
-    # ::vcards [Hash] with [JID] keys and [IqVcard] values
     attr_reader :vcards
     
     ##

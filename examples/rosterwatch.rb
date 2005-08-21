@@ -49,7 +49,7 @@ cl.auth(ARGV[1]) or raise "Auth failed"
 
 
 # The roster instance
-roster = Jabber::Roster.new(cl, Jabber::Presence.new.set_show('dnd').set_status('Watching my roster change...'))
+roster = Jabber::Roster.new(cl, Jabber::Presence.new.set_show(:dnd).set_status('Watching my roster change...'))
 
 
 # What has changed in the roster?
