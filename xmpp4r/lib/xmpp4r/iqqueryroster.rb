@@ -210,13 +210,15 @@ module Jabber
     ##
     # Set groups the item belongs to,
     # deletes old groups first.
-    # ary:: [Array] New groups
+    #
+    # See JEP 0083 for nested groups
+    # ary:: [Array] New groups, duplicate values will be removed
     def groups=(ary)
       # Delete old group elements
       delete_element('group')
 
       # Add new group elements
-      ary.each { |group|
+      ary.uniq.each { |group|
         add_element('group').text = group
       }
     end

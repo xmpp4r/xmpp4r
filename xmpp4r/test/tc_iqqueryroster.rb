@@ -103,6 +103,12 @@ class RosterItemTest < Test::Unit::TestCase
     assert_equal(:subscribe, ri.ask)
     ri.ask = nil
     assert_equal(nil, ri.ask)
+  end
 
+  def test_dupgroups
+    ri = RosterItem::new
+    mygroups = ['a', 'a', 'b']
+    ri.groups = mygroups
+    assert_equal(mygroups.uniq, ri.groups)
   end
 end
