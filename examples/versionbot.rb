@@ -45,8 +45,8 @@ cl.add_iq_callback { |iq|
 }
 
 cl.add_presence_callback { |pres|
-  # Already fingerprinted?
-  unless versions.has_key?(pres.from)
+  # Already fingerprinted or offline?
+  unless versions.has_key?(pres.from) || (pres.type == :unavailable)
     # Construct a new query
     iq = Jabber::Iq.new('get', pres.from)
     # and ask for the version
