@@ -6,6 +6,7 @@ require 'rexml/document'
 require 'xmpp4r/xmlstanza'
 require 'xmpp4r/jid'
 require 'xmpp4r/iqquery.rb'
+require 'xmpp4r/iqvcard.rb'
 require 'digest/sha1'
 include REXML
 
@@ -34,9 +35,19 @@ module Jabber
 
     ##
     # Returns the iq's query's namespace, or nil
+    # result:: [IqQuery]
     def queryns 
       s = nil
       each_element('query') { |e| s = e.namespace if s.nil? }
+      s
+    end
+
+    ##
+    # Returns the iq's vcard child, or nil
+    # result:: [IqVcard]
+    def vcard 
+      s = nil
+      each_element('vCard') { |e| s = e if s.nil? }
       s
     end
 
@@ -53,6 +64,8 @@ module Jabber
     def add(xmlelement)
       if xmlelement.kind_of?(REXML::Element) && (xmlelement.name == 'query')
         super(IqQuery::import(xmlelement))
+      elsif xmlelement.kind_of?(REXML::Element) && (xmlelement.name == 'vCard') && (xmlelement.namespace == 'vcard-temp')
+        super(IqVcard::import(xmlelement))
       else
         super(xmlelement)
       end
@@ -62,7 +75,7 @@ module Jabber
     # Create a new Iq stanza with a query child
     def Iq.new_query(type = nil, to = nil)
       iq = Iq::new(type, to)
-      query = Element::new('query')
+      query = IqQuery::new
       iq.add(query)
       iq
     end
@@ -71,7 +84,7 @@ module Jabber
     # Create a new jabber:iq:auth set Stanza.
     def Iq.new_authset(jid, password)
       iq = Iq::new('set')
-      query = Element::new('query')
+      query = IqQuery::new
       query.add_namespace('jabber:iq:auth')
       query.add(Element::new('username').add_text(jid.node))
       query.add(Element::new('password').add_text(password))
@@ -84,7 +97,7 @@ module Jabber
     # Create a new jabber:iq:auth set Stanza for Digest authentication
     def Iq.new_authset_digest(jid, session_id, password)
       iq = Iq::new('set')
-      query = Element::new('query')
+      query = IqQuery::new
       query.add_namespace('jabber:iq:auth')
       query.add(Element::new('username').add_text(jid.node))
       query.add(Element::new('digest').add_text(Digest::SHA1.new(session_id + password).hexdigest))
@@ -95,9 +108,11 @@ module Jabber
 
     ##
     # Create a new jabber:iq:roster get Stanza.
+    #
+    # IqQueryRoster is unused here because possibly not require'd
     def Iq.new_rosterget
       iq = Iq::new('get')
-      query = Element::new('query')
+      query = IqQuery::new
       query.add_namespace('jabber:iq:roster')
       iq.add(query)
       iq
@@ -107,18 +122,28 @@ module Jabber
     # Create a new jabber:iq:roster get Stanza.
     def Iq.new_browseget
       iq = Iq::new('get')
-      query = Element::new('query')
+      query = IqQuery::new
       query.add_namespace('jabber:iq:browse')
       iq.add(query)
       iq
     end
+
     ##
     # Create a new jabber:iq:roster set Stanza.
     def Iq.new_rosterset
       iq = Iq::new('set')
-      query = Element::new('query')
+      query = IqQuery::new
       query.add_namespace('jabber:iq:roster')
       iq.add(query)
+      iq
+    end
+
+    ##
+    # Create a new Iq stanza with a vCard child
+    # type:: [String] or "get" if omitted
+    def Iq.new_vcard(type = 'get', to = nil)
+      iq = Iq::new(type, to)
+      iq.add(IqVcard::new)
       iq
     end
   end
