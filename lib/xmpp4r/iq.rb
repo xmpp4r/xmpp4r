@@ -27,6 +27,7 @@ module Jabber
 
     ##
     # Returns the iq's query child, or nil
+    # result:: [IqQuery]
     def query 
       s = nil
       each_element('query') { |e| s = e if s.nil? }
@@ -35,7 +36,7 @@ module Jabber
 
     ##
     # Returns the iq's query's namespace, or nil
-    # result:: [IqQuery]
+    # result:: [String]
     def queryns 
       s = nil
       each_element('query') { |e| s = e.namespace if s.nil? }
@@ -43,7 +44,7 @@ module Jabber
     end
 
     ##
-    # Returns the iq's vcard child, or nil
+    # Returns the iq's <vCard/> child, or nil
     # result:: [IqVcard]
     def vcard 
       s = nil
