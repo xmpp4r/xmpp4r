@@ -11,9 +11,16 @@ module Jabber
   class IqVcard < XMLElement
     ##
     # Initialize a <vCard/> element
-    def initialize
+    # fields:: [Hash] Initialize with keys as XPath element names and values for element texts
+    def initialize(fields=nil)
       super("vCard")
       add_namespace('vcard-temp')
+
+      unless fields.nil?
+        fields.each { |name,value|
+          self[name] = value
+        }
+      end
     end
 
     ##
@@ -23,15 +30,58 @@ module Jabber
     end
 
     ##
-    # Get an element
+    # Get an elements/fields text
     #
     # vCards have too much possible children, so ask for them here
     # and extract the result with iqvcard.element('...').text
     # name:: [String] XPath
-    def element(name)
-      e = nil
-      each_element(name) { |child| e = child }
-      e
+    def [](name)
+      text = nil
+      each_element(name) { |child| text = child.text }
+      text
+    end
+
+    ##
+    # Set an elements/fields text
+    # name:: [String] XPath
+    # text:: [String] Value
+    def []=(name, text)
+      xe = self
+      name.split(/\//).each do |elementname|
+        # Does the children already exist?
+        newxe = nil
+        xe.each_element(elementname) { |child| newxe = child }
+
+        if newxe.nil?
+          # Create a new
+          xe = xe.add_element(elementname)
+        else
+          # Or take existing
+          xe = newxe
+        end
+      end
+      xe.text = text
+    end
+
+    ##
+    # Get vCard field names
+    #
+    # Recursed two levels at maximum
+    # result:: [Array] of [String]
+    def fields
+      names = []
+      each_element { |e|
+        if e.text.to_s.chomp != ''
+          names.push(e.name)
+        end
+
+        if e.kind_of?(REXML::Element)
+          e.each_element { |child|
+            names.push("#{e.name}/#{child.name}")
+          }
+        end
+      }
+      names.uniq
     end
   end
 end
