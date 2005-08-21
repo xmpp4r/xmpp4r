@@ -105,6 +105,16 @@ class RosterItemTest < Test::Unit::TestCase
     assert_equal(nil, ri.ask)
   end
 
+  def test_groupdeletion
+    ri = RosterItem::new
+    g1 = ['a', 'b', 'c']
+    ri.groups = g1
+    assert_equal(g1, ri.groups.sort)
+    g2 = ['c', 'd', 'e']
+    ri.groups = g2
+    assert_equal(g2, ri.groups.sort)
+  end
+
   def test_dupgroups
     ri = RosterItem::new
     mygroups = ['a', 'a', 'b']

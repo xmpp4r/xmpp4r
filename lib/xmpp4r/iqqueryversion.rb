@@ -39,7 +39,7 @@ module Jabber
     # The element won't be deleted if text is nil as
     # it must occur in a version query
     def iname=(text)
-      delete_element('name')
+      delete_elements('name')
       add_element('name').text = (text.nil? ? '' : text)
     end
 
@@ -62,7 +62,7 @@ module Jabber
     # The element won't be deleted if text is nil as
     # it must occur in a version query
     def version=(text)
-      delete_element('version')
+      delete_elements('version')
       add_element('version').text = text.nil? ? '' : text
     end
 
@@ -82,7 +82,7 @@ module Jabber
     ##
     # Set the os of the software
     def os=(text)
-      delete_element('os')
+      delete_elements('os')
       add_element('os').text = text unless text.nil?
     end
 

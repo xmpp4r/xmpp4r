@@ -36,6 +36,13 @@ module Jabber
       self
     end
 
+    ##
+    # Deletes one or more children elements,
+    # not just one like REXML::Element#delete_element
+    def delete_elements(element)
+      while(delete_element(element)) do end
+    end
+
 
     ##
     # Makes some changes to the structure of an XML element to help
