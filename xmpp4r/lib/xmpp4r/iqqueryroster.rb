@@ -215,7 +215,7 @@ module Jabber
     # ary:: [Array] New groups, duplicate values will be removed
     def groups=(ary)
       # Delete old group elements
-      delete_element('group')
+      delete_elements('group')
 
       # Add new group elements
       ary.uniq.each { |group|

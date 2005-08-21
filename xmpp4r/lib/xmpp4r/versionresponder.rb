@@ -48,13 +48,6 @@ module Jabber
           answer.type = 'result'
           answer.query.set_iname(@name).set_version(@version).set_os(@os)
 
-          p iq.query.class
-          p iq.query.to_s
-          iq.query.each_element('name') { |n| p n.to_s }
-          p answer.query.class
-          p answer.query.to_s
-          answer.query.each_element('name') { |n| p n.to_s }
-
           @stream.send(answer)
 
           iq.consume

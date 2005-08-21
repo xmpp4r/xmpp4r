@@ -35,6 +35,15 @@ module Jabber
     end
 
     ##
+    # Delete old elements named newquery.name
+    #
+    # newquery:: [XMLElement] will be added
+    def query=(newquery)
+      delete_elements(newquery.name)
+      add(newquery)
+    end
+
+    ##
     # Returns the iq's query's namespace, or nil
     # result:: [String]
     def queryns 
