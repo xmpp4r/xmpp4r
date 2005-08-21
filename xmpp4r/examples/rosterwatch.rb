@@ -84,13 +84,13 @@ roster.add_vcard_callback { |iq|
   # Do we have that in the roster?
   item = roster[iq.from.strip]
   if item
-    if iq.vcard.element('NICKNAME')
+    if iq.vcard['NICKNAME']
       # Let's take the <NICKNAME/>
-      item.iname = iq.vcard.element('NICKNAME').text
+      item.iname = iq.vcard['NICKNAME']
       puts("NICKNAME = #{item.iname.inspect}")
-    elsif iq.vcard.element('FN')
+    elsif iq.vcard['FN']
       # Let's take the <FN/>
-      item.iname = iq.vcard.element('FN').text
+      item.iname = iq.vcard['FN']
       puts("FN = #{item.iname.inspect}")
     else
       # Somebody was lazy here
