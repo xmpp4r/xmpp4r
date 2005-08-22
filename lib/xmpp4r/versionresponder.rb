@@ -43,14 +43,13 @@ module Jabber
     def iq_callback(iq)
       if iq.type == 'get'
         if iq.query.kind_of?(IqQueryVersion)
-          answer = Iq::import(iq)
-          answer.from, answer.to = iq.to, iq.from
-          answer.type = 'result'
-          answer.query.set_iname(@name).set_version(@version).set_os(@os)
-
-          @stream.send(answer)
-
           iq.consume
+
+          iq.from, iq.to = iq.to, iq.from
+          iq.type = 'result'
+          iq.query.set_iname(@name).set_version(@version).set_os(@os)
+
+          @stream.send(iq)
         end
       end
     end
