@@ -101,6 +101,15 @@ module Jabber
     end
 
     ##
+    # Iterate through all known RosterItems
+    # &block:: Will be yielded with one [RosterItem] at once
+    def each(&block)
+      @rosterquery.each_element('item') { |item|
+        yield(item)
+      }
+    end
+
+    ##
     # Get the known resources of a given JID
     # jid:: [JID]
     # result:: [Array] of [JID]
