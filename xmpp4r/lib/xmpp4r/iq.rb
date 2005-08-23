@@ -26,6 +26,46 @@ module Jabber
     end
 
     ##
+    # Get the type of the Iq stanza
+    #
+    # The following values are allowed:
+    # * :get
+    # * :set
+    # * :result
+    # * :error
+    # result:: [Symbol] or nil
+    def type
+      case attributes['type']
+        when 'get' then :get
+        when 'set' then :set
+        when 'result' then :result
+        when 'error' then :error
+        else nil
+      end
+    end
+
+    ##
+    # Set the type of the Iq stanza (see type)
+    # v:: [Symbol] or nil
+    def type=(v)
+      case v
+        when :get then attributes['type'] = 'get'
+        when :set then attributes['type'] = 'set'
+        when :result then attributes['type'] = 'result'
+        when :error then attributes['type'] = 'error'
+        else attributes['type'] = nil
+      end
+    end
+
+    ##
+    # Set the type of the Iq stanza (chaining-friendly)
+    # v:: [Symbol] or nil
+    def set_type(v)
+      self.type = v
+      self
+    end
+
+    ##
     # Returns the iq's query child, or nil
     # result:: [IqQuery]
     def query 
@@ -93,7 +133,7 @@ module Jabber
     ##
     # Create a new jabber:iq:auth set Stanza.
     def Iq.new_authset(jid, password)
-      iq = Iq::new('set')
+      iq = Iq::new(:set)
       query = IqQuery::new
       query.add_namespace('jabber:iq:auth')
       query.add(Element::new('username').add_text(jid.node))
@@ -106,7 +146,7 @@ module Jabber
     ##
     # Create a new jabber:iq:auth set Stanza for Digest authentication
     def Iq.new_authset_digest(jid, session_id, password)
-      iq = Iq::new('set')
+      iq = Iq::new(:set)
       query = IqQuery::new
       query.add_namespace('jabber:iq:auth')
       query.add(Element::new('username').add_text(jid.node))
@@ -121,7 +161,7 @@ module Jabber
     #
     # IqQueryRoster is unused here because possibly not require'd
     def Iq.new_rosterget
-      iq = Iq::new('get')
+      iq = Iq::new(:get)
       query = IqQuery::new
       query.add_namespace('jabber:iq:roster')
       iq.add(query)
@@ -131,7 +171,7 @@ module Jabber
     ##
     # Create a new jabber:iq:roster get Stanza.
     def Iq.new_browseget
-      iq = Iq::new('get')
+      iq = Iq::new(:get)
       query = IqQuery::new
       query.add_namespace('jabber:iq:browse')
       iq.add(query)
@@ -141,7 +181,7 @@ module Jabber
     ##
     # Create a new jabber:iq:roster set Stanza.
     def Iq.new_rosterset
-      iq = Iq::new('set')
+      iq = Iq::new(:set)
       query = IqQuery::new
       query.add_namespace('jabber:iq:roster')
       iq.add(query)
@@ -151,7 +191,7 @@ module Jabber
     ##
     # Create a new Iq stanza with a vCard child
     # type:: [String] or "get" if omitted
-    def Iq.new_vcard(type = 'get', to = nil)
+    def Iq.new_vcard(type = :get, to = nil)
       iq = Iq::new(type, to)
       iq.add(IqVcard::new)
       iq

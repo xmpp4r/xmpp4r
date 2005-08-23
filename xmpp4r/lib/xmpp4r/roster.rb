@@ -52,7 +52,7 @@ module Jabber
     # <iq/> callback handler
     # (registered by constructor and used internally only)
     def iq_callback(iq)
-      if (iq.type == 'result') || (iq.type == 'set')
+      if (iq.type == :result) || (iq.type == :set)
         if iq.query.kind_of?(IqQueryRoster)
           # Add all items seperately so we can call the rosteritem_callback
           iq.query.each { |item|
@@ -126,7 +126,7 @@ module Jabber
     # jid:: [JID] of desired vCard
     #   (resource stripping recommended, omit if requesting user's own vCard)
     def request_vcard(jid=nil)
-      @stream.send(Iq::new_vcard('get', jid))
+      @stream.send(Iq::new_vcard(:get, jid))
     end
 
     ##

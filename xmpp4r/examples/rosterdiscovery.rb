@@ -53,7 +53,7 @@ cl.add_iq_callback { |iq|
 
     # Prepare the <iq/> stanza for result
     iq.from, iq.to = iq.to, iq.from
-    iq.type = 'result'
+    iq.type = :result
 
 
     if iq.query.kind_of?(Jabber::IqQueryDiscoInfo)

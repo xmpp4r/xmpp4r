@@ -27,7 +27,7 @@ clto.auth(pwto) or raise "Auth failed"
 clfrom.send(Iq::new_rosterget)
 exit = false
 clfrom.add_iq_callback { |i|
-  if i.type == 'result' and i.queryns == 'jabber:iq:roster'
+  if i.type == :result and i.queryns == 'jabber:iq:roster'
     i.query.each_element do |e|
       e.text = ''
       jid = e.attribute('jid')
@@ -47,23 +47,23 @@ clfrom.add_iq_callback { |i|
       when 'from'
         # il veut me voir, je veux pas le voir.
         # envoi unsubscribed
-        clfrom.send(Presence::new.set_to(jid).set_type('unsubscribed'))
+        clfrom.send(Presence::new.set_to(jid).set_type(:unsubscribed))
         # envoi message d'info OLD & NEW
-        clfrom.send(Message::new(jid, BOTHOLD).set_type('chat'))
-        clto.send(Message::new(jid, BOTHNEW).set_type('chat'))
+        clfrom.send(Message::new(jid, BOTHOLD).set_type(:chat))
+        clto.send(Message::new(jid, BOTHNEW).set_type(:chat))
       when 'to'
         # je veux le voir, il veut pas me voir
         # envoi unsubscribe
-        clfrom.send(Presence::new.set_to(jid).set_type('unsubscribe'))
+        clfrom.send(Presence::new.set_to(jid).set_type(:unsubscribe))
         # envoi subscribe avec message
-        pres = Presence::new.set_to(jid).set_type('subscribe')
+        pres = Presence::new.set_to(jid).set_type(:subscribe)
         pres.add(Element::new('status').add_text("Hi, I was previously subscribed to your presence with my JID #{jidfrom.strip}. Can I re-subscribe to your presence ? Thank you."))
         clto.send(pres)
       when 'both'
         # envoi unsubscribed
-        clfrom.send(Presence::new.set_to(jid).set_type('unsubscribed'))
+        clfrom.send(Presence::new.set_to(jid).set_type(:unsubscribed))
         # envoi unsubscribe
-        clfrom.send(Presence::new.set_to(jid).set_type('unsubscribe'))
+        clfrom.send(Presence::new.set_to(jid).set_type(:unsubscribe))
         # update roster
         iq = Iq::new_rosterset
         e.delete_attribute('ask')
@@ -71,11 +71,11 @@ clfrom.add_iq_callback { |i|
         iq.query.add_element(e)
         clto.send(iq)
         # envoi message d'info OLD & NEW
-        clfrom.send(Message::new(jid, BOTHOLD).set_type('chat'))
-        pres = Presence::new.set_to(jid).set_type('subscribe')
+        clfrom.send(Message::new(jid, BOTHOLD).set_type(:chat))
+        pres = Presence::new.set_to(jid).set_type(:subscribe)
         pres.add(Element::new('status').add_text("Hi, I was previously subscribed to your presence with my JID #{jidfrom.strip}. Can I re-subscribe to your presence ? Thank you."))
         clto.send(pres)
-        clto.send(Message::new(jid, BOTHNEW).set_type('chat'))
+        clto.send(Message::new(jid, BOTHNEW).set_type(:chat))
       end
     end
   end

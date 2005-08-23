@@ -34,7 +34,7 @@ cl.auth(password) or raise "Auth failed"
 cl.send(Iq::new_rosterget)
 exit = false
 cl.add_iq_callback { |i|
-  if i.type == 'result' and i.queryns == 'jabber:iq:roster'
+  if i.type == :result and i.queryns == 'jabber:iq:roster'
     i.query.each_element { |e|
       e.text = ''
       puts e.to_s
