@@ -52,6 +52,7 @@ cl.add_presence_callback { |pres|
     # and ask for the version
     iq.query = Jabber::IqQueryVersion.new
     puts "Asking #{iq.to} for his/her/its version"
+    versions[pres.from] = :asking
     cl.send(iq)
   end
 }
