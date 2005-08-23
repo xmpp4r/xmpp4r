@@ -76,7 +76,7 @@ module Jabber
     # iq:: [Iq] Containing new roster
     # filter:: [Boolean] If false import non-roster-like results too
     def receive_iq(iq, filter=true)
-      if filter && (((iq.type != 'set') && (iq.type != 'result')) || (iq.queryns != 'jabber:iq:roster'))
+      if filter && (((iq.type != :set) && (iq.type != :result)) || (iq.queryns != 'jabber:iq:roster'))
         return
       end
 

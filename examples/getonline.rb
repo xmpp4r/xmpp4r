@@ -34,7 +34,7 @@ exit = false
 nb = 0
 cl.add_iq_callback { |i|
   fjid = JID::new(i.from)
-  if i.type == 'result' and fjid.resource == "admin"
+  if i.type == :result and fjid.resource == "admin"
     domain = fjid.domain
     items = nil
     i.each_element('item') { |e| items = e }

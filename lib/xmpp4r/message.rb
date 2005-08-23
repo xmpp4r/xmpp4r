@@ -22,6 +22,49 @@ module Jabber
     end
 
     ##
+    # Get the type of the Message stanza
+    #
+    # The following Symbols are allowed:
+    # * :chat
+    # * :error
+    # * :groupchat
+    # * :headline
+    # * :normal
+    # result:: [Symbol] or nil
+    def type
+      case attributes['type']
+        when 'chat' then :chat
+        when 'error' then :error
+        when 'groupchat' then :groupchat
+        when 'headline' then :headline
+        when 'normal' then :normal
+        else nil
+      end
+    end
+
+    ##
+    # Set the type of the Message stanza (see type)
+    # v:: [Symbol] or nil
+    def type=(v)
+      case v
+        when :chat then attributes['type'] = 'chat'
+        when :error then attributes['type'] = 'error'
+        when :groupchat then attributes['type'] = 'groupchat'
+        when :headline then attributes['type'] = 'headline'
+        when :normal then attributes['type'] = 'normal'
+        else attributes['type'] = nil
+      end
+    end
+
+    ##
+    # Set the type of the Message stanza (chaining-friendly)
+    # v:: [Symbol] or nil
+    def set_type(v)
+      self.type = v
+      self
+    end
+
+    ##
     # Returns the message's body, or nil
     def body
       s = nil
@@ -88,6 +131,31 @@ module Jabber
     def subject
       s = nil
       each_element('subject') { |e| s = e.text if s.nil? }
+      s
+    end
+
+    ##
+    # sets the message's thread
+    # s:: [String] thread to set
+    def thread=(s)
+      delete_elements('thread')
+      add_element('thread').text = s unless s.nil?
+    end
+
+    ##
+    # gets the message's thread (chaining-friendly)
+    # Please note that this are not [Thread] but a [String]-Identifier to track conversations
+    # s:: [String] thread to set
+    def set_thread(s)
+      self.thread = s
+      self
+    end
+
+    ##
+    # Returns the message's thread, or nil
+    def thread
+      s = nil
+      each_element('thread') { |e| s = e.text if s.nil? }
       s
     end
   end

@@ -12,7 +12,7 @@ include Jabber
 # jabber:iq:browse handling
 def sendbrowsereply(conn, from, id)
   puts "Sending jabber:iq:browse reply to #{from}"
-  i = Iq::new_query('result', from)
+  i = Iq::new_query(:result, from)
   i.from = JUDNAME
   i.id = id
   i.query.add_namespace('jabber:iq:browse')
@@ -28,7 +28,7 @@ end
 # Disco handling
 def senddiscoreplyinfo(conn, from, id)
   puts "Sending disco#info reply to #{from}"
-  i = Iq::new_query('result', from)
+  i = Iq::new_query(:result, from)
   i.from = JUDNAME
   i.id = id
   i.query.add_namespace('http://jabber.org/protocol/disco#info')
@@ -43,7 +43,7 @@ end
 
 def senddiscoreplyitems(conn, from, id)
   puts "Sending disco#items reply to #{from}"
-  i = Iq::new_query('error', from)
+  i = Iq::new_query(:error, from)
   i.from = JUDNAME
   i.id = id
   i.query.add_namespace('http://jabber.org/protocol/disco#info')
@@ -57,10 +57,10 @@ end
 
 # jabber:iq:search
 def handlesearch(conn, iq)
-  if iq.type == 'get'
+  if iq.type == :get
     puts "Sending jabber:iq:search type=get reply to #{iq.from}"
     # return search fields
-    i = Iq::new_query('result', iq.from)
+    i = Iq::new_query(:result, iq.from)
     i.from = JUDNAME
     i.id = iq.id
     i.query.add_namespace('jabber:iq:search')
@@ -102,7 +102,7 @@ def handlesearch(conn, iq)
     x.add(e)
     i.query.add(x)
     conn.send(i)
-  elsif iq.type == 'set'
+  elsif iq.type == :set
     puts "Got a jabber:iq:search query from #{iq.from}"
     fields = {}
     x = nil
@@ -131,7 +131,7 @@ def handlesearch(conn, iq)
       end
     end
     # fields is set. Let's build the query.
-    i = Iq::new('result', iq.from)
+    i = Iq::new(:result, iq.from)
     i.from = JUDNAME
     i.id = iq.id
     queryandreply(conn, i, fields, type)
@@ -141,10 +141,10 @@ end
 
 # jabber:iq:register
 def handleregister(conn, iq)
-  if iq.type == 'get'
+  if iq.type == :get
     puts "Sending jabber:iq:register type=get reply to #{iq.from}"
     # return search fields
-    i = Iq::new_query('result', iq.from)
+    i = Iq::new_query(:result, iq.from)
     i.from = JUDNAME
     i.id = iq.id
     i.query.add_namespace('jabber:iq:register')
@@ -186,7 +186,7 @@ def handleregister(conn, iq)
     x.add(e)
     i.query.add(x)
     conn.send(i)
-  elsif iq.type == 'set'
+  elsif iq.type == :set
    puts "Got a jabber:iq:register query from #{iq.from}"
     fields = {}
     x = nil
@@ -213,7 +213,7 @@ def handleregister(conn, iq)
       end
     end
     # fields is set. Let's build the query.
-    i = Iq::new('result', iq.from)
+    i = Iq::new(:result, iq.from)
     i.from = JUDNAME
     i.id = iq.id
     registerandreply(conn, i, JID::new(iq.from).strip, fields)
@@ -313,7 +313,7 @@ def queryandreply(jabconnection, iq, fields, type)
     na = XMLElement::new('internal-server-error')
     na.add_namespace('urn:ietf:params:xml:ns:xmpp-stanzas')
     e.add(na)
-    iq2 = Iq::new('error', iq.to)
+    iq2 = Iq::new(:error, iq.to)
     iq2.from = JUDNAME
     iq2.id = iq.id
     iq2.add(e)
@@ -373,7 +373,7 @@ def registerandreply(jabconnection, iq, jid, ifields)
     na = XMLElement::new('internal-server-error')
     na.add_namespace('urn:ietf:params:xml:ns:xmpp-stanzas')
     e.add(na)
-    iq.type = 'error'
+    iq.type = :error
     iq.add(e)
     jabconnection.send(iq)
   ensure
@@ -386,7 +386,7 @@ c = Component::new(JUDNAME, ROUTERHOST, ROUTERPORT)
 c.connect
 # register the callback for Iq requests
 c.add_iq_callback do |i|
-  if i.type == 'get'
+  if i.type == :get
     case i.queryns
       when 'jabber:iq:browse'
         sendbrowsereply(c, i.from, i.id)
@@ -401,7 +401,7 @@ c.add_iq_callback do |i|
       else
         puts "Unhandled get NS: #{i.queryns}"
     end
-  elsif i.type == 'set'
+  elsif i.type == :set
     case i.queryns
       when 'http://jabber.org/protocol/disco#info'
         senddiscoreplyinfo(c, i.from, i.id)

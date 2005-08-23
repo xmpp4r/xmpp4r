@@ -21,7 +21,7 @@ class IqTest < Test::Unit::TestCase
   end
 
   def test_query
-    x = Iq::new('set')
+    x = Iq::new(:set)
     query = Element::new('query')
     query.add_namespace('jabber:iq:auth')
     x.add(query)

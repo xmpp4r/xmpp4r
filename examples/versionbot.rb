@@ -33,7 +33,7 @@ Jabber::VersionResponder.new(cl, 'xmpp4r Versionbot example', 'SVN', IO.popen('u
 
 cl.add_iq_callback { |iq|
   # Filter for version query results
-  if (iq.type == 'result') && iq.query.kind_of?(Jabber::IqQueryVersion)
+  if (iq.type == :result) && iq.query.kind_of?(Jabber::IqQueryVersion)
     puts "Version query result from #{iq.from}"
     # Keep track of results per JID
     versions[iq.from] = iq.query
@@ -48,7 +48,7 @@ cl.add_presence_callback { |pres|
   # Already fingerprinted or offline?
   unless versions.has_key?(pres.from) || (pres.type == :unavailable)
     # Construct a new query
-    iq = Jabber::Iq.new('get', pres.from)
+    iq = Jabber::Iq.new(:get, pres.from)
     # and ask for the version
     iq.query = Jabber::IqQueryVersion.new
     puts "Asking #{iq.to} for his/her/its version"

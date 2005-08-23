@@ -42,7 +42,7 @@ roster = Jabber::RosterQuery.new
 presences = {}
 
 cl.add_iq_callback { |iq|
-  if (iq.type == 'result') && iq.query.kind_of?(Jabber::RosterQuery)
+  if (iq.type == :result) && iq.query.kind_of?(Jabber::RosterQuery)
     roster.import(iq.query)
     write_state(ARGV[2], roster, presences)
   end
@@ -58,7 +58,7 @@ cl.add_presence_callback { |pres|
     cl.send(Jabber::Presence.new.set_to(pres.from).set_type(:subscribe))
     # Add to roster
     # TODO: Resolve Nickname from vCard
-    roster_set_iq = Jabber::Iq.new('set')
+    roster_set_iq = Jabber::Iq.new(:set)
     roster_set_iq.add(Jabber::RosterQuery.new).add(Jabber::RosterItem.new(pres.from.strip))
     cl.send(roster_set_iq)
   end

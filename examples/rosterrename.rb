@@ -23,7 +23,7 @@ cl.connect
 cl.auth(ARGV[1]) or raise "Auth failed"
 
 # The iq stanza
-iq = Jabber::Iq::new('set')
+iq = Jabber::Iq::new(:set)
 # The new roster instance and item element
 iq.add(Jabber::RosterQuery.new).add(Jabber::RosterItem.new(ARGV[2], ARGV[3])).groups = ARGV[4..ARGV.size]
 

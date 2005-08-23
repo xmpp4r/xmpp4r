@@ -49,10 +49,10 @@ module Jabber
 
       res = false
       send(authset) { |r|
-        if r.kind_of?(Iq) and r.type == 'result'
+        if r.kind_of?(Iq) and r.type == :result
           res = true
           r.consume
-        elsif r.kind_of?(Iq) and r.type == 'error'
+        elsif r.kind_of?(Iq) and r.type == :error
           res = false
           r.consume
         end
