@@ -19,6 +19,8 @@
 
 $:.unshift '../lib'
 
+require 'thread'
+
 require 'xmpp4r'
 require 'xmpp4r/roster'
 require 'xmpp4r/iqquerydiscoinfo'
@@ -37,7 +39,7 @@ end
 
 jid = Jabber::JID.new(ARGV[0])
 
-cl = Jabber::Client.new(jid, false)
+cl = Jabber::Client.new(jid)
 cl.connect
 cl.auth(ARGV[1]) or raise "Auth failed"
 
@@ -91,6 +93,12 @@ cl.add_iq_callback { |iq|
           iq.query.add(Jabber::DiscoItem.new(cl.jid, group, group))
         }
 
+        # Collect all ungrouped roster items
+        roster.each { |item|
+          if item.groups == []
+            iq.query.add(Jabber::DiscoItem.new(item.jid, item.iname.to_s == '' ? item.jid : item.iname))
+          end
+        }
       else
         # Add a discovery item for each roster item in that group
         roster.each { |item|
@@ -113,7 +121,7 @@ cl.add_iq_callback { |iq|
 
 loop do
   cl.process
-  sleep(1)
+  Thread.stop
 end
 
 cl.close
