@@ -1,6 +1,6 @@
-#  XMPP4R - XMPP Library for Ruby
-#  Copyright (C) 2004 Lucas Nussbaum <lucas@lucas-nussbaum.net>
-#  Released under GPL v2 or later
+# =XMPP4R - XMPP Library for Ruby
+# License:: GPL (v2 or later)
+# Website::http://home.gna.org/xmpp4r/
 
 require 'thread'
 require 'xmpp4r/connection'
@@ -8,25 +8,19 @@ require 'xmpp4r/jid'
 require 'digest/sha1'
 
 module Jabber
-
   ##
   # The component class provides everything needed to build a basic XMPP Component.
-  #
   class Component  < Connection
 
-    ##
-   # The component's JID
+    # The component's JID
     attr_reader :jid
 
-    ##
     # The server's address
     attr_reader :server_address
 
-    ##
     # The server's port
     attr_reader :server_port
 
-    ##
     # Create a new Component
     def initialize(jid, server_address, server_port, threaded = true)
       super(server_address, threaded, server_port)
@@ -35,7 +29,6 @@ module Jabber
       @server_port = server_port
     end
     
-    ##
     # Connect to the server
     def connect
       super
@@ -47,7 +40,6 @@ module Jabber
       self
     end
 
-    ##
     # Send auth with given secret and wait for result
     # secret:: [String] the shared secret 
     # return:: [Boolean] true if auth was successful

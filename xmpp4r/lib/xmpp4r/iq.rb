@@ -1,6 +1,6 @@
-#  XMPP4R - XMPP Library for Ruby
-#  Copyright (C) 2004 Lucas Nussbaum <lucas@lucas-nussbaum.net>
-#  Released under GPL v2 or later
+# =XMPP4R - XMPP Library for Ruby
+# License:: GPL (v2 or later)
+# Website::http://home.gna.org/xmpp4r/
 
 require 'rexml/document'
 require 'xmpp4r/xmlstanza'
@@ -69,9 +69,7 @@ module Jabber
     # Returns the iq's query child, or nil
     # result:: [IqQuery]
     def query 
-      s = nil
-      each_element('query') { |e| s = e if s.nil? }
-      s
+      first_element('query')
     end
 
     ##
@@ -87,30 +85,31 @@ module Jabber
     # Returns the iq's query's namespace, or nil
     # result:: [String]
     def queryns 
-      s = nil
-      each_element('query') { |e| s = e.namespace if s.nil? }
-      s
+      e = first_element('query')
+      if e
+        return e.namespace
+      else
+        return nil
+      end
     end
 
     ##
     # Returns the iq's <vCard/> child, or nil
     # result:: [IqVcard]
     def vcard 
-      s = nil
-      each_element('vCard') { |e| s = e if s.nil? }
-      s
+      first_element('vCard')
     end
 
     ##
     # Create a new iq from a stanza
     def Iq.import(xmlstanza)
-      # TODO : clean up. The should be a better way.
       Iq::new.import(xmlstanza)
     end
 
     ##
     # Add an element to the Iq stanza
-    # xmlelement:: [REXML::Element] Element to add. <query/> elements will be converted to IqQuery
+    # xmlelement:: [REXML::Element] Element to add. <query/> elements will be
+    # converted to IqQuery
     def add(xmlelement)
       if xmlelement.kind_of?(REXML::Element) && (xmlelement.name == 'query')
         super(IqQuery::import(xmlelement))

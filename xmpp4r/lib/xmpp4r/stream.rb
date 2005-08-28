@@ -1,6 +1,6 @@
-#  XMPP4R - XMPP Library for Ruby
-#  Copyright (C) 2004 Lucas Nussbaum <lucas@lucas-nussbaum.net>
-#  Released under GPL v2 or later
+# =XMPP4R - XMPP Library for Ruby
+# License:: GPL (v2 or later)
+# Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/callbacklist'
 require 'thread'
@@ -11,7 +11,8 @@ require 'xmpp4r/iq'
 
 module Jabber
   ##
-  # The stream class manages a connection stream, abstracting connection details
+  # The stream class manages a connection stream (a file descriptor using which
+  # XML messages are read and sent)
   class Stream
     DISCONNECTED = 1
     CONNECTED = 2
@@ -113,11 +114,12 @@ module Jabber
     #
     # element:: [XMLElement] The received element
     def receive(element)
-      Jabber::DEBUG && puts("RECEIVED:\n#{element.to_s}")
+      Jabber::debuglog("RECEIVED:\n#{element.to_s}")
       case element.name
       when 'stream'
         stanza = element
-	@streamid = element.attribute("id").value
+      	i = element.attribute("id")
+        @streamid = i.value if i
       when 'message'
         stanza = Message::import(element)
       when 'iq'
@@ -151,7 +153,7 @@ module Jabber
     # Process |element| until it is consumed. Returns element.consumed?
     # element  The element to process
     def process_one(stanza)
-      Jabber::DEBUG && puts("PROCESSING:\n#{stanza.to_s}")
+      Jabber::debuglog("PROCESSING:\n#{stanza.to_s}")
       @xmlcbs.process(stanza)
       return true if stanza.consumed?
       @stanzacbs.process(stanza)
@@ -230,8 +232,7 @@ module Jabber
     # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
     def send(xml, proc=nil, &block)
-      Jabber::DEBUG &&
-        puts("SENDING:\n#{ xml.kind_of?(String) ? xml : xml.to_s }")
+      Jabber::debuglog("SENDING:\n#{ xml.kind_of?(String) ? xml : xml.to_s }")
       xml = xml.to_s if not xml.kind_of? String
       block = proc if proc
       @threadBlocks[Thread.current]=block if block

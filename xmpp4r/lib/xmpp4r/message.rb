@@ -1,6 +1,6 @@
-#  XMPP4R - XMPP Library for Ruby
-#  Copyright (C) 2004 Lucas Nussbaum <lucas@lucas-nussbaum.net>
-#  Released under GPL v2 or later
+# =XMPP4R - XMPP Library for Ruby
+# License:: GPL (v2 or later)
+# Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/xmlstanza'
 
@@ -67,9 +67,7 @@ module Jabber
     ##
     # Returns the message's body, or nil
     def body
-      s = nil
-      each_element('body') { |e| s = e.text if s.nil? }
-      s
+      return first_element_text('body')
     end
 
     ##
@@ -92,14 +90,7 @@ module Jabber
     # b:: [String] body to set
     # return:: [Jabber::Protocol::XMLElement] self for chaining
     def set_body(b)
-      xe = nil
-      each_element('body') { |c| xe = c if xe.nil? }
-      if xe.nil?
-        xe = XMLElement::new('body')
-        add_element(xe)
-      end
-      xe.text = b
-      self
+      replace_element_text('body', b)
     end
 
     ##
@@ -116,8 +107,7 @@ module Jabber
     # s:: [String] subject to set
     # return:: [Jabber::Protocol::XMLElement] self for chaining
     def set_subject(s)
-      xe = nil
-      each_element('subject') { |c| xe = c if xe.nil? }
+      xe = first_element('subject')
       if xe.nil?
         xe = XMLElement::new('subject')
         add_element(xe)
@@ -129,9 +119,7 @@ module Jabber
     ##
     # Returns the message's subject, or nil
     def subject
-      s = nil
-      each_element('subject') { |e| s = e.text if s.nil? }
-      s
+      return first_element_text('subject')
     end
 
     ##
@@ -154,9 +142,7 @@ module Jabber
     ##
     # Returns the message's thread, or nil
     def thread
-      s = nil
-      each_element('thread') { |e| s = e.text if s.nil? }
-      s
+      return first_element_text('thread')
     end
   end
 end

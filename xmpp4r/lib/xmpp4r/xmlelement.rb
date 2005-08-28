@@ -1,12 +1,14 @@
-#  XMPP4R - XMPP Library for Ruby
-#  Copyright (C) 2004 Lucas Nussbaum <lucas@lucas-nussbaum.net>
-#  Released under GPL v2 or later
+# =XMPP4R - XMPP Library for Ruby
+# License:: GPL (v2 or later)
+# Website::http://home.gna.org/xmpp4r/
 
-require 'rexml/element'
+require 'xmpp4r/rexmladdons'
 
 module Jabber
   ##
-  # This class is the root if all XML stanzas
+  # This class is the root if all XML stanzas which are Jabber messages.
+  # Children of those XMLElement should only be REXML::Element, not
+  # XMLElement.
   class XMLElement < REXML::Element
     ##
     # Construct an XMLElement for the supplied tag and attributes
@@ -17,32 +19,6 @@ module Jabber
       super(arg, parent, context)
       @consumed = false
     end
-
-    ##
-    # import this element's children and attributes
-    def import(xmlelement)
-      if @name and @name != xmlelement.name
-        raise "Trying to import an #{xmlelement.name} to a #{@name} !"
-      end
-      add_attributes(xmlelement.attributes.clone)
-      @context = xmlelement.context
-      xmlelement.each do |e|
-        if e.kind_of? REXML::Element
-          add(e.deep_clone)
-        else
-          add(e.clone)
-        end
-      end
-      self
-    end
-
-    ##
-    # Deletes one or more children elements,
-    # not just one like REXML::Element#delete_element
-    def delete_elements(element)
-      while(delete_element(element)) do end
-    end
-
 
     ##
     # Makes some changes to the structure of an XML element to help

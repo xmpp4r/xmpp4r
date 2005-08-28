@@ -1,10 +1,10 @@
-#  XMPP4R - XMPP Library for Ruby
-#  Copyright (C) 2004 Lucas Nussbaum <lucas@lucas-nussbaum.net>
-#  Released under GPL v2 or later
+# =XMPP4R - XMPP Library for Ruby
+# License:: GPL (v2 or later)
+# Website::http://home.gna.org/xmpp4r/
 
 module Jabber
-  ##
-  # a callback class
+  # This class is used to store callbacks inside CallbackList. See the
+  # CallbackList class for more detailed explanations.
   class Callback
 
     # The Callback's priority
@@ -19,7 +19,7 @@ module Jabber
     ##
     # Create a new callback
     # priority:: [Integer] the callback's priority. The higher, the sooner it
-    #   will be executed
+    #            will be executed
     # ref:: [String] The callback's reference
     def initialize(priority = 0, ref = nil, block = Proc::new {})
       @priority = priority
