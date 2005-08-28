@@ -1,6 +1,6 @@
-#  XMPP4R - XMPP Library for Ruby
-#  Copyright (C) 2004 Lucas Nussbaum <lucas@lucas-nussbaum.net>
-#  Released under GPL v2 or later
+# =XMPP4R - XMPP Library for Ruby
+# License:: GPL (v2 or later)
+# Website::http://home.gna.org/xmpp4r/
 
 require 'thread'
 require 'xmpp4r/connection'
@@ -8,17 +8,16 @@ require 'xmpp4r/jid'
 
 module Jabber
 
-  ##
   # The client class provides everything needed to build a basic XMPP Client.
-  #
   class Client  < Connection
 
-    ##
     # The client's JID
     attr_reader :jid
 
-    ##
-    # Create a new Client
+    # Create a new Client. If threaded mode is activated, callbacks are called
+    # as soon as messages are received; If it isn't, you have to call
+    # Stream#process from time to time.
+    # TODO SSL mode is not implemented yet.
     def initialize(jid, threaded = true, ssl = false)
       super(jid.domain, threaded, ssl ? 5223 : 5222)
       @jid = jid
@@ -44,11 +43,10 @@ module Jabber
       if digest
         authset = Iq::new_authset_digest(@jid, @streamid.to_s, password)
       else
-	authset = Iq::new_authset(@jid, password)
+        authset = Iq::new_authset(@jid, password)
       end
-
       res = false
-      send(authset) { |r|
+      send(authset) do |r|
         if r.kind_of?(Iq) and r.type == :result
           res = true
           r.consume
@@ -56,7 +54,7 @@ module Jabber
           res = false
           r.consume
         end
-      }
+      end
       $defout.flush
       res
     end

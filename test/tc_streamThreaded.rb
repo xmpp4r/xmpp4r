@@ -16,6 +16,11 @@ class StreamThreadedTest < Test::Unit::TestCase
     @servlisten = UNIXServer::new(@tmpfilepath)
     thServer = Thread.new { @server = @servlisten.accept }
     @iostream = UNIXSocket::new(@tmpfilepath)
+    n = 0
+    while @server.nil? and n < 10
+      sleep 0.1
+      n += 1
+    end
     @stream = Stream::new
     @stream.start(@iostream)
   end

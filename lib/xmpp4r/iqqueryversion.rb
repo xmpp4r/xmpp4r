@@ -1,6 +1,6 @@
-#  XMPP4R - XMPP Library for Ruby
-#  Copyright (C) 2005 Stephan Maka <stephan@spaceboyz.net>
-#  Released under GPL v2 or later
+# =XMPP4R - XMPP Library for Ruby
+# License:: GPL (v2 or later)
+# Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/iqquery'
 
@@ -14,7 +14,7 @@ module Jabber
   class IqQueryVersion < IqQuery
     ##
     # Create a new <query xmlns='jabber:iq:version'/>
-    def initialize(iname=nil, version=nil, os=nil)
+    def initialize(iname='', version='', os=nil)
       super()
       add_namespace('jabber:iq:version')
       set_iname(iname)
@@ -28,9 +28,7 @@ module Jabber
     # This has been renamed to 'iname' here to keep
     # REXML::Element#name accessible
     def iname
-      text = nil
-      each_element('name') { |name| text = name.text }
-      text
+      first_element_text('name')
     end
 
     ##
@@ -51,9 +49,7 @@ module Jabber
     ##
     # Get the version of the software
     def version
-      text = nil
-      each_element('version') { |version| text = version.text }
-      text
+      first_element_text('version')
     end
 
     ##
@@ -62,8 +58,7 @@ module Jabber
     # The element won't be deleted if text is nil as
     # it must occur in a version query
     def version=(text)
-      delete_elements('version')
-      add_element('version').text = text.nil? ? '' : text
+      replace_element_text('version', text)
     end
 
     def set_version(text)
@@ -82,12 +77,15 @@ module Jabber
     ##
     # Set the os of the software
     def os=(text)
-      delete_elements('os')
-      add_element('os').text = text unless text.nil?
+      set_os(text)
     end
 
     def set_os(text)
-      self.os = text
+      if text
+        replace_element_text('os', text)
+      else
+        delete_elements('os')
+      end
       self
     end
   end

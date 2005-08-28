@@ -16,7 +16,7 @@ class MessageTest < Test::Unit::TestCase
 
     x = Message::new("lucas@linux.ensimag.fr", "coucou")
     assert_equal("message", x.name)
-    assert_equal("lucas@linux.ensimag.fr", x.to)
+    assert_equal("lucas@linux.ensimag.fr", x.to.to_s)
     assert_equal("coucou", x.body)
   end
 
