@@ -63,7 +63,7 @@ module Jabber
   # Service Discovery item to add() to IqQueryDiscoItems
   #
   # Please note that JEP 0030 requires the jid to occur
-  class DiscoItem < XMLElement
+  class DiscoItem < REXML::Element
     def initialize(jid=nil, iname=nil, node=nil)
       super('item')
       set_jid(jid)

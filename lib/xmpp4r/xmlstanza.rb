@@ -3,11 +3,31 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/xmlelement'
+require 'xmpp4r/jid'
 
 module Jabber
   ##
   # root class of all Jabber XML elements
   class XMLStanza < XMLElement
+    ##
+    # Compose a response by doing the following:
+    # * Create a new XMLStanza of the same subclass
+    #   with the same element-name
+    # * Swap 'to' and 'from'
+    # * Copy 'id'
+    # * Does not take care about the type
+    # xmlstanza:: [XMLStanza] source
+    # result:: [XMLStanza] empty answer stanza
+    def XMLStanza.answer(xmlstanza, import=true)
+      x = xmlstanza.class::new(xmlstanza.name)
+      if import
+        x.import(xmlstanza)
+      end
+      x.from = xmlstanza.to
+      x.to = xmlstanza.from
+      x.id = xmlstanza.id
+      x
+    end
 
     ##
     # get the to attribute

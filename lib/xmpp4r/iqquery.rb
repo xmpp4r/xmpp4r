@@ -8,7 +8,7 @@ module Jabber
   ##
   # A class used to build/parse IQ Query requests/responses
   #
-  class IqQuery < XMLElement
+  class IqQuery < REXML::Element
     @@namespace_classes = {}
 
     ##
@@ -20,7 +20,7 @@ module Jabber
     end
 
     ##
-    # Create a new iq from query
+    # Create a new [IqQuery] from iq.query
     # xmlelement:: [REXML::Element] to import, will be automatically converted if namespace appropriate
     def IqQuery.import(xmlelement)
       if @@namespace_classes.has_key?(xmlelement.namespace)

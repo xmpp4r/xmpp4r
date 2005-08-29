@@ -3,6 +3,8 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/xmlstanza'
+require 'xmpp4r/error'
+require 'xmpp4r/x'
 
 module Jabber
   ##
@@ -19,6 +21,21 @@ module Jabber
       set_show(show)
       set_status(status)
       set_priority(priority)
+    end
+
+    ##
+    # Add an element to the presence stanza
+    # * <error/> elements are converted to [Error]
+    # * TODO: <x/>
+    # xmlelement:: [REXML::Element] to add
+    def add(xmlelement)
+      if xmlelement.kind_of?(REXML::Element) && (xmlelement.name == 'error')
+        super(Error::import(xmlelement))
+      elsif xmlelement.kind_of?(REXML::Element) && (xmlelement.name == 'x')
+        super(X::import(xmlelement))
+      else
+        super(xmlelement)
+      end
     end
 
     ##
@@ -39,6 +56,7 @@ module Jabber
     # * :unavailable
     # * :unsubscribe
     # * :unsubscribed
+    # * [nil] (available)
     # See RFC3921 - 2.2.1. for explanation.
     def type
       case super
@@ -74,6 +92,14 @@ module Jabber
     def set_type(val)
       self.type = val
       self
+    end
+
+    ##
+    # Get the first <x/> element of this stanza
+    def x
+      xe = nil
+      each_element('x') { |e| xe = e }
+      xe
     end
 
     ##

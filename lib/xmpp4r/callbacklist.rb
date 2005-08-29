@@ -65,7 +65,7 @@ module Jabber
 
     ##
     # Process an element through all my callbacks. returns e.consumed?
-    # e:: [XMLElement] The element to process
+    # e:: [XMLStanza] The element to process
     # return:: [Boolean] true if the element has been consumed
     def process(e)
       # process through callbacks

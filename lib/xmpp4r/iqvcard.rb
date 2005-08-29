@@ -8,7 +8,7 @@ module Jabber
   ##
   # vCard container
   # (JEP 0054)
-  class IqVcard < XMLElement
+  class IqVcard < REXML::Element
     ##
     # Initialize a <vCard/> element
     # fields:: [Hash] Initialize with keys as XPath element names and values for element texts

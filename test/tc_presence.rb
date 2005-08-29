@@ -97,4 +97,15 @@ class PresenceTest < Test::Unit::TestCase
     assert_equal("Plundering the fridge.", x.status)
     assert_equal(0, x.priority)
   end
+
+  def test_sample
+    x = Presence::new
+    require 'rexml/document'
+    x.import(REXML::Document.new("<presence from='astro@spaceboyz.net/versionbot' to='astro@spaceboyz.net/edgarr' xmlns='jabber:client'>\n    <x from='astro@spaceboyz.net/versionbot' stamp='20050823T02:18:42' xmlns='jabber:x:delay'/>\n    <show>xa</show>\n    <status>I am the evil fingerprinting robot</status>\n  </presence>").root)
+    num = 0
+    x.each_element('show') { |e| num += 1 }
+    assert_equal(1, num)
+    assert_equal(:xa, x.show)
+    assert_equal('I am the evil fingerprinting robot', x.status)
+  end
 end

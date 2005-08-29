@@ -3,6 +3,8 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/xmlstanza'
+require 'xmpp4r/error'
+require 'xmpp4r/x'
 
 module Jabber
   ##
@@ -17,7 +19,23 @@ module Jabber
         set_to(to)
       end
       if !body.nil?
-        add_element(XMLElement::new("body").add_text(body))
+        add_element(REXML::Element::new("body").add_text(body))
+      end
+    end
+
+    ##
+    # Add a sub-element
+    #
+    # Will be converted to [Error] if named "error"
+    # TODO: convert <x/>
+    # xmlelement:: [REXML::Element] to add
+    def add(xmlelement)
+      if xmlelement.kind_of?(REXML::Element) && (xmlelement.name == 'error')
+        super(Error::import(xmlelement))
+      elsif xmlelement.kind_of?(REXML::Element) && (xmlelement.name == 'x')
+        super(X::import(xmlelement))
+      else
+        super(xmlelement)
       end
     end
 
@@ -65,6 +83,14 @@ module Jabber
     end
 
     ##
+    # Get the first <x/> element of this stanza
+    def x
+      xe = nil
+      each_element('x') { |e| xe = e }
+      xe
+    end
+
+    ##
     # Returns the message's body, or nil
     def body
       return first_element_text('body')
@@ -88,7 +114,7 @@ module Jabber
     # sets the message's body
     #
     # b:: [String] body to set
-    # return:: [Jabber::Protocol::XMLElement] self for chaining
+    # return:: [REXML::Element] self for chaining
     def set_body(b)
       replace_element_text('body', b)
     end
@@ -105,11 +131,11 @@ module Jabber
     # sets the message's subject
     #
     # s:: [String] subject to set
-    # return:: [Jabber::Protocol::XMLElement] self for chaining
+    # return:: [REXML::Element] self for chaining
     def set_subject(s)
       xe = first_element('subject')
       if xe.nil?
-        xe = XMLElement::new('subject')
+        xe = REXML::Element::new('subject')
         add_element(xe)
       end
       xe.text = s
