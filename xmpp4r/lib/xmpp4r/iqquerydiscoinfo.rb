@@ -65,7 +65,7 @@ module Jabber
   # Service Discovery identity to add() to IqQueryDiscoInfo
   #
   # Please note that JEP 0030 requires both category and type to occur
-  class DiscoIdentity < XMLElement
+  class DiscoIdentity < REXML::Element
     def initialize(category=nil, iname=nil, type=nil)
       super('identity')
       set_category(category)
@@ -144,7 +144,7 @@ module Jabber
   # Service Discovery feature to add() to IqQueryDiscoInfo
   #
   # Please note that JEP 0030 requires var to be set
-  class DiscoFeature < XMLElement
+  class DiscoFeature < REXML::Element
     def initialize(var=nil)
       super('feature')
       set_var(var)

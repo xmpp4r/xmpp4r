@@ -64,6 +64,26 @@ module REXML
     def delete_elements(element)
       while(delete_element(element)) do end
     end
+
+#    ##
+#    # Workaround for buggy XPath handling in REXML
+#    #
+#    # See tc_presence [PresenceTest#test_sample] for a test
+#    def each_element(xmlelement=nil, &block)
+#      if xmlelement.kind_of?(String)
+#        if xmlelement =~ /\//
+#          super(xmlelement) { |e| yield e }
+#        else
+#          super() { |e|
+#            if e.name == xmlelement
+#              yield e
+#            end
+#          }
+#        end
+#      else
+#        super(xmlelement) { |e| yield e }
+#      end
+#    end
   end
 end
 

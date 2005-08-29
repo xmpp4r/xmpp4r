@@ -5,10 +5,10 @@
 require 'rexml/document'
 require 'xmpp4r/xmlstanza'
 require 'xmpp4r/jid'
+require 'xmpp4r/error'
 require 'xmpp4r/iqquery.rb'
 require 'xmpp4r/iqvcard.rb'
 require 'digest/sha1'
-include REXML
 
 module Jabber
   ##
@@ -75,7 +75,7 @@ module Jabber
     ##
     # Delete old elements named newquery.name
     #
-    # newquery:: [XMLElement] will be added
+    # newquery:: [REXML::Element] will be added
     def query=(newquery)
       delete_elements(newquery.name)
       add(newquery)
@@ -108,13 +108,17 @@ module Jabber
 
     ##
     # Add an element to the Iq stanza
-    # xmlelement:: [REXML::Element] Element to add. <query/> elements will be
-    # converted to IqQuery
+    # xmlelement:: [REXML::Element] Element to add.
+    # * <query/> elements will be converted to [IqQuery]
+    # * <vCard/> elements will be converted to [IqVcard]
+    # * <error/> elements will be converted to [Error]
     def add(xmlelement)
       if xmlelement.kind_of?(REXML::Element) && (xmlelement.name == 'query')
         super(IqQuery::import(xmlelement))
       elsif xmlelement.kind_of?(REXML::Element) && (xmlelement.name == 'vCard') && (xmlelement.namespace == 'vcard-temp')
         super(IqVcard::import(xmlelement))
+      elsif xmlelement.kind_of?(REXML::Element) && (xmlelement.name == 'error')
+        super(Error::import(xmlelement))
       else
         super(xmlelement)
       end
@@ -135,9 +139,9 @@ module Jabber
       iq = Iq::new(:set)
       query = IqQuery::new
       query.add_namespace('jabber:iq:auth')
-      query.add(Element::new('username').add_text(jid.node))
-      query.add(Element::new('password').add_text(password))
-      query.add(Element::new('resource').add_text(jid.resource)) if not jid.resource.nil?
+      query.add(REXML::Element::new('username').add_text(jid.node))
+      query.add(REXML::Element::new('password').add_text(password))
+      query.add(REXML::Element::new('resource').add_text(jid.resource)) if not jid.resource.nil?
       iq.add(query)
       iq
     end
@@ -148,9 +152,9 @@ module Jabber
       iq = Iq::new(:set)
       query = IqQuery::new
       query.add_namespace('jabber:iq:auth')
-      query.add(Element::new('username').add_text(jid.node))
-      query.add(Element::new('digest').add_text(Digest::SHA1.new(session_id + password).hexdigest))
-      query.add(Element::new('resource').add_text(jid.resource)) if not jid.resource.nil?
+      query.add(REXML::Element::new('username').add_text(jid.node))
+      query.add(REXML::Element::new('digest').add_text(Digest::SHA1.new(session_id + password).hexdigest))
+      query.add(REXML::Element::new('resource').add_text(jid.resource)) if not jid.resource.nil?
       iq.add(query)
       iq
     end

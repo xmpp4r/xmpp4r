@@ -28,7 +28,7 @@ cl.auth(ARGV[1]) or raise "Auth failed"
 
 # I'm not sure about the portability of 'uname -sr' here ;-)
 # but that's all needed to answer version queries:
-Jabber::VersionResponder.new(cl, 'xmpp4r Versionbot example', 'SVN', IO.popen('uname -sr').readlines.to_s.chomp)
+Jabber::VersionResponder.new(cl, 'xmpp4r Versionbot example', 'SVN', IO.popen('uname -sr').readlines.to_s.strip)
 
 
 cl.add_iq_callback { |iq|
@@ -46,7 +46,7 @@ cl.add_iq_callback { |iq|
 
 cl.add_presence_callback { |pres|
   # Already fingerprinted or offline?
-  unless versions.has_key?(pres.from) || (pres.type == :unavailable)
+  unless versions.has_key?(pres.from) || (pres.type == :unavailable) || (pres.type == :error)
     # Construct a new query
     iq = Jabber::Iq.new(:get, pres.from)
     # and ask for the version

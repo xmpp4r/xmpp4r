@@ -6,7 +6,7 @@ require 'xmpp4r/rexmladdons'
 
 module Jabber
   ##
-  # This class is the root if all XML stanzas which are Jabber messages.
+  # This class is the root of all XML stanzas which are Jabber messages.
   # Children of those XMLElement should only be REXML::Element, not
   # XMLElement.
   class XMLElement < REXML::Element

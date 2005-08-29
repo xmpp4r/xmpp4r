@@ -5,7 +5,7 @@ $:.unshift '../lib'
 require 'rexml/document'
 
 require 'xmpp4r'
-require 'xmpp4r/rosterquery'
+require 'xmpp4r/iqqueryroster'
 
 # Command line argument checking
 
@@ -38,11 +38,11 @@ cl.connect
 cl.auth(ARGV[1]) or raise "Auth failed"
 
 
-roster = Jabber::RosterQuery.new
+roster = Jabber::IqQueryRoster.new
 presences = {}
 
 cl.add_iq_callback { |iq|
-  if (iq.type == :result) && iq.query.kind_of?(Jabber::RosterQuery)
+  if (iq.type == :result) && iq.query.kind_of?(Jabber::IqQueryRoster)
     roster.import(iq.query)
     write_state(ARGV[2], roster, presences)
   end
@@ -59,7 +59,7 @@ cl.add_presence_callback { |pres|
     # Add to roster
     # TODO: Resolve Nickname from vCard
     roster_set_iq = Jabber::Iq.new(:set)
-    roster_set_iq.add(Jabber::RosterQuery.new).add(Jabber::RosterItem.new(pres.from.strip))
+    roster_set_iq.add(Jabber::IqQueryRoster.new).add(Jabber::RosterItem.new(pres.from.strip))
     cl.send(roster_set_iq)
   end
   

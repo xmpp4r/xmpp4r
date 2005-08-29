@@ -97,7 +97,7 @@ module Jabber
   # The 'name' attribute has been renamed to 'iname' here
   # as 'name' is already used by REXML::Element for the
   # element's name. It's still name='...' in XML.
-  class RosterItem < XMLElement
+  class RosterItem < REXML::Element
     ##
     # Construct a new roster item
     # jid:: [JID] Jabber ID

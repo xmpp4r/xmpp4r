@@ -34,7 +34,7 @@ module Jabber
       super
       send("<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:component:accept' to='#{@jid}'>") { |e|
         if e.name == 'stream'
-	   e.consume
+          e.consume
         end
       }
       self
@@ -47,7 +47,7 @@ module Jabber
       hash = Digest::SHA1::new(@streamid.to_s + secret).to_s
       ok = false
       send("<handshake>#{hash}</handshake>") { |e|
-        ok = true if e.name == 'handshake' and e.to_s == '<handshake/>'
+        ok = true if e.name == 'handshake' and e.namespace == 'jabber:component:accept'
         e.consume
       }
       ok
