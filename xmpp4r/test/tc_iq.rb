@@ -22,7 +22,7 @@ class IqTest < Test::Unit::TestCase
 
   def test_query
     x = Iq::new(:set)
-    query = Element::new('query')
+    query = REXML::Element::new('query')
     query.add_namespace('jabber:iq:auth')
     x.add(query)
     assert_equal(query.to_s, x.query.to_s)
