@@ -3,6 +3,7 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/callbacklist'
+require 'socket'
 require 'thread'
 require 'xmpp4r/streamparser'
 require 'xmpp4r/presence'

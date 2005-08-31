@@ -2,9 +2,7 @@
 # License:: GPL (v2 or later)
 # Website::http://home.gna.org/xmpp4r/
 
-require 'thread'
 require 'xmpp4r/connection'
-require 'xmpp4r/jid'
 
 module Jabber
 

@@ -2,8 +2,6 @@
 # License:: GPL (v2 or later)
 # Website::http://home.gna.org/xmpp4r/
 
-require 'socket'
-require 'thread'
 require 'xmpp4r/stream'
 
 module Jabber
