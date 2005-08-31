@@ -2,11 +2,12 @@
 # License:: GPL (v2 or later)
 # Website::http://home.gna.org/xmpp4r/
 
+require 'rexml/document'
+require 'rexml/parsers/sax2parser'
+require 'rexml/source'
+require 'xmpp4r/xmlelement'
+
 module Jabber
-  require 'rexml/document'
-  require 'rexml/parsers/sax2parser'
-  require 'rexml/source'
-  require 'xmpp4r/xmlelement'
 
   ##
   # The REXMLJabberParser uses REXML to parse the incoming XML stream
