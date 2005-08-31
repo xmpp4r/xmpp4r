@@ -4,9 +4,10 @@
 
 require 'rexml/element'
 
-# REXML module
+# REXML module. This file only adds a few methods to the REXML module, to
+# ease the coding.
 module REXML
-  # this class adds a few helper methods to REXML::Element
+  # this class adds a few helper methods to REXML::Element
   class Element
     ##
     # Replaces or add a child element of name <tt>e</tt> with text <tt>t</tt>.
