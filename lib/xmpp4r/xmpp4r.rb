@@ -40,8 +40,5 @@ module Jabber
   end
 end
 
-require 'xmpp4r/message'
-require 'xmpp4r/iq'
-require 'xmpp4r/presence'
 require 'xmpp4r/client'
 require 'xmpp4r/component'

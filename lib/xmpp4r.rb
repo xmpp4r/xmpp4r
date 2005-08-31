@@ -34,4 +34,4 @@
 # understand how to use them is probably to look at the examples in the
 # <tt>examples/</tt> dir.
 
-require 'xmpp4r/xmpp4r.rb'
+require 'xmpp4r/xmpp4r'
