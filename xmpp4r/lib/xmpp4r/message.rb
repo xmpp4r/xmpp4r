@@ -8,11 +8,13 @@ require 'xmpp4r/x'
 
 module Jabber
   ##
-  # The Message class manages the <message/> stanzas
+  # The Message class manages the <message/> stanzas.
   class Message < XMLStanza
 
     ##
     # Create a new message
+    # >to:: a JID or a String object to send the message to.
+    # >body:: the message's body
     def initialize(to = nil, body = nil)
       super("message")
       if not to.nil?
@@ -61,7 +63,7 @@ module Jabber
     end
 
     ##
-    # Set the type of the Message stanza (see type)
+    # Set the type of the Message stanza (see Message#type for details)
     # v:: [Symbol] or nil
     def type=(v)
       case v
@@ -83,17 +85,15 @@ module Jabber
     end
 
     ##
-    # Get the first <x/> element of this stanza
+    # Get the first <x/> element of this stanza, or nil if none found.
     def x
-      xe = nil
-      each_element('x') { |e| xe = e }
-      xe
+      first_element('x')
     end
 
     ##
     # Returns the message's body, or nil
     def body
-      return first_element_text('body')
+      first_element_text('body')
     end
 
     ##

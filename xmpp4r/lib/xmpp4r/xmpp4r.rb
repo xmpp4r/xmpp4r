@@ -13,7 +13,9 @@ module Jabber
   # Is debugging mode enabled ?
   @@debug = false
 
-  # Enable/disable debugging mode
+  # Enable/disable debugging mode. When debug mode is enabled, information
+  # can be logged using Jabber::debuglog. When debug mode is disabled, calls
+  # to Jabber::debuglog are just ignored.
   def Jabber::debug=(debug)
     @@debug = debug
     if @@debug
@@ -21,7 +23,8 @@ module Jabber
     end
   end
 
-  # returns true if debugging mode is enabled.
+  # returns true if debugging mode is enabled. If you just want to log
+  # something if debugging is enabled, use Jabber::debuglog instead.
   def Jabber::debug
     @@debug
   end
