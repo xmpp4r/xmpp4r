@@ -93,5 +93,5 @@ module Jabber
     end
   end
 
-  X.add_namespace('jabber:x:delay', XDelay)
+  X.add_namespaceclass('jabber:x:delay', XDelay)
 end

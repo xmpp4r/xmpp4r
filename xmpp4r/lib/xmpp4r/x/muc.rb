@@ -2,11 +2,9 @@
 #  Copyright (C) 2005 Stephan Maka <stephan@spaceboyz.net>
 #  Released under GPL v2 or later
 
-#require 'time'
-
 require 'xmpp4r/x'
 require 'xmpp4r/jid'
-require 'xmpp4r/muc/xmucuseritem'
+require 'xmpp4r/x/mucuseritem'
 
 module Jabber
   class XMuc < X
@@ -31,6 +29,6 @@ module Jabber
     end
   end
 
-  X.add_namespace('http://jabber.org/protocol/muc', XMuc)
-  X.add_namespace('http://jabber.org/protocol/muc#user', XMucUser)
+  X.add_namespaceclass('http://jabber.org/protocol/muc', XMuc)
+  X.add_namespaceclass('http://jabber.org/protocol/muc#user', XMucUser)
 end

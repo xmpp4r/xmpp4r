@@ -2,7 +2,7 @@
 # License:: GPL (v2 or later)
 # Website::http://home.gna.org/xmpp4r/
 
-require 'xmpp4r/iqquery'
+require 'xmpp4r/iq/query'
 
 module Jabber
   ##
@@ -224,5 +224,5 @@ module Jabber
     end
   end
 
-  IqQuery.add_namespace('jabber:iq:roster', IqQueryRoster)
+  IqQuery.add_namespaceclass('jabber:iq:roster', IqQueryRoster)
 end

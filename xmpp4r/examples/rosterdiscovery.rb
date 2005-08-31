@@ -22,9 +22,9 @@ $:.unshift '../lib'
 require 'thread'
 
 require 'xmpp4r'
-require 'xmpp4r/roster'
-require 'xmpp4r/iqquerydiscoinfo'
-require 'xmpp4r/iqquerydiscoitems'
+require 'xmpp4r/helpers/roster'
+require 'xmpp4r/iq/query/discoinfo'
+require 'xmpp4r/iq/query/discoitems'
 
 # Command line argument checking
 
@@ -35,7 +35,7 @@ end
 
 # Building up the connection
 
-#Jabber::DEBUG = true
+#Jabber::debug = true
 
 jid = Jabber::JID.new(ARGV[0])
 
@@ -45,7 +45,7 @@ cl.auth(ARGV[1]) or raise "Auth failed"
 
 
 # The roster instance
-roster = Jabber::Roster.new(cl, Jabber::Presence.new.set_status("Discover my roster at #{jid}"))
+roster = Jabber::Helpers::Roster.new(cl, Jabber::Presence.new.set_status("Discover my roster at #{jid}"))
 
 
 cl.add_iq_callback { |iq|

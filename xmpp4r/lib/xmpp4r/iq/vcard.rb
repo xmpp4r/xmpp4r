@@ -3,6 +3,7 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/xmlelement'
+require 'xmpp4r/iq'
 
 module Jabber
   ##
@@ -83,5 +84,7 @@ module Jabber
       }
       names.uniq
     end
+
+    Iq.add_elementclass('vCard', IqVcard)
   end
 end

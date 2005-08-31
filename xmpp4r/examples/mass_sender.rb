@@ -7,7 +7,7 @@ $:.unshift '../lib'
 require 'optparse'
 require 'xmpp4r'
 include Jabber
-#Jabber::DEBUG = true
+#Jabber::debug = true
 
 # - message in file
 # - subject in command line

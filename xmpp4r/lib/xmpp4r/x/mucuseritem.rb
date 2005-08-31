@@ -6,7 +6,7 @@ require 'xmpp4r/xmlelement'
 require 'xmpp4r/jid'
 
 module Jabber
-  class XMucUserItem < XMLElement
+  class XMucUserItem < REXML::Element
     def initialize(affiliation=nil, role=nil, jid=nil)
       super('item')
       set_affiliation(affiliation)

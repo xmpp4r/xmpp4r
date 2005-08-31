@@ -6,8 +6,6 @@ require 'rexml/document'
 require 'xmpp4r/xmlstanza'
 require 'xmpp4r/jid'
 require 'xmpp4r/error'
-require 'xmpp4r/iqquery.rb'
-require 'xmpp4r/iqvcard.rb'
 require 'digest/sha1'
 
 module Jabber
@@ -15,6 +13,8 @@ module Jabber
   # A class used to build/parse IQ requests/responses
   #
   class Iq < XMLStanza
+    @@element_classes = {}
+    
     def initialize(type = nil, to = nil)
       super("iq")
       if not to.nil?
@@ -109,16 +109,11 @@ module Jabber
     ##
     # Add an element to the Iq stanza
     # xmlelement:: [REXML::Element] Element to add.
-    # * <query/> elements will be converted to [IqQuery]
-    # * <vCard/> elements will be converted to [IqVcard]
-    # * <error/> elements will be converted to [Error]
+    # Will be automatically converted (imported) to
+    # a class registered with add_elementclass
     def add(xmlelement)
-      if xmlelement.kind_of?(REXML::Element) && (xmlelement.name == 'query')
-        super(IqQuery::import(xmlelement))
-      elsif xmlelement.kind_of?(REXML::Element) && (xmlelement.name == 'vCard') && (xmlelement.namespace == 'vcard-temp')
-        super(IqVcard::import(xmlelement))
-      elsif xmlelement.kind_of?(REXML::Element) && (xmlelement.name == 'error')
-        super(Error::import(xmlelement))
+      if xmlelement.kind_of?(REXML::Element) && @@element_classes.has_key?(xmlelement.name)
+        super(@@element_classes[xmlelement.name]::import(xmlelement))
       else
         super(xmlelement)
       end
@@ -199,5 +194,23 @@ module Jabber
       iq.add(IqVcard::new)
       iq
     end
+
+    ##
+    # Add a class by name.
+    # Elements with this name will be automatically converted
+    # to the specific class.
+    # Used for <query/>, <vCard>, <pubsub> etc.
+    # name:: [String] Element name
+    # elementclass:: [Class] Target class
+    def Iq.add_elementclass(name, elementclass)
+      @@element_classes[name] = elementclass
+    end
   end
 end
+
+# Actually these should be included at the top,
+# but then they would be unable to call Iq.add_elementclass
+# because it hasn't just been defined.
+
+require 'xmpp4r/iq/query'
+require 'xmpp4r/iq/vcard'

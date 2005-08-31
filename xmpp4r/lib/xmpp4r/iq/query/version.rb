@@ -2,7 +2,7 @@
 # License:: GPL (v2 or later)
 # Website::http://home.gna.org/xmpp4r/
 
-require 'xmpp4r/iqquery'
+require 'xmpp4r/iq/query'
 
 module Jabber
   ##
@@ -23,6 +23,17 @@ module Jabber
     end
 
     ##
+    # Import an element,
+    # deletes <name/>, <version/> and <os/> elements first
+    # xe:: [REXML::Element]
+    def import(xe)
+      delete_element('name')
+      delete_element('version')
+      delete_element('os')
+      super
+    end
+
+    ##
     # Get the name of the software
     #
     # This has been renamed to 'iname' here to keep
@@ -37,8 +48,7 @@ module Jabber
     # The element won't be deleted if text is nil as
     # it must occur in a version query
     def iname=(text)
-      delete_elements('name')
-      add_element('name').text = (text.nil? ? '' : text)
+      replace_element_text('name', text)
     end
 
     def set_iname(text)
@@ -69,27 +79,25 @@ module Jabber
     ##
     # Get the operating system
     def os
-      text = nil
-      each_element('os') { |os| text = os.text }
-      text
+      first_element_text('os')
     end
 
     ##
     # Set the os of the software
     def os=(text)
-      set_os(text)
-    end
-
-    def set_os(text)
       if text
         replace_element_text('os', text)
       else
         delete_elements('os')
       end
+    end
+
+    def set_os(text)
+      self.os = text
       self
     end
   end
 
-  IqQuery.add_namespace('jabber:iq:version', IqQueryVersion)
+  IqQuery.add_namespaceclass('jabber:iq:version', IqQueryVersion)
 end
 

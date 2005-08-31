@@ -3,6 +3,7 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/xmlelement'
+require 'xmpp4r/iq'
 
 module Jabber
   ##
@@ -34,8 +35,10 @@ module Jabber
     # Add a class by namespace for automatic IqQuery conversion (see IqQuery.import)
     # ns:: [String] Namespace (e.g. 'jabber:iq:roster')
     # queryclass:: [IqQuery] Query class derived from IqQuery
-    def IqQuery.add_namespace(ns, queryclass)
+    def IqQuery.add_namespaceclass(ns, queryclass)
       @@namespace_classes[ns] = queryclass
     end
   end
+
+  Iq.add_elementclass('query', IqQuery)
 end

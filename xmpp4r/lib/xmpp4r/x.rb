@@ -34,7 +34,7 @@ module Jabber
     # Add a class by namespace for automatic X conversion (see X.import)
     # ns:: [String] Namespace (e.g. 'jabber:x:delay')
     # xclass:: [X] x class derived from X
-    def X.add_namespace(ns, xclass)
+    def X.add_namespaceclass(ns, xclass)
       @@namespace_classes[ns] = xclass
     end
   end
