@@ -3,7 +3,8 @@
 $:.unshift '../lib'
 
 require 'xmpp4r'
-require 'xmpp4r/versionresponder'
+require 'xmpp4r/iq/query/version'
+require 'xmpp4r/helpers/version'
 
 
 # A Hash containing all Version Query answers with their JIDs as keys:
@@ -18,7 +19,7 @@ end
 
 # Building up the connection
 
-#Jabber::DEBUG = true
+#Jabber::debug = true
 
 jid = Jabber::JID.new(ARGV[0])
 
@@ -28,7 +29,7 @@ cl.auth(ARGV[1]) or raise "Auth failed"
 
 # I'm not sure about the portability of 'uname -sr' here ;-)
 # but that's all needed to answer version queries:
-Jabber::VersionResponder.new(cl, 'xmpp4r Versionbot example', 'SVN', IO.popen('uname -sr').readlines.to_s.strip)
+Jabber::Helpers::Version.new(cl, 'xmpp4r Versionbot example', 'SVN', IO.popen('uname -sr').readlines.to_s.strip)
 
 
 cl.add_iq_callback { |iq|

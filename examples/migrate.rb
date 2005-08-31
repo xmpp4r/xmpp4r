@@ -38,7 +38,7 @@ clfrom.add_iq_callback { |i|
       next if jid =~ /@(icq|msn|aim|yahoo).blop.info/
 #      next if jid !~ /lucas@im.apinc.org/
       puts "Processing #{e.to_s}"
-#      Jabber::DEBUG = true
+#      Jabber::debug = true
       name &&= name.value
       subscription &&= subscription.value
       ask &&= ask.value

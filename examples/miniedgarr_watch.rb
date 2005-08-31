@@ -29,7 +29,7 @@ end
 
 # Building up the connection
 
-Jabber::DEBUG = true
+Jabber::debug = true
 
 jid = Jabber::JID.new(ARGV[0])
 

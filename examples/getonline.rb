@@ -7,7 +7,7 @@ $:.unshift '../lib'
 require 'optparse'
 require 'xmpp4r'
 include Jabber
-Jabber::DEBUG = true
+Jabber::debug = true
 
 get = true
 jid = JID::new('lucastest@linux.ensimag.fr/rosterget')

@@ -28,7 +28,7 @@
 $:.unshift '../lib'
 
 require 'xmpp4r'
-require 'xmpp4r/roster'
+require 'xmpp4r/helpers/roster'
 
 # Command line argument checking
 
@@ -39,7 +39,7 @@ end
 
 # Building up the connection
 
-#Jabber::DEBUG = true
+#Jabber::debug = true
 
 jid = Jabber::JID.new(ARGV[0])
 
@@ -49,7 +49,7 @@ cl.auth(ARGV[1]) or raise "Auth failed"
 
 
 # The roster instance
-roster = Jabber::Roster.new(cl, Jabber::Presence.new.set_show(:dnd).set_status('Watching my roster change...'))
+roster = Jabber::Helpers::Roster.new(cl, Jabber::Presence.new.set_show(:dnd).set_status('Watching my roster change...'))
 
 
 # What has changed in the roster?

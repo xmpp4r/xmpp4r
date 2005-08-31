@@ -3,7 +3,7 @@
 $:.unshift '../lib'
 
 require 'test/unit'
-require 'xmpp4r/iqqueryversion'
+require 'xmpp4r/iq/query/version'
 require 'xmpp4r/iq'
 include Jabber
 
@@ -32,12 +32,26 @@ class IqQueryVersionTest < Test::Unit::TestCase
     assert_equal('FreeBSD 5.4-RELEASE-p4', x.os)
   end
 
-  def test_import
+  def test_import1
     iq = Iq::new
     q = XMLElement::new('query')
     q.add_namespace('jabber:iq:version')
     iq.add(q)
     assert_equal(IqQueryVersion, iq.query.class)
+  end
+
+  def test_import2
+    iq = Iq::new
+    q = XMLElement::new('query')
+    q.add_namespace('jabber:iq:version')
+    q.add_element('name').text = 'AstroBot'
+    q.add_element('version').text = 'XP'
+    q.add_element('os').text = 'FreeDOS'
+    iq.add(q)
+    assert_equal(IqQueryVersion, iq.query.class)
+    assert_equal('AstroBot', iq.query.iname)
+    assert_equal('XP', iq.query.version)
+    assert_equal('FreeDOS', iq.query.os)
   end
 
   def test_replace

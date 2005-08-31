@@ -3,7 +3,7 @@
 $:.unshift '../lib'
 
 require 'test/unit'
-require 'xmpp4r/iqvcard'
+require 'xmpp4r/iq/vcard'
 include Jabber
 
 class IqVcardTest < Test::Unit::TestCase

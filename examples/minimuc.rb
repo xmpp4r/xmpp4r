@@ -3,12 +3,12 @@
 $:.unshift '../lib'
 
 require 'xmpp4r'
-require 'xmpp4r/iqquerydiscoinfo'
-require 'xmpp4r/iqquerydiscoitems'
-require 'xmpp4r-muc'
+require 'xmpp4r/iq/query/discoinfo'
+require 'xmpp4r/iq/query/discoitems'
+require 'xmpp4r/x/muc'
 
 
-#Jabber::DEBUG = true
+#Jabber::debug = true
 
 class Room
   class RoomException < Exception
@@ -255,5 +255,11 @@ class MUC
   end
 end
 
-muc = MUC::new(Jabber::JID::new('muc.hooker.sin'), 'hastenichgesehen', 'localhost')
+if ARGV.size != 3
+  puts "Syntax: ./minimuc.rb <JID> <Password> <Host>"
+  puts "Example: ./minimuc.rb conference.xmpp4r.mil minimuc localhost"
+  exit
+end
+
+muc = MUC::new(Jabber::JID::new(ARGV[0]), ARGV[1], ARGV[2])
 Thread.stop

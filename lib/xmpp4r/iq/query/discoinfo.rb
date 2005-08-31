@@ -2,7 +2,7 @@
 # License:: GPL (v2 or later)
 # Website::http://home.gna.org/xmpp4r/
 
-require 'xmpp4r/iqquery'
+require 'xmpp4r/iq/query'
 
 module Jabber
   ##
@@ -59,7 +59,7 @@ module Jabber
     end
   end
 
-  IqQuery.add_namespace('http://jabber.org/protocol/disco#info', IqQueryDiscoInfo)
+  IqQuery.add_namespaceclass('http://jabber.org/protocol/disco#info', IqQueryDiscoInfo)
 
   ##
   # Service Discovery identity to add() to IqQueryDiscoInfo

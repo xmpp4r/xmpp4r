@@ -3,7 +3,7 @@
 $:.unshift '../lib'
 
 require 'test/unit'
-require 'xmpp4r/iqqueryroster'
+require 'xmpp4r/iq/query/roster'
 # Just the bare minimum:
 require 'xmpp4r/jid'
 require 'xmpp4r/iq'
