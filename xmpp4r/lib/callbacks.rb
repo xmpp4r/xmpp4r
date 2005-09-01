@@ -61,7 +61,7 @@ class CallbackList
   def process(*e)
     # process through callbacks
     @list.each do |item|
-      return true if item.block.call(*e)
+      return true if item.block.call(*e) == true
     end
     false
   end

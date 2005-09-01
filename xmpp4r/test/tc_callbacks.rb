@@ -78,4 +78,22 @@ class CallbacksTest < Test::Unit::TestCase
     assert(!cbl.process(c, d))
     assert(ok)
    end
+
+  def test_callbacklist7
+    cbl = CallbackList::new
+    called1 = false
+    called2 = false
+    called3 = false
+    called4 = false
+    cbl.add(3, "ref1") { called4 = true ; true }
+    cbl.add(5, "ref1") { called1 = true ; true }
+    cbl.add(7, "ref1") { called2 = true ; 'a'}
+    cbl.add(9, "ref1") { called3 = true ;1 }
+    o = "aaaa"
+    assert(cbl.process(o))
+    assert(called1)
+    assert(called2)
+    assert(called3)
+    assert(!called4)
+  end
 end
