@@ -13,11 +13,18 @@
 # considered.
 #
 # Callbacks are processed for a given set of objects as long as they return
-# false. If you want to stop processing, you must return true.
-# Additionally, callbacks can "consume" elements. If a callback "consume" an
-# element, further Callbacks aren't considered. Rationale: some callbacks
-# need to be called only to "watch" elements (think of an "XML console"
-# feature) without blocking further callbacks from being considered.
+# false. If you want to stop processing, you must return true. Example :
+#  cbl = CallbackList::new
+#  c1 = false
+#  c2 = false
+#  c3 = false
+#  cbl.add(10) { c1 = true; 1 }
+#  cbl.add(5) { c2 = true; true }
+#  cbl.add(0) { c3 = true }
+#  cbl.process('aa')
+#  puts "#{c1} #{c2} #{c3}"
+# This example would display "true true false" as callbacks processing was
+# stopped after the second callback returned true.
 class CallbackList
 
   # create a new list of callbacks

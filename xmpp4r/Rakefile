@@ -12,6 +12,7 @@ end
 Rake::RDocTask.new do |rd|
   f = []
   f << 'lib/xmpp4r.rb'
+  f << 'lib/callbacks.rb' 
   f += Dir.glob('lib/xmpp4r/*.rb')
   p f.delete("lib/xmpp4r/xmpp4r.rb")
   # hack to document the Jabber module properly
