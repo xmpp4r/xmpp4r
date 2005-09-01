@@ -2,7 +2,7 @@
 # License:: GPL (v2 or later)
 # Website::http://home.gna.org/xmpp4r/
 
-require 'xmpp4r/callbacklist'
+require 'callbacks'
 require 'socket'
 require 'thread'
 require 'xmpp4r/streamparser'

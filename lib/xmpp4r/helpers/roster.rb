@@ -4,7 +4,7 @@
 
 require 'xmpp4r/iq'
 require 'xmpp4r/iq/query/roster'
-require 'xmpp4r/callbacklist'
+require 'callbacks'
 
 module Jabber
   module Helpers
