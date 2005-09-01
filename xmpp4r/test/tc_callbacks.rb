@@ -3,11 +3,7 @@
 $:.unshift '../lib'
 
 require 'test/unit'
-require 'socket'
-require 'xmpp4r/callbacklist'
-require 'xmpp4r/xmlelement'
-
-include Jabber
+require 'callbacks'
 
 class CallbacksTest < Test::Unit::TestCase
   def test_test1
@@ -27,14 +23,13 @@ class CallbacksTest < Test::Unit::TestCase
     called2 = false
     called3 = false
     called4 = false
-    mycbhandler = Proc.new { called3 = true }
-    cbl.add(5, "ref1") { called1 = true }
-    cbl.add(7, "ref1") { |e| called2 = true ; e.consume }
-    cbl.add(9, "ref1", mycbhandler)
-    cbl.add(11, "ref1") { called4 = true }
-    xmlelement = XMLElement::new('message')
-    assert(cbl.process(xmlelement))
-    assert(!called1)
+    cbl.add(5, "ref1") { called1 = true ; true }
+    cbl.add(7, "ref1") { |e| called2 = true ; false}
+    cbl.add(9, "ref1") { called3 = true ;false }
+    cbl.add(11, "ref1") { called4 = true ; false }
+    o = "aaaa"
+    assert(cbl.process(o))
+    assert(called1)
     assert(called2)
     assert(called3)
     assert(called4)
@@ -53,16 +48,34 @@ class CallbacksTest < Test::Unit::TestCase
     assert(2, cbl.length)
   end
 
-  def test_callbacklist3
-    cbl = CallbackList::new
-    assert_raise(NoBlockError) { cbl.add(2, "ref") }
-  end
-
   def test_callbacklist4
     cbl = CallbackList::new
-    cbl.add(5, "ref1") {  }
-    cbl.add(7, "ref1") {  }
-    xmlelement = XMLElement::new('message')
-    assert(!cbl.process(xmlelement))
+    cbl.add(5, "ref1") { false }
+    cbl.add(7, "ref1") { false }
+    o = "o"
+    assert(!cbl.process(o))
+   end
+
+  def test_callbacklist5
+    cbl = CallbackList::new
+    cbl.add(5, "ref1") { true }
+    cbl.add(7, "ref1") { false }
+    o = "o"
+    assert(cbl.process(o))
+   end
+
+  def test_callbacklist6
+    cbl = CallbackList::new
+    ok = false
+    c = 'a'
+    d = 'b'
+    cbl.add(5, "ref1") { |a, b|
+      if a == 'a' and b == 'b'
+        ok = true
+      end
+      false
+    }
+    assert(!cbl.process(c, d))
+    assert(ok)
    end
 end
