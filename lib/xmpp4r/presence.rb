@@ -27,14 +27,14 @@ module Jabber
     # Add an element to the presence stanza
     # * <error/> elements are converted to [Error]
     # * TODO: <x/>
-    # xmlelement:: [REXML::Element] to add
-    def add(xmlelement)
-      if xmlelement.kind_of?(REXML::Element) && (xmlelement.name == 'error')
-        super(Error::import(xmlelement))
-      elsif xmlelement.kind_of?(REXML::Element) && (xmlelement.name == 'x')
-        super(X::import(xmlelement))
+    # element:: [REXML::Element] to add
+    def add(element)
+      if element.kind_of?(REXML::Element) && (element.name == 'error')
+        super(Error::import(element))
+      elsif element.kind_of?(REXML::Element) && (element.name == 'x')
+        super(X::import(element))
       else
-        super(xmlelement)
+        super(element)
       end
     end
 

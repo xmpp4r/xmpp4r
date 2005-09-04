@@ -2,7 +2,6 @@
 # License:: GPL (v2 or later)
 # Website::http://home.gna.org/xmpp4r/
 
-require 'xmpp4r/xmlelement'
 require 'xmpp4r/iq'
 
 module Jabber
@@ -25,9 +24,9 @@ module Jabber
     end
 
     ##
-    # xmlelement:: [REXML::Element] to import
-    def IqVcard.import(xmlelement)
-      IqVcard::new.import(xmlelement)
+    # element:: [REXML::Element] to import
+    def IqVcard.import(element)
+      IqVcard::new.import(element)
     end
 
     ##

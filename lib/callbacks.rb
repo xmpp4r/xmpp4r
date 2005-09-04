@@ -38,7 +38,8 @@ class CallbackList
   # ref:: [String] the callback's reference
   # block:: [Block] a block to execute
   # return:: [Jabber::CallbackList] The list, for chaining
-  def add(prio = 0, ref = nil, &block)
+  def add(prio = 0, ref = nil, proc = nil, &block)
+    block = proc if proc
     @list.push(Callback::new(prio, ref, block))
     @list.sort! { |a, b| b.priority <=> a.priority }
     self

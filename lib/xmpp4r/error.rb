@@ -2,8 +2,6 @@
 # License:: GPL (v2 or later)
 # Website::http://home.gna.org/xmpp4r/
 
-require 'xmpp4r/xmlelement'
-
 module Jabber
   ##
   # A class used to build/parse <error/> elements.
@@ -64,9 +62,9 @@ module Jabber
 
     ##
     # Create a new <error/> element and import from existing
-    # xmlelement:: [REXML::Element] to import
-    def Error.import(xmlelement)
-      Error::new.import(xmlelement)
+    # element:: [REXML::Element] to import
+    def Error.import(element)
+      Error::new.import(element)
     end
     
     ##

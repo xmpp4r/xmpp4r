@@ -2,7 +2,7 @@
 # License:: GPL (v2 or later)
 # Website::http://home.gna.org/xmpp4r/
 
-require 'rexml/element'
+require 'rexml/document'
 
 # REXML module. This file only adds a few methods to the REXML module, to
 # ease the coding.

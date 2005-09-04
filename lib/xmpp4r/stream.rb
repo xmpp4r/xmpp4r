@@ -5,10 +5,12 @@
 require 'callbacks'
 require 'socket'
 require 'thread'
+Thread::abort_on_exception = true
 require 'xmpp4r/streamparser'
 require 'xmpp4r/presence'
 require 'xmpp4r/message'
 require 'xmpp4r/iq'
+require 'xmpp4r/debuglog'
 
 module Jabber
   ##
@@ -89,7 +91,9 @@ module Jabber
       if @exception_block
         Thread.new { @exception_block.call }
       else
-        puts "parse_failure was called but no exception block was defined."
+        puts "Stream#parse_failure was called by XML parser. Dumping " +
+        "backtrace and exiting...\n" + $!.exception + "\n"
+        puts $!.backtrace
       end
       close
     end
@@ -110,10 +114,10 @@ module Jabber
     end
 
     ##
-    # Processes a received XMLElement and executes 
+    # Processes a received REXML::Element and executes 
     # registered thread blocks and filters against it.
     #
-    # element:: [XMLElement] The received element
+    # element:: [REXML::Element] The received element
     def receive(element)
       Jabber::debuglog("RECEIVED:\n#{element.to_s}")
       case element.name
@@ -132,8 +136,8 @@ module Jabber
       end
       # Iterate through blocked theads (= waiting for an answer)
       @threadBlocks.each { |thread, proc|
-        proc.call(stanza)
-        if stanza.consumed?
+        r = proc.call(stanza)
+        if r == true
           @threadBlocks.delete(thread)
           thread.wakeup if thread.alive?
           return
@@ -155,19 +159,16 @@ module Jabber
     # element  The element to process
     def process_one(stanza)
       Jabber::debuglog("PROCESSING:\n#{stanza.to_s}")
-      @xmlcbs.process(stanza)
-      return true if stanza.consumed?
-      @stanzacbs.process(stanza)
-      return true if stanza.consumed?
+      return true if @xmlcbs.process(stanza)
+      return true if @stanzacbs.process(stanza)
       case stanza
       when Message
-        @messagecbs.process(stanza)
+        return true if @messagecbs.process(stanza)
       when Iq
-        @iqcbs.process(stanza)
+        return true if @iqcbs.process(stanza)
       when Presence
-        @presencecbs.process(stanza)
+        return true if @presencecbs.process(stanza)
       end
-      return true if stanza.consumed?
     end
     private :process_one
 
@@ -245,7 +246,9 @@ module Jabber
         if @exception_block 
           @exception_block.call
         else
-          puts("Exception caught while sending !")
+          puts "Exception caught while sending, dumping backtrace and" +
+            " exiting...\n" + $!.exception + "\n"
+          puts $!.backtrace
           exit(1)
         end
       end

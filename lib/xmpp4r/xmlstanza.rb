@@ -2,13 +2,12 @@
 # License:: GPL (v2 or later)
 # Website::http://home.gna.org/xmpp4r/
 
-require 'xmpp4r/xmlelement'
 require 'xmpp4r/jid'
 
 module Jabber
   ##
   # root class of all Jabber XML elements
-  class XMLStanza < XMLElement
+  class XMLStanza < REXML::Element
     ##
     # Compose a response by doing the following:
     # * Create a new XMLStanza of the same subclass
@@ -27,6 +26,13 @@ module Jabber
       x.to = xmlstanza.from
       x.id = xmlstanza.id
       x
+    end
+
+    ##
+    # Makes some changes to the structure of an XML element to help
+    # it respect the specification. For example, in a message, we should
+    # have <subject/> < <body/> < { rest of tags }
+    def normalize
     end
 
     ##
