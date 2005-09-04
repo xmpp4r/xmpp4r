@@ -2,7 +2,6 @@
 # License:: GPL (v2 or later)
 # Website::http://home.gna.org/xmpp4r/
 
-require 'rexml/document'
 require 'xmpp4r/xmlstanza'
 require 'xmpp4r/jid'
 require 'xmpp4r/error'
@@ -108,14 +107,14 @@ module Jabber
 
     ##
     # Add an element to the Iq stanza
-    # xmlelement:: [REXML::Element] Element to add.
+    # element:: [REXML::Element] Element to add.
     # Will be automatically converted (imported) to
     # a class registered with add_elementclass
-    def add(xmlelement)
-      if xmlelement.kind_of?(REXML::Element) && @@element_classes.has_key?(xmlelement.name)
-        super(@@element_classes[xmlelement.name]::import(xmlelement))
+    def add(element)
+      if element.kind_of?(REXML::Element) && @@element_classes.has_key?(element.name)
+        super(@@element_classes[element.name]::import(element))
       else
-        super(xmlelement)
+        super(element)
       end
     end
 

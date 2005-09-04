@@ -3,6 +3,7 @@
 $:.unshift '../lib'
 
 require 'test/unit'
+require 'xmpp4r/rexmladdons'
 require 'xmpp4r/iq/query'
 include Jabber
 
@@ -17,7 +18,7 @@ class IqQueryTest < Test::Unit::TestCase
     q = IqQuery::new
     assert_equal(IqQuery, q.class)
 
-    e = XMLElement.new('query')
+    e = REXML::Element.new('query')
     e.add_namespace('jabber:iq:roster')
     # kind_of? only checks that the class belongs to the IqQuery class
     # hierarchy.

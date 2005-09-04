@@ -5,7 +5,7 @@ $:.unshift '../lib'
 require 'tempfile'
 require 'test/unit'
 require 'socket'
-require 'xmpp4r'
+require 'xmpp4r/stream'
 include Jabber
 
 class StreamThreadedTest < Test::Unit::TestCase

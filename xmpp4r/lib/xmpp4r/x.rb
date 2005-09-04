@@ -2,8 +2,6 @@
 # License:: GPL (v2 or later)
 # Website::http://home.gna.org/xmpp4r/
 
-require 'xmpp4r/xmlelement'
-
 module Jabber
   ##
   # A class used to build/parse <x/> elements
@@ -21,12 +19,12 @@ module Jabber
 
     ##
     # Create a new [X] from an XML-Element
-    # xmlelement:: [REXML::Element] to import, will be automatically converted if namespace appropriate
-    def X.import(xmlelement)
-      if @@namespace_classes.has_key?(xmlelement.namespace)
-        @@namespace_classes[xmlelement.namespace]::new.import(xmlelement)
+    # element:: [REXML::Element] to import, will be automatically converted if namespace appropriate
+    def X.import(element)
+      if @@namespace_classes.has_key?(element.namespace)
+        @@namespace_classes[element.namespace]::new.import(element)
       else
-        X::new.import(xmlelement)
+        X::new.import(element)
       end
     end
 

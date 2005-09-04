@@ -4,8 +4,8 @@ $:.unshift '../lib'
 
 require 'test/unit'
 require 'socket'
+require 'xmpp4r/rexmladdons'
 require 'xmpp4r/iq'
-require 'xmpp4r/jid'
 include Jabber
 
 class IqTest < Test::Unit::TestCase

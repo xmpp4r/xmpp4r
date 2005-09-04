@@ -3,7 +3,7 @@
 $:.unshift '../lib'
 
 require 'test/unit'
-require 'xmpp4r'
+require 'xmpp4r/client'
 include Jabber
 
 class ClientTest < Test::Unit::TestCase

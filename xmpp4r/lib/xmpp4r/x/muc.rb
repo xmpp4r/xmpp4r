@@ -20,11 +20,11 @@ module Jabber
       add_namespace('http://jabber.org/protocol/muc#user')
     end
 
-    def add(xmlelement)
-      if xmlelement.kind_of?(XMLElement) && (xmlelement.name == 'item')
-        super(XMucUserItem::new.import(xmlelement))
+    def add(element)
+      if element.kind_of?(REXML::Element) && (element.name == 'item')
+        super(XMucUserItem::new.import(element))
       else
-        super(xmlelement)
+        super(element)
       end
     end
   end

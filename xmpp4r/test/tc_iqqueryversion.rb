@@ -3,8 +3,8 @@
 $:.unshift '../lib'
 
 require 'test/unit'
+require 'xmpp4r/rexmladdons'
 require 'xmpp4r/iq/query/version'
-require 'xmpp4r/iq'
 include Jabber
 
 class IqQueryVersionTest < Test::Unit::TestCase
@@ -34,7 +34,7 @@ class IqQueryVersionTest < Test::Unit::TestCase
 
   def test_import1
     iq = Iq::new
-    q = XMLElement::new('query')
+    q = REXML::Element::new('query')
     q.add_namespace('jabber:iq:version')
     iq.add(q)
     assert_equal(IqQueryVersion, iq.query.class)
@@ -42,7 +42,7 @@ class IqQueryVersionTest < Test::Unit::TestCase
 
   def test_import2
     iq = Iq::new
-    q = XMLElement::new('query')
+    q = REXML::Element::new('query')
     q.add_namespace('jabber:iq:version')
     q.add_element('name').text = 'AstroBot'
     q.add_element('version').text = 'XP'

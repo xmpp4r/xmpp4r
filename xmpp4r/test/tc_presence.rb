@@ -4,8 +4,8 @@ $:.unshift '../lib'
 
 require 'test/unit'
 require 'socket'
+require 'xmpp4r/rexmladdons'
 require 'xmpp4r/presence'
-require 'xmpp4r/jid'
 include Jabber
 
 class PresenceTest < Test::Unit::TestCase
@@ -43,7 +43,7 @@ class PresenceTest < Test::Unit::TestCase
     x.show = nil
     assert_equal(nil, x.show)
 
-    showelement = XMLElement.new('show')
+    showelement = REXML::Element.new('show')
     showelement.text = 'chat'
     x.add(showelement)
     assert_equal(:chat, x.show)

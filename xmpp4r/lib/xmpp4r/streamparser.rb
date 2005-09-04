@@ -2,16 +2,15 @@
 # License:: GPL (v2 or later)
 # Website::http://home.gna.org/xmpp4r/
 
-require 'rexml/document'
+require 'xmpp4r/rexmladdons'
 require 'rexml/parsers/sax2parser'
 require 'rexml/source'
-require 'xmpp4r/xmlelement'
 
 module Jabber
 
   ##
   # The REXMLJabberParser uses REXML to parse the incoming XML stream
-  # of the Jabber protocol and fires XMLElements at the Connection
+  # of the Jabber protocol and fires XMLStanzas at the Connection
   # instance.
   #
   class StreamParser
@@ -22,7 +21,7 @@ module Jabber
     # Constructs a parser for the supplied stream (socket input)
     #
     # stream:: [IO] Socket input stream
-    # listener:: [Object.receive(XMLElement)] The listener (usually a Jabber::Protocol::Connection instance
+    # listener:: [Object.receive(XMLStanza)] The listener (usually a Jabber::Protocol::Connection instance
     #
     def initialize(stream, listener)
       @stream = stream
@@ -47,9 +46,9 @@ module Jabber
         parser = REXML::Parsers::SAX2Parser.new @stream 
         parser.listen( :start_element ) do |uri, localname, qname, attributes|
           if @current.nil?
-            @current = XMLElement::new(qname)
+            @current = REXML::Element::new(qname)
           else
-            e = XMLElement::new(qname)
+            e = REXML::Element::new(qname)
             @current = @current.add_element(e)
           end
           @current.add_attributes attributes

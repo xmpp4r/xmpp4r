@@ -22,19 +22,19 @@ module Jabber
     #
     # Converts <identity/> elements to [DiscoIdentity]
     # and <feature/> elements to [DiscoFeature]
-    def add(xmlelement)
-      if xmlelement.kind_of?(REXML::Element)
+    def add(element)
+      if element.kind_of?(REXML::Element)
 
-        if xmlelement.name == 'identity'
-          super(DiscoIdentity::new.import(xmlelement))
-        elsif xmlelement.name == 'feature'
-          super(DiscoFeature::new.import(xmlelement))
+        if element.name == 'identity'
+          super(DiscoIdentity::new.import(element))
+        elsif element.name == 'feature'
+          super(DiscoFeature::new.import(element))
         else
-          super(xmlelement)
+          super(element)
         end
 
       else
-        super(xmlelement)
+        super(element)
       end
     end
 

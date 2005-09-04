@@ -3,10 +3,8 @@
 $:.unshift '../lib'
 
 require 'test/unit'
+require 'xmpp4r/rexmladdons'
 require 'xmpp4r/iq/query/roster'
-# Just the bare minimum:
-require 'xmpp4r/jid'
-require 'xmpp4r/iq'
 include Jabber
 
 class IqQueryRosterTest < Test::Unit::TestCase
@@ -20,7 +18,7 @@ class IqQueryRosterTest < Test::Unit::TestCase
 
   def test_import
     iq = Iq::new
-    q = XMLElement::new('query')
+    q = REXML::Element::new('query')
     q.add_namespace('jabber:iq:roster')
     iq.add(q)
     assert_equal(IqQueryRoster, iq.query.class)

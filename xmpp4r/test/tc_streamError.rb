@@ -4,6 +4,7 @@ $:.unshift '../lib'
 
 require 'test/unit'
 require 'socket'
+require 'xmpp4r/rexmladdons'
 require 'xmpp4r'
 include Jabber
 

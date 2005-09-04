@@ -2,7 +2,6 @@
 # License:: GPL (v2 or later)
 # Website::http://home.gna.org/xmpp4r/
 
-require 'xmpp4r/xmlelement'
 require 'xmpp4r/iq'
 
 module Jabber
@@ -22,12 +21,12 @@ module Jabber
 
     ##
     # Create a new [IqQuery] from iq.query
-    # xmlelement:: [REXML::Element] to import, will be automatically converted if namespace appropriate
-    def IqQuery.import(xmlelement)
-      if @@namespace_classes.has_key?(xmlelement.namespace)
-        @@namespace_classes[xmlelement.namespace]::new.import(xmlelement)
+    # element:: [REXML::Element] to import, will be automatically converted if namespace appropriate
+    def IqQuery.import(element)
+      if @@namespace_classes.has_key?(element.namespace)
+        @@namespace_classes[element.namespace]::new.import(element)
       else
-        IqQuery::new.import(xmlelement)
+        IqQuery::new.import(element)
       end
     end
 

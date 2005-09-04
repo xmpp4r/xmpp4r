@@ -3,7 +3,7 @@
 $:.unshift '../lib'
 
 require 'test/unit'
-require 'xmpp4r/xmlelement'
+require 'xmpp4r/rexmladdons'
 require 'xmpp4r/x/delay'
 include Jabber
 
