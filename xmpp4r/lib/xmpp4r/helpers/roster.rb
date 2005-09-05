@@ -65,7 +65,7 @@ module Jabber
               @rosteritemcbs.process(RosterChange::new(olditem, curitem))
             }
 
-            iq.consume
+            true
           end
         end
 
@@ -188,15 +188,6 @@ module Jabber
       def initialize(old, cur)
         @old = old
         @cur = cur
-        @consumed = false
-      end
-
-      def consume
-        @consumed = true
-      end
-
-      def consumed?
-        @consumed
       end
     end
   end

@@ -112,8 +112,7 @@ cl.add_iq_callback { |iq|
 
     cl.send(iq)
 
-    iq.consume
-
+    true
   end
 }
 

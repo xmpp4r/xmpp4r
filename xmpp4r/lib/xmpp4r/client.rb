@@ -27,7 +27,7 @@ module Jabber
       super
       send("<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:client' to='#{@host}'>") { |b| 
         # TODO sanity check : is b a stream ? get version, etc.
-        b.consume
+        true
       }
     end
 
@@ -47,10 +47,12 @@ module Jabber
       send(authset) do |r|
         if r.kind_of?(Iq) and r.type == :result
           res = true
-          r.consume
+          true
         elsif r.kind_of?(Iq) and r.type == :error
           res = false
-          r.consume
+          true
+        else
+          false
         end
       end
       $defout.flush

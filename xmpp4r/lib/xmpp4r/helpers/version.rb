@@ -44,13 +44,13 @@ module Jabber
       def iq_callback(iq)
         if iq.type == :get
           if iq.query.kind_of?(IqQueryVersion)
-            iq.consume
-
             iq.from, iq.to = iq.to, iq.from
             iq.type = :result
             iq.query.set_iname(@name).set_version(@version).set_os(@os)
 
             @stream.send(iq)
+
+            true
           end
         end
       end
