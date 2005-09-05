@@ -43,7 +43,8 @@ class Room
     unless msg.from.nil?
       broadcast(msg)
     end
-    msg.consume
+
+    true
   end
 
   def handle_presence(pres)
@@ -146,10 +147,12 @@ class MUC
     puts "#{iq.from} #{iq.queryns} to #{iq.to}"
     if iq.query.kind_of?(Jabber::IqQueryDiscoInfo)
       handle_disco_info(iq)
-      iq.consume
+      true
     elsif iq.query.kind_of?(Jabber::IqQueryDiscoItems)
       handle_disco_items(iq)
-      iq.consume
+      true
+    else
+      false
     end
   end
 
@@ -167,8 +170,7 @@ class MUC
       pres.type = :error
       pres.add(Jabber::Error.new('item-not-found'))
       @component.send(pres)
-      pres.consume
-      return
+      return(true)
     end
 
     begin
@@ -178,10 +180,9 @@ class MUC
       pres.type = :error
       pres.add(e.error)
       @component.send(pres)
-      pres.consume
-      return
+      return(true)
     end
-    pres.consume
+    return(false)
   end
 
   def handle_message(msg)

@@ -84,7 +84,7 @@ class PresenceTest < Test::Unit::TestCase
     assert_equal(nil, x.type)
     x.type = nil
     assert_equal(nil, x.type)
-    [:error, :probe, :subscribe, :subscribed, :unavailable, :unsubscribe, :unsubscribed].each { |type|
+    [:error, :probe, :subscribe, :subscribed, :unavailable, :unsubscribe, :unsubscribed, nil].each { |type|
       x.type = type
       assert_equal(type, x.type)
     }
