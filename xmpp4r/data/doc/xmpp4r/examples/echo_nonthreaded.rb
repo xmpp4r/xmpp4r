@@ -3,17 +3,20 @@
 # This bot will reply to every message it receives. To end the game, send 'exit'
 # NON-THREADED VERSION
 
-$:.unshift '../lib'
-
 require 'xmpp4r'
 include Jabber
 
 # settings
-myJID = JID::new('bot@localhost/Bot')
-myPassword = 'bot'
+if ARGV.length != 2
+  puts "Run with ./echo_thread.rb user@server/resource password"
+  exit 1
+end
+myJID = JID::new(ARGV[0])
+myPassword = ARGV[1] 
 cl = Client::new(myJID, false)
 cl.connect
 cl.auth(myPassword) or raise "Auth failed"
+cl.send(Presence::new)
 puts "Connected ! send messages to #{myJID.strip.to_s}."
 exit = false
 cl.add_message_callback { |m|
