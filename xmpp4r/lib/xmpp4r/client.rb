@@ -24,12 +24,15 @@ module Jabber
 
     ##
     # connect to the server
+    # (chaining-friendly)
+    # return:: self
     def connect
       super
       send("<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:client' to='#{@host}'>") { |b| 
         # TODO sanity check : is b a stream ? get version, etc.
         true
       }
+      self
     end
 
     ##
