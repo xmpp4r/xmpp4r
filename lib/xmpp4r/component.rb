@@ -27,6 +27,8 @@ module Jabber
     end
     
     # Connect to the server
+    # (chaining-friendly)
+    # return:: self
     def connect
       super
       send("<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:component:accept' to='#{@jid}'>") { |e|
