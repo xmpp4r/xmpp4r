@@ -1,12 +1,10 @@
 #!/usr/bin/ruby
 
 # This script can get all roster entries
-# TODO: This should use IqQueryRoster et al.
-
-$:.unshift '../lib'
 
 require 'optparse'
 require 'xmpp4r'
+require 'xmpp4r/iq/query/roster'
 include Jabber
 
 get = true
@@ -28,14 +26,11 @@ end
 
 cl = Client::new(jid, false)
 cl.connect
-p jid
-p password
-p cl
 cl.auth(password)
 cl.send(Iq::new_rosterget)
 exit = false
 cl.add_iq_callback { |i|
-  if i.type == :result and i.queryns == 'jabber:iq:roster'
+  if i.type == :result and i.query.kind_of?(IqQueryRoster)
     i.query.each_element { |e|
       e.text = ''
       puts e.to_s
