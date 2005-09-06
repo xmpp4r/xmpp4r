@@ -35,7 +35,14 @@ end
 Rake::PackageTask.new('xmpp4r', '0.1') do |p|
 	p.need_tar = true
 	p.package_files.include('ChangeLog', 'README', 'COPYING', 'setup.rb',
-	'Rakefile', 'examples/*', 'examples/*/*', 'test/*.rb', 'lib/*.rb',
-	'lib/xmpp4r/*.rb', 'lib/xmpp4r/iq/*.rb')
+	'Rakefile')
+	require 'find'
+	Find.find('lib/', 'data/', 'test/', 'tools/') do |f|
+		if FileTest.directory?(f) and f =~ /\.svn/
+			Find.prune
+		else
+			p.package_files << f
+		end
+	end
 end
 
