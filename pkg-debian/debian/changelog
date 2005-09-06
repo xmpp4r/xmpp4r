@@ -1,0 +1,5 @@
+xmpp4r (0.1-1) unstable; urgency=low
+
+  * First Debian package.
+
+ -- Lucas Nussbaum <lucas@lucas-nussbaum.net>  Mon, 06 Sep 2005 19:07:13 +0200
