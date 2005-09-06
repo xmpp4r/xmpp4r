@@ -3,6 +3,7 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/connection'
+require 'xmpp4r/authenticationfailure'
 
 module Jabber
 
@@ -33,9 +34,10 @@ module Jabber
 
     ##
     # Send auth with given password and wait for result
+    #
+    # Throws AuthenticationFailure
     # password:: [String] the password
     # digest:: [Boolean] use Digest authentication
-    # return:: [Boolean] true if auth was successful
     def auth(password, digest=true)
       authset = nil
       if digest
@@ -43,20 +45,21 @@ module Jabber
       else
         authset = Iq::new_authset(@jid, password)
       end
-      res = false
+      authenticated = false
       send(authset) do |r|
         if r.kind_of?(Iq) and r.type == :result
-          res = true
+          authenticated = true
           true
         elsif r.kind_of?(Iq) and r.type == :error
-          res = false
           true
         else
           false
         end
       end
       $defout.flush
-      res
+      unless authenticated
+        raise AuthenticationFailure.new, "Client authentication failed"
+      end
     end
   end  
 end

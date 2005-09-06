@@ -40,15 +40,25 @@ module Jabber
     end
 
     # Send auth with given secret and wait for result
+    #
+    # Throws AuthenticationFailure
     # secret:: [String] the shared secret 
-    # return:: [Boolean] true if auth was successful
     def auth(secret)
       hash = Digest::SHA1::new(@streamid.to_s + secret).to_s
-      ok = false
-      send("<handshake>#{hash}</handshake>") { |e|
-        ok = true if e.name == 'handshake' and e.namespace == 'jabber:component:accept'
+      authenticated = false
+      send("<handshake>#{hash}</handshake>") { |r|
+        if r.prefix == 'stream' and r.name == 'error'
+          true
+        elsif r.name == 'handshake' and r.namespace == 'jabber:component:accept'
+          authenticated = true
+          true
+        else
+          false
+        end
       }
-      ok
+      unless authenticated
+        raise AuthenticationFailure.new, "Component authentication failed"
+      end
     end
   end  
 end
