@@ -33,7 +33,7 @@ end
 
 cl = Client::new(myJID, false)
 cl.connect
-cl.auth(myPassword) or raise "Auth failed"
+cl.auth(myPassword)
 body = STDIN.readlines.join
 m = Message::new(to, body).set_type(:normal).set_id('1').set_subject(subject)
 puts m.to_s

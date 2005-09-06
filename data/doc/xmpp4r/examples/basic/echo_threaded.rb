@@ -15,7 +15,7 @@ myJID = JID::new(ARGV[0])
 myPassword = ARGV[1] 
 cl = Client::new(myJID)
 cl.connect
-cl.auth(myPassword) or raise "Auth failed"
+cl.auth(myPassword)
 cl.send(Presence::new)
 puts "Connected ! send messages to #{myJID.strip.to_s}."
 mainthread = Thread.current

@@ -5,8 +5,8 @@ class AdventureMUC
     @worlds = {}
     
     @component = Jabber::Component::new(jid, addr, port)
-    @component.connect or raise "Unable to connect to #{addr}:#{port}"
-    @component.auth(secret) or raise "Unable to auth as #{jid}"
+    @component.connect
+    @component.auth(secret)
 
     @component.add_iq_callback { |iq|
       handle_iq(iq)

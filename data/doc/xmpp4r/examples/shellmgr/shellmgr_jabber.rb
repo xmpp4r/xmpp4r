@@ -16,8 +16,8 @@ authjid = JID::new(ARGV[2])
 
 myjid = JID::new(myjid.node, myjid.domain, 'RSM')
 cl = Client::new(myjid)
-cl.connect or raise "Connect failed"
-cl.auth(mypassword) or raise "Auth failed"
+cl.connect
+cl.auth(mypassword)
 mainthread = Thread.current
 sh = Shell::new { |str| 
   puts "-----RECEIVING-----\n#{str}"

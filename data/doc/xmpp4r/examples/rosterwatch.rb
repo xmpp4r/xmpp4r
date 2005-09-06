@@ -45,7 +45,7 @@ jid = Jabber::JID.new(ARGV[0])
 
 cl = Jabber::Client.new(jid, false)
 cl.connect
-cl.auth(ARGV[1]) or raise "Auth failed"
+cl.auth(ARGV[1])
 
 
 # The roster instance

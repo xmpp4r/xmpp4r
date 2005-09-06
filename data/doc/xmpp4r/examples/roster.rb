@@ -30,7 +30,7 @@ cl.connect
 p jid
 p password
 p cl
-cl.auth(password) or raise "Auth failed"
+cl.auth(password)
 cl.send(Iq::new_rosterget)
 exit = false
 cl.add_iq_callback { |i|

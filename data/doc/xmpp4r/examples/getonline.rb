@@ -29,7 +29,7 @@ end
 
 cl = Client::new(jid, false)
 cl.connect
-cl.auth(password) or raise "Auth failed"
+cl.auth(password)
 exit = false
 nb = 0
 cl.add_iq_callback { |i|

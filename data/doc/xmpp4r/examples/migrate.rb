@@ -18,10 +18,10 @@ BOTHNEW = "Hi, you are subscribed to the presence of my previous JID : #{jidfrom
 
 clfrom = Client::new(jidfrom, false)
 clfrom.connect
-clfrom.auth(pwfrom) or raise "Auth failed"
+clfrom.auth(pwfrom)
 clto = Client::new(jidto, false)
 clto.connect
-clto.auth(pwto) or raise "Auth failed"
+clto.auth(pwto)
 #clfrom.send(Presence::new)
 #clto.send(Presence::new)
 clfrom.send(Iq::new_rosterget)

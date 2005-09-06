@@ -38,7 +38,7 @@ body = IO::read(filename).chomp
 
 cl = Client::new(jid, false)
 cl.connect
-cl.auth(password) or raise "Auth failed"
+cl.auth(password)
 exit = false
 cl.add_message_callback { |m|
   cl.send(Message::new(m.from, "Je suis un robot. Si tu souhaites contacter un administrateur du serveur, ecris a lucas@nussbaum.fr ."))
