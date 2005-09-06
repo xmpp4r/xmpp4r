@@ -1,13 +1,18 @@
 #!/usr/bin/ruby
 
-$:.unshift '../lib'
+# Basic console client that does nothing, but easy to modify to test things.
+# to test, start, then type :
+# connect login@server/resource password
+# auth
 
-require 'xmpp4r'
+require 'xmpp4r/client'
 include Jabber
+
+Jabber::debug = true
 
 class BasicClient
   def initialize
-    print "Welcome to this Basic Console Jabber Client!\n"
+    puts "Welcome to this Basic Console Jabber Client!"
     quit = false
     # main loop
     while not quit do
@@ -24,20 +29,24 @@ class BasicClient
           quit = true
         when 'connect'
           do_connect(args)
+        when 'help'
+          do_help
         when 'auth'
           do_auth
         else
-          print "Command \"#{command}\" unknown\n"
+          puts "Command \"#{command}\" unknown"
         end
       end
     end
-    print "Goodbye!\n"
+    puts "Goodbye!"
   end
 
   def do_help
-    print "exit\n"
-    print "connect\n"
-    print "auth\n"
+    puts <<-EOF
+# exit - exits
+# connect user@server/resource password - connects
+# auth - sends authentification
+    EOF
   end
 
   ##
@@ -49,14 +58,10 @@ class BasicClient
     @cl.connect
   end
 
-  def do_auth
-    @cl.auth(@password)
-  end
-
   ##
-  # register <email>
-  def do_register(args)
-    @cl.register(@password, args)
+  # auth
+  def do_auth
+    @cl.auth(@password, false)
   end
 end
 
