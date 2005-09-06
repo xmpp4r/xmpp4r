@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 
 # This script can get all roster entries
+# TODO: This should use IqQueryRoster et al.
 
 $:.unshift '../lib'
 
