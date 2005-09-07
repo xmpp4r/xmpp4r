@@ -5,6 +5,16 @@ Maintainer: Lucas Nussbaum <lucas@lucas-nussbaum.net>
 Build-Depends-Indep: debhelper (>= 4), ruby1.8
 Standards-Version: 3.6.2.1
 
+Package: libxmpp4r-ruby1.8
+Depends: ruby1.8
+Architecture: all
+Description: XMPP/Jabber library for Ruby (dummy package)
+ XMPP4R is an XMPP/Jabber library for Ruby. It provides all the necessary
+ backend to write scripts or applications acting as Jabber clients or
+ components.
+ .
+ Homepage: http://home.gna.org/xmpp4r/
+
 Package: libxmpp4r-ruby
 Architecture: all
 Depends: libxmpp4r-ruby1.8
@@ -18,13 +28,4 @@ Description: XMPP/Jabber library for Ruby (dummy package)
  This package is a dependency package, which depends on Debian's default Ruby
  version (currently 1.8.x).
 
-Package: libxmpp4r-ruby1.8
-Depends: ruby1.8
-Architecture: all
-Description: XMPP/Jabber library for Ruby (dummy package)
- XMPP4R is an XMPP/Jabber library for Ruby. It provides all the necessary
- backend to write scripts or applications acting as Jabber clients or
- components.
- .
- Homepage: http://home.gna.org/xmpp4r/
 

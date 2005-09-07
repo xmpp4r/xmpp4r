@@ -17,10 +17,11 @@ binary-indep: build
 	dh_installdirs
 	dh_installchangelogs ChangeLog
 	dh_installdocs README
+	mv data/doc/xmpp4r data/doc/libxmpp4r-ruby1.8
 	ruby1.8 setup.rb config --siteruby=/usr/lib/ruby
 	ruby1.8 setup.rb install --prefix=`pwd`/debian/libxmpp4r-ruby1.8
 	dh_fixperms
-	dh_compress
+	dh_compress -X.rb
 	dh_installdeb
 	dh_gencontrol
 	dh_md5sums
