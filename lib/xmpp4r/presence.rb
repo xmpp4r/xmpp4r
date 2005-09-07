@@ -26,7 +26,7 @@ module Jabber
     ##
     # Add an element to the presence stanza
     # * <error/> elements are converted to [Error]
-    # * TODO: <x/>
+    # * <x/> elements are converted to [X]
     # element:: [REXML::Element] to add
     def add(element)
       if element.kind_of?(REXML::Element) && (element.name == 'error')
@@ -89,6 +89,7 @@ module Jabber
 
     ##
     # Set type of presence (chaining-friendly)
+    # val:: [Symbol] See type for possible subscription types
     def set_type(val)
       self.type = val
       self
@@ -96,6 +97,7 @@ module Jabber
 
     ##
     # Get the first <x/> element of this stanza
+    # result:: [REXML::Element] or nil
     def x
       xe = nil
       each_element('x') { |e| xe = e }
@@ -149,6 +151,7 @@ module Jabber
 
     ##
     # Set Availability Status (chaining-friendly)
+    # val:: [Symbol] or [Nil] See show for explanation
     def set_show(val)
       self.show = val
       self
@@ -156,40 +159,33 @@ module Jabber
 
     ##
     # Get status message
+    # result:: [String] or nil
     def status
-      each_element('status') { |status| return(status.text) }
-      nil
+      first_element_text('status')
     end
 
     ##
     # Set status message
+    # val:: [String] or nil
     def status=(val)
-      xe = nil
-      each_element('status') { |status| xe = status }
-      if xe.nil?
-        xe = add_element('status')
-      end
-      
-      if val.nil?
-        delete_element(xe)
-      else
-        xe.text = val
-      end
+      replace_element_text('status', val)
     end
 
     ##
     # Set status message (chaining-friendly)
+    # val:: [String] or nil
     def set_status(val)
       self.status = val
       self
     end
 
     ##
-    # Get presence priority
+    # Get presence priority, or 0 if absent
     # result:: [Integer]
     def priority
-      each_element('priority') { |prio| return(prio.text.to_i) }
-      nil
+      # to_i returns 0 if String isn't numeric,
+      # but thats completely okay here
+      first_element_text('priority').to_i
     end
 
     ##
@@ -199,21 +195,12 @@ module Jabber
     # *Warning:* negative values make you receive no subscription requests etc.
     # (RFC3921 - 2.2.2.3.)
     def priority=(val)
-      xe = nil
-      each_element('priority') { |prio| xe = prio }
-      if xe.nil?
-        xe = add_element('priority')
-      end
-      
-      if val.nil?
-        delete_element(xe)
-      else
-        xe.text = val.to_s
-      end
+      replace_element_text('priority', val)
     end
 
     ##
     # Set presence priority (chaining-friendly)
+    # val:: [Integer] Priority value between -128 and +127
     def set_priority(val)
       self.priority = val
       self

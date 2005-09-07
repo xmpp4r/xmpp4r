@@ -27,13 +27,16 @@
 # stopped after the second callback returned true.
 class CallbackList
 
-  # create a new list of callbacks
+  # Create a new list of callbacks
   def initialize
     @list = []
   end
 
   ##
   # Add a callback to the list
+  #
+  # List will be sorted afterwards
+  #
   # prio:: [Integer] the callback's priority, the higher, the sooner.
   # ref:: [String] the callback's reference
   # block:: [Block] a block to execute

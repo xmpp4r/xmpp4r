@@ -28,6 +28,7 @@ module Jabber
 
     ##
     # Create a new stream
+    # (just initializes)
     def initialize(threaded = true)
       @fd = nil
       @status = DISCONNECTED

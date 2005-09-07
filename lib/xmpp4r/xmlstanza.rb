@@ -12,11 +12,13 @@ module Jabber
     # Compose a response by doing the following:
     # * Create a new XMLStanza of the same subclass
     #   with the same element-name
+    # * Import xmlstanza if import is true
     # * Swap 'to' and 'from'
     # * Copy 'id'
     # * Does not take care about the type
     # xmlstanza:: [XMLStanza] source
-    # result:: [XMLStanza] empty answer stanza
+    # import:: [true or false] Copy attributes and children of source
+    # result:: [XMLStanza] answer stanza
     def XMLStanza.answer(xmlstanza, import=true)
       x = xmlstanza.class::new(xmlstanza.name)
       if import
@@ -26,6 +28,14 @@ module Jabber
       x.to = xmlstanza.from
       x.id = xmlstanza.id
       x
+    end
+
+    ##
+    # Compose a response of this XMLStanza
+    # (see XMLStanza.answer)
+    # result:: [XMLStanza] New constructed stanza
+    def answer(import=true)
+      XMLStanza.answer(self, import)
     end
 
     ##

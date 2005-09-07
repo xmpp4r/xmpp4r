@@ -8,7 +8,8 @@ require 'xmpp4r/x'
 
 module Jabber
   ##
-  # The Message class manages the <message/> stanzas.
+  # The Message class manages the <message/> stanzas,
+  # which is used for all messaging communication.
   class Message < XMLStanza
 
     ##
@@ -29,7 +30,7 @@ module Jabber
     # Add a sub-element
     #
     # Will be converted to [Error] if named "error"
-    # TODO: convert <x/>
+    # or to [X] if named "x"
     # element:: [REXML::Element] to add
     def add(element)
       if element.kind_of?(REXML::Element) && (element.name == 'error')
@@ -91,32 +92,37 @@ module Jabber
     end
 
     ##
-    # Returns the message's body, or nil
+    # Returns the message's body, or nil.
+    # This is the message's plain-text content.
     def body
       first_element_text('body')
     end
 
     ##
-    # Create a new message from a stanza
+    # Create a new message from a stanza,
+    # by copying all attributes and children from it.
+    # xmlstanza:: [REXML::Element] Source
+    # return:: [Message] Result
     def Message.import(xmlstanza)
       Message::new.import(xmlstanza)
     end
 
     ##
-    # sets the message's body
+    # Sets the message's body
     #
     # b:: [String] body to set
     def body=(b)
-      set_body(b)
+      replace_element_text('body', b)
     end
 
     ##
-    # sets the message's body
+    # Sets the message's body
     #
     # b:: [String] body to set
     # return:: [REXML::Element] self for chaining
     def set_body(b)
-      replace_element_text('body', b)
+      self.body = b
+      self
     end
 
     ##
@@ -124,7 +130,7 @@ module Jabber
     #
     # s:: [String] subject to set
     def subject=(s)
-      set_subject(s)
+      replace_element_text('subject', s)
     end
 
     ##
@@ -133,19 +139,14 @@ module Jabber
     # s:: [String] subject to set
     # return:: [REXML::Element] self for chaining
     def set_subject(s)
-      xe = first_element('subject')
-      if xe.nil?
-        xe = REXML::Element::new('subject')
-        add_element(xe)
-      end
-      xe.text = s
+      self.subject = s
       self
     end
 
     ##
     # Returns the message's subject, or nil
     def subject
-      return first_element_text('subject')
+      first_element_text('subject')
     end
 
     ##
@@ -153,7 +154,7 @@ module Jabber
     # s:: [String] thread to set
     def thread=(s)
       delete_elements('thread')
-      add_element('thread').text = s unless s.nil?
+      replace_element_text('thread', s) unless s.nil?
     end
 
     ##
@@ -168,7 +169,7 @@ module Jabber
     ##
     # Returns the message's thread, or nil
     def thread
-      return first_element_text('thread')
+      first_element_text('thread')
     end
   end
 end
