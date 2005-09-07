@@ -61,7 +61,7 @@ cl.add_iq_callback { |iq|
       puts("#{iq.to} requests info of #{iq.from} node #{iq.query.node.inspect}")
 
       if iq.query.node.nil?
-        iq.query.add(Jabber::DiscoIdentity.new('directory', 'Roster discovery', 'roster'))
+        iq.query.add(Jabber::DiscoIdentity.new('directory', 'Roster discovery', 'user'))
       else
         # Count contacts in group
         in_group = 0
@@ -71,7 +71,7 @@ cl.add_iq_callback { |iq|
           end
         }
 
-        iq.query.add(Jabber::DiscoIdentity.new('directory', "#{iq.query.node} (#{in_group})", 'roster'))
+        iq.query.add(Jabber::DiscoIdentity.new('directory', "#{iq.query.node} (#{in_group})", 'group'))
       end
 
       iq.query.add(Jabber::DiscoFeature.new(Jabber::IqQueryDiscoInfo.new.namespace))
