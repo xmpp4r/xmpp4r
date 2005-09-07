@@ -19,9 +19,9 @@ Rake::RDocTask.new do |rd|
       f << file if not FileTest.directory?(file)
     end
   end
-  f.delete("lib/xmpp4r/xmpp4r.rb")
+  f.delete('lib/xmpp4r.rb')
   # hack to document the Jabber module properly
-  f << 'lib/xmpp4r/xmpp4r.rb'
+  f.unshift('lib/xmpp4r.rb')
   rd.rdoc_files.include(f)
   rd.options << '--all'
   rd.options << '--diagram'
