@@ -31,7 +31,9 @@ module Jabber
     # * "subscription-required"
     # * "undefined-condition"
     # * "unexpected-request"
-    # Will raise an [Exception] if not [nil] and one of the above
+    # Will raise an [Exception] if not [nil] and none of the above
+    #
+    # Does also set type and code to appropriate values according to errorcondition
     #
     # text: [nil] or [String] Error text
     def initialize(errorcondition=nil, text=nil)
@@ -182,7 +184,7 @@ module Jabber
     end
 
     ##
-    # Set the type of error (see type)
+    # Set the type of error (see Error#type)
     def type=(t)
       case t
         when :auth then attributes['type'] = 'auth'

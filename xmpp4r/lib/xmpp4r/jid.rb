@@ -6,6 +6,8 @@ module Jabber
   ##
   # The JID class represents a Jabber Identifier as described by 
   # RFC3920 section 3.1.
+  #
+  # Note that you can use JIDs also for Sorting, Hash keys, ...
   class JID
     include Comparable
 
@@ -43,6 +45,11 @@ module Jabber
 
     ##
     # Returns a string representation of the JID
+    # * ""
+    # * "domain"
+    # * "node@domain"
+    # * "domain/resource"
+    # * "node@domain/resource"
     def to_s
       s = ''
       s = "#{@node}@" if not @node.nil?
@@ -53,31 +60,39 @@ module Jabber
 
     ##
     # Returns a new JID with resource removed.
+    # return:: [JID]
     def strip
       JID::new(@node, @domain)
     end
 
     ##
-    # Remove the resource
+    # Remove the resource of *this* object
+    # return:: [JID] self
     def strip!
       @resource = nil
       self
     end
 
     ##
-    # Returns an hash value
+    # Returns a hash value of the String representation
+    # (see JID#to_s)
     def hash
       return to_s.hash
     end
 
     ##
-    # compare to another JID
+    # Ccompare to another JID
+    #
+    # String representations are compared, see JID#to_s
     def eql?(o)
       to_s.eql?(o.to_s)
     end
     
     ##
-    # Compare two JIDs
+    # Compare two JIDs,
+    # helpful for sorting etc.
+    #
+    # String representations are compared, see JID#to_s
     def <=>(o)
       to_s <=> o.to_s
     end

@@ -6,7 +6,8 @@ require 'xmpp4r/iq'
 
 module Jabber
   ##
-  # vCard container
+  # vCard container for User Information
+  # (can be specified by users themselves, mostly kept on servers)
   # (JEP 0054)
   class IqVcard < REXML::Element
     ##
@@ -25,6 +26,7 @@ module Jabber
 
     ##
     # element:: [REXML::Element] to import
+    # result:: [IqVcard] with all attributes and children copied from element
     def IqVcard.import(element)
       IqVcard::new.import(element)
     end

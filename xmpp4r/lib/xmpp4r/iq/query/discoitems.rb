@@ -9,9 +9,16 @@ module Jabber
   # Class for handling Service Discovery queries,
   # items
   # (JEP 0030)
+  #
+  # This <query/> may contain multiple DiscoItem elements,
+  # describing multiple services to be browsed by Jabber clients.
+  # These may then get further information about these items by
+  # querying IqQueryDiscoInfo and further sub-items by querying
+  # IqQueryDiscoItems.
   class IqQueryDiscoItems < IqQuery
     ##
     # Create a new query
+    # with namespace http://jabber.org/protocol/disco#items
     def initialize
       super
       add_namespace('http://jabber.org/protocol/disco#items')
@@ -20,8 +27,7 @@ module Jabber
     ##
     # Add a children element
     #
-    # Converts <identity/> elements to [DiscoIdentity]
-    # and <feature/> elements to [DiscoFeature]
+    # Converts <item/> elements to [DiscoItem]
     def add(element)
       if element.kind_of?(REXML::Element)
 
@@ -37,19 +43,23 @@ module Jabber
     end
 
     ##
-    # Get the queried node or nil
+    # Get the queried Service Discovery node or nil
+    #
+    # A Service Discovery node is _not_ a JID node,
+    # this may be a bit confusing. It's just to make
+    # Service Discovery browsing a bit more structured.
     def node
       attributes['node']
     end
 
     ##
-    # Get the queried node or nil
+    # Get the queried Service Discovery node or nil
     def node=(val)
       attributes['node'] = val
     end
 
     ##
-    # Get the queried node or nil
+    # Get the queried Service Discovery node or nil
     # (chaining-friendly)
     def set_node(val)
       self.node = val
@@ -64,6 +74,12 @@ module Jabber
   #
   # Please note that JEP 0030 requires the jid to occur
   class DiscoItem < REXML::Element
+    ##
+    # Initialize a new Service Discovery <item/>
+    # to be added to IqQueryDiscoItems
+    # jid:: [JID]
+    # iname:: [String] Item name
+    # node:: [String] Service Discovery node (_not_ JID#node)
     def initialize(jid=nil, iname=nil, node=nil)
       super('item')
       set_jid(jid)
@@ -80,13 +96,14 @@ module Jabber
 
     ##
     # Set the item's jid
-    # val:: [String]
+    # val:: [JID]
     def jid=(val)
       attributes['jid'] = val.to_s
     end
 
     ##
     # Set the item's jid (chaining-friendly)
+    # val:: [JID]
     def set_jid(val)
       self.jid = val
       self
@@ -111,27 +128,29 @@ module Jabber
 
     ##
     # Set the item's name (chaining-friendly)
+    # val:: [String]
     def set_iname(val)
       self.iname = val
       self
     end
 
     ##
-    # Get the item's node or nil
+    # Get the item's Service Discovery node or nil
     # result:: [String]
     def node
       attributes['node']
     end
 
     ##
-    # Set the item's node
+    # Set the item's Service Discovery node
     # val:: [String]
     def node=(val)
       attributes['node'] = val
     end
 
     ##
-    # Set the item's node (chaining-friendly)
+    # Set the item's Service Discovery node (chaining-friendly)
+    # val:: [String]
     def set_node(val)
       self.node = val
       self

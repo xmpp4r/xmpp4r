@@ -6,6 +6,8 @@ module Jabber
   ##
   # A class used to build/parse <x/> elements
   #
+  # These elements may occur as "attachments"
+  # in [Message] and [Presence] stanzas
   class X < REXML::Element
     @@namespace_classes = {}
 

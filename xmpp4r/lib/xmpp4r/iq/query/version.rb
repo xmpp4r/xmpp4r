@@ -13,7 +13,7 @@ module Jabber
   # <name/> (iname) and <version/> must be present
   class IqQueryVersion < IqQuery
     ##
-    # Create a new <query xmlns='jabber:iq:version'/>
+    # Create a new <query xmlns='jabber:iq:version'/> element
     def initialize(iname='', version='', os=nil)
       super()
       add_namespace('jabber:iq:version')
@@ -51,6 +51,9 @@ module Jabber
       replace_element_text('name', text)
     end
 
+    ##
+    # Set the name of the software (chaining-friendly)
+    # result:: [String] or nil
     def set_iname(text)
       self.iname = text
       self
@@ -58,6 +61,7 @@ module Jabber
 
     ##
     # Get the version of the software
+    # result:: [String] or nil
     def version
       first_element_text('version')
     end
@@ -71,19 +75,24 @@ module Jabber
       replace_element_text('version', text)
     end
 
+    ##
+    # Set the version of the software (chaining-friendly)
+    # text:: [String]
     def set_version(text)
       self.version = text
       self
     end
 
     ##
-    # Get the operating system
+    # Get the operating system or nil
+    # (os is not mandatory for Version Query)
     def os
       first_element_text('os')
     end
 
     ##
     # Set the os of the software
+    # text:: [String] or nil
     def os=(text)
       if text
         replace_element_text('os', text)
@@ -92,6 +101,9 @@ module Jabber
       end
     end
 
+    ##
+    # Set the os of the software (chaining-friendly)
+    # text:: [String] or nil
     def set_os(text)
       self.os = text
       self

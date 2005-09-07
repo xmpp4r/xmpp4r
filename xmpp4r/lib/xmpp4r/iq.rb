@@ -9,11 +9,17 @@ require 'digest/sha1'
 
 module Jabber
   ##
-  # A class used to build/parse IQ requests/responses
+  # IQ: Information/Query
+  # (see RFC3920 - 9.2.3
   #
+  # A class used to build/parse IQ requests/responses
   class Iq < XMLStanza
     @@element_classes = {}
-    
+
+    ##
+    # Build a new <iq/> stanza
+    # type:: [Symbol] or nil, see Iq#type
+    # to:: [JID] Recipient
     def initialize(type = nil, to = nil)
       super("iq")
       if not to.nil?
@@ -44,7 +50,7 @@ module Jabber
     end
 
     ##
-    # Set the type of the Iq stanza (see type)
+    # Set the type of the Iq stanza (see Iq#type)
     # v:: [Symbol] or nil
     def type=(v)
       case v
@@ -100,7 +106,10 @@ module Jabber
     end
 
     ##
-    # Create a new iq from a stanza
+    # Create a new iq from a stanza,
+    # copies all attributes and children from xmlstanza
+    # xmlstanza:: [REXML::Element] Source stanza
+    # return:: [Iq] New stanza
     def Iq.import(xmlstanza)
       Iq::new.import(xmlstanza)
     end
@@ -119,7 +128,8 @@ module Jabber
     end
 
     ##
-    # Create a new Iq stanza with a query child
+    # Create a new Iq stanza with an unspecified query child
+    # (<query/> has no namespace)
     def Iq.new_query(type = nil, to = nil)
       iq = Iq::new(type, to)
       query = IqQuery::new

@@ -15,6 +15,8 @@ module Jabber
   # as its functionality is not needed for a working XMPP implementation.
   # This will make [IqQuery] convert all Queries with namespace 'jabber:iq:roster'
   # to [IqQueryRoster]
+  #
+  # This <query/> contains multiple <item/> children. See RosterItem.
   class IqQueryRoster < IqQuery
     ##
     # Create a new <query xmlns='jabber:iq:roster'/>
@@ -41,6 +43,7 @@ module Jabber
 
     ##
     # Iterate through all items
+    # &block:: Yield for every [RosterItem]
     def each(&block)
       each_element { |item|
         # XPath won't work here as it's missing a prefix...
@@ -54,7 +57,7 @@ module Jabber
     # result:: [RosterItem]
     def [](jid)
       each { |item|
-        return(item) if item.jid == jid.strip
+        return(item) if item.jid == jid
       }
       nil
     end
@@ -85,6 +88,9 @@ module Jabber
 
     ##
     # Output for "p"
+    #
+    # JIDs of all contained [RosterItem] elements are joined with a comma
+    # result:: [String]
     def inspect
       jids = to_a.collect { |item| item.jid.inspect }
       jids.join(', ')
@@ -102,7 +108,7 @@ module Jabber
     # Construct a new roster item
     # jid:: [JID] Jabber ID
     # iname:: [String] Name in the roster
-    # subscription:: [String] Type of subscription (see subscription=())
+    # subscription:: [String] Type of subscription (see RosterItem#subscription=)
     # ask:: [String] or [Nil] Can be "ask"
     def initialize(jid=nil, iname=nil, subscription=nil, ask=nil)
       super('item')
@@ -114,31 +120,38 @@ module Jabber
 
     ##
     # Create new RosterItem from REXML::Element
+    # item:: [REXML::Element] source element to copy attributes and children from
     def RosterItem.import(item)
       RosterItem::new.import(item)
     end
 
     ##
     # Get name of roster item
+    #
+    # names can be set by the roster's owner himself
+    # return:: [String]
     def iname
       attributes['name']
     end
 
     ##
     # Set name of roster item
+    # val:: [String] Name for this item
     def iname=(val)
       attributes['name'] = val
     end
 
     ##
     # Get JID of roster item
-    # Resource of the JID will be stripped
+    # Resource of the JID will _not_ be stripped
+    # return:: [JID]
     def jid
-      JID::new(attributes['jid']).strip
+      JID::new(attributes['jid'])
     end
 
     ##
     # Set JID of roster item
+    # val:: [JID] or nil
     def jid=(val)
       attributes['jid'] = val.nil? ? nil : val.to_s
     end

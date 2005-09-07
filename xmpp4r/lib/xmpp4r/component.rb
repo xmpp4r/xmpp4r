@@ -6,7 +6,10 @@ require 'xmpp4r/connection'
 
 module Jabber
   ##
-  # The component class provides everything needed to build a basic XMPP Component.
+  # The component class provides everything needed to build a XMPP Component.
+  #
+  # Components are more flexible as they are only restricted in the use of a
+  # fixed domain. node and resource of JIDs are freely choosable for all stanzas.
   class Component  < Connection
 
     # The component's JID
@@ -19,6 +22,9 @@ module Jabber
     attr_reader :server_port
 
     # Create a new Component
+    # jid:: [JID]
+    # server_address:: [String] Hostname
+    # server_port:: [Integer] TCP port (5347)
     def initialize(jid, server_address, server_port, threaded = true)
       super(server_address, threaded, server_port)
       @jid = jid
