@@ -8,7 +8,7 @@ Standards-Version: 3.6.2.1
 Package: libxmpp4r-ruby1.8
 Depends: ruby1.8
 Architecture: all
-Description: XMPP/Jabber library for Ruby (dummy package)
+Description: XMPP/Jabber library for Ruby
  XMPP4R is an XMPP/Jabber library for Ruby. It provides all the necessary
  backend to write scripts or applications acting as Jabber clients or
  components.
