@@ -16,6 +16,49 @@
 # the user can access attributes and childs using either the XMPP4R's helpers
 # or directly using REXML's methods.
 #
+# ===Automatic element casting
+#
+# Because there are special classes derived from REXML::Element to ease
+# development on the protocol level, Elements must be cast to them. This is
+# done via REXML::Element.import. This method is also used in import class
+# methods of some Element classes.
+#
+# The first occurance of this feature is in Jabber::Stream::receive:
+# * <tt><message/></tt> stanzas are cast to Jabber::Message class
+# * <tt><presence/></tt> stanzas are cast to Jabber::Presence class
+# * <tt><iq/></tt> stanzas are cast to Jabber::Iq class
+#
+# This is not only useful for stanzas but all other XML processing, too:
+# * <tt><x/></tt> children elements of <tt><message/></tt> and <tt><presence/></tt> are converted to Jabber::X
+# * <tt><error/></tt> children elements of all three stanzas are converted to Jabber::Error
+# * <tt><query/></tt> children elements of <tt><iq/></tt> are converted to Jabber::IqQuery
+# * <tt><vCard/></tt> children elements of <tt><iq/></tt> are converted to Jabber::IqVcard
+#
+# The following conversion facilities are only executed if the respective
+# library parts are loaded. See below for more details on Non-basic features.
+# * Jabber::IqQuery elements are converted to Jabber::IqQueryRoster if their
+#   namespace is 'jabber:iq:roster'
+# * Jabber::IqQuery elements are converted to Jabber::IqQueryVersion if their
+#   namespace is 'jabber:iq:version'
+# * Jabber::IqQuery elements are converted to Jabber::IqQueryDiscoInfo if their
+#   namespace is 'http://jabber.org/protocol/disco#info'
+# * Jabber::IqQuery elements are converted to Jabber::IqQueryDiscoItems if their
+#   namespace is 'http://jabber.org/protocol/disco#items'
+# * <tt><item/></tt> children elements of Jabber::IqQueryRoster are converted
+#   to Jabber::RosterItem
+# * <tt><identity/></tt> children elements of Jabber::IqQueryDiscoInfo are converted
+#   to Jabber::DiscoIdentity
+# * <tt><feature/></tt> children elements of Jabber::IqQueryDiscoInfo are converted
+#   to Jabber::DiscoFeature
+# * <tt><item/></tt> children elements of Jabber::IqQueryDiscoItems are converted
+#   to Jabber::DiscoItem
+#
+# To use this, don't check for:
+# <tt>iq.queryns == 'http://jabber.org/protocol/disco#info'</tt>
+#
+# But instead check for the query's class:
+# <tt>iq.query.kind_of?(Jabber::IqQueryDiscoInfo)</tt>
+#
 # ==Threaded and non-threaded modes
 #
 # From the user point of view, the library can be used either in threaded mode,

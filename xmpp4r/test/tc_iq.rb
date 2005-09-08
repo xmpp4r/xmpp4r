@@ -28,4 +28,11 @@ class IqTest < Test::Unit::TestCase
     assert_equal(query.to_s, x.query.to_s)
     assert_equal('jabber:iq:auth', x.queryns)
   end
+
+  def test_error
+    x = Iq::new(:set)
+    e = REXML::Element::new('error')
+    x.add(e)
+    assert_equal(Error, x.first_element('error').class)
+  end
 end

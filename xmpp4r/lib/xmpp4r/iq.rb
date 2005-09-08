@@ -223,3 +223,4 @@ end
 
 require 'xmpp4r/iq/query'
 require 'xmpp4r/iq/vcard'
+require 'xmpp4r/iq/error'
