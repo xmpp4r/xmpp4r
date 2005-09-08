@@ -40,14 +40,20 @@ cl = Client::new(jid, false)
 cl.connect
 cl.auth(password)
 exit = false
-cl.add_message_callback { |m|
-  cl.send(Message::new(m.from, "Je suis un robot. Si tu souhaites contacter un administrateur du serveur, ecris a lucas@nussbaum.fr ."))
-  if m.body == 'exitnowplease'
-    cl.send(Message::new(m.from, "Exiting ..."))
-    exit = true
+sent = []
+cl.add_message_callback do |m|
+  if m.type != :error
+    if !sent.include?(m.from)
+      cl.send(Message::new(m.from, "Je suis un robot. Si tu souhaites contacter un administrateur du serveur, envoie un message à lucas@nussbaum.fr ou rejoins la salle jabberfr@chat.jabberfr.org."))
+      sent << m.from
+    end
+    if m.body == 'exitnowplease'
+      cl.send(Message::new(m.from, "Exiting ..."))
+      exit = true
+    end
+    cl.send(Message::new('lucas@nussbaum.fr', "From #{m.from}: #{m.body.to_s}"))
   end
-  cl.send(Message::new('lucas@nussbaum.fr', "From #{m.from}: #{m.body.to_s}"))
-}
+end
 cl.send(Presence::new)
 m = Message::new(nil, body)
 STDIN.each_line { |l|

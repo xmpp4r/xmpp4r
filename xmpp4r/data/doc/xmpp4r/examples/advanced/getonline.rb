@@ -2,12 +2,9 @@
 
 # This script can get all roster entries
 
-$:.unshift '../lib'
-
 require 'optparse'
 require 'xmpp4r'
 include Jabber
-Jabber::debug = true
 
 get = true
 jid = JID::new('lucastest@linux.ensimag.fr/rosterget')
