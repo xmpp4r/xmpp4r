@@ -30,4 +30,10 @@ class MessageTest < Test::Unit::TestCase
     assert_equal("2", x.body)
   end
 
+  def test_error
+    x = Message::new()
+    e = REXML::Element::new('error')
+    x.add(e)
+    assert_equal(Error, x.first_element('error').class)
+  end
 end

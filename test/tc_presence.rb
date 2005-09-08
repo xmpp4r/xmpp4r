@@ -98,6 +98,13 @@ class PresenceTest < Test::Unit::TestCase
     assert_equal(0, x.priority)
   end
 
+  def test_error
+    x = Presence::new()
+    e = REXML::Element::new('error')
+    x.add(e)
+    assert_equal(Error, x.first_element('error').class)
+  end
+
   def test_sample
     x = Presence::new
     require 'rexml/document'
