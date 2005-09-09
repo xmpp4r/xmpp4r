@@ -28,11 +28,9 @@ class PresenceTest < Test::Unit::TestCase
   def test_show
     x = Presence::new()
     assert_equal(nil, x.show)
-    x.show = "a"
+    assert_raise(RuntimeError) { x.show = "a" }
     assert_equal(nil, x.show)
-    x.show = :notaway
-    assert_equal(nil, x.show)
-    x.show = 'away'
+    assert_raise(RuntimeError) { x.show = 'away' }
     assert_equal(nil, x.show)
     x.show = :away
     assert_equal(:away, x.show)
@@ -108,11 +106,22 @@ class PresenceTest < Test::Unit::TestCase
   def test_sample
     x = Presence::new
     require 'rexml/document'
-    x.import(REXML::Document.new("<presence from='astro@spaceboyz.net/versionbot' to='astro@spaceboyz.net/edgarr' xmlns='jabber:client'>\n    <x from='astro@spaceboyz.net/versionbot' stamp='20050823T02:18:42' xmlns='jabber:x:delay'/>\n    <show>xa</show>\n    <status>I am the evil fingerprinting robot</status>\n  </presence>").root)
+    d = REXML::Document.new("<presence from='astro@spaceboyz.net/versionbot' to='astro@spaceboyz.net/edgarr' xmlns='jabber:client'>\n    <x from='astro@spaceboyz.net/versionbot' stamp='20050823T02:18:42' xmlns='jabber:x:delay'/><show>xa</show>\n    <status>I am the evil fingerprinting robot</status>\n  </presence>")
+    x.import(d.root)
     num = 0
-    x.each_element('show') { |e| num += 1 }
+    x.each_element('show') { num += 1 }
     assert_equal(1, num)
     assert_equal(:xa, x.show)
     assert_equal('I am the evil fingerprinting robot', x.status)
+  end
+
+  def test_sample2
+    x = Presence::new
+    require 'rexml/document'
+    d = REXML::Document.new("<tag1 xmlns='ns1'><tag2 xmlns='ns2'/><tada>xa</tada></tag1>")
+    x = d.root
+    num = 0
+    x.each_element('tada') {  num += 1 }
+    assert_equal(1, num)
   end
 end
