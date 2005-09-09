@@ -115,8 +115,7 @@ class PresenceTest < Test::Unit::TestCase
     assert_equal('I am the evil fingerprinting robot', x.status)
   end
 
-  def test_sample2
-    x = Presence::new
+  def test_xpathbug
     require 'rexml/document'
     d = REXML::Document.new("<tag1 xmlns='ns1'><tag2 xmlns='ns2'/><tada>xa</tada></tag1>")
     x = d.root
