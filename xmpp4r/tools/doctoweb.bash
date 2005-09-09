@@ -14,8 +14,16 @@ if [ ! -d $TARGET ]; then
 fi
 rsync -a rdoc/ $TARGET/
 
+echo "###########################################################"
 echo "CVS status :"
 cd $TARGET
+cvs -q up
+echo "CVS Adding files."
+while [ $(cvs -q up | grep "^? " | wc -l) -gt 0 ]; do
+	cvs add $(cvs -q up | grep "^? " | awk '{print $2}')
+done
+echo "###########################################################"
+echo "CVS status after adding missing files:"
 cvs -q up
 echo "Commit changes now with"
 echo "# (cd $TARGET && cvs commit -m \"rdoc update\")"
