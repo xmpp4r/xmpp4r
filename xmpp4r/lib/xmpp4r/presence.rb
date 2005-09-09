@@ -18,9 +18,9 @@ module Jabber
     # priority:: [Fixnum] Initial priority value
     def initialize(show=nil, status=nil, priority=nil)
       super("presence")
-      set_show(show)
-      set_status(status)
-      set_priority(priority)
+      set_show(show) if show
+      set_status(status) if status
+      set_priority(priority) if priority
     end
 
     ##
@@ -113,8 +113,8 @@ module Jabber
     # * :dnd (Do not disturb)
     # * :xa (Extended away)
     def show
-      text = nil
-      each_element('show') { |show| text = show.text }
+      e = first_element('show')
+      text = e ? e.text : nil
       case text
         when 'away' then :away
         when 'chat' then :chat
@@ -128,8 +128,7 @@ module Jabber
     # Set Availability Status
     # val:: [Symbol] or [Nil] See show for explanation
     def show=(val)
-      xe = nil
-      each_element('show') { |show| xe = show }
+      xe = first_element('show')
       if xe.nil?
         xe = add_element('show')
       end
@@ -139,7 +138,8 @@ module Jabber
         when :chat then text = 'chat'
         when :dnd then text = 'dnd'
         when :xa then text = 'xa'
-        else text = nil
+        when nil then text = nil
+        else raise "Invalid value for show."
       end
 
       if text.nil?
@@ -168,7 +168,11 @@ module Jabber
     # Set status message
     # val:: [String] or nil
     def status=(val)
-      replace_element_text('status', val)
+      if val.nil?
+        delete_element('status')
+      else
+        replace_element_text('status', val)
+      end
     end
 
     ##
@@ -183,9 +187,12 @@ module Jabber
     # Get presence priority, or 0 if absent
     # result:: [Integer]
     def priority
-      # to_i returns 0 if String isn't numeric,
-      # but thats completely okay here
-      first_element_text('priority').to_i
+      e = first_element_text('priority')
+      if e
+        return e.to_i
+      else
+        return nil
+      end
     end
 
     ##
@@ -195,7 +202,11 @@ module Jabber
     # *Warning:* negative values make you receive no subscription requests etc.
     # (RFC3921 - 2.2.2.3.)
     def priority=(val)
-      replace_element_text('priority', val)
+      if val.nil?
+        delete_element('priority')
+      else
+        replace_element_text('priority', val)
+      end
     end
 
     ##
