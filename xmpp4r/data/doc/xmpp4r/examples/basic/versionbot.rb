@@ -13,7 +13,7 @@ versions = {}
 # Command line argument checking
 
 if ARGV.size != 2
-  puts("Usage: ./rosterrename.rb <jid> <password>")
+  puts("Usage: ./versionbot.rb <jid> <password>")
   exit
 end
 

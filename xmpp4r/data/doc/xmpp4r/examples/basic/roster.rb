@@ -7,14 +7,12 @@ require 'xmpp4r'
 require 'xmpp4r/iq/query/roster'
 include Jabber
 
-get = true
 jid = JID::new('lucastest@linux.ensimag.fr/rosterget')
 password = 'lucastest'
 
 OptionParser::new do |opts|
   opts.banner = 'Usage: roster.rb -t get -j jid -p password'
   opts.separator ''
-  opts.on('-t', '--type get|set', 'sets the type of request') { |s| get = ( s == 'get' ? true : false) }
   opts.on('-j', '--jid JID', 'sets the jid') { |j| jid = JID::new(j) }
   opts.on('-p', '--password PASSWORD', 'sets the password') { |p| password = p }
   opts.on_tail('-h', '--help', 'Show this message') {
