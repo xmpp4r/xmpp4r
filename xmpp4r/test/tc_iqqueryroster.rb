@@ -45,7 +45,7 @@ class IqQueryRosterTest < Test::Unit::TestCase
     assert_equal(nil, r.to_a[0].subscription)
     assert_equal(nil, r.to_a[0].ask)
 
-    assert_equal(JID.new('a@b'), r.to_a[1].jid)     # Resource stripped from JID
+    assert_equal(JID.new('a@b/d'), r.to_a[1].jid)
     assert_equal('ABC', r.to_a[1].iname)
     assert_equal(:none, r.to_a[1].subscription)
     assert_equal(:subscribe, r.to_a[1].ask)
@@ -77,7 +77,7 @@ class RosterItemTest < Test::Unit::TestCase
     assert_equal(nil, ri.ask)
 
     ri = RosterItem::new(JID.new('a@b/c'), 'xyz', :both, nil)
-    assert_equal(JID.new('a@b'), ri.jid)            # Resource stripped from JID
+    assert_equal(JID.new('a@b/c'), ri.jid)
     assert_equal('xyz', ri.iname)
     assert_equal(:both, ri.subscription)
     assert_equal(nil, ri.ask)
@@ -86,7 +86,7 @@ class RosterItemTest < Test::Unit::TestCase
   def test_modify
     ri = RosterItem::new(JID.new('a@b/c'), 'xyz', :both, :subscribe)
 
-    assert_equal(JID.new('a@b'), ri.jid)
+    assert_equal(JID.new('a@b/c'), ri.jid)
     ri.jid = nil
     assert_equal(JID::new, ri.jid)
 
