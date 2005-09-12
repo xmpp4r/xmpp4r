@@ -2,7 +2,7 @@
 #
 # XMPP4R - XMPP Library for Ruby
 # Copyright (C) 2005 Stephan Maka <stephan@spaceboyz.net>
-# Released under GPL v2 or later
+# Released under Ruby's license (see the LICENSE file) or GPL, at your option
 #
 #
 # Roster-Watch example
