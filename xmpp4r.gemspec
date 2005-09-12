@@ -27,7 +27,7 @@ end
 spec = Gem::Specification.new do |s|
   s.name = 'xmpp4r'
   s.version = '0.0.1'
-  s.authors = ['Lucas Nussbaum', 'Stephen Maka']
+  s.authors = ['Lucas Nussbaum', 'Stephan Maka']
   s.email = 'xmpp4r-devel@gna.org'
   s.homepage = 'http://home.gna.org/xmpp4r/'
   s.platform = Gem::Platform::RUBY
