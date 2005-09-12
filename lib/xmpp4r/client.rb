@@ -36,6 +36,14 @@ module Jabber
     end
 
     ##
+    # Close the connection,
+    # sends <tt></stream:stream></tt> tag first
+    def close
+      send("</stream:stream>")
+      super
+    end
+
+    ##
     # Send auth with given password and wait for result
     #
     # Throws AuthenticationFailure
