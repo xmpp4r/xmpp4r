@@ -1,5 +1,5 @@
 # =XMPP4R - XMPP Library for Ruby
-# License:: GPL (v2 or later)
+# License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/rexmladdons'
