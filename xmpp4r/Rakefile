@@ -39,7 +39,7 @@ end
 
 Rake::PackageTask.new('xmpp4r', '0.1') do |p|
 	p.need_tar = true
-	p.package_files.include('ChangeLog', 'README', 'COPYING', 'setup.rb',
+	p.package_files.include('ChangeLog', 'README', 'COPYING', 'LICENSE', 'setup.rb',
 	'Rakefile')
 	require 'find'
 	Find.find('lib/', 'data/', 'test/', 'tools/') do |f|
