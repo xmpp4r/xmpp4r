@@ -253,6 +253,7 @@ module Jabber
           exit(1)
         end
       end
+      Thread.critical = false
       Thread.stop if block
       @pollCounter = 10
     end
