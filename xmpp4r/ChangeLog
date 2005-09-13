@@ -1,3 +1,8 @@
-XMPP4R 0.1 (date unknown)
-=========================
+XMPP4R 0.2 (XX/XX/2005)
+=======================
+* fixed a serious bug in Stream#send which caused some lockups. Reported by
+  chunlinyao@gmail.com.
+
+XMPP4R 0.1 (12/09/2005)
+=======================
 * first public release.
