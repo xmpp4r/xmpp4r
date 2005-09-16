@@ -27,7 +27,7 @@ module Jabber
     #
     # Converts <identity/> elements to [DiscoIdentity]
     # and <feature/> elements to [DiscoFeature]
-    def add(element)
+    def typed_add(element)
       if element.kind_of?(REXML::Element)
 
         if element.name == 'identity'

@@ -41,6 +41,15 @@ module REXML
       end
     end
 
+    # This method does exactly the same thing as add(), but it can be
+    # overriden by subclasses to provide on-the-fly object creations.
+    # For example, if you import a REXML::Element of name 'plop', and you
+    # have a Plop class that subclasses REXML::Element, with typed_add you
+    # can get your REXML::Element to be "magically" converted to Plop.
+    def typed_add(e)
+      add(e)
+    end
+
     ##
     # import this element's children and attributes
     def import(xmlelement)
@@ -51,8 +60,8 @@ module REXML
       @context = xmlelement.context
       xmlelement.each do |e|
         if e.kind_of? REXML::Element
-          add(e.deep_clone)
-        else
+          typed_add(e.deep_clone)
+        else # text element, probably.
           add(e.clone)
         end
       end

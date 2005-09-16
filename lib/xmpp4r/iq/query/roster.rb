@@ -30,7 +30,7 @@ module Jabber
     # Add an element to the roster
     #
     # Converts <item/> elements to RosterItem
-    def add(element)
+    def typed_add(element)
       if element.kind_of?(REXML::Element) && (element.name == 'item')
         item = RosterItem::new.import(element)
         # XPath injection here?

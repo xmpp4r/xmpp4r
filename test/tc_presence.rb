@@ -100,7 +100,10 @@ class PresenceTest < Test::Unit::TestCase
     x = Presence::new()
     e = REXML::Element::new('error')
     x.add(e)
-    assert_equal(Error, x.first_element('error').class)
+    x2 = Presence::new.import(x)
+    # test if, after an import, the error element is successfully changed
+    # into an Error object.
+    assert_equal(Error, x2.first_element('error').class)
   end
 
   def test_sample

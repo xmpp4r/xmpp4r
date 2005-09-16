@@ -32,7 +32,7 @@ module Jabber
     # Will be converted to [Error] if named "error"
     # or to [X] if named "x"
     # element:: [REXML::Element] to add
-    def add(element)
+    def typed_add(element)
       if element.kind_of?(REXML::Element) && (element.name == 'error')
         super(Error::import(element))
       elsif element.kind_of?(REXML::Element) && (element.name == 'x')

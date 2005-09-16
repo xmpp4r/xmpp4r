@@ -33,6 +33,9 @@ class IqTest < Test::Unit::TestCase
     x = Iq::new(:set)
     e = REXML::Element::new('error')
     x.add(e)
-    assert_equal(Error, x.first_element('error').class)
+    # test if, after an import, the error element is successfully changed
+    # into an Error object.
+    x2 = Iq::new.import(x)
+    assert_equal(Error, x2.first_element('error').class)
   end
 end

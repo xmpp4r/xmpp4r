@@ -28,7 +28,7 @@ module Jabber
     # Add a children element
     #
     # Converts <item/> elements to [DiscoItem]
-    def add(element)
+    def typed_add(element)
       if element.kind_of?(REXML::Element)
 
         if element.name == 'item'
