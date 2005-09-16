@@ -119,7 +119,7 @@ module Jabber
     # element:: [REXML::Element] Element to add.
     # Will be automatically converted (imported) to
     # a class registered with add_elementclass
-    def add(element)
+    def typed_add(element)
       if element.kind_of?(REXML::Element) && @@element_classes.has_key?(element.name)
         super(@@element_classes[element.name]::import(element))
       else

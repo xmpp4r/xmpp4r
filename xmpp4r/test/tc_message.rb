@@ -34,6 +34,9 @@ class MessageTest < Test::Unit::TestCase
     x = Message::new()
     e = REXML::Element::new('error')
     x.add(e)
-    assert_equal(Error, x.first_element('error').class)
+    # test if, after an import, the error element is successfully changed
+    # into an Error object.
+    x2 = Message::new.import(x)
+    assert_equal(Error, x2.first_element('error').class)
   end
 end

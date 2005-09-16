@@ -37,7 +37,8 @@ class IqQueryVersionTest < Test::Unit::TestCase
     q = REXML::Element::new('query')
     q.add_namespace('jabber:iq:version')
     iq.add(q)
-    assert_equal(IqQueryVersion, iq.query.class)
+    iq2 = Iq::new.import(iq)
+    assert_equal(IqQueryVersion, iq2.query.class)
   end
 
   def test_import2
@@ -48,6 +49,7 @@ class IqQueryVersionTest < Test::Unit::TestCase
     q.add_element('version').text = 'XP'
     q.add_element('os').text = 'FreeDOS'
     iq.add(q)
+    iq = Iq::new.import(iq)
     assert_equal(IqQueryVersion, iq.query.class)
     assert_equal('AstroBot', iq.query.iname)
     assert_equal('XP', iq.query.version)

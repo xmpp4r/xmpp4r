@@ -39,7 +39,7 @@ module Jabber
     ##
     # Add a children element,
     # will be imported to [XMucUserItem] if name is "item"
-    def add(element)
+    def typed_add(element)
       if element.kind_of?(REXML::Element) && (element.name == 'item')
         super(XMucUserItem::new.import(element))
       else
