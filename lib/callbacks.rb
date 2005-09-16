@@ -25,6 +25,18 @@
 #  puts "#{c1} #{c2} #{c3}"
 # This example would display "true true false" as callbacks processing was
 # stopped after the second callback returned true.
+#
+# In XMPP4R, callbacks' priorities are quite normalized since we want to be
+# able to "cascade" callbacks in a clean way. Here are values your code should
+# take into account :
+# 
+# >= 200 :: logging & debugging callbacks. Those callbacks should not consume
+# elements.
+# 100-199 :: Where Helpers register their callbacks. The normal value is 100,
+# and Helpers shouldn't register something else unless there's a very good
+# reason to.
+# < 100 :: all those numbers are normally available for your application.
+# That's enough, don't you think ?
 class CallbackList
 
   # Create a new list of callbacks
