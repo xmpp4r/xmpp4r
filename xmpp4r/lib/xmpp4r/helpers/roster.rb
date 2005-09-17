@@ -9,186 +9,289 @@ require 'callbacks'
 module Jabber
   module Helpers
     ##
-    # A class to track Roster and Presence updates
+    # The Roster helper intercepts <iq/> stanzas with Jabber::IqQueryRoster
+    # and <presence/> stanzas, but provides cbs which allow the programmer
+    # to keep track of updates.
     class Roster
       ##
-      # [Hash] with [JID] keys and [IqVcard] values,
-      # mostly filled by results to request_vcard()
-      attr_reader :vcards
-      
-      ##
-      # Initialize a new Roster handler
-      # stream:: [Stream] Where to register callback handlers
-      # initial_presence:: [Presence] Initial presence to be send.
-      # priority:: [Integer] Priority for callbacks
-      # ref:: [String] Reference for callbacks
-      def initialize(stream, initial_presence=nil, priority=0, ref=nil)
+      # Initialize a new Roster helper
+      #
+      # Registers its cbs (prio = 120, ref = "Helpers::Roster")
+      #
+      # Request a roster
+      # (Remember to send initial presence afterwards!)
+      def initialize(stream)
         @stream = stream
+        @items = {}
+        @update_cbs = CallbackList.new
+        @presence_cbs = CallbackList.new
+        @subscription_cbs = CallbackList.new
 
-        @rosterquery = IqQueryRoster.new
-        @presences = {}
-        @vcards = {}
-
-        @rosteritemcbs = CallbackList::new
-        @presencecbs = CallbackList::new
-        @vcardcbs = CallbackList::new
+        # Register cbs
+        stream.add_iq_callback(120, "Helpers::Roster") { |iq|
+          handle_iq(iq)
+        }
+        stream.add_presence_callback(120, "Helpers::Roster") { |pres|
+          handle_presence(pres)
+        }
         
-        stream.add_iq_callback(priority, ref) { |iq|
-          iq_callback(iq)
-        }
-        stream.add_presence_callback(priority, ref) { |pres|
-          presence_callback(pres)
-        }
+        # Request the roster
+        rosterget = Iq.new_rosterget
+        stream.send(rosterget)
+      end
 
-        # Request roster
-        stream.send(Jabber::Iq.new_rosterget)
+      ##
+      # Add a callback for Jabber::Helpers::RosterItem updates
+      #
+      # Note that this will be called much after initialization
+      # for the answer of the initial roster request
+      #
+      # The block receives two objects:
+      # * the old Jabber::Helpers::RosterItem
+      # * the new Jabber::Helpers::RosterItem
+      def add_update_callback(prio = 0, ref = nil, proc = nil, &block)
+        block = proc if proc
+        @update_cbs.add(prio, ref, block)
+      end
 
-        # Send initial presence
-        unless initial_presence.nil?
-          stream.send(initial_presence)
+      ##
+      # Add a callback for Jabber::Presence updates
+      #
+      # This will be called for <presence/> stanzas for known RosterItems.
+      # Unknown JIDs may still pass and can be caught via Jabber::Stream#add_presence_callback.
+      #
+      # The block receives three objects:
+      # * the Jabber::Helpers::RosterItem
+      # * the old Jabber::Presence (or nil)
+      # * the new Jabber::Presence (or nil)
+      def add_presence_callback(prio = 0, ref = nil, proc = nil, &block)
+        block = proc if proc
+        @presence_cbs.add(prio, ref, block)
+      end
+
+      ##
+      # Add a callback for subscription updates,
+      # which will be called upon receiving a <presence/> stanza
+      # with type:
+      # * :subscribe (you may want to answer with :subscribed or :unsubscribed)
+      # * :subscribed
+      # * :unsubscribe
+      # * :unsubscribed
+      #
+      # *Warning:* if you don't add a callback here or all callbacks return
+      # false subscription requests will be agreed by default in
+      # Jabber::Helpers::Roster#handle_presence.
+      #
+      # The block receives two objects:
+      # * the Jabber::Helpers::RosterItem (or nil)
+      # * the <presence/> stanza
+      #
+      # Example usage:
+      #  my_roster.add_subscription_callback do |item,presence|
+      #    if presence.type == :subscribe
+      #      answer = presence.answer(false)
+      #      if accept_subscription_requests
+      #        answer.type = :subscribed
+      #      else
+      #        answer.type = :unsubscribed
+      #      end
+      #      client.send(answer)
+      #    end
+      #  end
+      def add_subscription_callback(prio = 0, ref = nil, proc = nil, &block)
+        block = proc if proc
+        @subscription_cbs.add(prio, ref, block)
+      end
+
+      ##
+      # Handle received <iq/> stanzas,
+      # used internally
+      def handle_iq(iq)
+        if iq.query.kind_of?(IqQueryRoster)
+          # If the <iq/> contains <error/> we just ignore that
+          # and assume an empty roster
+          iq.query.each_element('item') do |item|
+            # Handle deletion of item
+            if item.subscription == :remove
+              @items.delete(item.jid)
+              return(true)
+            end
+            
+            olditem = nil
+            if @items.has_key?(item.jid)
+              olditem = RosterItem.new(@stream).import(@items[item.jid])
+              @items[item.jid].import(item)
+            else
+              @items[item.jid] = RosterItem.new(@stream).import(item)
+            end
+            @update_cbs.process(olditem, @items[item.jid])
+          end
+          true
+        else
+          false
         end
       end
 
       ##
-      # <iq/> callback handler
-      # (registered by constructor and used internally only)
-      def iq_callback(iq)
-        if (iq.type == :result) || (iq.type == :set)
-          if iq.query.kind_of?(IqQueryRoster)
-            # Add all items seperately so we can call the rosteritem_callback
-            iq.query.each { |item|
-              olditem = @rosterquery[item.jid]
-
-              @rosterquery.add(item)
-
-              curitem = @rosterquery[item.jid]
-              @rosteritemcbs.process(RosterChange::new(olditem, curitem))
-            }
-
+      # Handle received <presence/> stanzas,
+      # used internally
+      def handle_presence(pres)
+        item = self[pres.from]
+        if [:subscribe, :subscribed, :unsubscribe, :unsubscribed].include?(pres.type)
+          unless @subscription_cbs.process(item, pres)
+            @stream.send(Presence.new.set_to(pres.from.strip).set_type(:subscribed))
+          end
+          true
+        else
+          unless item.nil?
+            update_presence(item, pres)
             true
+          else
+            false
           end
         end
-
-        if iq.vcard.kind_of?(IqVcard)
-          @vcards[iq.from] = iq.vcard
-          # We must callback with the full Iq, the single vCard doesn't contain the JID
-          @vcardcbs.process(iq)
-        end
       end
 
       ##
-      # <presence/> callback handler
-      # (registered by constructor and used internally only)
+      # Update the presence of an item,
+      # used internally
       #
-      # Presence stanzas with type 'error' or 'probe' will be silently discarded
-      def presence_callback(pres)
-        if (pres.type != :error) && (pres.type != :probe)
-          oldpres = @presences[pres.from]
-          @presences[pres.from] = pres
-          @presencecbs.process(RosterChange::new(oldpres, pres))
-        end
+      # Callbacks are called here
+      def update_presence(item, pres)
+        oldpres = item.presence(pres.from).nil? ? nil : Presence.new.import(item.presence(pres.from))
+
+        item.presence = pres
+
+        @presence_cbs.process(item, oldpres, pres)
       end
 
       ##
-      # Get a RosterItem or Presence by JID
-      # jid:: [JID] to look for
-      # result:: [RosterItem] if [jid] has no resource (nil) or [Presence]
+      # Get an item by jid
+      #
+      # If not available tries to look for it with the resource stripped
       def [](jid)
-        if jid.resource.nil?
-          @rosterquery[jid]
+        if @items.has_key?(jid)
+          @items[jid]
+        elsif @items.has_key?(jid.strip)
+          @items[jid.strip]
         else
-          @presences[jid]
+          nil
         end
       end
-
+      
       ##
-      # Iterate through all known RosterItems
-      # &block:: Will be yielded with one [RosterItem] at once
-      def each(&block)
-        @rosterquery.each_element('item') { |item|
-          yield(item)
-        }
+      # Add a user to your roster
+      #
+      # If the item is already in the local roster
+      # it will simply send itself
+      def add(jid)
+        if self[jid]
+          self[jid].send
+        else
+          request = Iq.new_rosterset
+          request.query.add(Jabber::RosterItem.new(jid))
+          @stream.send(request)
+          # Adding to list is handled by handle_iq
+        end
       end
-
+      
       ##
-      # Get the known resources of a given JID
+      # Remove item (also unsubscribes)
       # jid:: [JID]
-      # result:: [Array] of [JID]
-      def resources(jid)
-        jids = []
-        @presences.each_key { |pjid|
-          jids.push(pjid) if jid.strip == pjid.strip
-        }
-        jids
-      end
-
-      ##
-      # Send request for a vCard
-      # jid:: [JID] of desired vCard
-      #   (resource stripping recommended, omit if requesting user's own vCard)
-      def request_vcard(jid=nil)
-        @stream.send(Iq::new_vcard(:get, jid))
-      end
-
-      ##
-      # Add a callback/block to process updated RosterItem elements
-      # proc or block:: Will be called with an [RosterChange] containing old [RosterItem] and new [RosterItem]
-      def add_rosteritem_callback(priority = 0, ref = nil, proc=nil, &block)
-        block = proc if proc
-        @rosteritemcbs.add(priority, ref, block)
-      end
-
-      ##
-      # Delete a RosterItem callback
-      # ref:: [String] Reference given when added
-      def delete_rosteritem_callback(ref)
-        @rosteritemcbs.delete(ref)
-      end
-
-      ##
-      # Add a callback/block to process updated presence stanzas.
-      # This differs from [Stream#add_presence_callback] by submitting the
-      # previous presence stanza of the resource too.
-      # proc or block:: Will be called with an [RosterChange] containing old [RosterItem] and new [RosterItem]
-      def add_presence_callback(priority = 0, ref = nil, proc=nil, &block)
-        block = proc if proc
-        @presencecbs.add(priority, ref, block)
-      end
-
-      ##
-      # Delete a presence callback
-      # ref:: [String] Reference given when added
-      def delete_presence_callback(ref)
-        @presencecbs.delete(ref)
-      end
-
-      ##
-      # Add a callback/block to process updated vCards
-      # proc or block:: Will be called with an [Iq] containing the newly retrieved [Vcard]
-      def add_vcard_callback(priority = 0, ref = nil, proc=nil, &block)
-        block = proc if proc
-        @vcardcbs.add(priority, ref, block)
-      end
-
-      ##
-      # Delete a vCard callback
-      # ref:: [String] Reference given when added
-      def delete_vcard_callback(ref)
-        @vcardcbs.delete(ref)
+      def remove(jid)
+        request = Iq.new_rosterset
+        request.query.add(Jabber::RosterItem.new(jid, nil, :remove))
+        @stream.send(request)
+        # Removing from list is handled by handle_iq
       end
     end
 
     ##
-    # A class passed to callbacks
-    #
-    # Consumption is a hack here, but works flawless
-    class RosterChange
-      attr_accessor :old, :cur
+    # These are extensions to RosterItem to carry presence information.
+    # This information is *not* stored in XML!
+    class RosterItem < Jabber::RosterItem
+      ##
+      # Initialize an empty RosterItem
+      def initialize(stream)
+        super()
+        @stream = stream
+        @presences = []
+      end
+
+      ##
+      # Import another element,
+      # also import presences if xe is a RosterItem
+      # return:: [RosterItem] self
+      def import(xe)
+        super
+        if xe.kind_of?(RosterItem)
+          xe.each_presence { |pres|
+            @presences.push(Presence.new.import(pres))
+          }
+        end
+        self
+      end
+
+      ##
+      # Send the updated RosterItem to the server,
+      # i.e. if you modified iname, groups, ...
+      def send
+        request = Iq.new_rosterset
+        request.query.add(self)
+        @stream.send(request)
+      end
       
-      def initialize(old, cur)
-        @old = old
-        @cur = cur
+      ##
+      # Iterate through all received <presence/> stanzas
+      def each_presence(&block)
+        @presences.each { |pres|
+          yield(pres)
+        }
+      end
+      
+      ##
+      # Get specific presence
+      # jid:: [JID] Full JID
+      def presence(jid)
+        @presences.each do |pres|
+          if pres.from == jid
+            return(pres)
+          end
+        end
+        nil
+      end
+
+      ##
+      # Add presence
+      # (unless type is :unavailable)
+      def presence=(newpres)
+        # Delete old presences with the same JID
+        @presences.delete_if do |pres|
+          pres.from == newpres.from
+        end
+        # Add new presence
+        unless newpres.type == :unavailable
+          @presences.push(newpres)
+        end
+      end
+
+      ##
+      # Send subscription request to the user
+      #
+      # The block given to Jabber::Helpers::Roster#add_update_callback will
+      # be called, carrying the RosterItem with ask="subscribe"
+      def subscribe
+        pres = Presence.new.set_type(:subscribe).set_to(jid)
+        @stream.send(pres)
+      end
+
+      ##
+      # Send unsubscription request to the user
+      def unsubscribe
+        pres = Presence.new.set_type(:unsubscribe).set_to(jid)
+        @stream.send(pres)
       end
     end
   end
 end
+

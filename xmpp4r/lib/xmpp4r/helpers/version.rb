@@ -13,6 +13,9 @@ module Jabber
     #
     # This is simplification as one doesn't need dynamic
     # version answering normally.
+    #
+    # Example usage:
+    #  Jabber::Helpers::Version.new(my_client, "My cool XMPP4R script", "1.0", "Younicks")
     class Version
       attr_accessor :name
       attr_accessor :version
@@ -20,20 +23,20 @@ module Jabber
 
       ##
       # Initialize a new version responder
+      #
+      # Registers it's callback (prio = 180, ref = "Helpers::Version")
       # stream:: [Stream] Where to register callback handlers
       # name:: [String] Software name for answers
       # version:: [String] Software versio for answers
       # os:: [String] Optional operating system name for answers
-      # priority:: [Integer] Priority for callbacks
-      # ref:: [String] Reference for callbacks
-      def initialize(stream, name, version, os=nil, priority=0, ref=nil)
+      def initialize(stream, name, version, os=nil)
         @stream = stream
 
         @name = name
         @version = version
         @os = os
 
-        stream.add_iq_callback(priority, ref) { |iq|
+        stream.add_iq_callback(180, "Helpers::Version") { |iq|
           iq_callback(iq)
         }
       end
@@ -41,6 +44,8 @@ module Jabber
       ##
       # <iq/> callback handler to answer Software Version queries
       # (registered by constructor and used internally only)
+      #
+      # Used internally
       def iq_callback(iq)
         if iq.type == :get
           if iq.query.kind_of?(IqQueryVersion)

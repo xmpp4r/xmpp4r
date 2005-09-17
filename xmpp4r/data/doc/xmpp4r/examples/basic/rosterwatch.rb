@@ -10,6 +10,7 @@
 #
 # Learn how a roster looks like
 #       how presences are received
+#       about subscription requests and answers
 #       what vCards contain
 #
 # It's recommended to insert 'p' commands in this script. :-)
@@ -18,17 +19,21 @@
 #
 # * Listing roster changes
 #
-# * Requesting vCards for items in your roster
+# * Subscribe to roster items which have a subscription of "none" or "from"
+#   WARNING: Chances are that you don't want that :-)
 #
-# * Receiving vCards and saving a <NICKNAME/> or <FN/> from it
+# * Requesting vCards for unnamed items in your roster and renaming them
+#   to the <NICKNAME/> or <FN/> field in the vCard
 #
 # * Listing presence changes
 #
+# * Listing subscription and unsubscription requests and answers
 
-$:.unshift '../lib'
+$:.unshift '../../../../../lib/'
 
 require 'xmpp4r'
 require 'xmpp4r/helpers/roster'
+require 'xmpp4r/helpers/vcard'
 
 # Command line argument checking
 
@@ -43,104 +48,120 @@ end
 
 jid = Jabber::JID.new(ARGV[0])
 
-cl = Jabber::Client.new(jid, false)
+cl = Jabber::Client.new(jid)
 cl.connect
 cl.auth(ARGV[1])
 
-
 # The roster instance
-roster = Jabber::Helpers::Roster.new(cl, Jabber::Presence.new.set_show(:dnd).set_status('Watching my roster change...'))
+roster = Jabber::Helpers::Roster.new(cl)
 
-
-# What has changed in the roster?
-#
-# Mostly only called back once,
-# except another resource is renaming items etc.
-roster.add_rosteritem_callback { |change|
-  oitem = change.old
-  item = change.cur
+# Callback to handle updated roster items
+roster.add_update_callback { |olditem,item|
+  if [:from, :none].include?(item.subscription) && item.ask != :subscribe
+    puts("Subscribing to #{item.jid}")
+    item.subscribe
+  end
   
-  if oitem.nil?
-    # We didn't knew before:
+  # Print the item
+  if olditem.nil?                                                    
+    # We didn't knew before:                                       
     puts("#{item.iname} (#{item.jid}, #{item.subscription}) #{item.groups.join(', ')}")
-  else
-    # Showing whats different:
-    puts("#{oitem.iname} (#{oitem.jid}, #{oitem.subscription}) #{oitem.groups.join(', ')} -> #{item.iname} (#{item.jid}, #{item.subscription}) #{item.groups.join(', ')}")
+  else                                                             
+    # Showing whats different:                                     
+    puts("#{olditem.iname} (#{olditem.jid}, #{olditem.subscription}) #{olditem.groups.join(', ')} -> #{item.iname} (#{item.jid}, #{item.subscription}) #{item.groups.join(', ')}")
   end
 
-  # Don't we have a vCard from him?
-  unless roster.vcards[item.jid]
-    # Request a vCard from him!
-    roster.request_vcard(item.jid)
-  end
-}
+  # If the item has no name associated...
+  unless item.iname
+    Thread.new do
+      puts("#{item.jid} has no nickname... getting vCard")
+      begin
+        # ...get a vCard
+        vcard = Jabber::Helpers::Vcard.new(cl).get(item.jid.strip)
 
-# Received a vCard...
-#
-# We set RosterItem's name here to remember it, the item is *not* sent!
-roster.add_vcard_callback { |iq|
-  print("Got vCard for #{iq.from}: ")
-  
-  # Do we have that in the roster?
-  item = roster[iq.from.strip]
-  if item
-    if iq.vcard['NICKNAME']
-      # Let's take the <NICKNAME/>
-      item.iname = iq.vcard['NICKNAME']
-      puts("NICKNAME = #{item.iname.inspect}")
-    elsif iq.vcard['FN']
-      # Let's take the <FN/>
-      item.iname = iq.vcard['FN']
-      puts("FN = #{item.iname.inspect}")
-    else
-      # Somebody was lazy here
-      puts("but no name given in vCard")
+        # Rename him to vCard's <NICKNAME/> field
+        if vcard['NICKNAME']
+          item.iname = vcard['NICKNAME']
+          puts("Renaming #{item.jid} to #{vcard['NICKNAME']}")
+          item.send
+        # Rename him to vCard's <FN/> field
+        elsif vcard['FN']
+          item.iname = vcard['FN']
+          puts("Renaming #{item.jid} to #{vcard['FN']}")
+          item.send
+        # We've got a lazy one
+        else
+          puts("#{item.jid} provided no details in vCard")
+        end
+
+      rescue Exception => e
+        # This will be (mostly) thrown by Jabber::Helpers::Vcard#get
+        puts("Error getting vCard for #{item.jid}: #{e.to_s}")
+      end
     end
-  else
-    # vCards are only requested for items in the roster here...
-    puts("but #{iq.from} is not in roster. Who requested the vCard?")
   end
 }
 
-# <presence/> callback
-roster.add_presence_callback { |change|
+# Presence updates:
+roster.add_presence_callback { |item,oldpres,pres|
   # Can't look for something that just does not exist...
-  if change.old.nil?
+  if pres.nil?
     # ...so create it:
-    change.old = Jabber::Presence.new
+    pres = Jabber::Presence.new
+  end
+  if oldpres.nil?
+    # ...so create it:
+    oldpres = Jabber::Presence.new
   end
   
   # Print name and jid:
-  name = change.cur.from
-  if roster[change.cur.from.strip] && roster[change.cur.from.strip].iname
-    name = "#{roster[change.cur.from.strip].iname} (#{change.cur.from})"
+  name = "#{pres.from}"
+  if item.iname
+    name = "#{item.iname} (#{pres.from})"
   end
   puts(name)
 
   # Print type changes:
-  unless change.old.type.nil? && change.cur.type.nil?
-    puts("  Type: #{change.old.type.inspect} -> #{change.cur.type.inspect}")
+  unless oldpres.type.nil? && pres.type.nil?
+    puts("  Type: #{oldpres.type.inspect} -> #{pres.type.inspect}")
   end
   # Print show changes:
-  unless change.old.show.nil? && change.cur.show.nil?
-    puts("  Show:     #{change.old.show.to_s.inspect} -> #{change.cur.show.to_s.inspect}")
+  unless oldpres.show.nil? && pres.show.nil?
+    puts("  Show:     #{oldpres.show.to_s.inspect} -> #{pres.show.to_s.inspect}")
   end
   # Print status changes:
-  unless change.old.status.nil? && change.cur.status.nil?
-    puts("  Status:   #{change.old.status.to_s.inspect} -> #{change.cur.status.to_s.inspect}")
+  unless oldpres.status.nil? && pres.status.nil?
+    puts("  Status:   #{oldpres.status.to_s.inspect} -> #{pres.status.to_s.inspect}")
   end
   # Print priority changes:
-  unless change.old.priority.nil? && change.cur.priority.nil?
-    puts("  Priority: #{change.old.priority.inspect} -> #{change.cur.priority.inspect}")
+  unless oldpres.priority.nil? && pres.priority.nil?
+    puts("  Priority: #{oldpres.priority.inspect} -> #{pres.priority.inspect}")
   end
 }
 
-# Main loop:
+# Subscription requests and responses:
+roster.add_subscription_callback { |item,pres|
+  name = pres.from
+  if item != nil && item.iname != nil
+    name = "#{item.iname} (#{pres.from})"
+  end
+  case pres.type
+    when :subscribe then puts("Subscription request from #{name}")
+    when :subscribed then puts("Subscribed to #{name}")
+    when :unsubscribe then puts("Unsubscription request from #{name}")
+    when :unsubscribed then puts("Unsubscribed from #{name}")
+    else raise "The Roster Helper is buggy!!! subscription callback with type=#{pres.type}"
+  end
 
-loop do
-  cl.process
-  sleep(1)
-end
+  false
+}
+
+# Send initial presence
+# this is important for receiving presence of subscribed users
+cl.send(Jabber::Presence.new.set_show(:dnd).set_status('Watching my roster change...'))
+
+# Main loop:
+Thread.stop
 
 cl.close
 
