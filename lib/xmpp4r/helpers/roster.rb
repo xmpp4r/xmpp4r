@@ -9,8 +9,8 @@ require 'callbacks'
 module Jabber
   module Helpers
     ##
-    # The Roster helper intercepts <iq/> stanzas with Jabber::IqQueryRoster
-    # and <presence/> stanzas, but provides cbs which allow the programmer
+    # The Roster helper intercepts <tt><iq/></tt> stanzas with Jabber::IqQueryRoster
+    # and <tt><presence/></tt> stanzas, but provides cbs which allow the programmer
     # to keep track of updates.
     class Roster
       ##
@@ -57,7 +57,7 @@ module Jabber
       ##
       # Add a callback for Jabber::Presence updates
       #
-      # This will be called for <presence/> stanzas for known RosterItems.
+      # This will be called for <tt><presence/></tt> stanzas for known RosterItems.
       # Unknown JIDs may still pass and can be caught via Jabber::Stream#add_presence_callback.
       #
       # The block receives three objects:
@@ -71,31 +71,30 @@ module Jabber
 
       ##
       # Add a callback for subscription updates,
-      # which will be called upon receiving a <presence/> stanza
+      # which will be called upon receiving a <tt><presence/></tt> stanza
       # with type:
       # * :subscribe (you may want to answer with :subscribed or :unsubscribed)
       # * :subscribed
       # * :unsubscribe
       # * :unsubscribed
       #
-      # *Warning:* if you don't add a callback here or all callbacks return
+      # *Warning*: if you don't add a callback here or all callbacks return
       # false subscription requests will be agreed by default in
       # Jabber::Helpers::Roster#handle_presence.
       #
       # The block receives two objects:
       # * the Jabber::Helpers::RosterItem (or nil)
-      # * the <presence/> stanza
+      # * the <tt><presence/></tt> stanza
       #
       # Example usage:
       #  my_roster.add_subscription_callback do |item,presence|
       #    if presence.type == :subscribe
       #      answer = presence.answer(false)
-      #      if accept_subscription_requests
-      #        answer.type = :subscribed
-      #      else
-      #        answer.type = :unsubscribed
-      #      end
+      #      answer.type = accept_subscription_requests ? :subscribed : :unsubscribed
       #      client.send(answer)
+      #      true
+      #    else
+      #      false
       #    end
       #  end
       def add_subscription_callback(prio = 0, ref = nil, proc = nil, &block)
@@ -104,7 +103,7 @@ module Jabber
       end
 
       ##
-      # Handle received <iq/> stanzas,
+      # Handle received <tt><iq/></tt> stanzas,
       # used internally
       def handle_iq(iq)
         if iq.query.kind_of?(IqQueryRoster)
@@ -133,7 +132,7 @@ module Jabber
       end
 
       ##
-      # Handle received <presence/> stanzas,
+      # Handle received <tt><presence/></tt> stanzas,
       # used internally
       def handle_presence(pres)
         item = self[pres.from]
@@ -145,9 +144,9 @@ module Jabber
         else
           unless item.nil?
             update_presence(item, pres)
-            true
+            true  # Callback consumed stanza
           else
-            false
+            false # Callback did not consume stanza
           end
         end
       end
@@ -226,7 +225,7 @@ module Jabber
         super
         if xe.kind_of?(RosterItem)
           xe.each_presence { |pres|
-            @presences.push(Presence.new.import(pres))
+            self.presence = Presence.new.import(pres)
           }
         end
         self
@@ -242,7 +241,7 @@ module Jabber
       end
       
       ##
-      # Iterate through all received <presence/> stanzas
+      # Iterate through all received <tt><presence/></tt> stanzas
       def each_presence(&block)
         @presences.each { |pres|
           yield(pres)
@@ -264,6 +263,11 @@ module Jabber
       ##
       # Add presence
       # (unless type is :unavailable)
+      #
+      # This overwrites previous stanzas with the same destination
+      # JID to keep track of resources. Presence stanzas with
+      # <tt>type == :unavailable</tt> will be deleted as this indicates
+      # that this resource has gone offline.
       def presence=(newpres)
         # Delete old presences with the same JID
         @presences.delete_if do |pres|
