@@ -26,7 +26,7 @@ module REXML
     ##
     # Returns first element of name <tt>e</tt>
     def first_element(e)
-      each_element(e) { |el| return el }
+      each_element { |el| return el if el.name == e }
       return nil
     end
 
