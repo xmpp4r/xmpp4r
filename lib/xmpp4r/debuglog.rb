@@ -16,7 +16,7 @@ module Jabber
     end
   end
 
-  # returns true if debugging mode is enabled. If you just want to log
+  # returns true if debugging mode is enabled. If you just want to log
   # something if debugging is enabled, use Jabber::debuglog instead.
   def Jabber::debug
     @@debug

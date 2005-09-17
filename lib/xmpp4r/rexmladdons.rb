@@ -61,7 +61,7 @@ module REXML
       xmlelement.each do |e|
         if e.kind_of? REXML::Element
           typed_add(e.deep_clone)
-        else # text element, probably.
+        else # text element, probably.
           add(e.clone)
         end
       end

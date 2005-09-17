@@ -64,7 +64,7 @@ class IqQueryRosterTest < Test::Unit::TestCase
     assert_equal('ab', r[jid].iname)
     ri.iname = 'cd'
     assert_equal('cd', ri.iname)
-    # FIXME why would it be 'ab' since you modified the RosterItem object you
+    # FIXME why would it be 'ab' since you modified the RosterItem object you
     # created ? I don't think adding transparent copies everywhere is a good
     # thing.
     assert_equal('ab', r[jid].iname)
