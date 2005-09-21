@@ -1,7 +1,5 @@
 #!/usr/bin/ruby
 
-$:.unshift '../lib'
-
 require 'judconfig'
 require "mysql"
 require 'date'
