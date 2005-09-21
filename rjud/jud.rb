@@ -5,9 +5,13 @@ $:.unshift '../lib'
 require 'judconfig'
 require "mysql"
 require 'date'
-require 'xmpp4r'
+require 'xmpp4r/component'
+require 'xmpp4r/iq/query/discoitems'
+require 'xmpp4r/iq/query/discoinfo'
 include Jabber
 
+# TODO list
+# - add helpers for browsing and use them.
 
 # jabber:iq:browse handling
 def sendbrowsereply(conn, from, id)
@@ -20,24 +24,21 @@ def sendbrowsereply(conn, from, id)
   i.query.add_attribute('type', 'jud')
   i.query.add_attribute('jid', JUDNAME)
   i.query.add_attribute('name', 'Jabber User Directory')
-  i.query.add(Element::new('ns').add_text('jabber:iq:search'))
-  i.query.add(Element::new('ns').add_text('jabber:iq:register'))
+  i.query.add(REXML::Element::new('ns').add_text('jabber:iq:search'))
+  i.query.add(REXML::Element::new('ns').add_text('jabber:iq:register'))
   conn.send(i)
 end
 
 # Disco handling
 def senddiscoreplyinfo(conn, from, id)
   puts "Sending disco#info reply to #{from}"
-  i = Iq::new_query(:result, from)
+  i = Iq::new(:result, from)
   i.from = JUDNAME
   i.id = id
-  i.query.add_namespace('http://jabber.org/protocol/disco#info')
-  identity = XMLElement::new('identity')
-  identity.add_attribute('category', 'directory')
-  identity.add_attribute('type', 'user')
-  i.query.add(identity)
-  i.query.add(XMLElement::new('feature').add_attribute('var', 'jabber:iq:search'))
-  i.query.add(XMLElement::new('feature').add_attribute('var', 'jabber:iq:register'))
+  i.query = IqQueryDiscoInfo::new
+  i.query.add(DiscoIdentity::new('directory', nil, 'user'))
+  i.query.add(DiscoFeature::new('jabber:iq:search'))
+  i.query.add(DiscoFeature::new('jabber:iq:register'))
   conn.send(i)
 end
 
@@ -46,11 +47,8 @@ def senddiscoreplyitems(conn, from, id)
   i = Iq::new_query(:error, from)
   i.from = JUDNAME
   i.id = id
-  i.query.add_namespace('http://jabber.org/protocol/disco#info')
-  error = XMLElement::new('error')
-  error.add_attribute('type', 'modify')
-  error.add_attribute('code', '400')
-  error.add(XMLElement::new('bad-request').add_namespace('urn:ietf:params:xml:ns:xmpp-stanzas'))
+  i.query = IqQueryDiscoItems::new
+  error = Error::new("bad-request").set_code(400).set_type(:modify)
   i.query.add(error)
   conn.send(i)
 end
@@ -64,13 +62,13 @@ def handlesearch(conn, iq)
     i.from = JUDNAME
     i.id = iq.id
     i.query.add_namespace('jabber:iq:search')
-    i.query.add(XMLElement::new('instructions').add_text("Use the enclosed form to search. You client might not support x:data. Consider using the web interface at #{WEBINTERFACE}"))
+    i.query.add(REXML::Element::new('instructions').add_text("Use the enclosed form to search. You client might not support x:data. Consider using the web interface at #{WEBINTERFACE}"))
     # create the form
-    x = XMLElement::new('x')
+    x = REXML::Element::new('x')
     x.add_namespace('jabber:x:data')
     x.add_attribute('type', 'form')
-    x.add(XMLElement::new('title').add_text("Search users in #{JUDNAME}"))
-    x.add(XMLElement::new('instructions').add_text('Fill in the form to search for any matching Jabber User'))
+    x.add(REXML::Element::new('title').add_text("Search users in #{JUDNAME}"))
+    x.add(REXML::Element::new('instructions').add_text('Fill in the form to search for any matching Jabber User'))
     [ # var, label, type
       [ 'jid', 'Jabber ID', 'text-single' ],
       [ 'first', 'Firstname', 'text-single' ],
@@ -81,23 +79,23 @@ def handlesearch(conn, iq)
       [ 'location', 'Location', 'text-single' ],
       [ 'birthdate', 'Birthdate (DD/MM/YYYY)', 'text-single' ]
     ].each do |f|
-      e = XMLElement::new('field')
+      e = REXML::Element::new('field')
       e.add_attribute('var', f[0])
       e.add_attribute('label', f[1])
       e.add_attribute('type', f[2])
       x.add(e)
     end
-    e = XMLElement::new('field')
+    e = REXML::Element::new('field')
     e.add_attribute('var', 'gender')
     e.add_attribute('label', 'Gender (M/F)')
     e.add_attribute('type', 'list-single')
-    o = XMLElement::new('option')
+    o = REXML::Element::new('option')
     o.add_attribute('label', 'Male')
-    o.add(XMLElement::new('value').add_text('M'))
+    o.add(REXML::Element::new('value').add_text('M'))
     e.add(o)
-    o = XMLElement::new('option')
+    o = REXML::Element::new('option')
     o.add_attribute('label', 'Female')
-    o.add(XMLElement::new('value').add_text('F'))
+    o.add(REXML::Element::new('value').add_text('F'))
     e.add(o)
     x.add(e)
     i.query.add(x)
@@ -138,7 +136,6 @@ def handlesearch(conn, iq)
   end
 end
 
-
 # jabber:iq:register
 def handleregister(conn, iq)
   if iq.type == :get
@@ -148,13 +145,13 @@ def handleregister(conn, iq)
     i.from = JUDNAME
     i.id = iq.id
     i.query.add_namespace('jabber:iq:register')
-    i.query.add(XMLElement::new('instructions').add_text("Use the enclosed form to register. You client might not support x:data. Consider using the web interface at #{WEBINTERFACE}"))
+    i.query.add(REXML::Element::new('instructions').add_text("Use the enclosed form to register. You client might not support x:data. Consider using the web interface at #{WEBINTERFACE}"))
     # create the form
-    x = XMLElement::new('x')
+    x = REXML::Element::new('x')
     x.add_namespace('jabber:x:data')
     x.add_attribute('type', 'form')
-    x.add(XMLElement::new('title').add_text("Jabber User Directory Registration"))
-    x.add(XMLElement::new('instructions').add_text('Fill in the form to register in the Jabber User Directory'))
+    x.add(REXML::Element::new('title').add_text("Jabber User Directory Registration"))
+    x.add(REXML::Element::new('instructions').add_text('Fill in the form to register in the Jabber User Directory'))
     [ # var, label, type
       [ 'first', 'Firstname', 'text-single' ],
       [ 'last', 'Lastname', 'text-single' ],
@@ -165,23 +162,23 @@ def handleregister(conn, iq)
       [ 'birthdate', 'Birthdate (DD/MM/YYYY)', 'text-single' ],
       [ 'comment', 'Comments', 'text-single' ]
     ].each do |f|
-      e = XMLElement::new('field')
+      e = REXML::Element::new('field')
       e.add_attribute('var', f[0])
       e.add_attribute('label', f[1])
       e.add_attribute('type', f[2])
       x.add(e)
     end
-    e = XMLElement::new('field')
+    e = REXML::Element::new('field')
     e.add_attribute('var', 'gender')
     e.add_attribute('label', 'Gender (M/F)')
     e.add_attribute('type', 'list-single')
-    o = XMLElement::new('option')
+    o = REXML::Element::new('option')
     o.add_attribute('label', 'Male')
-    o.add(XMLElement::new('value').add_text('M'))
+    o.add(REXML::Element::new('value').add_text('M'))
     e.add(o)
-    o = XMLElement::new('option')
+    o = REXML::Element::new('option')
     o.add_attribute('label', 'Female')
-    o.add(XMLElement::new('value').add_text('F'))
+    o.add(REXML::Element::new('value').add_text('F'))
     e.add(o)
     x.add(e)
     i.query.add(x)
@@ -249,31 +246,33 @@ def queryandreply(jabconnection, iq, fields, type)
     end
     puts "MySQL Query: #{query}"
     res = dbh.query(query)
-    q = XMLElement::new('query')
+    q = REXML::Element::new('query')
     q.add_namespace('jabber:iq:search')
     iq.add(q)
     if type == 'simple'
       res.each_hash do |r|
-        i = XMLElement::new('item')
+        i = REXML::Element::new('item')
         i.add_attribute('jid', r['jid'] || '')
         [ 'first', 'last', 'nick', 'email' ].each do |f|
-          e = XMLElement::new(f)
+          e = REXML::Element::new(f)
           e.add_text(r[f] || '')
           i.add(e)
         end
         q.add(i)
       end
     elsif type == 'xdata'
-      x = XMLElement::new('x')
+      x = REXML::Element::new('x')
       q.add(x)
+		puts q.to_s
+		puts iq.to_s
       x.add_namespace('jabber:x:data')
       x.add_attribute('type', 'result')
-      f = XMLElement::new('field')
+      f = REXML::Element::new('field')
       f.add_attribute('type', 'hidden')
       f.add_attribute('var', 'FORM_TYPE')
-      f.add(XMLElement::new('value').add_text('jabber:iq:search'))
+      f.add(REXML::Element::new('value').add_text('jabber:iq:search'))
       x.add(f)
-      r = XMLElement::new('reported')
+      r = REXML::Element::new('reported')
       x.add(r)
       fields = [ # var, label, type
         [ 'jid', 'Jabber ID', 'text-single' ],
@@ -287,30 +286,33 @@ def queryandreply(jabconnection, iq, fields, type)
         [ 'comment', 'Comments', 'text-single' ]
       ]
       fields.each do |f|
-        e = XMLElement::new('field')
+        e = REXML::Element::new('field')
         e.add_attribute('var', f[0])
         e.add_attribute('label', f[1])
         r.add(e)
       end
       res.each_hash do |r|
-        i = XMLElement::new('item')
+		  p r
+        i = REXML::Element::new('item')
         fields.each do |fi|
-          f = XMLElement::new('field')
+          f = REXML::Element::new('field')
           f.add_attribute('var', fi[0])
-          f.add(XMLElement::new('value').add_text(r[fi[0]] || ''))
+          f.add(REXML::Element::new('value').add_text(r[fi[0]] || ''))
           i.add(f)
         end
         x.add(i)
       end
+	 else
+		 raise "Type unknown: #{type}"
     end
     jabconnection.send(iq)
   rescue MysqlError => e
     puts "MySQL Error code: #{e.errno}"
     puts "MySQL Error message: #{e.error}"
-    e = XMLElement::new('error')
+    e = REXML::Element::new('error')
     e.add_attribute('code', '500')
     e.add_attribute('type', 'wait')
-    na = XMLElement::new('internal-server-error')
+    na = REXML::Element::new('internal-server-error')
     na.add_namespace('urn:ietf:params:xml:ns:xmpp-stanzas')
     e.add(na)
     iq2 = Iq::new(:error, iq.to)
@@ -367,10 +369,10 @@ def registerandreply(jabconnection, iq, jid, ifields)
   rescue MysqlError => e
     puts "MySQL Error code: #{e.errno}"
     puts "MySQL Error message: #{e.error}"
-    e = XMLElement::new('error')
+    e = REXML::Element::new('error')
     e.add_attribute('code', '500')
     e.add_attribute('type', 'wait')
-    na = XMLElement::new('internal-server-error')
+    na = REXML::Element::new('internal-server-error')
     na.add_namespace('urn:ietf:params:xml:ns:xmpp-stanzas')
     e.add(na)
     iq.type = :error
@@ -415,7 +417,7 @@ c.add_iq_callback do |i|
   else
     puts "Unhandled Iq type: #{i.type}"
   end
-  i.consume
+  true # consume
 end
 c.auth(ROUTERPASSWORD)
 puts "JUD started and connected to the router."
