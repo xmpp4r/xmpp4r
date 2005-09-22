@@ -1,5 +1,6 @@
 XMPP4R 0.2 (XX/XX/2005)
 =======================
+* Presences are now Comparable according to priority or interest
 * fixed a serious bug in Stream#send which caused some lockups. Reported by
   chunlinyao@gmail.com.
 

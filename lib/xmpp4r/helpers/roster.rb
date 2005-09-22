@@ -158,9 +158,7 @@ module Jabber
       # Callbacks are called here
       def update_presence(item, pres)
         oldpres = item.presence(pres.from).nil? ? nil : Presence.new.import(item.presence(pres.from))
-
         item.presence = pres
-
         @presence_cbs.process(item, oldpres, pres)
       end
 
@@ -178,6 +176,18 @@ module Jabber
         end
       end
       
+      ##
+      # Returns the list of RosterItems which, stripped, are equal to the
+      # one you are looking for. 
+      def find(jid)
+        j = jid.strip
+        l = {}
+        @items.each_pair do |k, v|
+          l[k] = v if k.strip == j
+        end
+        l
+      end
+
       ##
       # Add a user to your roster
       #
