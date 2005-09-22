@@ -48,7 +48,11 @@ module Jabber
     # The element won't be deleted if text is nil as
     # it must occur in a version query
     def iname=(text)
-      replace_element_text('name', text)
+      if text != ''
+        replace_element_text('name', text)
+      else
+        delete_elements('name')
+      end
     end
 
     ##
@@ -72,7 +76,11 @@ module Jabber
     # The element won't be deleted if text is nil as
     # it must occur in a version query
     def version=(text)
-      replace_element_text('version', text)
+      if text != ''
+        replace_element_text('version', text)
+      else
+        delete_elements('version')
+      end
     end
 
     ##
