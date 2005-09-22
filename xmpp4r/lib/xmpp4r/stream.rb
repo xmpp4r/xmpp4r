@@ -52,7 +52,7 @@ module Jabber
     def start(fd)
       @fd = fd
       @parser = StreamParser.new(@fd, self)
-      @parserThread = Thread.new {
+      @parserThread = Thread.new do
         begin
         @parser.parse
         rescue
@@ -61,7 +61,7 @@ module Jabber
           puts $!.backtrace
           exit
         end
-      }
+      end
 #      @pollThread = Thread.new do
 #        begin
 #        poll

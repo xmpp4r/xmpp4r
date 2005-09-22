@@ -126,4 +126,23 @@ class PresenceTest < Test::Unit::TestCase
     x.each_element('tada') {  num += 1 }
     assert_equal(1, num)
   end
+
+  def test_compare_prio
+    assert_equal(0, Presence::new(:chat, '', 5) <=> Presence::new(:chat, '', 5))
+    assert_equal(-1, Presence::new(:chat, '', 4) <=> Presence::new(:chat, '', 5))
+    assert_equal(1, Presence::new(:chat, '', 4) <=> Presence::new(:chat, '', 3))
+    assert_equal(1, Presence::new(:chat, '', nil) <=> Presence::new(:chat, '', 3))
+    assert_equal(-1, Presence::new(:chat, '', 10) <=> Presence::new(:chat, '', nil))
+    assert_equal(0, Presence::new(:chat, '', nil) <=> Presence::new(:chat, '', nil))
+  end
+
+  def test_compare_interest
+    unav = Presence::new.set_type(:unavailable)
+    assert_equal(0, unav.cmp_interest(unav))
+    assert_equal(1, unav.cmp_interest(Presence::new))
+    assert_equal(-1, Presence::new.cmp_interest(unav))
+    assert_equal(1, Presence::new(:chat).cmp_interest(Presence::new))
+    assert_equal(-1, Presence::new(:away).cmp_interest(Presence::new(:dnd)))
+  end
+
 end
