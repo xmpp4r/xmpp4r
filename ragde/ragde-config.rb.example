@@ -1,0 +1,5 @@
+# JID (without ressource) to use to connect.
+RAGDE_JID='ragde@localhost'
+# Password
+RAGDE_PASSWORD='ragde'
+
