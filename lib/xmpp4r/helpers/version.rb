@@ -8,8 +8,7 @@ require 'xmpp4r/iq/query/version'
 module Jabber
   module Helpers
     ##
-    # A class to answer version requests
-    # utilizing IqQueryVersion
+    # A class to answer version requests using IqQueryVersion
     #
     # This is simplification as one doesn't need dynamic
     # version answering normally.
