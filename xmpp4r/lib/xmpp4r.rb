@@ -108,5 +108,6 @@
 #
 # * Jabber::Helpers::Version: <tt>require 'xmpp4r/helpers/version'</tt>
 # * Jabber::Helpers::Roster: <tt>require 'xmpp4r/helpers/roster'</tt>
+# * Jabber::Helpers::Vcard: <tt>require 'xmpp4r/helpers/vcard'</tt>
 
 require 'xmpp4r/xmpp4r'

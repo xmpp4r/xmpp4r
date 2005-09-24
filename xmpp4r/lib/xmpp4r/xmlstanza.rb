@@ -16,6 +16,12 @@ module Jabber
     # * Swap 'to' and 'from'
     # * Copy 'id'
     # * Does not take care about the type
+    #
+    # *Attention*: Be careful when answering to stanzas with
+    # <tt>type == :error</tt> - answering to an error may generate
+    # another error on the other side, which could be leading to a
+    # ping-pong effect quickly!
+    #
     # xmlstanza:: [XMLStanza] source
     # import:: [true or false] Copy attributes and children of source
     # result:: [XMLStanza] answer stanza

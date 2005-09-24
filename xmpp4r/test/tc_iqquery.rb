@@ -21,8 +21,9 @@ class IqQueryTest < Test::Unit::TestCase
     e = REXML::Element.new('query')
     e.add_namespace('jabber:iq:roster')
     # kind_of? only checks that the class belongs to the IqQuery class
-    # hierarchy.
-    assert(IqQuery.import(e).kind_of?(IqQuery))
+    # hierarchy. See IqQueryRosterTest#test_import for a more strict
+    # check.
+    assert_kind_of(IqQuery, IqQuery.import(e))
 
     # Importing specific derivates is to be tested in the test case of the derivate
     # (e.g. tc_iqqueryroster.rb)
