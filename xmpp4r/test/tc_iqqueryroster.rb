@@ -31,7 +31,7 @@ class IqQueryRosterTest < Test::Unit::TestCase
     r.add(RosterItem.new(JID.new('a@b/d'), 'ABC', :none, :subscribe)).groups = ['a']
     itemstr = "<item jid='astro@spaceboyz.net' name='Astro' subscribtion='both'>" \
             + "<group>SpaceBoyZ</group><group>xmpp4r</group></item>"
-    r.add(REXML::Document.new(itemstr).root)
+    r.typed_add(REXML::Document.new(itemstr).root)
 
     r.each { |item|
       assert_equal(item, r[item.jid])
@@ -51,8 +51,7 @@ class IqQueryRosterTest < Test::Unit::TestCase
     assert_equal(:none, r.to_a[1].subscription)
     assert_equal(:subscribe, r.to_a[1].ask)
 
-# FIXME broken test, and I don't really understand why.
-#    assert_equal(REXML::Document.new(itemstr).root.to_s, r.to_a[1].to_s)
+    assert_equal(REXML::Document.new(itemstr).root.to_s, r.to_a[2].to_s)
   end
 
   def test_dupitems

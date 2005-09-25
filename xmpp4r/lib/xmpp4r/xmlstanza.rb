@@ -26,7 +26,7 @@ module Jabber
     # import:: [true or false] Copy attributes and children of source
     # result:: [XMLStanza] answer stanza
     def XMLStanza.answer(xmlstanza, import=true)
-      x = xmlstanza.class::new(xmlstanza.name)
+      x = xmlstanza.class::new
       if import
         x.import(xmlstanza)
       end

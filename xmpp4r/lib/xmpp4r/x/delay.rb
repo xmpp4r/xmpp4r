@@ -26,6 +26,7 @@ module Jabber
     # insertnow:: [Boolean] Set the stamp to [Time::now]
     def initialize(insertnow=true)
       super()
+      add_namespace('jabber:x:delay')
 
       if insertnow
         set_stamp(Time.now)
