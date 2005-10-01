@@ -109,7 +109,7 @@ module Jabber
     ##
     # Get Availability Status (RFC3921 - 5.2)
     # result:: [Symbol] or [Nil] Valid values according to RFC3921:
-    # * nil (Online, no <show/> element)
+    # * nil (Available, no <show/> element)
     # * :away
     # * :chat (Free for chat)
     # * :dnd (Do not disturb)

@@ -17,41 +17,63 @@ module Jabber
 
       ##
       # Retrieve vCard of the RosterItem
-      # (Resource should be stripped before!)
       #
-      # Raises exception upon retrieval error
+      # Raises exception upon retrieval error, please catch that!
       #
       # Usage of Threads is suggested here as vCards can be very
       # big (see <tt>/iq/vCard/PHOTO/BINVAL</tt>).
-      # result:: [Jabber::IqVcard] or [Jabber::Error]
       #
-      # TODO: Add some id generation here - some servers send
-      # empty <iq type='result' .../> stanzas. :-(
-      def get(jid)
+      # jid:: [Jabber::JID] or nil (nil for the client's own vCard)
+      # result:: [Jabber::IqVcard] or nil (nil results may be handled as empty vCards)
+      def get(jid=nil)
         res = nil
         request = Iq.new(:get, jid)
         request.add(IqVcard.new)
-        @stream.send(request) { |answer|
-          if answer.kind_of?(Iq) and answer.from == jid
-            if answer.type == :result
-              res = answer.vcard
-              true
-            elsif answer.type == :error
-              res = answer.first_element('error')
-              true
-            else
-              false
-            end
+        @stream.send_with_id(request) { |answer|
+          # No check for sender or queryns needed (see send_with_id)
+          if answer.type == :result
+            res = answer.vcard
+            true
+          elsif answer.type == :error
+            res = answer.first_element('error')
+            true
           else
             false
           end
         }
         if res.kind_of?(Error)
           raise "Error getting vCard: #{res.error}, #{res.text}"
-        elsif !res.kind_of?(IqVcard)
-          raise "Unspecified error getting vCard"
         end
         res
+      end
+
+      ##
+      # Set your own vCard
+      #
+      # Raises exception when setting fails
+      #
+      # Usage of Threads suggested here, too. The function
+      # waits for approval from the server.
+      #
+      # iqvcard:: [Jabber::IqVcard]
+      def set(iqvcard)
+        iq = Iq.new(:set)
+        iq.add(iqvcard)
+
+        error = nil
+        @stream.send_with_id(iq) { |answer|
+          if answer.type == :result
+            true
+          elsif answer.type == :error
+            error = answer.first_element('error')
+            true
+          else
+            false
+          end
+        }
+        unless error.nil?
+          raise "Error setting vCard: #{res.error}, #{res.text}"
+        end
       end
     end
   end
