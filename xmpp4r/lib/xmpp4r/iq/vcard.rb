@@ -78,7 +78,7 @@ module Jabber
       # Recursive helper function,
       # returns all element names in an array, concatenated
       # to their parent's name with a slash
-      def element_names(xe, prefix='')
+      def element_names(xe, prefix='')  # :nodoc:
         res = []
         xe.each_element { |child|
           if child.kind_of?(REXML::Element)
