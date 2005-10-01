@@ -7,15 +7,20 @@ require 'xmpp4r/jid'
 
 module Jabber
   ##
-  # Implementation of JEP 0093
-  # for <x xmlns='jabber:x:roster'/>
-  # applied on <message/> stanzas
+  # Implementation of JEP-0144
+  # for <tt><x xmlns='http://jabber.org/protocol/rosterx'/></tt>
+  # attached to <tt><message/></tt> stanzas
+  #
+  # Should be backwards compatible to JEP-0093,
+  # as only action attribute of roster items are missing there.
+  # Pay attention to the namespace which is <tt>jabber:x:roster</tt>
+  # for JEP-0093!
   class XRoster < X
     ##
     # Initialize a new XRoster element
     def initialize
       super()
-      add_namespace('jabber:x:roster')
+      add_namespace('http://jabber.org/protocol/rosterx')
     end
 
     ##
@@ -32,6 +37,7 @@ module Jabber
   end
 
   X.add_namespaceclass('jabber:x:roster', XRoster)
+  X.add_namespaceclass('http://jabber.org/protocol/rosterx', XRoster)
 
   ##
   # Class containing an <item/> element
@@ -90,6 +96,31 @@ module Jabber
     # val:: [JID] or nil
     def jid=(val)
       attributes['jid'] = val.nil? ? nil : val.to_s
+    end
+
+    ##
+    # Get action for this roster item
+    # * :add
+    # * :modify
+    # * :delete
+    # result:: [Symbol] (defaults to :add according to JEP-0144)
+    def action
+      case attributes['action']
+        when 'modify' then :modify
+        when 'delete' then :delete
+        else :add
+      end
+    end
+
+    ##
+    # Set action for this roster item
+    # (see action)
+    def action=(a)
+      case a
+        when :modify then attributes['action'] = 'modify'
+        when :delete then attributes['action'] = 'delete'
+        else attributes['action'] = 'add'
+      end
     end
 
     ##

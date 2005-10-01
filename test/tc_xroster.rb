@@ -12,7 +12,7 @@ class XRosterTest < Test::Unit::TestCase
   def test_create
     r = XRoster.new
     assert_equal('x', r.name)
-    assert_equal('jabber:x:roster', r.namespace)
+    assert_equal('http://jabber.org/protocol/rosterx', r.namespace)
   end
 
   def test_import
@@ -20,6 +20,7 @@ class XRosterTest < Test::Unit::TestCase
     x1.add_namespace('jabber:x:roster')
     x2 = X::import(x1)
     assert_equal(XRoster, x2.class)
+    assert_equal('jabber:x:roster', x2.namespace)
   end
 
   def test_typed_add
@@ -34,6 +35,7 @@ class XRosterTest < Test::Unit::TestCase
     j1 = XRosterItem.new
     assert_equal(JID.new(nil), j1.jid)
     assert_equal(nil, j1.iname)
+
     j2 = XRosterItem.new(JID.new('a@b/c'))
     assert_equal(JID.new('a@b/c'), j2.jid)
     assert_equal(nil, j2.iname)
@@ -44,5 +46,25 @@ class XRosterTest < Test::Unit::TestCase
 
     j3.groups = ['X', 'Y', 'Z']
     assert_equal(['X', 'Y', 'Z'], j3.groups)
+  end
+
+  def test_actions
+    j = XRosterItem.new
+    assert_equal(:add, j.action)
+
+    j.action = :modify
+    assert_equal(:modify, j.action)
+
+    j.action = :delete
+    assert_equal(:delete, j.action)
+
+    j.action = :invalid
+    assert_equal(:add, j.action)
+
+    j.attributes['action'] = 'modify'
+    assert_equal(:modify, j.action)
+
+    j.attributes['action'] = 'invalid'
+    assert_equal(:add, j.action)
   end
 end
