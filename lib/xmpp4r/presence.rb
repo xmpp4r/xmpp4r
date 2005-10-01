@@ -52,12 +52,12 @@ module Jabber
     #
     # result:: [Symbol] or [Nil] Possible values are:
     # * :error
-    # * :probe
-    # * :subscribe
-    # * :subscribed
-    # * :unavailable
-    # * :unsubscribe
-    # * :unsubscribed
+    # * :probe (Servers send this to request presence information)
+    # * :subscribe (Subscription request)
+    # * :subscribed (Subscription approval)
+    # * :unavailable (User has gone offline)
+    # * :unsubscribe (Unsubscription request)
+    # * :unsubscribed (Unsubscription approval)
     # * [nil] (available)
     # See RFC3921 - 2.2.1. for explanation.
     def type
