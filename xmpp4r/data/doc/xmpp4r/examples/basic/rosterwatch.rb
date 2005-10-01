@@ -79,19 +79,21 @@ roster.add_update_callback { |olditem,item|
         # ...get a vCard
         vcard = Jabber::Helpers::Vcard.new(cl).get(item.jid.strip)
 
-        # Rename him to vCard's <NICKNAME/> field
-        if vcard['NICKNAME']
-          item.iname = vcard['NICKNAME']
-          puts("Renaming #{item.jid} to #{vcard['NICKNAME']}")
-          item.send
-        # Rename him to vCard's <FN/> field
-        elsif vcard['FN']
-          item.iname = vcard['FN']
-          puts("Renaming #{item.jid} to #{vcard['FN']}")
-          item.send
-        # We've got a lazy one
-        else
-          puts("#{item.jid} provided no details in vCard")
+        unless vcard.nil?
+          # Rename him to vCard's <NICKNAME/> field
+          if vcard['NICKNAME']
+            item.iname = vcard['NICKNAME']
+            puts("Renaming #{item.jid} to #{vcard['NICKNAME']}")
+            item.send
+          # Rename him to vCard's <FN/> field
+          elsif vcard['FN']
+            item.iname = vcard['FN']
+            puts("Renaming #{item.jid} to #{vcard['FN']}")
+            item.send
+          # We've got a lazy one
+          else
+            puts("#{item.jid} provided no details in vCard")
+          end
         end
 
       rescue Exception => e
