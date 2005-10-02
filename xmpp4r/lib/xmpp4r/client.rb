@@ -17,18 +17,19 @@ module Jabber
     # as soon as messages are received; If it isn't, you have to call
     # Stream#process from time to time.
     # TODO SSL mode is not implemented yet.
-    def initialize(jid, threaded = true, ssl = false)
-      super(jid.domain, threaded, ssl ? 5223 : 5222)
+    def initialize(jid, threaded = true)
+      super(threaded)
       @jid = jid
     end
 
     ##
     # connect to the server
     # (chaining-friendly)
+    # host:: [String] Optional c2s host, will be extracted from jid if nil
     # return:: self
-    def connect
-      super
-      send("<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:client' to='#{@host}'>") { |b| 
+    def connect(host = nil, port = 5222)
+      super(host.nil? ? jid.domain : host, port)
+      send("<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:client' to='#{@jid.domain}'>") { |b| 
         # TODO sanity check : is b a stream ? get version, etc.
         true
       }
