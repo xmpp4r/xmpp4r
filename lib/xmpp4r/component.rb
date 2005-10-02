@@ -25,8 +25,8 @@ module Jabber
     # jid:: [JID]
     # server_address:: [String] Hostname
     # server_port:: [Integer] TCP port (5347)
-    def initialize(jid, server_address, server_port, threaded = true)
-      super(server_address, threaded, server_port)
+    def initialize(jid, server_address, server_port=5347, threaded = true)
+      super(threaded)
       @jid = jid
       @server_address = server_address
       @server_port = server_port
@@ -36,7 +36,7 @@ module Jabber
     # (chaining-friendly)
     # return:: self
     def connect
-      super
+      super(@server_address, @server_port)
       send("<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:component:accept' to='#{@jid}'>") { |e|
         if e.name == 'stream'
           true
