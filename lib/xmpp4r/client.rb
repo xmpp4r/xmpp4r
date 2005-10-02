@@ -73,5 +73,34 @@ module Jabber
         raise AuthenticationFailure.new, "Client authentication failed"
       end
     end
+
+    ##
+    # Change the client's password
+    #
+    # Threading is suggested, as this code waits
+    # for an answer.
+    #
+    # Raises an exception upon error response.
+    # new_password:: [String] New password
+    def password=(new_password)
+      iq = Iq::new_query(:set, @jid.domain)
+      iq.query.add_namespace('jabber:iq:register')
+      iq.query.add(REXML::Element.new('username')).text = @jid.node
+      iq.query.add(REXML::Element.new('password')).text = new_password
+
+      err = nil
+      send_with_id(iq) { |answer|
+        if answer.type == :result
+          true
+        elsif answer.type == :error
+          err = "Error changing password: #{answer.error}, #{answer.text}"
+          true
+        else
+          false
+        end
+      }
+
+      raise err unless err.nil?
+    end
   end  
 end
