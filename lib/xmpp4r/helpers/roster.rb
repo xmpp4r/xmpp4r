@@ -14,6 +14,10 @@ module Jabber
     # to keep track of updates.
     class Roster
       ##
+      # All items in your roster
+      attr_reader :items
+
+      ##
       # Initialize a new Roster helper
       #
       # Registers its cbs (prio = 120, ref = "Helpers::Roster")
@@ -175,7 +179,7 @@ module Jabber
           nil
         end
       end
-      
+
       ##
       # Returns the list of RosterItems which, stripped, are equal to the
       # one you are looking for. 

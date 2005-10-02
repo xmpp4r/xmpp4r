@@ -17,7 +17,7 @@
 # to turn off "Auto-browse into objects" for big rosters.
 #
 
-$:.unshift '../lib'
+$:.unshift '../../../../../lib'
 
 require 'thread'
 
@@ -45,7 +45,7 @@ cl.auth(ARGV[1])
 
 
 # The roster instance
-roster = Jabber::Helpers::Roster.new(cl, Jabber::Presence.new.set_status("Discover my roster at #{jid}"))
+roster = Jabber::Helpers::Roster.new(cl)
 
 
 cl.add_iq_callback { |iq|
@@ -65,7 +65,7 @@ cl.add_iq_callback { |iq|
       else
         # Count contacts in group
         in_group = 0
-        roster.each { |item|
+        roster.items.each { |jid,item|
           if item.groups.include?(iq.query.node)
             in_group += 1
           end
@@ -85,7 +85,7 @@ cl.add_iq_callback { |iq|
         # Make items from group names
         groups = []
         
-        roster.each { |item|
+        roster.items.each { |jid,item|
           groups += item.groups
         }
         
@@ -94,14 +94,14 @@ cl.add_iq_callback { |iq|
         }
 
         # Collect all ungrouped roster items
-        roster.each { |item|
+        roster.items.each { |jid,item|
           if item.groups == []
             iq.query.add(Jabber::DiscoItem.new(item.jid, item.iname.to_s == '' ? item.jid : item.iname))
           end
         }
       else
         # Add a discovery item for each roster item in that group
-        roster.each { |item|
+        roster.items.each { |jid,item|
           if item.groups.include?(iq.query.node)
             iq.query.add(Jabber::DiscoItem.new(item.jid, item.iname.to_s == '' ? item.jid : item.iname))
           end
@@ -115,6 +115,9 @@ cl.add_iq_callback { |iq|
     true
   end
 }
+
+# Initial presence
+cl.send(Jabber::Presence.new.set_status("Discover my roster at #{jid}"))
 
 # Main loop:
 
