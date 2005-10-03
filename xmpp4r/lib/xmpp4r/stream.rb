@@ -255,7 +255,9 @@ module Jabber
         end
       end
       Thread.critical = false
-      Thread.stop if block
+      # The parser thread might be running this (think of a callback running send())
+      # If this is the case, we mustn't stop (or we would cause a deadlock)
+      Thread.stop if block and Thread.current != @parserThread
       @pollCounter = 10
     end
 
