@@ -134,7 +134,6 @@ module Jabber
       if xe.nil?
         xe = add_element('show')
       end
-
       case val
         when :away then text = 'away'
         when :chat then text = 'chat'
