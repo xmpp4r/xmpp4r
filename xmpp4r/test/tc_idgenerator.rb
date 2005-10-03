@@ -15,14 +15,16 @@ class IdGeneratorTest < Test::Unit::TestCase
     ids = []
     100.times { ids.push(Jabber::IdGenerator.generate_id) }
 
+    ok = true
     ids.each_index { |a|
       ids.each_index { |b|
         if a == b
-          assert_equal(ids[a], ids[b])
+          ok = false if ids[a] != ids[b]
         else
-          assert_not_equal(ids[a], ids[b])
+          ok = false if ids[a] == ids[b]
         end
       }
     }
+    assert(ok)
   end
 end
