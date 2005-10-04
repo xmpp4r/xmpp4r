@@ -46,13 +46,10 @@ module Jabber
     # Set the name of the software
     #
     # The element won't be deleted if text is nil as
-    # it must occur in a version query
+    # it must occur in a version query, but its text will
+    # be empty.
     def iname=(text)
-      if text != ''
-        replace_element_text('name', text)
-      else
-        delete_elements('name')
-      end
+      replace_element_text('name', text.nil? ? '' : text)
     end
 
     ##
@@ -76,11 +73,7 @@ module Jabber
     # The element won't be deleted if text is nil as
     # it must occur in a version query
     def version=(text)
-      if text != ''
-        replace_element_text('version', text)
-      else
-        delete_elements('version')
-      end
+      replace_element_text('version', text.nil? ? '' : text)
     end
 
     ##
