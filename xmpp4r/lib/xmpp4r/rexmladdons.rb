@@ -3,6 +3,7 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'rexml/document'
+require 'rexml/parsers/xpathparser'
 
 # REXML module. This file only adds a few methods to the REXML module, to
 # ease the coding.
