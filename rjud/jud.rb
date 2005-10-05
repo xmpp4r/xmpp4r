@@ -11,9 +11,14 @@ include Jabber
 # TODO list
 # - add helpers for browsing and use them.
 
+# Debug function
+def dputs(s)
+  puts Time::now.to_s + ": " + s + " (#{caller(1)[0]})"
+end
+
 # jabber:iq:browse handling
 def sendbrowsereply(conn, from, id)
-  puts "Sending jabber:iq:browse reply to #{from}"
+  dputs "Sending jabber:iq:browse reply to #{from}"
   i = Iq::new_query(:result, from)
   i.from = JUDNAME
   i.id = id
@@ -29,7 +34,7 @@ end
 
 # Disco handling
 def senddiscoreplyinfo(conn, from, id)
-  puts "Sending disco#info reply to #{from}"
+  dputs "Sending disco#info reply to #{from}"
   i = Iq::new(:result, from)
   i.from = JUDNAME
   i.id = id
@@ -41,7 +46,7 @@ def senddiscoreplyinfo(conn, from, id)
 end
 
 def senddiscoreplyitems(conn, from, id)
-  puts "Sending disco#items reply to #{from}"
+  dputs "Sending disco#items reply to #{from}"
   i = Iq::new_query(:error, from)
   i.from = JUDNAME
   i.id = id
@@ -54,7 +59,7 @@ end
 # jabber:iq:search
 def handlesearch(conn, iq)
   if iq.type == :get
-    puts "Sending jabber:iq:search type=get reply to #{iq.from}"
+    dputs "Sending jabber:iq:search type=get reply to #{iq.from}"
     # return search fields
     i = Iq::new_query(:result, iq.from)
     i.from = JUDNAME
@@ -99,13 +104,13 @@ def handlesearch(conn, iq)
     i.query.add(x)
     conn.send(i)
   elsif iq.type == :set
-    puts "Got a jabber:iq:search query from #{iq.from}"
+    dputs "Got a jabber:iq:search query from #{iq.from}"
     fields = {}
     x = nil
     iq.query.each_element('x') { |e| x = e if x.nil? }
     type = 'simple'
     if x
-      puts "Query was using jabber:x:data."
+      dputs "Query was using jabber:x:data."
       type = 'xdata'
       # We have an 'x' element.
       x.each_element('field') do |e|
@@ -137,7 +142,7 @@ end
 # jabber:iq:register
 def handleregister(conn, iq)
   if iq.type == :get
-    puts "Sending jabber:iq:register type=get reply to #{iq.from}"
+    dputs "Sending jabber:iq:register type=get reply to #{iq.from}"
     # return search fields
     i = Iq::new_query(:result, iq.from)
     i.from = JUDNAME
@@ -182,12 +187,12 @@ def handleregister(conn, iq)
     i.query.add(x)
     conn.send(i)
   elsif iq.type == :set
-   puts "Got a jabber:iq:register query from #{iq.from}"
+    dputs "Got a jabber:iq:register query from #{iq.from}"
     fields = {}
     x = nil
     iq.query.each_element('x') { |e| x = e if x.nil? }
     if x
-      puts "Query was using jabber:x:data."
+      dputs "Query was using jabber:x:data."
       # We have an 'x' element.
       x.each_element('field') do |e|
         v = e.attribute('var')
@@ -242,7 +247,7 @@ def queryandreply(jabconnection, iq, fields, type)
     if MYSQLLIMIT > 0
       query += " LIMIT #{MYSQLLIMIT}"
     end
-    puts "MySQL Query: #{query}"
+    dputs "MySQL Query: #{query}"
     res = dbh.query(query)
     q = REXML::Element::new('query')
     q.add_namespace('jabber:iq:search')
@@ -261,8 +266,6 @@ def queryandreply(jabconnection, iq, fields, type)
     elsif type == 'xdata'
       x = REXML::Element::new('x')
       q.add(x)
-		puts q.to_s
-		puts iq.to_s
       x.add_namespace('jabber:x:data')
       x.add_attribute('type', 'result')
       f = REXML::Element::new('field')
@@ -290,7 +293,6 @@ def queryandreply(jabconnection, iq, fields, type)
         r.add(e)
       end
       res.each_hash do |r|
-		  p r
         i = REXML::Element::new('item')
         fields.each do |fi|
           f = REXML::Element::new('field')
@@ -305,8 +307,8 @@ def queryandreply(jabconnection, iq, fields, type)
     end
     jabconnection.send(iq)
   rescue MysqlError => e
-    puts "MySQL Error code: #{e.errno}"
-    puts "MySQL Error message: #{e.error}"
+    dputs "MySQL Error code: #{e.errno}"
+    dputs "MySQL Error message: #{e.error}"
     e = REXML::Element::new('error')
     e.add_attribute('code', '500')
     e.add_attribute('type', 'wait')
@@ -325,12 +327,12 @@ end
 
 # Register the user in the database and send the reply
 def registerandreply(jabconnection, iq, jid, ifields)
-  puts "Registering user #{jid}"
+  dputs "Registering user #{jid}"
   begin
     dbh = Mysql::real_connect(MYSQLHOST, MYSQLUSER, MYSQLPASS, MYSQLDB)
     # delete data
     q = "DELETE FROM jud WHERE jid = '#{jid}'"
-    puts "MySQL Query: #{q}"
+    dputs "MySQL Query: #{q}"
     dbh.query(q)
     fields = {}
     # normal fields
@@ -360,13 +362,13 @@ def registerandreply(jabconnection, iq, jid, ifields)
     end
     q = q1 + q2 + ')'
     if fields.length > 0
-      puts "MySQL Query: #{q}"
+      dputs "MySQL Query: #{q}"
       dbh.query(q)
     end
     jabconnection.send(iq)
   rescue MysqlError => e
-    puts "MySQL Error code: #{e.errno}"
-    puts "MySQL Error message: #{e.error}"
+    dputs "MySQL Error code: #{e.errno}"
+    dputs "MySQL Error message: #{e.error}"
     e = REXML::Element::new('error')
     e.add_attribute('code', '500')
     e.add_attribute('type', 'wait')
@@ -399,7 +401,7 @@ c.add_iq_callback do |i|
       when 'jabber:iq:register'
         handleregister(c, i)
       else
-        puts "Unhandled get NS: #{i.queryns}"
+        dputs "Unhandled get NS: #{i.queryns}"
     end
   elsif i.type == :set
     case i.queryns
@@ -410,14 +412,14 @@ c.add_iq_callback do |i|
       when 'jabber:iq:register'
         handleregister(c, i)
       else
-        puts "Unhandled set NS: #{i.queryns}"
+        dputs "Unhandled set NS: #{i.queryns}"
     end
   else
-    puts "Unhandled Iq type: #{i.type}"
+    dputs "Unhandled Iq type: #{i.type}"
   end
   true # consume
 end
 c.auth(ROUTERPASSWORD)
-puts "JUD started and connected to the router."
+dputs "JUD started and connected to the router."
 
 Thread.stop
