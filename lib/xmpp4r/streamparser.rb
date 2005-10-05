@@ -2,9 +2,9 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
-require 'xmpp4r/rexmladdons'
 require 'rexml/parsers/sax2parser'
 require 'rexml/source'
+require 'xmpp4r/rexmladdons'
 
 module Jabber
 
