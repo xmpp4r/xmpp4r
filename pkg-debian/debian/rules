@@ -17,9 +17,12 @@ binary-indep: build
 	dh_installdirs
 	dh_installchangelogs ChangeLog
 	dh_installdocs README
-	mv data/doc/xmpp4r data/doc/libxmpp4r-ruby1.8
 	ruby1.8 setup.rb config --siteruby=/usr/lib/ruby
 	ruby1.8 setup.rb install --prefix=`pwd`/debian/libxmpp4r-ruby1.8
+	mkdir -p `pwd`/debian/libxmpp4r-ruby1.8-examples/usr/share/doc/
+	cp -r `pwd`/debian/libxmpp4r-ruby1.8/usr/share/doc/xmpp4r/examples `pwd`/debian/libxmpp4r-ruby1.8-examples/usr/share/doc/libxmpp4-ruby1.8-examples
+	rm -rf `pwd`/debian/libxmpp4r-ruby1.8/usr/share/doc/xmpp4r
+	mv data/doc/xmpp4r data/doc/libxmpp4r-ruby1.8
 	dh_fixperms
 	dh_compress -X.rb
 	dh_installdeb

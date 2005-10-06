@@ -1,3 +1,9 @@
+xmpp4r (0.1+cvs.20051006-1) unstable; urgency=low
+
+  * Rebuilt packages. SVN changes included.
+
+ -- Lucas Nussbaum <lucas@lucas-nussbaum.net>  Thu,  6 Oct 2005 10:22:29 +0200
+
 xmpp4r (0.1-1) unstable; urgency=low
 
   * First Debian package.

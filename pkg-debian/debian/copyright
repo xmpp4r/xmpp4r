@@ -12,6 +12,9 @@ XMPP4R is released under the Ruby license (see the LICENSE file), which is
 compatible with the GNU GPL (see the COPYING file) via an explicit
 dual-licensing clause.
 
+On Debian systems, the complete text of the GNU General Public
+License can be found in the file `/usr/share/common-licenses/GPL'.
+
 -----------------------------------------------------------------------
 Ruby's license:
 
@@ -73,4 +76,5 @@ COPYING file), or the conditions below:
      IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
      WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
      PURPOSE.
+
 
