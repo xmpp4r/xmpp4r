@@ -1,0 +1,57 @@
+JabberHole
+==========
+
+
+What is JabberHole?
+-------------------
+
+JabberHole is a proxy for Jabber clients. It does not only
+relay TCP data between a client and a server, but is able to
+intercept, generate and modify XMPP stanzas.
+
+JabberHole is something similar to MouseHole[0], which does
+the same for HTTP.
+
+[0] http://mousehole.rubyforge.org/wiki/wiki.pl?MouseHole
+
+
+How to use JabberHole?
+----------------------
+
+Modify the account settings in your Jabber client. Keep the
+JID, the proxy determines the target server from it. Just
+set your client to connect to localhost:5224.
+
+
+How to extend JabberHole?
+-------------------------
+
+JabberHole reads all scripts found in the scripts/
+subdirectory. These scripts may hook callbacks for stanzas
+from clients and from servers:
+
+Proxy.add_client_callback { |stanza,cl| ... }
+Proxy.add_server_callback { |stanza,cl| ... }
+
+Scripts may now determine whether they take action upon the
+received stanza.
+
+To send a custom stanza to the client:
+cl.send(mystanza)
+
+To send a custom stanza to the server:
+cl.server_conn.send(mystanza)
+
+To determine the JID of the client, when it has already
+authenticated:
+cl.jid
+
+To indicate that a stanza has been fully processed by a
+user-scripts callback and no further callbacks are to be
+called for this stanza, the block has to return true.
+
+If the callback's block does not return true, server stanzas
+are forwarded to the client and client stanzas are forwarded
+to the server as normal behaviour. Have a look at the sample
+scripts.
+
