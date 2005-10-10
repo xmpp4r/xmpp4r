@@ -42,11 +42,11 @@ class ClientServer < Jabber::Stream
   ##
   # Handle stanzas received from client stream
   def handle_stanza(stanza)
-    #puts "From client: #{stanza.to_s.inspect}"
     if stanza.name == 'stream' and stanza.prefix == 'stream'
       # The opening tag carries a to='...' attribute,
       # letting us know to what server to connect
       @server_host = stanza.attributes['to']
+      puts "#{@fd.peeraddr[2]}:#{@fd.peeraddr[1]} connects to #{@server_host}"
 
       # Initializing the server connection
       @server_conn = Jabber::Connection.new
@@ -69,7 +69,6 @@ class ClientServer < Jabber::Stream
       
       # Stanzas are only sent if no user-script callback returns +true+
       unless Proxy::process_client(stanza, self)
-        #puts "To server: #{stanza.to_s.inspect}"
         @server_conn.send(stanza)
       end
 
@@ -80,14 +79,12 @@ class ClientServer < Jabber::Stream
   ##
   # Handle stanzas received from server stream
   def handle_server_stanza(stanza)
-    #puts "From server: #{stanza.to_s.inspect}"
     if stanza.name == 'stream' and stanza.prefix == 'stream'
       # The <stream:stream> opening tag
       send(stanza.to_s.sub(/\/>$/, '>'))
     else
       # Stanzas are only sent if no user-script callback returns +true+
       unless Proxy::process_server(stanza, self)
-        #puts "To client: #{stanza.to_s.inspect}"
         send(stanza)
       end
     end
