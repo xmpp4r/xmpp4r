@@ -41,6 +41,7 @@ module Jabber
       @threaded = threaded
       @StanzaQueue = []
       @StanzaQueueMutex = Mutex::new
+      @exception_block = nil
       @threadBlocks = {}
 #      @pollCounter = 10
       @waitingThread = nil
@@ -55,12 +56,14 @@ module Jabber
       @parser = StreamParser.new(@fd, self)
       @parserThread = Thread.new do
         begin
-        @parser.parse
+          @parser.parse
         rescue
-          puts "Exception caught in Parser thread, dumping backtrace and" +
-            " exiting...\n" + $!.exception + "\n"
-          puts $!.backtrace
-          exit
+          if @exception_block
+            Thread.new { @exception_block.call($!, self, :start) }
+          else
+            puts "Exception caught in Parser thread!"
+            raise
+          end
         end
       end
 #      @pollThread = Thread.new do
@@ -91,13 +94,14 @@ module Jabber
       # A new thread has to be created because close will cause the thread
       # to commit suicide
       if @exception_block
-        Thread.new { @exception_block.call }
+        Thread.new { @exception_block.call($!, self, :parser) }
       else
         puts "Stream#parse_failure was called by XML parser. Dumping " +
-        "backtrace and exiting...\n" + $!.exception + "\n"
+        "backtrace...\n" + $!.exception + "\n"
         puts $!.backtrace
+        close
+        raise
       end
-      close
     end
 
     ##
@@ -246,12 +250,10 @@ module Jabber
         @fd.flush
       rescue
         if @exception_block 
-          @exception_block.call
+          @exception_block.call($!, self, :sending)
         else
-          puts "Exception caught while sending, dumping backtrace and" +
-            " exiting...\n" + $!.exception + "\n"
-          puts $!.backtrace
-          exit(1)
+          puts "Exception caught while sending!"
+          raise
         end
       end
       Thread.critical = false
@@ -273,13 +275,13 @@ module Jabber
         xml.id = Jabber::IdGenerator.instance.generate_id
       end
 
-      send(xml) { |received|
+      send(xml) do |received|
         if received.id == xml.id
           yield(received)
         else
           false
         end
-      }
+      end
     end
 
     ##
