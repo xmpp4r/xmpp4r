@@ -208,8 +208,8 @@ module REXML
 
     # Expr takes a stack of path elements and a set of nodes (either a Parent
     # or an Array and returns an Array of matching nodes
-#    ALL = [ :attribute, :element, :text, :processing_instruction, :comment ]
-#    ELEMENTS = [ :element ]
+    ALL = [ :attribute, :element, :text, :processing_instruction, :comment ] unless defined?(ALL)
+    ELEMENTS = [ :element ] unless defined?(ELEMENTS)
     def expr( path_stack, nodeset, context=nil )
       #puts "#"*15
       #puts "In expr with #{path_stack.inspect}"
