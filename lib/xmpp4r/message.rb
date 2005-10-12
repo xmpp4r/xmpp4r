@@ -3,7 +3,6 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/xmlstanza'
-require 'xmpp4r/error'
 require 'xmpp4r/x'
 
 module Jabber
@@ -29,13 +28,10 @@ module Jabber
     ##
     # Add a sub-element
     #
-    # Will be converted to [Error] if named "error"
-    # or to [X] if named "x"
+    # Will be converted to [X] if named "x"
     # element:: [REXML::Element] to add
     def typed_add(element)
-      if element.kind_of?(REXML::Element) && (element.name == 'error')
-        super(Error::import(element))
-      elsif element.kind_of?(REXML::Element) && (element.name == 'x')
+      if element.kind_of?(REXML::Element) && (element.name == 'x')
         super(X::import(element))
       else
         super(element)
@@ -53,7 +49,7 @@ module Jabber
     # * :normal
     # result:: [Symbol] or nil
     def type
-      case attributes['type']
+      case super
         when 'chat' then :chat
         when 'error' then :error
         when 'groupchat' then :groupchat
@@ -68,12 +64,12 @@ module Jabber
     # v:: [Symbol] or nil
     def type=(v)
       case v
-        when :chat then attributes['type'] = 'chat'
-        when :error then attributes['type'] = 'error'
-        when :groupchat then attributes['type'] = 'groupchat'
-        when :headline then attributes['type'] = 'headline'
-        when :normal then attributes['type'] = 'normal'
-        else attributes['type'] = nil
+        when :chat then super('chat')
+        when :error then super('error')
+        when :groupchat then super('groupchat')
+        when :headline then super('headline')
+        when :normal then super('normal')
+        else super(nil)
       end
     end
 

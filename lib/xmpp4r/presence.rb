@@ -3,7 +3,6 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/xmlstanza'
-require 'xmpp4r/error'
 require 'xmpp4r/x'
 
 module Jabber
@@ -27,13 +26,10 @@ module Jabber
 
     ##
     # Add an element to the presence stanza
-    # * <error/> elements are converted to [Error]
     # * <x/> elements are converted to [X]
     # element:: [REXML::Element] to add
     def typed_add(element)
-      if element.kind_of?(REXML::Element) && (element.name == 'error')
-        super(Error::import(element))
-      elsif element.kind_of?(REXML::Element) && (element.name == 'x')
+      if element.kind_of?(REXML::Element) && (element.name == 'x')
         super(X::import(element))
       else
         super(element)
