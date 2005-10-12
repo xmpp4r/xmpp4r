@@ -4,7 +4,6 @@
 
 require 'xmpp4r/xmlstanza'
 require 'xmpp4r/jid'
-require 'xmpp4r/error'
 require 'digest/sha1'
 
 module Jabber
@@ -40,7 +39,7 @@ module Jabber
     # * :error
     # result:: [Symbol] or nil
     def type
-      case attributes['type']
+      case super
         when 'get' then :get
         when 'set' then :set
         when 'result' then :result
@@ -54,11 +53,11 @@ module Jabber
     # v:: [Symbol] or nil
     def type=(v)
       case v
-        when :get then attributes['type'] = 'get'
-        when :set then attributes['type'] = 'set'
-        when :result then attributes['type'] = 'result'
-        when :error then attributes['type'] = 'error'
-        else attributes['type'] = nil
+        when :get then super('get')
+        when :set then super('set')
+        when :result then super('result')
+        when :error then super('error')
+        else super(nil)
       end
     end
 
@@ -223,4 +222,3 @@ end
 
 require 'xmpp4r/iq/query'
 require 'xmpp4r/iq/vcard'
-require 'xmpp4r/iq/error'

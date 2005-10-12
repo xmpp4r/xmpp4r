@@ -32,6 +32,7 @@ class MessageTest < Test::Unit::TestCase
 
   def test_error
     x = Message::new()
+    assert_equal(nil, x.error)
     e = REXML::Element::new('error')
     x.add(e)
     # test if, after an import, the error element is successfully changed

@@ -3,6 +3,7 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/jid'
+require 'xmpp4r/error'
 
 module Jabber
   ##
@@ -34,6 +35,25 @@ module Jabber
       x.to = xmlstanza.from
       x.id = xmlstanza.id
       x
+    end
+
+    ##
+    # Add a sub-element
+    #
+    # Will be converted to [Error] if named "error"
+    # element:: [REXML::Element] to add
+    def typed_add(element)
+      if element.kind_of?(REXML::Element) && (element.name == 'error')
+        super(Error::import(element))
+      else
+        super(element)
+      end
+    end
+
+    ##
+    # Return the first <tt><error/></tt> child
+    def error
+      first_element('error')
     end
 
     ##

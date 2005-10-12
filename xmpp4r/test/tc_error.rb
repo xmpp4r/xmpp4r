@@ -31,4 +31,11 @@ class ErrorTest < Test::Unit::TestCase
     assert_equal(:modify, e.type)
     assert_equal('User moved to afterlife.gov', e.text)
   end
+
+  def test_stanzas
+    m = Message.new
+    assert_equal(nil, m.error)
+    m.typed_add(Error.new)
+    assert_equal('<error/>', m.error.to_s)
+  end
 end
