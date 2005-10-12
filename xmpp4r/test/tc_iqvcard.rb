@@ -46,5 +46,7 @@ class IqVcardTest < Test::Unit::TestCase
       assert_equal('John D. Random', v['FN'])
       assert_equal('image/png', v['PHOTO/TYPE'])
       assert_equal('====', v['PHOTO/BINVAL'])
+      assert_equal(nil, v['PHOTO'])
+      assert_equal(nil, v['NICKNAME'])
   end
 end
