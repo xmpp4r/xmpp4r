@@ -16,18 +16,19 @@ module Jabber
       end
 
       ##
-      # Retrieve vCard of the RosterItem
+      # Retrieve vCard of an entity
       #
       # Raises exception upon retrieval error, please catch that!
       #
       # Usage of Threads is suggested here as vCards can be very
       # big (see <tt>/iq/vCard/PHOTO/BINVAL</tt>).
       #
-      # jid:: [Jabber::JID] or nil (nil for the client's own vCard)
+      # jid:: [Jabber::JID] or nil (should be stripped, nil for the client's own vCard)
       # result:: [Jabber::IqVcard] or nil (nil results may be handled as empty vCards)
       def get(jid=nil)
         res = nil
         request = Iq.new(:get, jid)
+        request.from = @stream.jid  # Enable components to use this
         request.add(IqVcard.new)
         @stream.send_with_id(request) { |answer|
           # No check for sender or queryns needed (see send_with_id)
@@ -48,7 +49,7 @@ module Jabber
       end
 
       ##
-      # Set your own vCard
+      # Set your own vCard (Clients only)
       #
       # Raises exception when setting fails
       #
@@ -74,6 +75,20 @@ module Jabber
         unless error.nil?
           raise "Error setting vCard: #{res.error}, #{res.text}"
         end
+      end
+
+      ##
+      # Quickly initialize a Vcard helper and get
+      # a vCard. See Vcard#get
+      def Vcard.get(stream, jid=nil)
+        Vcard.new(stream).get(jid)
+      end
+
+      ##
+      # Quickly initialize a Vcard helper and set
+      # your vCard. See Vcard#set
+      def Vcard.set(stream, iqvcard)
+        Vcard.new(stream).set(iqvcard)
       end
     end
   end
