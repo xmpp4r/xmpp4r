@@ -16,7 +16,7 @@ include Jabber
 
 # settings
 if ARGV.length < 2
-  puts "Usage:\t./send_vcard.rb <jid> <password>"
+  puts "Usage:\t./send_vcard.rb <jid> <password> [<field1>=<value1> [... <fieldN>=<valueN>] ]"
   puts "Example:\t./send_vcard.rb user@server/resource password NICKNAME=User \"FN=A user\""
   exit 1
 end
