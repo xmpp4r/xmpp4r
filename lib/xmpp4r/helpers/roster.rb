@@ -162,7 +162,7 @@ module Jabber
       # Callbacks are called here
       def update_presence(item, pres)
         oldpres = item.presence(pres.from).nil? ? nil : Presence.new.import(item.presence(pres.from))
-        item.presence = pres
+        item.add_presence(pres)
         @presence_cbs.process(item, oldpres, pres)
       end
 
@@ -239,7 +239,7 @@ module Jabber
         super
         if xe.kind_of?(RosterItem)
           xe.each_presence { |pres|
-            self.presence = Presence.new.import(pres)
+            add_presence(Presence.new.import(pres))
           }
         end
         self
@@ -282,7 +282,7 @@ module Jabber
       # JID to keep track of resources. Presence stanzas with
       # <tt>type == :unavailable</tt> will be deleted as this indicates
       # that this resource has gone offline.
-      def presence=(newpres)
+      def add_presence(newpres)
         # Delete old presences with the same JID
         @presences.delete_if do |pres|
           pres.from == newpres.from
