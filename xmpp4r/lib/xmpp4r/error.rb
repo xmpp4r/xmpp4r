@@ -137,9 +137,7 @@ module Jabber
     # Get the errors <text/> element text
     # result:: [String] or nil
     def text
-      text = nil
-      each_element { |e| text = e.text if e.name == 'text' }
-      text
+      first_element_text('text') || super
     end
 
     ##
