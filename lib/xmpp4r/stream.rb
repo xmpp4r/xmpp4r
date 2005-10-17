@@ -10,6 +10,7 @@ require 'xmpp4r/streamparser'
 require 'xmpp4r/presence'
 require 'xmpp4r/message'
 require 'xmpp4r/iq'
+require 'xmpp4r/errorexception'
 require 'xmpp4r/debuglog'
 require 'xmpp4r/idgenerator'
 
@@ -269,18 +270,32 @@ module Jabber
     #
     # The block will be called once: when receiving a stanza with the
     # same Jabber::XMLStanza#id. It *must* return true to complete this!
+    #
+    # Be aware that if a stanza with <tt>type='error'</tt> is received
+    # the function does not yield but raises an ErrorException with
+    # the corresponding error element.
     # xml:: [XMLStanza]
     def send_with_id(xml, &block)
       if xml.id.nil?
         xml.id = Jabber::IdGenerator.instance.generate_id
       end
 
+      error = nil
       send(xml) do |received|
         if received.id == xml.id
-          yield(received)
+          if received.type == :error
+            error = received.error
+            true
+          else
+            yield(received)
+          end
         else
           false
         end
+      end
+
+      unless error.nil?
+        raise ErrorException.new(error)
       end
     end
 

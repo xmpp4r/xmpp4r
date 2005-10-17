@@ -80,7 +80,8 @@ module Jabber
     # Threading is suggested, as this code waits
     # for an answer.
     #
-    # Raises an exception upon error response.
+    # Raises an exception upon error response (ErrorException from
+    # Stream#send_with_id).
     # new_password:: [String] New password
     def password=(new_password)
       iq = Iq::new_query(:set, @jid.domain)
@@ -92,15 +93,10 @@ module Jabber
       send_with_id(iq) { |answer|
         if answer.type == :result
           true
-        elsif answer.type == :error
-          err = "Error changing password: #{answer.error}, #{answer.text}"
-          true
         else
           false
         end
       }
-
-      raise err unless err.nil?
     end
   end  
 end

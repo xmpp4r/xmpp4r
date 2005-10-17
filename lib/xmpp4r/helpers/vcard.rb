@@ -3,6 +3,7 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/iq'
+require 'xmpp4r/errorexception'
 
 module Jabber
   module Helpers
@@ -19,6 +20,8 @@ module Jabber
       # Retrieve vCard of an entity
       #
       # Raises exception upon retrieval error, please catch that!
+      # (The exception is ErrorException and is raisen by
+      # Stream#send_with_id.
       #
       # Usage of Threads is suggested here as vCards can be very
       # big (see <tt>/iq/vCard/PHOTO/BINVAL</tt>).
@@ -35,16 +38,10 @@ module Jabber
           if answer.type == :result
             res = answer.vcard
             true
-          elsif answer.type == :error
-            res = answer.first_element('error')
-            true
           else
             false
           end
         }
-        if res.kind_of?(Error)
-          raise "Error getting vCard: #{res.error}, #{res.text}"
-        end
         res
       end
 
@@ -61,20 +58,13 @@ module Jabber
         iq = Iq.new(:set)
         iq.add(iqvcard)
 
-        error = nil
         @stream.send_with_id(iq) { |answer|
           if answer.type == :result
-            true
-          elsif answer.type == :error
-            error = answer.first_element('error')
             true
           else
             false
           end
         }
-        unless error.nil?
-          raise "Error setting vCard: #{res.error}, #{res.text}"
-        end
       end
 
       ##
