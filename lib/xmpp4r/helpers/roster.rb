@@ -224,6 +224,10 @@ module Jabber
     # This information is *not* stored in XML!
     class RosterItem < Jabber::RosterItem
       ##
+      # Tracked (online) presences of this RosterItem
+      attr_reader :presences
+
+      ##
       # Initialize an empty RosterItem
       def initialize(stream)
         super()
@@ -252,6 +256,15 @@ module Jabber
         request = Iq.new_rosterset
         request.query.add(self)
         @stream.send(request)
+      end
+
+      ##
+      # Is any presence of this person on-line?
+      #
+      # (Or is there any presence? Unavailable presences are
+      # deleted.)
+      def online?
+        @presences.size > 0
       end
       
       ##
