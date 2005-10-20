@@ -1,4 +1,4 @@
-XMPP4R 0.2 (XX/XX/2005)
+XMPP4R 0.2 (20/10/2005)
 =======================
 * Workarounds for REXML bugs.
 * Presences are now Comparable according to priority or interest

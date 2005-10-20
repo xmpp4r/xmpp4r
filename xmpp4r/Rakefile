@@ -37,7 +37,7 @@ task :doctoweb => [:rdoc] do |t|
    sh "tools/doctoweb.bash"
 end
 
-Rake::PackageTask.new('xmpp4r', '0.1') do |p|
+Rake::PackageTask.new('xmpp4r', '0.2') do |p|
 	p.need_tar = true
 	p.package_files.include('ChangeLog', 'README', 'COPYING', 'LICENSE', 'setup.rb',
 	'Rakefile')
