@@ -67,6 +67,24 @@ module Jabber
       self.node = val
       self
     end
+
+    ##
+    # Get the first identity child
+    # result:: [DiscoIdentity]
+    def identity
+      first_element('identity')
+    end
+
+    ##
+    # Get list of features
+    # result:: [Array] of [String]
+    def features
+      res = []
+      each_element('feature') { |feature|
+        res.push(feature.var)
+      }
+      res
+    end
   end
 
   IqQuery.add_namespaceclass('http://jabber.org/protocol/disco#info', IqQueryDiscoInfo)
