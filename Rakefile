@@ -1,7 +1,7 @@
 require 'rake/testtask'
-require 'rake/rdoctask'
 require 'rake/packagetask'
-require 'rake/gempackagetask'
+require 'rake/rdoctask'
+require 'rake'
 require 'find'
 
 # Globals
@@ -59,21 +59,28 @@ end
 Rake::PackageTask.new(PKG_NAME, PKG_VERSION) do |p|
 	p.need_tar = true
 	p.package_files = PKG_FILES
+	p p.package_files
 end
 
-spec = Gem::Specification.new do |s|
-	s.platform = Gem::Platform::RUBY
-	s.summary = "Ruby library for Jabber Instant-Messaging"
-	s.name = PKG_NAME
-	s.version = PKG_VERSION
-	s.requirements << 'none'
-	s.require_path = 'lib'
-	s.autorequire = 'xmpp4r'
-	s.files = PKG_FILES
-	s.description = "Ruby library for Jabber Instant-Messaging"
-end
+# "Gem" part of the Rakefile
+begin
+	require 'rake/gempackagetask'
 
-Rake::GemPackageTask.new(spec) do |pkg|
-	pkg.need_zip = true
-	pkg.need_tar = true
+	spec = Gem::Specification.new do |s|
+		s.platform = Gem::Platform::RUBY
+		s.summary = "Ruby library for Jabber Instant-Messaging"
+		s.name = PKG_NAME
+		s.version = PKG_VERSION
+		s.requirements << 'none'
+		s.require_path = 'lib'
+		s.autorequire = 'xmpp4r'
+		s.files = PKG_FILES
+		s.description = "Ruby library for Jabber Instant-Messaging"
+	end
+
+	Rake::GemPackageTask.new(spec) do |pkg|
+		pkg.need_zip = true
+		pkg.need_tar = true
+	end
+rescue LoadError
 end
