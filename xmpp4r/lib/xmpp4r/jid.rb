@@ -27,14 +27,20 @@ module Jabber
         @node = node
         if domain.nil?
           if not node.nil?
-            if node.include?('@')
-              @node, @domain = node.split('@',2)
-              if @domain.include?('/')
-                @domain, @resource = @domain.split('/',2)
-              end
-            elsif node.include?('/')
+            # node@domain/resource or domain/resource
+            if node.include?('/')
               @domain, @resource = @node.split('/',2)
-              @node = nil
+              # node@domain/resource
+              if @domain.include?('@')
+                @node, @domain = @domain.split('@', 2)
+              # domain/resource
+              else
+                @node = nil
+              end
+            # node@domain
+            elsif node.include?('@')
+              @node, @domain = node.split('@', 2)
+            # domain
             else
               @domain = node
               @node = nil
