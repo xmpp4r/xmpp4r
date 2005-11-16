@@ -34,6 +34,7 @@ module Jabber
               end
             elsif node.include?('/')
               @domain, @resource = @node.split('/',2)
+              @node = nil
             else
               @domain = node
               @node = nil
