@@ -20,6 +20,7 @@ class JIDTest < Test::Unit::TestCase
     assert_equal('a', j2.node)
     assert_equal('b', j2.domain)
     assert_equal('c', j2.resource)
+    assert_equal('a@b/c', j.to_s)
   end
 
   def test_create3
@@ -27,6 +28,7 @@ class JIDTest < Test::Unit::TestCase
     assert_equal('a', j.node)
     assert_equal('b', j.domain)
     assert_equal('c', j.resource)
+    assert_equal('a@b/c', j.to_s)
   end
 
   def test_create4
@@ -34,6 +36,7 @@ class JIDTest < Test::Unit::TestCase
     assert_equal('a', j.node)
     assert_equal('b', j.domain)
     assert_equal(nil, j.resource)
+    assert_equal('a@b', j.to_s)
   end
 
   def test_create5
@@ -41,6 +44,7 @@ class JIDTest < Test::Unit::TestCase
     assert_equal(nil, j.node)
     assert_equal(nil, j.domain)
     assert_equal(nil, j.resource)
+    assert_equal('', j.to_s)
   end
 
   def test_create6
@@ -48,6 +52,23 @@ class JIDTest < Test::Unit::TestCase
     assert_equal(nil, j.node)
     assert_equal('dom', j.domain)
     assert_equal(nil, j.resource)
+    assert_equal('dom', j.to_s)
+  end
+
+  def test_create7
+    j = JID::new('dom/res')
+    assert_equal(nil, j.node)
+    assert_equal('dom', j.domain)
+    assert_equal('res', j.resource)
+    assert_equal('dom/res', j.to_s)
+  end
+
+  def test_create8
+    j = JID::new('dom/a@b')
+    assert_equal(nil, j.node)
+    assert_equal('dom', j.domain)
+    assert_equal('a@b', j.resource)
+    assert_equal('dom/a@b', j.to_s)
   end
 
   def test_tos
@@ -60,8 +81,11 @@ class JIDTest < Test::Unit::TestCase
 
   def test_equal
     assert_equal(JID::new('domain.fr'), JID::new('domain.fr'))
+    assert_equal(JID::new('domain.fr'), JID::new(nil, 'domain.fr'))
     assert_equal(JID::new('l@domain.fr'), JID::new('l@domain.fr'))
+    assert_equal(JID::new('l@domain.fr'), JID::new('l', 'domain.fr'))
     assert_equal(JID::new('l@domain.fr/res'), JID::new('l@domain.fr/res'))
+    assert_equal(JID::new('l@domain.fr/res'), JID::new('l', 'domain.fr', 'res'))
   end
 
   def test_hash
