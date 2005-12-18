@@ -71,6 +71,13 @@ class JIDTest < Test::Unit::TestCase
     assert_equal('dom/a@b', j.to_s)
   end
 
+	def test_create9
+		assert_nothing_raised{JID::new("#{'n'*1023}@#{'d'*1023}/#{'r'*1023}")}
+		assert_raises(ArgumentError){JID::new("#{'n'*1024}@#{'d'*1023}/#{'r'*1023}")}
+		assert_raises(ArgumentError){JID::new("#{'n'*1023}@#{'d'*1024}/#{'r'*1023}")}
+		assert_raises(ArgumentError){JID::new("#{'n'*1023}@#{'d'*1023}/#{'r'*1024}")}
+	end
+
   def test_tos
     assert_equal('',JID::new.to_s)
     assert_equal('domain.fr',JID::new('domain.fr').to_s)
@@ -94,4 +101,10 @@ class JIDTest < Test::Unit::TestCase
     h[j] = 'a'
     assert_equal(h[j], h[JID::new('l@domain.fr/res')])
   end
+
+	def test_strip
+		assert_equal(JID::new('l@domain.fr'),JID::new('l@domain.fr/res').strip)
+		assert_equal(JID::new('l@domain.fr'),JID::new('l@domain.fr').strip)
+		assert_equal(JID::new('l@domain.fr'),JID::new('l@domain.fr/res').bare)
+	end
 end
