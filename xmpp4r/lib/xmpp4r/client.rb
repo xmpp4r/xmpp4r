@@ -72,6 +72,8 @@ module Jabber
       unless authenticated
         raise AuthenticationFailure.new, "Client authentication failed"
       end
+
+      authenticated
     end
 
     ##
