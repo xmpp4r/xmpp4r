@@ -13,41 +13,22 @@ module Jabber
 
     attr_reader :node, :domain, :resource
 
+		PATTERN = /^(?:([^@]*)@)??([^@\/]+)(?:\/(.*?))?$/
+
     ##
     # Create a new JID. If called as new('a@b/c'), parse the string and
     # split (node, domain, resource)
     def initialize(node = nil, domain = nil, resource = nil)
-      if node.kind_of? JID
-        @node = node.node
-        @domain = node.domain
-        @resource = node.resource
-      else
-        @resource = resource
-        @domain = domain
-        @node = node
-        if domain.nil?
-          if not node.nil?
-            # node@domain/resource or domain/resource
-            if node.include?('/')
-              @domain, @resource = @node.split('/',2)
-              # node@domain/resource
-              if @domain.include?('@')
-                @node, @domain = @domain.split('@', 2)
-              # domain/resource
-              else
-                @node = nil
-              end
-            # node@domain
-            elsif node.include?('@')
-              @node, @domain = node.split('@', 2)
-            # domain
-            else
-              @domain = node
-              @node = nil
-            end
-          end
-        end
-      end
+			@resource = resource
+			@domain = domain
+			@node = node
+			if domain.nil? and not node.nil?
+				@node, @domain, @resource = node.to_s.scan(PATTERN).first
+			end
+
+			raise ArgumentError, 'Node too long' if @node.to_s.length > 1023
+			raise ArgumentError, 'Domain too long' if @domain.to_s.length > 1023
+			raise ArgumentError, 'Resource too long' if @resource.to_s.length > 1023
     end
 
     ##
@@ -71,6 +52,7 @@ module Jabber
     def strip
       JID::new(@node, @domain)
     end
+		alias_method :bare, :strip
 
     ##
     # Remove the resource of *this* object
