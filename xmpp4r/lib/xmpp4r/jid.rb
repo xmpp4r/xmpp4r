@@ -55,11 +55,10 @@ module Jabber
 		alias_method :bare, :strip
 
     ##
-    # Remove the resource of *this* object
-    # return:: [JID] self
+    # No longer implemented. use strip instead !
+		# return:: [JID] self
     def strip!
-      @resource = nil
-      self
+			raise "strip! is no longer implemented. use strip instead !"
     end
 
     ##
