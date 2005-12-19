@@ -164,12 +164,14 @@ module Jabber
 
     ##
     # Create a new jabber:iq:register set stanza for service/server registration
-    def Iq.new_register(username, password)
+    # username:: [String] (Element will be ommited if unset)
+    # password:: [String] (Element will be ommited if unset)
+    def Iq.new_register(username=nil, password=nil)
       iq = Iq::new(:set)
       query = IqQuery::new
       query.add_namespace('jabber:iq:register')
-      query.add(REXML::Element::new('username').add_text(username))
-      query.add(REXML::Element::new('password').add_text(password))
+      query.add(REXML::Element::new('username').add_text(username)) if username
+      query.add(REXML::Element::new('password').add_text(password)) if password
       iq.add(query)
       iq
     end
