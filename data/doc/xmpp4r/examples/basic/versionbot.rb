@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-$:.unshift '../lib'
+$:.unshift '../../../../../lib'
 
 require 'xmpp4r'
 require 'xmpp4r/iq/query/version'

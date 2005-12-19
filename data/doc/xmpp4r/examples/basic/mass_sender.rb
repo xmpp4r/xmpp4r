@@ -2,7 +2,7 @@
 
 # This script will send a jabber message to a list of JID given on stdin.
 
-$:.unshift '../lib'
+$:.unshift '../../../../../lib'
 
 require 'optparse'
 require 'xmpp4r'
