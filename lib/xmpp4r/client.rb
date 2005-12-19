@@ -2,6 +2,8 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
+require 'resolv'
+
 require 'xmpp4r/connection'
 require 'xmpp4r/authenticationfailure'
 
@@ -25,9 +27,39 @@ module Jabber
     ##
     # connect to the server
     # (chaining-friendly)
+    #
+    # If you omit the optional host argument SRV records for your jid will
+    # be resolved. If none works, fallback is connecting to the domain part
+    # of the jid.
     # host:: [String] Optional c2s host, will be extracted from jid if nil
     # return:: self
     def connect(host = nil, port = 5222)
+      if host.nil?
+        begin
+          srv = []
+          Resolv::DNS.open { |dns|
+            # If ruby version is too old and SRV is unknown, this will raise a NameError
+            # which is catched below
+            srv = dns.getresources("_xmpp-client._tcp.#{jid.domain}", Resolv::DNS::Resource::IN::SRV)
+          }
+          # Sort SRV records: lowest priority first, highest weight first
+          srv.sort! { |a,b| (a.priority != b.priority) ? (a.priority <=> b.priority) : (b.weight <=> a.weight) }
+
+          srv.each { |record|
+            begin
+              connect(record.target.to_s, record.port)
+              # Success
+              return self
+            rescue SocketError
+              # Try next SRV record
+            end
+          }
+        rescue NameError
+          puts "Resolv::DNS does not support SRV records. Please upgrade to ruby-1.8.3 or later!"
+        end
+        # Fallback to normal connect method
+      end
+      
       super(host.nil? ? jid.domain : host, port)
       send("<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:client' to='#{@jid.domain}'>") { |b| 
         # TODO sanity check : is b a stream ? get version, etc.
