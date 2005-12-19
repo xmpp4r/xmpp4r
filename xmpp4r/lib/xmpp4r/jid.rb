@@ -13,22 +13,22 @@ module Jabber
 
     attr_reader :node, :domain, :resource
 
-		PATTERN = /^(?:([^@]*)@)??([^@\/]+)(?:\/(.*?))?$/
+    PATTERN = /^(?:([^@]*)@)??([^@\/]+)(?:\/(.*?))?$/
 
     ##
     # Create a new JID. If called as new('a@b/c'), parse the string and
     # split (node, domain, resource)
     def initialize(node = nil, domain = nil, resource = nil)
-			@resource = resource
-			@domain = domain
-			@node = node
-			if domain.nil? and not node.nil?
-				@node, @domain, @resource = node.to_s.scan(PATTERN).first
-			end
+      @resource = resource
+      @domain = domain
+      @node = node
+      if domain.nil? and not node.nil?
+        @node, @domain, @resource = node.to_s.scan(PATTERN).first
+      end
 
-			raise ArgumentError, 'Node too long' if @node.to_s.length > 1023
-			raise ArgumentError, 'Domain too long' if @domain.to_s.length > 1023
-			raise ArgumentError, 'Resource too long' if @resource.to_s.length > 1023
+      raise ArgumentError, 'Node too long' if @node.to_s.length > 1023
+      raise ArgumentError, 'Domain too long' if @domain.to_s.length > 1023
+      raise ArgumentError, 'Resource too long' if @resource.to_s.length > 1023
     end
 
     ##
@@ -52,13 +52,13 @@ module Jabber
     def strip
       JID::new(@node, @domain)
     end
-		alias_method :bare, :strip
+    alias_method :bare, :strip
 
     ##
     # No longer implemented. use strip instead !
-		# return:: [JID] self
+    # return:: [JID] self
     def strip!
-			raise "strip! is no longer implemented. use strip instead !"
+      raise "strip! is no longer implemented. use strip instead !"
     end
 
     ##
@@ -75,7 +75,7 @@ module Jabber
     def eql?(o)
       to_s.eql?(o.to_s)
     end
-    
+
     ##
     # Compare two JIDs,
     # helpful for sorting etc.
