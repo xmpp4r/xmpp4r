@@ -15,9 +15,13 @@ module Jabber
     # The client's JID
     attr_reader :jid
 
+    ##
     # Create a new Client. If threaded mode is activated, callbacks are called
     # as soon as messages are received; If it isn't, you have to call
     # Stream#process from time to time.
+    #
+    # Remember to *always* put a resource in your JID!
+    #
     # TODO SSL mode is not implemented yet.
     def initialize(jid, threaded = true)
       super(threaded)
@@ -116,7 +120,23 @@ module Jabber
     # not successful.
     def register(password)
       reg = Iq.new_register(jid.node, password)
+      reg.to = jid.domain
       send_with_id(reg) { |answer|
+        true
+      }
+    end
+
+    ##
+    # Remove the registration of a user account
+    #
+    # *WARNING:* this deletes your roster and everything else
+    # stored on the server!
+    def remove_registration
+      reg = Iq.new_register
+      reg.to = jid.domain
+      reg.query.add(REXML::Element.new('remove'))
+      send_with_id(reg) { |answer|
+        p answer.to_s
         true
       }
     end
