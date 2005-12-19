@@ -15,6 +15,13 @@ module Jabber
 
     PATTERN = /^(?:([^@]*)@)??([^@\/]+)(?:\/(.*?))?$/
 
+    begin
+      require 'idn'
+      USE_STRINGPREP = true
+    rescue LoadError
+      USE_STRINGPREP = false
+    end
+
     ##
     # Create a new JID. If called as new('a@b/c'), parse the string and
     # split (node, domain, resource)
@@ -24,6 +31,12 @@ module Jabber
       @node = node
       if domain.nil? and not node.nil?
         @node, @domain, @resource = node.to_s.scan(PATTERN).first
+      end
+
+      if USE_STRINGPREP
+        @node = IDN::Stringprep.nodeprep(@node) unless @node.nil?
+        @domain = IDN::Stringprep.nameprep(@domain) unless @domain.nil?
+        @resource = IDN::Stringprep.resourceprep(@resource) unless @resource.nil?
       end
 
       raise ArgumentError, 'Node too long' if @node.to_s.length > 1023
