@@ -163,6 +163,18 @@ module Jabber
     end
 
     ##
+    # Create a new jabber:iq:register set stanza for service/server registration
+    def Iq.new_register(username, password)
+      iq = Iq::new(:set)
+      query = IqQuery::new
+      query.add_namespace('jabber:iq:register')
+      query.add(REXML::Element::new('username').add_text(username))
+      query.add(REXML::Element::new('password').add_text(password))
+      iq.add(query)
+      iq
+    end
+
+    ##
     # Create a new jabber:iq:roster get Stanza.
     #
     # IqQueryRoster is unused here because possibly not require'd

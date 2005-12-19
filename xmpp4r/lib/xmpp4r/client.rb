@@ -109,6 +109,19 @@ module Jabber
     end
 
     ##
+    # Register a new user account
+    # (may be used instead of Client#auth)
+    #
+    # This method may raise ErrorException if the registration was
+    # not successful.
+    def register(password)
+      reg = Iq.new_register(jid.node, password)
+      send_with_id(reg) { |answer|
+        true
+      }
+    end
+
+    ##
     # Change the client's password
     #
     # Threading is suggested, as this code waits
