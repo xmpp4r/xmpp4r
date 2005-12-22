@@ -107,4 +107,14 @@ class JIDTest < Test::Unit::TestCase
     assert_equal(JID::new('l@domain.fr'),JID::new('l@domain.fr').strip)
     assert_equal(JID::new('l@domain.fr'),JID::new('l@domain.fr/res').bare)
   end
+
+  def test_change1
+    j = JID::new('a@b/c')
+    j.node = 'd'
+    assert_equal('d@b/c', j.to_s)
+    j.domain = 'e'
+    assert_equal('d@e/c', j.to_s)
+    j.resource = 'f'
+    assert_equal('d@e/f', j.to_s)
+  end
 end
