@@ -106,12 +106,12 @@ class JIDTest < Test::Unit::TestCase
     assert_equal(JID::new('l@domain.fr'),JID::new('l@domain.fr/res').strip)
     assert_equal(JID::new('l@domain.fr'),JID::new('l@domain.fr').strip)
     assert_equal(JID::new('l@domain.fr'),JID::new('l@domain.fr/res').bare)
-		jid = JID::new('l@domain.fr/res')
-		jid.strip!
+    jid = JID::new('l@domain.fr/res')
+    jid.strip!
     assert_equal(JID::new('l@domain.fr'),jid)
 
-		jid = JID::new('l@domain.fr/res')
-		jid.bare!
+    jid = JID::new('l@domain.fr/res')
+    jid.bare!
     assert_equal(JID::new('l@domain.fr'),jid)
   end
 

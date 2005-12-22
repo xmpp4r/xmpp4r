@@ -73,7 +73,7 @@ module Jabber
     def strip!
       self.resource = nil
     end
-		alias_method :bare!, :strip!
+    alias_method :bare!, :strip!
 
     ##
     # Returns a hash value of the String representation
@@ -99,23 +99,23 @@ module Jabber
       to_s <=> o.to_s
     end
 
-    
+
     # Set the JID's node
     def node=(v)
       @node = v
-			@node = IDN::Stringprep.nodeprep(@node) unless @node.nil? or not USE_STRINGPREP
+      @node = IDN::Stringprep.nodeprep(@node) unless @node.nil? or not USE_STRINGPREP
     end
 
     # Set the JID's domain
     def domain=(v)
       @domain = v
-			@domain = IDN::Stringprep.nodeprep(@domain) unless @domain.nil? or not USE_STRINGPREP
+      @domain = IDN::Stringprep.nodeprep(@domain) unless @domain.nil? or not USE_STRINGPREP
     end
-  
+
     # Set the JID's resource
     def resource=(v)
       @resource = v
-			@resource = IDN::Stringprep.nodeprep(@resource) unless @resource.nil? or not USE_STRINGPREP
+      @resource = IDN::Stringprep.nodeprep(@resource) unless @resource.nil? or not USE_STRINGPREP
     end
   end
 end
