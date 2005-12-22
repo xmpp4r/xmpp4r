@@ -71,8 +71,9 @@ module Jabber
     # No longer implemented. use strip instead !
     # return:: [JID] self
     def strip!
-      raise "strip! is no longer implemented. use strip instead !"
+      self.resource = nil
     end
+		alias_method :bare!, :strip!
 
     ##
     # Returns a hash value of the String representation
@@ -101,20 +102,20 @@ module Jabber
     
     # Set the JID's node
     def node=(v)
-      # FIXME we need to use stringprep for this.
       @node = v
+			@node = IDN::Stringprep.nodeprep(@node) unless @node.nil? or not USE_STRINGPREP
     end
 
     # Set the JID's domain
     def domain=(v)
-      # FIXME we need to use stringprep for this.
       @domain = v
+			@domain = IDN::Stringprep.nodeprep(@domain) unless @domain.nil? or not USE_STRINGPREP
     end
   
     # Set the JID's resource
     def resource=(v)
-      # FIXME we need to use stringprep for this.
       @resource = v
+			@resource = IDN::Stringprep.nodeprep(@resource) unless @resource.nil? or not USE_STRINGPREP
     end
   end
 end
