@@ -124,4 +124,17 @@ class JIDTest < Test::Unit::TestCase
     j.resource = 'f'
     assert_equal('d@e/f', j.to_s)
   end
+
+  def test_escaping
+    j = JID::new('user1@server1')
+    j2 = JID::new(JID::escape(j), 'server2', 'res2')
+    assert_equal('user1%server1@server2/res2', j2.to_s)
+  end
+
+if defined?(libidnbug) # this crashes the interpreter
+  def test_invalidnode
+#    assert_raises(IDN::Stringprep::StringprepError) { JID::new('toto@a/a', 'server', 'res') }
+    assert_raises(IDN::Stringprep::StringprepError) { IDN::Stringprep.nodeprep('toto@a/a') }
+  end
+end
 end

@@ -102,20 +102,35 @@ module Jabber
 
     # Set the JID's node
     def node=(v)
-      @node = v
-      @node = IDN::Stringprep.nodeprep(@node) unless @node.nil? or not USE_STRINGPREP
+      @node = v.to_s
+      if USE_STRINGPREP
+        @node = IDN::Stringprep.nodeprep(@node) if @node
+      end
     end
 
     # Set the JID's domain
     def domain=(v)
-      @domain = v
-      @domain = IDN::Stringprep.nodeprep(@domain) unless @domain.nil? or not USE_STRINGPREP
+      @domain = v.to_s
+      if USE_STRINGPREP
+        @domain = IDN::Stringprep.nodeprep(@domain) if @domain
+      end
     end
 
     # Set the JID's resource
     def resource=(v)
-      @resource = v
-      @resource = IDN::Stringprep.nodeprep(@resource) unless @resource.nil? or not USE_STRINGPREP
+      if v # we don't want @resource = "" if v = nil
+        @resource = v.to_s
+      else
+        @resource = nil
+      end
+      if USE_STRINGPREP
+        @resource = IDN::Stringprep.nodeprep(@resource) if @resource
+      end
+    end
+
+    # Escape JID
+    def JID::escape(jid)
+      return jid.to_s.gsub('@', '%')
     end
   end
 end
