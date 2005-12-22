@@ -97,5 +97,24 @@ module Jabber
     def <=>(o)
       to_s <=> o.to_s
     end
+
+    
+    # Set the JID's node
+    def node=(v)
+      # FIXME we need to use stringprep for this.
+      @node = v
+    end
+
+    # Set the JID's domain
+    def domain=(v)
+      # FIXME we need to use stringprep for this.
+      @domain = v
+    end
+  
+    # Set the JID's resource
+    def resource=(v)
+      # FIXME we need to use stringprep for this.
+      @resource = v
+    end
   end
 end
