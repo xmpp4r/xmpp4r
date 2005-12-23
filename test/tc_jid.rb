@@ -137,4 +137,16 @@ if defined?(libidnbug) # this crashes the interpreter
     assert_raises(IDN::Stringprep::StringprepError) { IDN::Stringprep.nodeprep('toto@a/a') }
   end
 end
+
+  def test_empty
+    assert(JID.new.empty?)
+    assert(!JID.new("test").empty?)
+  end
+
+  def test_stripped
+    assert(JID.new("node@domain").stripped?)
+    assert(!JID.new("node@domain/res").stripped?)
+    assert(JID.new("node@domain").bared?)
+    assert(!JID.new("node@domain/res").bared?)
+  end
 end

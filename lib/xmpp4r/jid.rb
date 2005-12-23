@@ -143,5 +143,16 @@ module Jabber
     def JID::escape(jid)
       return jid.to_s.gsub('@', '%')
     end
+
+    # Test if jid is empty
+    def empty?
+      to_s.empty?
+    end
+
+    # Test id jid is strepped
+    def stripped?
+      @resource.empty?
+    end
+    alias_method :bared?, :stripped?
   end
 end
