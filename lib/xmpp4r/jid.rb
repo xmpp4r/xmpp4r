@@ -11,36 +11,35 @@ module Jabber
   class JID
     include Comparable
 
-    attr_reader :node, :domain, :resource
+    PATTERN = /^(?:([^@]*)@)??([^@\/]+)(?:\/(.*?))?$/
+
+    begin
+      require 'idn'
+      USE_STRINGPREP = true
+    rescue LoadError
+      USE_STRINGPREP = false
+    end
 
     ##
     # Create a new JID. If called as new('a@b/c'), parse the string and
     # split (node, domain, resource)
-    def initialize(node = nil, domain = nil, resource = nil)
-      if node.kind_of? JID
-        @node = node.node
-        @domain = node.domain
-        @resource = node.resource
-      else
-        @resource = resource
-        @domain = domain
-        @node = node
-        if domain.nil?
-          if not node.nil?
-            if node.include?('@')
-              @node, @domain = node.split('@',2)
-              if @domain.include?('/')
-                @domain, @resource = @domain.split('/',2)
-              end
-            elsif node.include?('/')
-              @domain, @resource = @node.split('/',2)
-            else
-              @domain = node
-              @node = nil
-            end
-          end
-        end
+    def initialize(node = "", domain = "", resource = "")
+      @resource = resource.to_s
+      @domain = domain.to_s
+      @node = node.to_s
+      if @domain.empty? and not @node.empty?
+        @node, @domain, @resource = @node.scan(PATTERN).first
       end
+
+      if USE_STRINGPREP
+        @node = IDN::Stringprep.nodeprep(@node)
+        @domain = IDN::Stringprep.nameprep(@domain)
+        @resource = IDN::Stringprep.resourceprep(@resource)
+      end
+
+      raise ArgumentError, 'Node too long' if @node.length > 1023
+      raise ArgumentError, 'Domain too long' if @domain.length > 1023
+      raise ArgumentError, 'Resource too long' if @resource.length > 1023
     end
 
     ##
@@ -52,9 +51,9 @@ module Jabber
     # * "node@domain/resource"
     def to_s
       s = ''
-      s = "#{@node}@" if not @node.nil?
-      s += @domain if not @domain.nil?
-      s += "/#{@resource}" if not @resource.nil?
+      s = "#{@node}@" if not @node.empty?
+      s += @domain if not @domain.empty?
+      s += "/#{@resource}" if not @resource.empty?
       return s
     end
 
@@ -64,14 +63,15 @@ module Jabber
     def strip
       JID::new(@node, @domain)
     end
+    alias_method :bare, :strip
 
     ##
-    # Remove the resource of *this* object
+    # No longer implemented. use strip instead !
     # return:: [JID] self
     def strip!
-      @resource = nil
-      self
+      @resource = ""
     end
+    alias_method :bare!, :strip!
 
     ##
     # Returns a hash value of the String representation
@@ -87,7 +87,7 @@ module Jabber
     def eql?(o)
       to_s.eql?(o.to_s)
     end
-    
+
     ##
     # Compare two JIDs,
     # helpful for sorting etc.
@@ -96,5 +96,63 @@ module Jabber
     def <=>(o)
       to_s <=> o.to_s
     end
+
+    # Get the JID's node
+    def node
+      return nil if @node.empty?
+      @node
+    end
+
+    # Set the JID's node
+    def node=(v)
+      @node = v.to_s
+      if USE_STRINGPREP
+        @node = IDN::Stringprep.nodeprep(@node) if @node
+      end
+    end
+
+    # Get the JID's domain
+    def domain
+      return nil if @domain.empty?
+      @domain
+    end
+
+    # Set the JID's domain
+    def domain=(v)
+      @domain = v.to_s
+      if USE_STRINGPREP
+        @domain = IDN::Stringprep.nodeprep(@domain)
+      end
+    end
+
+    # Get the JID's resource
+    def resource
+      return nil if @resource.empty?
+      @resource
+    end
+
+    # Set the JID's resource
+    def resource=(v)
+      @resource = v.to_s
+      if USE_STRINGPREP
+        @resource = IDN::Stringprep.nodeprep(@resource)
+      end
+    end
+
+    # Escape JID
+    def JID::escape(jid)
+      return jid.to_s.gsub('@', '%')
+    end
+
+    # Test if jid is empty
+    def empty?
+      to_s.empty?
+    end
+
+    # Test id jid is strepped
+    def stripped?
+      @resource.empty?
+    end
+    alias_method :bared?, :stripped?
   end
 end

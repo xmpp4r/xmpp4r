@@ -3,7 +3,7 @@
 # This script will send a jabber message to the specified JID. The subject can be
 # specified using the '-s' option, and the message will be taken from stdin.
 
-$:.unshift '../lib'
+$:.unshift '../../../../../lib'
 
 require 'optparse'
 require 'xmpp4r'

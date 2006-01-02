@@ -14,17 +14,20 @@ module Jabber
     ##
     # Create a new connection to the given host and port, using threaded mode
     # or not.
-    def initialize(host, threaded = true, port=5222)
+    def initialize(threaded = true)
       super(threaded)
-      @host = host
-      @port = port
+      @host = nil
+      @port = nil
     end
 
     ##
     # Connects to the Jabber server through a TCP Socket and
     # starts the Jabber parser.
     #
-    def connect
+    def connect(host, port)
+      @host = host
+      @port = port
+
       @socket = TCPSocket.new(@host, @port)
       start(@socket)
     end

@@ -31,7 +31,7 @@ class IqQueryRosterTest < Test::Unit::TestCase
     r.add(RosterItem.new(JID.new('a@b/d'), 'ABC', :none, :subscribe)).groups = ['a']
     itemstr = "<item jid='astro@spaceboyz.net' name='Astro' subscribtion='both'>" \
             + "<group>SpaceBoyZ</group><group>xmpp4r</group></item>"
-    r.add(REXML::Document.new(itemstr).root)
+    r.typed_add(REXML::Document.new(itemstr).root)
 
     r.each { |item|
       assert_equal(item, r[item.jid])
@@ -51,25 +51,38 @@ class IqQueryRosterTest < Test::Unit::TestCase
     assert_equal(:none, r.to_a[1].subscription)
     assert_equal(:subscribe, r.to_a[1].ask)
 
-# FIXME broken test, and I don't really understand why.
-#    assert_equal(REXML::Document.new(itemstr).root.to_s, r.to_a[1].to_s)
+    assert_equal(REXML::Document.new(itemstr).root.to_s, r.to_a[2].to_s)
   end
 
   def test_dupitems
     r = IqQueryRoster::new
     jid = JID::new('a@b')
+    jid2 = JID::new('c@d')
     ri = RosterItem::new(jid, 'ab')
     r.add(ri)
     assert_equal('ab', ri.iname)
     assert_equal('ab', r[jid].iname)
     ri.iname = 'cd'
     assert_equal('cd', ri.iname)
-    # FIXME why would it be 'ab' since you modified the RosterItem object you
-    # created ? I don't think adding transparent copies everywhere is a good
-    # thing.
-    assert_equal('ab', r[jid].iname)
+    # There are no shallow copies - everything is alright.
+    assert_equal('cd', r[jid].iname)
+
     r.add(ri)
     assert_equal('cd', r[jid].iname)
+    assert_equal(ri, r[jid])
+
+    ri.jid = jid2
+    assert_equal(nil, r[jid])
+    assert_equal(ri, r[jid2])
+    assert_equal(2, r.to_a.size)
+
+    r.each_element('item') { |item|
+      assert_equal(ri, item)
+      assert_equal(ri.jid, item.jid)
+      assert_equal(ri.iname, item.iname)
+      assert_equal(jid2, item.jid)
+      assert_equal('cd', item.iname)
+    }
   end
 end
 

@@ -3,7 +3,6 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/xmlstanza'
-require 'xmpp4r/error'
 require 'xmpp4r/x'
 
 module Jabber
@@ -11,6 +10,8 @@ module Jabber
   # The presence class is used to construct presence messages to 
   # send to the Jabber service.
   class Presence < XMLStanza
+    include Comparable
+
     ##
     # Create presence stanza
     # show:: [String] Initial Availability Status
@@ -25,13 +26,10 @@ module Jabber
 
     ##
     # Add an element to the presence stanza
-    # * <error/> elements are converted to [Error]
     # * <x/> elements are converted to [X]
     # element:: [REXML::Element] to add
     def typed_add(element)
-      if element.kind_of?(REXML::Element) && (element.name == 'error')
-        super(Error::import(element))
-      elsif element.kind_of?(REXML::Element) && (element.name == 'x')
+      if element.kind_of?(REXML::Element) && (element.name == 'x')
         super(X::import(element))
       else
         super(element)
@@ -50,12 +48,12 @@ module Jabber
     #
     # result:: [Symbol] or [Nil] Possible values are:
     # * :error
-    # * :probe
-    # * :subscribe
-    # * :subscribed
-    # * :unavailable
-    # * :unsubscribe
-    # * :unsubscribed
+    # * :probe (Servers send this to request presence information)
+    # * :subscribe (Subscription request)
+    # * :subscribed (Subscription approval)
+    # * :unavailable (User has gone offline)
+    # * :unsubscribe (Unsubscription request)
+    # * :unsubscribed (Unsubscription approval)
     # * [nil] (available)
     # See RFC3921 - 2.2.1. for explanation.
     def type
@@ -107,7 +105,7 @@ module Jabber
     ##
     # Get Availability Status (RFC3921 - 5.2)
     # result:: [Symbol] or [Nil] Valid values according to RFC3921:
-    # * nil (Online, no <show/> element)
+    # * nil (Available, no <show/> element)
     # * :away
     # * :chat (Free for chat)
     # * :dnd (Do not disturb)
@@ -132,7 +130,6 @@ module Jabber
       if xe.nil?
         xe = add_element('show')
       end
-
       case val
         when :away then text = 'away'
         when :chat then text = 'chat'
@@ -184,7 +181,7 @@ module Jabber
     end
 
     ##
-    # Get presence priority, or 0 if absent
+    # Get presence priority, or nil if absent
     # result:: [Integer]
     def priority
       e = first_element_text('priority')
@@ -216,5 +213,42 @@ module Jabber
       self.priority = val
       self
     end
+
+    ##
+    # Compare two presences using priority.
+    def <=>(o)
+      if priority.nil?
+        if o.priority.nil?
+          return 0
+        else
+          return 1
+        end
+      elsif o.priority.nil?
+        return -1
+      else
+        return priority <=> o.priority
+      end
+    end
+
+    ##
+    # Compare two presences. The most suitable to talk with is the
+    # biggest.
+    PRESENCE_STATUS = { :chat => 4, nil => 3, :dnd => 2, :away => 1, :xa => 0 }
+    def cmp_interest(o)
+      if type.nil?
+        if o.type.nil?
+          # both available.
+          PRESENCE_STATUS[show] <=> PRESENCE_STATUS[o.show]
+        else
+          return -1
+        end
+      elsif o.type.nil?
+        return 1
+      else
+        # both are non-nil. We consider this is equal.
+        return 0
+      end
+    end
+
   end
 end

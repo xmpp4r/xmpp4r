@@ -30,11 +30,12 @@ module Jabber
     # Add an element to the roster
     #
     # Converts <item/> elements to RosterItem
+    #
+    # Previous RosterItems with the same JID will
+    # *not* be deleted!
     def typed_add(element)
       if element.kind_of?(REXML::Element) && (element.name == 'item')
         item = RosterItem::new.import(element)
-        # XPath injection here?
-        delete_element("item[@jid='#{item.jid}']")
         super(item)
       else
         super(element)

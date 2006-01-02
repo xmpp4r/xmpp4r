@@ -38,13 +38,15 @@ class IqVcardTest < Test::Unit::TestCase
 
   def test_deep
     v = IqVcard.new({
-      'PHOTO' => '...',
+      'FN' => 'John D. Random',
       'PHOTO/TYPE' => 'image/png',
       'PHOTO/BINVAL' => '===='})
     
-      assert_equal(['PHOTO', 'PHOTO/BINVAL', 'PHOTO/TYPE'], v.fields.sort)
-      assert_equal('...', v['PHOTO'])
+      assert_equal(['FN', 'PHOTO/BINVAL', 'PHOTO/TYPE'], v.fields.sort)
+      assert_equal('John D. Random', v['FN'])
       assert_equal('image/png', v['PHOTO/TYPE'])
       assert_equal('====', v['PHOTO/BINVAL'])
+      assert_equal(nil, v['PHOTO'])
+      assert_equal(nil, v['NICKNAME'])
   end
 end

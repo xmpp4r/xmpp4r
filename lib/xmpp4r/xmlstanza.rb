@@ -3,6 +3,7 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/jid'
+require 'xmpp4r/error'
 
 module Jabber
   ##
@@ -16,11 +17,17 @@ module Jabber
     # * Swap 'to' and 'from'
     # * Copy 'id'
     # * Does not take care about the type
+    #
+    # *Attention*: Be careful when answering to stanzas with
+    # <tt>type == :error</tt> - answering to an error may generate
+    # another error on the other side, which could be leading to a
+    # ping-pong effect quickly!
+    #
     # xmlstanza:: [XMLStanza] source
     # import:: [true or false] Copy attributes and children of source
     # result:: [XMLStanza] answer stanza
     def XMLStanza.answer(xmlstanza, import=true)
-      x = xmlstanza.class::new(xmlstanza.name)
+      x = xmlstanza.class::new
       if import
         x.import(xmlstanza)
       end
@@ -28,6 +35,25 @@ module Jabber
       x.to = xmlstanza.from
       x.id = xmlstanza.id
       x
+    end
+
+    ##
+    # Add a sub-element
+    #
+    # Will be converted to [Error] if named "error"
+    # element:: [REXML::Element] to add
+    def typed_add(element)
+      if element.kind_of?(REXML::Element) && (element.name == 'error')
+        super(Error::import(element))
+      else
+        super(element)
+      end
+    end
+
+    ##
+    # Return the first <tt><error/></tt> child
+    def error
+      first_element('error')
     end
 
     ##

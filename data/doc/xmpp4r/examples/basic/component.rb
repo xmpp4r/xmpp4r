@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-$:.unshift '../lib'
+$:.unshift '../../../../../lib'
 
 require 'xmpp4r'
 include Jabber

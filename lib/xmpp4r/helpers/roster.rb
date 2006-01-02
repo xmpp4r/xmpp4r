@@ -14,6 +14,11 @@ module Jabber
     # to keep track of updates.
     class Roster
       ##
+      # All items in your roster
+      # items:: [Hash] ([JID] => [Helpers::RosterItem])
+      attr_reader :items
+
+      ##
       # Initialize a new Roster helper
       #
       # Registers its cbs (prio = 120, ref = "Helpers::Roster")
@@ -23,6 +28,7 @@ module Jabber
       def initialize(stream)
         @stream = stream
         @items = {}
+        @query_cbs = CallbackList.new
         @update_cbs = CallbackList.new
         @presence_cbs = CallbackList.new
         @subscription_cbs = CallbackList.new
@@ -38,6 +44,18 @@ module Jabber
         # Request the roster
         rosterget = Iq.new_rosterget
         stream.send(rosterget)
+      end
+
+      ##
+      # Add a callback to be called when a query has been processed
+      #
+      # Because update callbacks are called for each roster item,
+      # this may be appropriate to notify that *anything* has updated.
+      #
+      # Arguments for callback block: The received <tt><iq/></tt> stanza
+      def add_query_callback(prio = 0, ref = nil, proc = nil, &block)
+        block = proc if proc
+        @query_cbs.add(prio, ref, block)
       end
 
       ##
@@ -125,7 +143,8 @@ module Jabber
             end
             @update_cbs.process(olditem, @items[item.jid])
           end
-          true
+
+          @query_cbs.process(iq)
         else
           false
         end
@@ -158,9 +177,7 @@ module Jabber
       # Callbacks are called here
       def update_presence(item, pres)
         oldpres = item.presence(pres.from).nil? ? nil : Presence.new.import(item.presence(pres.from))
-
-        item.presence = pres
-
+        item.add_presence(pres)
         @presence_cbs.process(item, oldpres, pres)
       end
 
@@ -177,7 +194,48 @@ module Jabber
           nil
         end
       end
-      
+
+      ##
+      # Returns the list of RosterItems which, stripped, are equal to the
+      # one you are looking for. 
+      def find(jid)
+        j = jid.strip
+        l = {}
+        @items.each_pair do |k, v|
+          l[k] = v if k.strip == j
+        end
+        l
+      end
+
+      ##
+      # Groups in this Roster,
+      # sorted by name
+      #
+      # Contains +nil+ if there are ungrouped items
+      # result:: [Array] containing group names (String)
+      def groups
+        res = []
+        @items.each_pair do |jid,item|
+          res += item.groups
+          res += [nil] if item.groups == []
+        end
+        res.uniq.sort { |a,b| a.to_s <=> b.to_s }
+      end
+
+      ##
+      # Get items in a group
+      #
+      # When group is nil, return ungrouped items
+      # group:: [String] Group name
+      def find_by_group(group)
+        res = []
+        @items.each_pair do |jid,item|
+          res.push(item) if item.groups.include?(group)
+          res.push(item) if item.groups == [] and group.nil?
+        end
+        res
+      end
+
       ##
       # Add a user to your roster
       #
@@ -210,6 +268,10 @@ module Jabber
     # This information is *not* stored in XML!
     class RosterItem < Jabber::RosterItem
       ##
+      # Tracked (online) presences of this RosterItem
+      attr_reader :presences
+
+      ##
       # Initialize an empty RosterItem
       def initialize(stream)
         super()
@@ -225,7 +287,7 @@ module Jabber
         super
         if xe.kind_of?(RosterItem)
           xe.each_presence { |pres|
-            self.presence = Presence.new.import(pres)
+            add_presence(Presence.new.import(pres))
           }
         end
         self
@@ -238,6 +300,15 @@ module Jabber
         request = Iq.new_rosterset
         request.query.add(self)
         @stream.send(request)
+      end
+
+      ##
+      # Is any presence of this person on-line?
+      #
+      # (Or is there any presence? Unavailable presences are
+      # deleted.)
+      def online?
+        @presences.size > 0
       end
       
       ##
@@ -268,7 +339,7 @@ module Jabber
       # JID to keep track of resources. Presence stanzas with
       # <tt>type == :unavailable</tt> will be deleted as this indicates
       # that this resource has gone offline.
-      def presence=(newpres)
+      def add_presence(newpres)
         # Delete old presences with the same JID
         @presences.delete_if do |pres|
           pres.from == newpres.from

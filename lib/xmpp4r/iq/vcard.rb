@@ -68,22 +68,31 @@ module Jabber
     ##
     # Get vCard field names
     #
-    # Recursed two levels at maximum
+    # Example:
+    #  ["NICKNAME", "BDAY", "ORG/ORGUNIT", "PHOTO/TYPE", "PHOTO/BINVAL"]
+    #
     # result:: [Array] of [String]
     def fields
-      names = []
-      each_element { |e|
-        if e.text.to_s.chomp != ''
-          names.push(e.name)
-        end
+      element_names(self).uniq
+    end
 
-        if e.kind_of?(REXML::Element)
-          e.each_element { |child|
-            names.push("#{e.name}/#{child.name}")
-          }
+    ##
+    # Recursive helper function,
+    # returns all element names in an array, concatenated
+    # to their parent's name with a slash
+    def element_names(xe, prefix='')  # :nodoc:
+      res = []
+      xe.each_element { |child|
+        if child.kind_of?(REXML::Element)
+          children = element_names(child, "#{prefix}#{child.name}/")
+          if children == []
+            res.push("#{prefix}#{child.name}")
+          else
+            res += children
+          end
         end
       }
-      names.uniq
+      res
     end
 
     Iq.add_elementclass('vCard', IqVcard)

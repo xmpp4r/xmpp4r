@@ -65,4 +65,12 @@ class XMLStanzaTest < Test::Unit::TestCase
     assert_equal(x.to_s, iq.to_s)
     assert_equal(q.namespace, iq.queryns)
   end
+
+  def test_error
+    x = XMLStanza::new("presence")
+    assert_equal(nil, x.error)
+    x.typed_add(REXML::Element.new('error'))
+    assert_equal('<error/>', x.error.to_s)
+    assert_equal(Error, x.error.class)
+  end
 end

@@ -97,6 +97,7 @@
 # * Jabber::IqQueryRoster, Jabber::RosterItem: <tt>require 'xmpp4r/iq/query/roster'</tt>
 # * Jabber::IqQueryVersion: <tt>require 'xmpp4r/iq/query/version'</tt>
 # * Jabber::XDelay: <tt>require 'xmpp4r/x/delay'</tt>
+# * Jabber::XRoster, Jabber::XRosterItem: <tt>require 'xmpp4r/x/roster'</tt>
 # * Jabber::XMuc, Jabber::XMucUser: <tt>require 'xmpp4r/x/muc'</tt>
 # * Jabber::XMucUserItem: <tt>require 'xmpp4r/x/mucuseritem'</tt>
 #
@@ -108,5 +109,6 @@
 #
 # * Jabber::Helpers::Version: <tt>require 'xmpp4r/helpers/version'</tt>
 # * Jabber::Helpers::Roster: <tt>require 'xmpp4r/helpers/roster'</tt>
+# * Jabber::Helpers::Vcard: <tt>require 'xmpp4r/helpers/vcard'</tt>
 
 require 'xmpp4r/xmpp4r'

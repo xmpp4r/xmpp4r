@@ -1,6 +1,25 @@
 require 'rake/testtask'
-require 'rake/rdoctask'
 require 'rake/packagetask'
+require 'rake/rdoctask'
+require 'rake'
+require 'find'
+
+# Globals
+
+PKG_NAME = 'xmpp4r'
+PKG_VERSION = '0.3'
+
+PKG_FILES = ['ChangeLog', 'README', 'COPYING', 'LICENSE', 'setup.rb', 'Rakefile']
+Find.find('lib/', 'data/', 'test/', 'tools/') do |f|
+	if FileTest.directory?(f) and f =~ /\.svn/
+		Find.prune
+	else
+		PKG_FILES << f
+	end
+end
+
+
+# Tasks
 
 task :default => [:package]
 
@@ -37,17 +56,31 @@ task :doctoweb => [:rdoc] do |t|
    sh "tools/doctoweb.bash"
 end
 
-Rake::PackageTask.new('xmpp4r', '0.1') do |p|
+Rake::PackageTask.new(PKG_NAME, PKG_VERSION) do |p|
 	p.need_tar = true
-	p.package_files.include('ChangeLog', 'README', 'COPYING', 'LICENSE', 'setup.rb',
-	'Rakefile')
-	require 'find'
-	Find.find('lib/', 'data/', 'test/', 'tools/') do |f|
-		if FileTest.directory?(f) and f =~ /\.svn/
-			Find.prune
-		else
-			p.package_files << f
-		end
-	end
+	p.package_files = PKG_FILES
+	p p.package_files
 end
 
+# "Gem" part of the Rakefile
+begin
+	require 'rake/gempackagetask'
+
+	spec = Gem::Specification.new do |s|
+		s.platform = Gem::Platform::RUBY
+		s.summary = "Ruby library for Jabber Instant-Messaging"
+		s.name = PKG_NAME
+		s.version = PKG_VERSION
+		s.requirements << 'none'
+		s.require_path = 'lib'
+		s.autorequire = 'xmpp4r'
+		s.files = PKG_FILES
+		s.description = "Ruby library for Jabber Instant-Messaging"
+	end
+
+	Rake::GemPackageTask.new(spec) do |pkg|
+		pkg.need_zip = true
+		pkg.need_tar = true
+	end
+rescue LoadError
+end

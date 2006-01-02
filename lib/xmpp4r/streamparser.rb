@@ -2,14 +2,14 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
-require 'xmpp4r/rexmladdons'
 require 'rexml/parsers/sax2parser'
 require 'rexml/source'
+require 'xmpp4r/rexmladdons'
 
 module Jabber
 
   ##
-  # The REXMLJabberParser uses REXML to parse the incoming XML stream
+  # The StreamParser uses REXML to parse the incoming XML stream
   # of the Jabber protocol and fires XMLStanzas at the Connection
   # instance.
   #
@@ -25,13 +25,6 @@ module Jabber
     #
     def initialize(stream, listener)
       @stream = stream
-      # this hack fixes REXML version "2.7.3"
-      if REXML::Version=="2.7.3"
-        def @stream.read(len=nil)
-          len = 100 unless len
-          super(len)
-        end
-      end
       @listener = listener
       @current = nil
     end
@@ -44,34 +37,35 @@ module Jabber
       @started = false
       begin
         parser = REXML::Parsers::SAX2Parser.new @stream 
+
         parser.listen( :start_element ) do |uri, localname, qname, attributes|
-          if @current.nil?
-            @current = REXML::Element::new(qname)
-          else
-            e = REXML::Element::new(qname)
-            @current = @current.add_element(e)
-          end
-          @current.add_attributes attributes
+          e = REXML::Element::new(qname)
+          e.add_attributes attributes
+          @current = @current.nil? ? e : @current.add_element(e)
+
           if @current.name == 'stream'
             @listener.receive(@current)
             @started = true
           end
         end
+
         parser.listen( :end_element ) do  |uri, localname, qname|
-          case qname
-          when "stream:stream"
+          if qname == "stream:stream"
             @started = false
           else
             @listener.receive(@current) if @current.parent.name == 'stream'
             @current = @current.parent
           end
         end
+
         parser.listen( :characters ) do | text |
-          @current.text = (@current.text.nil? ? '' : @current.text) + text
+          @current.text = @current.text.to_s + text
         end
+
         parser.listen( :cdata ) do | text |
           raise "Not implemented !"
         end
+
         parser.parse
       rescue REXML::ParseException
         @listener.parse_failure

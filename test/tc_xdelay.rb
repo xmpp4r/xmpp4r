@@ -12,6 +12,7 @@ class XDelayTest < Test::Unit::TestCase
     d = XDelay.new(false)
     assert_equal(nil, d.stamp)
     assert_equal(nil, d.from)
+    assert_equal('jabber:x:delay', d.namespace)
   end
 
   def test_create2
@@ -19,6 +20,7 @@ class XDelayTest < Test::Unit::TestCase
     # Hopefully the seconds don't change here...
     assert_equal(Time.now.to_s, d.stamp.to_s)
     assert_equal(nil, d.from)
+    assert_equal('jabber:x:delay', d.namespace)
   end
 
   def test_from
