@@ -85,6 +85,10 @@ module Jabber
     # poll send.  This will likely be the first indication that
     # the socket dropped in a Jabber Session.
     #
+    # The block has to take three arguments:
+    # * the Exception
+    # * the Jabber::Stream object (self)
+    # * a symbol where it happened, namely :start, :parser and :sending
     def on_exception(&block)
       @exception_block = block
     end
