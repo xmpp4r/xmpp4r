@@ -96,9 +96,9 @@ module Jabber
       # * :unsubscribe
       # * :unsubscribed
       #
-      # *Warning*: if you don't add a callback here or all callbacks return
-      # false subscription requests will be agreed by default in
-      # Jabber::Helpers::Roster#handle_presence.
+      # If type is :subscribe and your callback returns +true+
+      # the subscription request will be accepted. Otherwise it
+      # will be declined.
       #
       # The block receives two objects:
       # * the Jabber::Helpers::RosterItem (or nil)
@@ -106,10 +106,7 @@ module Jabber
       #
       # Example usage:
       #  my_roster.add_subscription_callback do |item,presence|
-      #    if presence.type == :subscribe
-      #      answer = presence.answer(false)
-      #      answer.type = accept_subscription_requests ? :subscribed : :unsubscribed
-      #      client.send(answer)
+      #    if presence.type == :subscribe and accept_subscription_requests
       #      true
       #    else
       #      false
@@ -155,9 +152,14 @@ module Jabber
       # used internally
       def handle_presence(pres)
         item = self[pres.from]
-        if [:subscribe, :subscribed, :unsubscribe, :unsubscribed].include?(pres.type)
-          unless @subscription_cbs.process(item, pres)
+        if [:subscribed, :unsubscribe, :unsubscribed].include?(pres.type)
+          @subscription_cbs.process(item, pres)
+          true
+        elsif pres.type == :subscribe
+          if @subscription_cbs.process(item, pres)
             @stream.send(Presence.new.set_to(pres.from.strip).set_type(:subscribed))
+          else
+            @stream.send(Presence.new.set_to(pres.from.strip).set_type(:unsubscribed))
           end
           true
         else
@@ -239,27 +241,34 @@ module Jabber
       ##
       # Add a user to your roster
       #
+      # Threading is encouraged as the function waits for
+      # a result. ErrorException is thrown upon error.
+      #
+      # See Jabber::Helpers::RosterItem#subscribe for details
+      # about subscribing. (This method isn't used here but the
+      # same functionality applies.)
+      #
       # If the item is already in the local roster
       # it will simply send itself
-      def add(jid)
+      # jid:: [JID] to add
+      # iname:: [String] Optional item name
+      # subscribe:: [Boolean] Whether to subscribe to this jid
+      def add(jid, iname=nil, subscribe=false)
         if self[jid]
           self[jid].send
         else
           request = Iq.new_rosterset
-          request.query.add(Jabber::RosterItem.new(jid))
-          @stream.send(request)
+          request.query.add(Jabber::RosterItem.new(jid, iname))
+          @stream.send_with_id(request) { true }
           # Adding to list is handled by handle_iq
         end
-      end
-      
-      ##
-      # Remove item (also unsubscribes)
-      # jid:: [JID]
-      def remove(jid)
-        request = Iq.new_rosterset
-        request.query.add(Jabber::RosterItem.new(jid, nil, :remove))
-        @stream.send(request)
-        # Removing from list is handled by handle_iq
+
+        if subscribe
+          # Actually the item *should* already be known now,
+          # but we do it manually to exclude conditions.
+          pres = Presence.new.set_type(:subscribe).set_to(jid)
+          @stream.send(pres)
+        end
       end
     end
 
@@ -300,6 +309,21 @@ module Jabber
         request = Iq.new_rosterset
         request.query.add(self)
         @stream.send(request)
+      end
+      
+      ##
+      # Remove item
+      #
+      # This cancels both subscription *from* the contact to you
+      # and from you *to* the contact.
+      #
+      # The methods waits for a roster push from the server (success)
+      # or throws ErrorException upon failure.
+      def remove
+        request = Iq.new_rosterset
+        request.query.add(Jabber::RosterItem.new(jid, nil, :remove))
+        @stream.send_with_id(request) { true }
+        # Removing from list is handled by Roster#handle_iq
       end
 
       ##
@@ -355,16 +379,43 @@ module Jabber
       #
       # The block given to Jabber::Helpers::Roster#add_update_callback will
       # be called, carrying the RosterItem with ask="subscribe"
+      #
+      # This function returns immediately after sending the subscription
+      # request and will not wait of approval or declination as it may
+      # take months for the contact to decide. ;-)
       def subscribe
         pres = Presence.new.set_type(:subscribe).set_to(jid)
         @stream.send(pres)
       end
 
       ##
-      # Send unsubscription request to the user
+      # Unsubscribe from a contact's presence
+      #
+      # This method waits for a presence with type='unsubscribed'
+      # from the contact. It may throw ErrorException upon failure.
+      #
+      # subscription attribute of the item is *from* or *none*
+      # afterwards. As long as you don't remove that item and
+      # subscription='from' the contact is subscribed to your
+      # presence.
       def unsubscribe
         pres = Presence.new.set_type(:unsubscribe).set_to(jid)
-        @stream.send(pres)
+        @stream.send_with_id(pres) { |answer|
+          answer.type == :unsubscribed
+        }
+      end
+
+      ##
+      # Deny the contact to see your presence.
+      #
+      # This method will not wait and returns immediately
+      # as you will need no confirmation for this action.
+      #
+      # Though, you will get a roster update for that item,
+      # carrying either subscription='to' or 'none'.
+      def cancel_subscription
+        pres = Presence.new.set_type(:unsubscribed).set_to(jid)
+        @stream.send_with_id(pres)
       end
     end
   end
