@@ -78,6 +78,38 @@ class JIDTest < Test::Unit::TestCase
     assert_raises(ArgumentError){JID::new("#{'n'*1023}@#{'d'*1023}/#{'r'*1024}")}
   end
 
+  def test_create10
+    j = JID::new('@b/c')
+    assert_equal('', j.node)
+    assert_equal('b', j.domain)
+    assert_equal('c', j.resource)
+    assert_equal('@b/c', j.to_s)
+  end
+
+  def test_create11
+    j = JID::new('@b')
+    assert_equal('', j.node)
+    assert_equal('b', j.domain)
+    assert_equal(nil, j.resource)
+    assert_equal('@b', j.to_s)
+  end
+
+  def test_create12
+    j = JID::new('@b/')
+    assert_equal('', j.node)
+    assert_equal('b', j.domain)
+    assert_equal('', j.resource)
+    assert_equal('@b/', j.to_s)
+  end
+
+  def test_create13
+    j = JID::new('a@b/')
+    assert_equal('a', j.node)
+    assert_equal('b', j.domain)
+    assert_equal('', j.resource)
+    assert_equal('a@b/', j.to_s)
+  end
+
   def test_tos
     assert_equal('',JID::new.to_s)
     assert_equal('domain.fr',JID::new('domain.fr').to_s)
