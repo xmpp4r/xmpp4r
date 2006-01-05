@@ -11,7 +11,7 @@ module Jabber
   class JID
     include Comparable
 
-    PATTERN = /^(?:([^@]*)@)??([^@\/]+)(?:\/(.*?))?$/
+    PATTERN = /^(?:([^@]*)@)??([^@\/]*)(?:\/(.*?))?$/
 
     begin
       require 'idn'
@@ -23,23 +23,23 @@ module Jabber
     ##
     # Create a new JID. If called as new('a@b/c'), parse the string and
     # split (node, domain, resource)
-    def initialize(node = "", domain = "", resource = "")
-      @resource = resource.to_s
-      @domain = domain.to_s
-      @node = node.to_s
-      if @domain.empty? and not @node.empty?
-        @node, @domain, @resource = @node.scan(PATTERN).first
+    def initialize(node = "", domain = nil, resource = nil)
+      @resource = resource
+      @domain = domain
+      @node = node
+      if @domain.nil? and @resource.nil? and @node
+        @node, @domain, @resource = @node.to_s.scan(PATTERN).first
       end
 
       if USE_STRINGPREP
-        @node = IDN::Stringprep.nodeprep(@node)
-        @domain = IDN::Stringprep.nameprep(@domain)
-        @resource = IDN::Stringprep.resourceprep(@resource)
+        @node = IDN::Stringprep.nodeprep(@node) if @node
+        @domain = IDN::Stringprep.nameprep(@domain) if @domain
+        @resource = IDN::Stringprep.resourceprep(@resource) if @resource
       end
 
-      raise ArgumentError, 'Node too long' if @node.length > 1023
+      raise ArgumentError, 'Node too long' if (@node || '').length > 1023
       raise ArgumentError, 'Domain too long' if @domain.length > 1023
-      raise ArgumentError, 'Resource too long' if @resource.length > 1023
+      raise ArgumentError, 'Resource too long' if (@resource || '').length > 1023
     end
 
     ##
@@ -50,10 +50,9 @@ module Jabber
     # * "domain/resource"
     # * "node@domain/resource"
     def to_s
-      s = ''
-      s = "#{@node}@" if not @node.empty?
-      s += @domain if not @domain.empty?
-      s += "/#{@resource}" if not @resource.empty?
+      s = @domain
+      s = "#{@node}@#{s}" if @node
+      s += "/#{@resource}" if @resource
       return s
     end
 
@@ -66,10 +65,11 @@ module Jabber
     alias_method :bare, :strip
 
     ##
-    # No longer implemented. use strip instead !
+    # Removes the resource (sets it to nil)
     # return:: [JID] self
     def strip!
-      @resource = ""
+      @resource = nil
+      self
     end
     alias_method :bare!, :strip!
 
@@ -99,7 +99,6 @@ module Jabber
 
     # Get the JID's node
     def node
-      return nil if @node.empty?
       @node
     end
 
@@ -127,7 +126,6 @@ module Jabber
 
     # Get the JID's resource
     def resource
-      return nil if @resource.empty?
       @resource
     end
 
@@ -151,7 +149,7 @@ module Jabber
 
     # Test id jid is strepped
     def stripped?
-      @resource.empty?
+      @resource.nil?
     end
     alias_method :bared?, :stripped?
   end

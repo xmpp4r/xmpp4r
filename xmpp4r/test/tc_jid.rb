@@ -72,10 +72,10 @@ class JIDTest < Test::Unit::TestCase
   end
 
   def test_create9
-    assert_nothing_raised{JID::new("#{'n'*1023}@#{'d'*1023}/#{'r'*1023}")}
-    assert_raises(ArgumentError){JID::new("#{'n'*1024}@#{'d'*1023}/#{'r'*1023}")}
-    assert_raises(ArgumentError){JID::new("#{'n'*1023}@#{'d'*1024}/#{'r'*1023}")}
-    assert_raises(ArgumentError){JID::new("#{'n'*1023}@#{'d'*1023}/#{'r'*1024}")}
+    assert_nothing_raised { JID::new("#{'n'*1023}@#{'d'*1023}/#{'r'*1023}") }
+    assert_raises(ArgumentError) { JID::new("#{'n'*1024}@#{'d'*1023}/#{'r'*1023}") }
+    assert_raises(ArgumentError) { JID::new("#{'n'*1023}@#{'d'*1024}/#{'r'*1023}") }
+    assert_raises(ArgumentError) { JID::new("#{'n'*1023}@#{'d'*1023}/#{'r'*1024}") }
   end
 
   def test_create10
@@ -111,11 +111,11 @@ class JIDTest < Test::Unit::TestCase
   end
 
   def test_tos
-    assert_equal('',JID::new.to_s)
-    assert_equal('domain.fr',JID::new('domain.fr').to_s)
-    assert_equal('l@domain.fr',JID::new('l','domain.fr').to_s)
-    assert_equal('l@domain.fr/res',JID::new('l','domain.fr','res').to_s)
-    assert_equal('domain.fr/res',JID::new(nil,'domain.fr','res').to_s)
+    assert_equal('', JID::new.to_s)
+    assert_equal('domain.fr', JID::new('domain.fr').to_s)
+    assert_equal('l@domain.fr', JID::new('l','domain.fr').to_s)
+    assert_equal('l@domain.fr/res', JID::new('l','domain.fr','res').to_s)
+    assert_equal('domain.fr/res', JID::new(nil,'domain.fr','res').to_s)
   end
 
   def test_equal
@@ -135,16 +135,16 @@ class JIDTest < Test::Unit::TestCase
   end
 
   def test_strip
-    assert_equal(JID::new('l@domain.fr'),JID::new('l@domain.fr/res').strip)
-    assert_equal(JID::new('l@domain.fr'),JID::new('l@domain.fr').strip)
-    assert_equal(JID::new('l@domain.fr'),JID::new('l@domain.fr/res').bare)
+    assert_equal(JID::new('l@domain.fr'), JID::new('l@domain.fr/res').strip)
+    assert_equal(JID::new('l@domain.fr'), JID::new('l@domain.fr').strip)
+    assert_equal(JID::new('l@domain.fr'), JID::new('l@domain.fr/res').bare)
     jid = JID::new('l@domain.fr/res')
     jid.strip!
-    assert_equal(JID::new('l@domain.fr'),jid)
+    assert_equal(JID::new('l@domain.fr'), jid)
 
     jid = JID::new('l@domain.fr/res')
     jid.bare!
-    assert_equal(JID::new('l@domain.fr'),jid)
+    assert_equal(JID::new('l@domain.fr'), jid)
   end
 
   def test_change1
