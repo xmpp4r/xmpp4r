@@ -84,7 +84,7 @@ module Jabber
     #
     # v:: [String] the value to set
     def to= (v)
-      add_attribute('to', v.to_s)
+      add_attribute('to', v ? v.to_s : nil)
     end
 
     ##
@@ -92,7 +92,7 @@ module Jabber
     #
     # v:: [String] the value to set
     def set_to(v)
-      add_attribute('to', v.to_s)
+      self.to = v
       self
     end
 
@@ -109,7 +109,7 @@ module Jabber
     #
     # v:: [String] the value from set
     def from= (v)
-      add_attribute('from', v.to_s)
+      add_attribute('from', v ? v.to_s : nil)
     end
 
     ##
@@ -117,7 +117,7 @@ module Jabber
     #
     # v:: [String] the value from set
     def set_from(v)
-      add_attribute('from', v.to_s)
+      add_attribute('from', v ? v.to_s : nil)
       self
     end
 
