@@ -28,6 +28,7 @@ module Jabber
       @host = host
       @port = port
 
+      Jabber::debuglog("CONNECTING:\n#{@host}:#{@port}")
       @socket = TCPSocket.new(@host, @port)
       start(@socket)
     end

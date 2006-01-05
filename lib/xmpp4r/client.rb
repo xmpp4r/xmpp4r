@@ -44,6 +44,7 @@ module Jabber
           Resolv::DNS.open { |dns|
             # If ruby version is too old and SRV is unknown, this will raise a NameError
             # which is catched below
+            Jabber::debuglog("RESOLVING:\n_xmpp-client._tcp.#{@jid.domain} (SRV)")
             srv = dns.getresources("_xmpp-client._tcp.#{@jid.domain}", Resolv::DNS::Resource::IN::SRV)
           }
           # Sort SRV records: lowest priority first, highest weight first
