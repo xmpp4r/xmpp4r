@@ -139,6 +139,9 @@ roster.add_presence_callback { |item,oldpres,pres|
   unless oldpres.priority.nil? && pres.priority.nil?
     puts("  Priority: #{oldpres.priority.inspect} -> #{pres.priority.inspect}")
   end
+
+  # Note: presences with type='error' will reflect our own show/status/priority
+  # as it is mostly just a reply from a server. This is *not* a bug.
 }
 
 # Subscription requests and responses:
@@ -155,6 +158,7 @@ roster.add_subscription_callback { |item,pres|
     else raise "The Roster Helper is buggy!!! subscription callback with type=#{pres.type}"
   end
 
+  # Never accept subscription request
   false
 }
 
