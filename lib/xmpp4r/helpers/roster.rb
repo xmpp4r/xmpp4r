@@ -5,6 +5,7 @@
 require 'xmpp4r/iq'
 require 'xmpp4r/iq/query/roster'
 require 'callbacks'
+require 'thread'
 
 module Jabber
   module Helpers
@@ -28,6 +29,7 @@ module Jabber
       def initialize(stream)
         @stream = stream
         @items = {}
+        @items_lock = Mutex.new
         @query_cbs = CallbackList.new
         @update_cbs = CallbackList.new
         @presence_cbs = CallbackList.new
@@ -127,17 +129,21 @@ module Jabber
           iq.query.each_element('item') do |item|
             # Handle deletion of item
             if item.subscription == :remove
-              @items.delete(item.jid)
+              @items_lock.synchronize {
+                @items.delete(item.jid)
+              }
               return(true)
             end
             
             olditem = nil
-            if @items.has_key?(item.jid)
-              olditem = RosterItem.new(@stream).import(@items[item.jid])
-              @items[item.jid].import(item)
-            else
-              @items[item.jid] = RosterItem.new(@stream).import(item)
-            end
+            @items_lock.synchronize {
+              if @items.has_key?(item.jid)
+                olditem = RosterItem.new(@stream).import(@items[item.jid])
+                @items[item.jid].import(item)
+              else
+                @items[item.jid] = RosterItem.new(@stream).import(item)
+              end
+            }
             @update_cbs.process(olditem, @items[item.jid])
           end
 
@@ -188,13 +194,15 @@ module Jabber
       #
       # If not available tries to look for it with the resource stripped
       def [](jid)
-        if @items.has_key?(jid)
-          @items[jid]
-        elsif @items.has_key?(jid.strip)
-          @items[jid.strip]
-        else
-          nil
-        end
+        @items_lock.synchronize {
+          if @items.has_key?(jid)
+            @items[jid]
+          elsif @items.has_key?(jid.strip)
+            @items[jid.strip]
+          else
+            nil
+          end
+        }
       end
 
       ##
@@ -203,9 +211,11 @@ module Jabber
       def find(jid)
         j = jid.strip
         l = {}
-        @items.each_pair do |k, v|
-          l[k] = v if k.strip == j
-        end
+        @items_lock.synchronize {
+          @items.each_pair do |k, v|
+            l[k] = v if k.strip == j
+          end
+        }
         l
       end
 
@@ -217,10 +227,12 @@ module Jabber
       # result:: [Array] containing group names (String)
       def groups
         res = []
-        @items.each_pair do |jid,item|
-          res += item.groups
-          res += [nil] if item.groups == []
-        end
+        @items_lock.synchronize {
+          @items.each_pair do |jid,item|
+            res += item.groups
+            res += [nil] if item.groups == []
+          end
+        }
         res.uniq.sort { |a,b| a.to_s <=> b.to_s }
       end
 
@@ -231,10 +243,12 @@ module Jabber
       # group:: [String] Group name
       def find_by_group(group)
         res = []
-        @items.each_pair do |jid,item|
-          res.push(item) if item.groups.include?(group)
-          res.push(item) if item.groups == [] and group.nil?
-        end
+        @items_lock.synchronize {
+          @items.each_pair do |jid,item|
+            res.push(item) if item.groups.include?(group)
+            res.push(item) if item.groups == [] and group.nil?
+          end
+        }
         res
       end
 
@@ -286,6 +300,7 @@ module Jabber
         super()
         @stream = stream
         @presences = []
+        @presences_lock = Mutex.new
       end
 
       ##
@@ -332,12 +347,15 @@ module Jabber
       # (Or is there any presence? Unavailable presences are
       # deleted.)
       def online?
-        @presences.size > 0
+        @presences_lock.synchronize {
+          @presences.size > 0
+        }
       end
       
       ##
       # Iterate through all received <tt><presence/></tt> stanzas
       def each_presence(&block)
+        # Don't lock here, we don't know what block does...
         @presences.each { |pres|
           yield(pres)
         }
@@ -347,31 +365,49 @@ module Jabber
       # Get specific presence
       # jid:: [JID] Full JID
       def presence(jid)
-        @presences.each do |pres|
-          if pres.from == jid
-            return(pres)
-          end
-        end
+        @presences_lock.synchronize {
+          @presences.each { |pres|
+            return(pres) if pres.from == jid
+          }
+        }
         nil
       end
 
       ##
+      # Same as presence
+      # jid:: [JID] Full JID
+      def presences[](jid)
+        presence(jid)
+      end
+
+      ##
       # Add presence
-      # (unless type is :unavailable)
+      # (unless type is :unavailable or :error)
       #
       # This overwrites previous stanzas with the same destination
       # JID to keep track of resources. Presence stanzas with
-      # <tt>type == :unavailable</tt> will be deleted as this indicates
-      # that this resource has gone offline.
+      # <tt>type == :unavailable</tt> or <tt>type == :error</tt> will
+      # be deleted as this indicates that this resource has gone
+      # offline.
+      #
+      # If <tt>type == :error</tt> and the presence's origin has no
+      # specific resource the contact is treated completely offline.
       def add_presence(newpres)
-        # Delete old presences with the same JID
-        @presences.delete_if do |pres|
-          pres.from == newpres.from
-        end
-        # Add new presence
-        unless newpres.type == :unavailable
-          @presences.push(newpres)
-        end
+        @presences_lock.synchronize {
+          # Delete old presences with the same JID
+          @presences.delete_if do |pres|
+            pres.from == newpres.from
+          end
+          # Add new presence
+          if newpres.type == :error
+            # Error from no specific resource - contact is completely offline
+            if newpres.from.resource.nil?
+              @presences = []
+            end
+          elsif newpres.type != :unavailable
+            @presences.push(newpres)
+          end
+        }
       end
 
       ##

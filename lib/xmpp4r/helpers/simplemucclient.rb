@@ -14,24 +14,22 @@ module Jabber
     # invocation will overwrite the previous set up block.
     #
     # Example usage:
-    #   my_muc = Jabber::Helpers::SimpleMUCClient.new(my_client, Jabber::JID.new('jdev@conference.jabber.org/XMPP4R-Bot'))
+    #   my_muc = Jabber::Helpers::SimpleMUCClient.new(my_client)
     #   my_muc.on_message { |time,nick,text|
     #     puts (time || Time.new).strftime('%I:%M') + " <#{nick}> #{text}"
     #   }
+    #   my_muc.join(Jabber::JID.new('jdev@conference.jabber.org/XMPP4R-Bot'))
     #
     # Please take a look at Jabber::Helpers::MUCClient for
-    # SimpleMUCClient#exit (derived from MUCClient#exit) and
-    # advanced features.
+    # derived methods, such as MUCClient#join, MUCClient#exit,
+    # ...
     class SimpleMUCClient < MUCClient
       ##
       # Initialize a SimpleMUCClient
-      # 
-      # Calls it superclass MUCClient, thus will join immediately
-      # after adding callbacks.
       # stream:: [Stream] to operate on
       # jid:: [JID] room@component/nick
       # password:: [String] Optional password
-      def initialize(stream, jid, password=nil)
+      def initialize(stream)
         super
 
         @room_message_block = nil
@@ -111,20 +109,38 @@ module Jabber
       public
 
       ##
-      # Room subject
+      # Room subject/topic
+      # result:: [String] The subject
       def subject
         @subject
       end
 
       ##
-      # Change the room's subject
+      # Change the room's subject/topic
       #
       # This will not be reflected by SimpleMUCClient#subject
       # immediately, wait for SimpleMUCClient#on_subject
+      # s:: [String] New subject
       def subject=(s)
         msg = Message.new
         msg.subject = s
         send_message(msg)
+      end
+
+      ##
+      # The MUCClient's own nick
+      # (= resource)
+      # result:: [String] Nickname
+      def nick
+        @jid.resource
+      end
+
+      ##
+      # The room name
+      # (= node)
+      # result:: [String] Room name
+      def room
+        @jid.node
       end
 
       ##

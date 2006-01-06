@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+$:.unshift '../../../../../lib/'
 require 'xmpp4r'
 require 'xmpp4r/helpers/simplemucclient'
 
@@ -27,13 +28,13 @@ cl.auth(ARGV[1])
 mainthread = Thread.current
 
 # This is the SimpleMUCClient helper!
-m = Jabber::Helpers::SimpleMUCClient.new(cl, Jabber::JID.new(ARGV[2]))
+m = Jabber::Helpers::SimpleMUCClient.new(cl)
 
 # SimpleMUCClient callback-blocks
 
 m.on_join { |time,nick|
   print_line time, "#{nick} has joined!"
-  puts "Users: " + m.roster.collect { |jid,pres| jid.resource }.join(', ')
+  puts "Users: " + m.roster.keys.join(', ')
 }
 m.on_leave { |time,nick|
   print_line time, "#{nick} has left!"
@@ -72,6 +73,8 @@ m.on_room_message { |time,text|
 m.on_subject { |time,nick,subject|
   print_line time, "*** (#{nick}) #{subject}"
 }
+
+m.join(ARGV[2])
 
 # Wait for being waken up by m.on_message
 Thread.stop
