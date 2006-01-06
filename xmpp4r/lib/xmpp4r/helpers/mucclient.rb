@@ -5,6 +5,7 @@
 require 'callbacks'
 require 'xmpp4r/presence'
 require 'xmpp4r/x/muc'
+require 'thread'
 
 module Jabber
   module Helpers
@@ -36,41 +37,40 @@ module Jabber
 
       ##
       # Initialize a MUCClient
-      # (will attempt to join)
       #
+      # Call MUCClient#join *after* you have registered your
+      # callbacks to avoid reception of stanzas after joining
+      # and before registration of callbacks.
       # stream:: [Stream] to operate on
-      # jid:: [JID] room@component/nick
-      # password:: [String] Optional password
-      def initialize(stream, jid, password=nil)
+      def initialize(stream)
         # Attributes initialization
         @stream = stream
         @my_jid = nil
-        @jid = jid
+        @jid = nil
         @roster = {}
+        @roster_lock = Mutex.new
+
+        @active = false
+
         @join_cbs = CallbackList.new
         @leave_cbs = CallbackList.new
         @presence_cbs = CallbackList.new
         @message_cbs = CallbackList.new
         @private_message_cbs = CallbackList.new
+      end
 
-        # Callbacks
-        @stream.add_presence_callback(150, callback_ref) { |presence|
-          if from_room?(presence.from)
-            handle_presence(presence)
-            true
-          else
-            false
-          end
-        }
-
-        @stream.add_message_callback(150, callback_ref) { |message|
-          if from_room?(message.from)
-            handle_message(message)
-            true
-          else
-            false
-          end
-        }
+      ##
+      # Join a room
+      #
+      # This registers its own callbacks on the stream
+      # provided to initialize and sends initial presence
+      # to the room. May throw ErrorException if joining
+      # fails.
+      # jid:: [JID] room@component/nick
+      # password:: [String] Optional password
+      def join(jid, password=nil)
+        @jid = (jid.kind_of?(JID) ? jid : JID.new(jid))
+        activate
 
         # Joining
         pres = Presence.new
@@ -114,8 +114,17 @@ module Jabber
         pres.status = reason if reason
         @stream.send(pres)
 
-        @stream.delete_presence_callback(callback_ref)
-        @stream.delete_message_callback(callback_ref)
+        deactivate
+      end
+
+      ##
+      # Is the MUC client active?
+      #
+      # This is false after initialization,
+      # true after joining and
+      # false after exit/kick
+      def active?
+        @active
       end
 
       ##
@@ -209,10 +218,14 @@ module Jabber
       def handle_presence(pres)
         if pres.type == :unavailable or pres.type == :error
           @leave_cbs.process(pres)
-          @roster.delete(pres.from.resource)
+          @roster_lock.synchronize {
+            @roster.delete(pres.from.resource)
+          }
         else
           is_join = ! @roster.has_key?(pres.from.resource)
-          @roster[pres.from.resource] = pres
+          @roster_lock.synchronize {
+            @roster[pres.from.resource] = pres
+          }
           if is_join
             @join_cbs.process(pres)
           else
@@ -227,6 +240,37 @@ module Jabber
         else  # type == :groupchat or anything else
           @message_cbs.process(msg)
         end
+      end
+
+      def activate
+        @active = true
+
+        # Callbacks
+        @stream.add_presence_callback(150, callback_ref) { |presence|
+          if from_room?(presence.from)
+            handle_presence(presence)
+            true
+          else
+            false
+          end
+        }
+
+        @stream.add_message_callback(150, callback_ref) { |message|
+          if from_room?(message.from)
+            handle_message(message)
+            true
+          else
+            false
+          end
+        }
+      end
+
+      def deactivate
+        @active = false
+
+        # Callbacks
+        @stream.delete_presence_callback(callback_ref)
+        @stream.delete_message_callback(callback_ref)
       end
 
       ##
