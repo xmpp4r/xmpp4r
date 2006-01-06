@@ -61,7 +61,7 @@
 #
 # ==Threaded and non-threaded modes
 #
-# From the user point of view, the library can be used either in threaded mode,
+# From the user's point of view, the library can be used either in threaded mode,
 # or in non-threaded mode, using a call to <tt>Jabber::Stream#process</tt> to
 # receive pending messages.
 #
@@ -89,7 +89,7 @@
 # ===Protocol-level features
 #
 # You're highly advised to read the according RFCs and JEPs if you intend to
-# use them. The benefit will be that you'll understand the protocols and are
+# use them. The benefit will be that you'll understand the protocols and be
 # going to be more efficient when programming with them.
 #
 # * Jabber::IqQueryDiscoInfo, Jabber::DiscoIdentity, Jabber::DiscoFeature: <tt>require 'xmpp4r/iq/query/discoinfo'</tt>
@@ -100,6 +100,7 @@
 # * Jabber::XRoster, Jabber::XRosterItem: <tt>require 'xmpp4r/x/roster'</tt>
 # * Jabber::XMuc, Jabber::XMucUser: <tt>require 'xmpp4r/x/muc'</tt>
 # * Jabber::XMucUserItem: <tt>require 'xmpp4r/x/mucuseritem'</tt>
+# * Jabber::XMucUserInvite: <tt>require 'xmpp4r/x/mucuserinvite'</tt>
 #
 # ===Helpers
 #
@@ -110,5 +111,11 @@
 # * Jabber::Helpers::Version: <tt>require 'xmpp4r/helpers/version'</tt>
 # * Jabber::Helpers::Roster: <tt>require 'xmpp4r/helpers/roster'</tt>
 # * Jabber::Helpers::Vcard: <tt>require 'xmpp4r/helpers/vcard'</tt>
+#
+# Helpers for Multi-User Chat:
+# 
+# * Jabber::Helpers::MUCBrowser: <tt>require 'xmpp4r/helpers/mucbrowser'</tt>
+# * Jabber::Helpers::MUCClient: <tt>require 'xmpp4r/helpers/mucclient'</tt>
+# * Jabber::Helpers::SimpleMUCClient: <tt>require 'xmpp4r/helpers/simplemucclient'</tt>
 
 require 'xmpp4r/xmpp4r'
