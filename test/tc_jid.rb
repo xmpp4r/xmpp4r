@@ -110,6 +110,14 @@ class JIDTest < Test::Unit::TestCase
     assert_equal('a@b/', j.to_s)
   end
 
+  def test_create14
+    j = JID::new('nOdE@dOmAiN/rEsOuRcE')
+    assert_equal('nOdE', j.node)
+    assert_equal('dOmAiN', j.domain)
+    assert_equal('rEsOuRcE', j.resource)
+    assert_equal('nOdE@dOmAiN/rEsOuRcE', j.to_s)
+  end
+
   def test_tos
     assert_equal('', JID::new.to_s)
     assert_equal('domain.fr', JID::new('domain.fr').to_s)
