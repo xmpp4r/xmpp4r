@@ -13,6 +13,9 @@ module Jabber
     # CallbackLists and may therefore only used once. A second
     # invocation will overwrite the previous set up block.
     #
+    # *Hint:* the parameter time may be nil if the server didn't
+    # send it.
+    #
     # Example usage:
     #   my_muc = Jabber::Helpers::SimpleMUCClient.new(my_client)
     #   my_muc.on_message { |time,nick,text|
@@ -55,6 +58,7 @@ module Jabber
         }
 
         @leave_block = nil
+        @self_leave_block = nil
         add_leave_callback(999) { |pres|
           # Presence time
           time = nil
@@ -65,7 +69,11 @@ module Jabber
           }
 
           # Invoke...
-          @leave_block.call(time, pres.from.resource) if @leave_block
+          if pres.from == jid
+            @self_leave_block.call(time) if @leave_block
+          else
+            @leave_block.call(time, pres.from.resource) if @leave_block
+          end
           false
         }
       end
@@ -216,6 +224,15 @@ module Jabber
       # block:: Takes two arguments: time, nickname
       def on_leave(&block)
         @leave_block = block
+      end
+
+      ##
+      # Block to be called when *you* leave the room
+      #
+      # Deactivation occurs *afterwards*.
+      # block:: Takes one argument: time
+      def on_self_leave(&block)
+        @self_leave_block = block
       end
     end
   end

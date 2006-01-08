@@ -69,6 +69,10 @@ module Jabber
       # jid:: [JID] room@component/nick
       # password:: [String] Optional password
       def join(jid, password=nil)
+        if active?
+          raise "MUCClient already active"
+        end
+        
         @jid = (jid.kind_of?(JID) ? jid : JID.new(jid))
         activate
 
@@ -87,7 +91,9 @@ module Jabber
           if from_room?(r.from) and r.kind_of?(Presence) and r.type == :error
             # Error from room
             error = r.error
-          elsif r.from == jid and r.kind_of?(Presence)
+          # type='unavailable' may occur when the MUC kills our previous instance,
+          # but all join-failures should be type='error'
+          elsif r.from == jid and r.kind_of?(Presence) and r.type != :unavailable
             # Our own presence reflected back - success
             handle_presence(r)
             true
@@ -103,16 +109,29 @@ module Jabber
       ##
       # Exit the room
       #
-      # Sends presence with type='unavailable' with an optional
-      # reason in <tt><status/></tt>,
-      # then deletes callbacks from the stream.
+      # * Sends presence with type='unavailable' with an optional
+      #   reason in <tt><status/></tt>,
+      # * then waits for a reply from the MUC component (will be
+      #   processed by leave-callbacks),
+      # * then deletes callbacks from the stream.
       # reason:: [String] Optional custom exit message
       def exit(reason=nil)
+        unless active?
+          raise "MUCClient hasn't yet joined"
+        end
+
         pres = Presence.new
         pres.type = :unavailable
         pres.to = jid
         pres.status = reason if reason
-        @stream.send(pres)
+        @stream.send(pres) { |r|
+          if r.kind_of?(Presence) and r.type == :unavailable and r.from == jid
+            @leave_cbs.process(r)
+            true
+          else
+            false
+          end
+        }
 
         deactivate
       end
@@ -171,6 +190,9 @@ module Jabber
       # Note that this is called just *before* the stanza is removed from
       # MUCClient#roster, so it is still possible to see the last presence
       # in the given block.
+      #
+      # If the presence's origin is your MUC JID, the MUCClient will be
+      # deactivated *afterwards*.
       def add_leave_callback(prio = 0, ref = nil, proc = nil, &block)
         block = proc if proc
         @leave_cbs.add(prio, ref, block)
@@ -221,6 +243,10 @@ module Jabber
           @roster_lock.synchronize {
             @roster.delete(pres.from.resource)
           }
+
+          if pres.from == jid
+            deactivate
+          end
         else
           is_join = ! @roster.has_key?(pres.from.resource)
           @roster_lock.synchronize {
@@ -274,8 +300,9 @@ module Jabber
       end
 
       ##
-      # A safe identification for this instance,
-      # so callbacks can be removed safely upon leave.
+      # A callback identification for this instance,
+      # so own callbacks can be removed safely upon
+      # deactivation.
       def callback_ref
         "Helpers::MUCClient #{my_jid} #{jid}"
       end
