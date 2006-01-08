@@ -2,10 +2,12 @@
 
 require 'gtk2'
 
-#$:.unshift '../../../../../lib'
+$:.unshift '../../../../../lib'
 require 'xmpp4r'
 require 'xmpp4r/helpers/simplemucclient'
+require 'xmpp4r/helpers/version'
 
+#Jabber::debug = true
 
 class Gtk::Label
   def self.new_show(str = nil, mnemonic = false)
@@ -18,6 +20,7 @@ end
 class SetupWindow < Gtk::Window
   def initialize
     super(Gtk::Window::TOPLEVEL)
+    self.title = "GtkMUCClient setup"
     signal_connect("delete_event") { cancel }
 
     vbox = Gtk::VBox.new
@@ -139,19 +142,25 @@ end
 class ChatWindow < Gtk::Window
   def initialize(jid, password, mucjid)
     super(Gtk::Window::TOPLEVEL)
+    self.title = "GtkMUCClient: #{mucjid.resource} in #{mucjid.strip}"
     signal_connect("delete_event") { destroy; Gtk.main_quit }
 
-    layout = Gtk::Table.new(10, 4, true)
+    layout = Gtk::VBox.new
 
     @topic = Gtk::Entry.new
     @topic.editable = false
     @topic.show
-    layout.attach(@topic, 0, 4, 0, 1)
+    layout.pack_start(@topic, false, false, 2)
+
+    layout_mid = Gtk::HPaned.new
+    layout_mid.position = 500
+    layout_mid.show
+    layout.pack_start(layout_mid)
 
     @buffer_scroll = Gtk::ScrolledWindow.new
     @buffer_scroll.show
     @buffer_scroll.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC)
-    layout.attach(@buffer_scroll, 0, 3, 1, 9)
+    layout_mid.pack1(@buffer_scroll, true, true)
 
     @buffer_view = Gtk::TextView.new
     @buffer_view.editable = false
@@ -164,7 +173,7 @@ class ChatWindow < Gtk::Window
     roster_scroll = Gtk::ScrolledWindow.new
     roster_scroll.show
     roster_scroll.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC)
-    layout.attach(roster_scroll, 3, 4, 1, 9)
+    layout_mid.pack2(roster_scroll, true, true)
     
     @roster = Gtk::ListStore.new(String)
     @roster.set_sort_column_id(0)
@@ -180,7 +189,7 @@ class ChatWindow < Gtk::Window
       @input.text = ''
     }
     @input.show
-    layout.attach(@input, 0, 4, 9, 10)
+    layout.pack_start(@input, false, false, 2)
 
     layout.show
     add(layout)
@@ -189,6 +198,7 @@ class ChatWindow < Gtk::Window
     print_buffer "Commands start with a slash, type \"/help\" for a list"
     
     @client = Jabber::Client.new(jid)
+    Jabber::Helpers::Version.new(@client, "XMPP4R example: GtkMUCClient", "0.3", IO.popen("uname -sr").readlines.to_s.strip)
     Thread.new {
       begin
         print_buffer "Connecting for domain #{jid.domain}..."
@@ -204,6 +214,8 @@ class ChatWindow < Gtk::Window
         print_buffer("Error: #{e}")
       end
     }
+
+    set_size_request(600, 400)
   end
 
   def print_buffer(s, time=nil)
@@ -228,6 +240,9 @@ class ChatWindow < Gtk::Window
     }
     @muc.on_join { |time,nick|
       @roster.append[0] = nick
+    }
+    @muc.on_self_leave { |time|
+      print_buffer("You have exited the room", time)
     }
     @muc.on_leave { |time,nick|
       del_iter = nil
@@ -271,7 +286,7 @@ class ChatWindow < Gtk::Window
       'quit' => [
         'Leave room with optional message, then disconnect client and shut down',
         lambda { |args|
-          @muc.exit(args.join(' '))
+          @muc.exit(args.join(' ')) if @muc.active?
           @client.close
           Gtk.main_quit
         }

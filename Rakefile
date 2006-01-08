@@ -32,7 +32,8 @@ Rake::RDocTask.new do |rd|
   f = []
   require 'find'
   Find.find('lib/') do |file|
-    if FileTest.directory?(file) and file =~ /\.svn/
+    # Skip hidden files (.svn/ directories and Vim swapfiles)
+    if file.split(/\//).last =~ /^\./
       Find.prune
     else
       f << file if not FileTest.directory?(file)
