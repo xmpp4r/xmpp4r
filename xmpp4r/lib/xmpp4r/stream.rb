@@ -241,6 +241,11 @@ module Jabber
     # Sends XML data to the socket and (optionally) waits
     # to process received data.
     #
+    # If you invoke this method again in &block, you cannot
+    # define a second block. It will return immediately.
+    # If you need this, move your second Stream#send outside
+    # the &block.
+    #
     # xml:: [String] The xml data to send
     # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
@@ -278,6 +283,8 @@ module Jabber
     # Be aware that if a stanza with <tt>type='error'</tt> is received
     # the function does not yield but raises an ErrorException with
     # the corresponding error element.
+    #
+    # Please read the note about nesting at Stream#send
     # xml:: [XMLStanza]
     def send_with_id(xml, &block)
       if xml.id.nil?
