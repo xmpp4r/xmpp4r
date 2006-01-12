@@ -29,7 +29,7 @@ cl.auth(ARGV[1])
 
 # I'm not sure about the portability of 'uname -sr' here ;-)
 # but that's all needed to answer version queries:
-Jabber::Helpers::Version.new(cl, 'xmpp4r Versionbot example', 'SVN', IO.popen('uname -sr').readlines.to_s.strip)
+Jabber::Helpers::Version.new(cl, 'xmpp4r Versionbot example', Jabber::XMPP4R_VERSION, IO.popen('uname -sr').readlines.to_s.strip)
 
 
 cl.add_iq_callback { |iq|

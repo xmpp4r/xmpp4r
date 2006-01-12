@@ -198,7 +198,7 @@ class ChatWindow < Gtk::Window
     print_buffer "Commands start with a slash, type \"/help\" for a list"
     
     @client = Jabber::Client.new(jid)
-    Jabber::Helpers::Version.new(@client, "XMPP4R example: GtkMUCClient", "0.3", IO.popen("uname -sr").readlines.to_s.strip)
+    Jabber::Helpers::Version.new(@client, "XMPP4R example: GtkMUCClient", Jabber::XMPP4R_VERSION, IO.popen("uname -sr").readlines.to_s.strip)
     Thread.new {
       begin
         print_buffer "Connecting for domain #{jid.domain}..."
