@@ -29,8 +29,9 @@ module Jabber
 
     def generate_id
       @last_id += 1
+      timefrac = Time.new.to_f.to_s.split(/\./, 2).last[-3..-1]
       
-      @last_id.to_s
+      "#{@last_id}#{timefrac}"
     end
   end
 end
