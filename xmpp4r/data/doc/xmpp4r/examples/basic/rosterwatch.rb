@@ -145,7 +145,7 @@ roster.add_presence_callback { |item,oldpres,pres|
 }
 
 # Subscription requests and responses:
-roster.add_subscription_callback { |item,pres|
+subscription_callback = lambda { |item,pres|
   name = pres.from
   if item != nil && item.iname != nil
     name = "#{item.iname} (#{pres.from})"
@@ -157,10 +157,9 @@ roster.add_subscription_callback { |item,pres|
     when :unsubscribed then puts("Unsubscribed from #{name}")
     else raise "The Roster Helper is buggy!!! subscription callback with type=#{pres.type}"
   end
-
-  # Never accept subscription request
-  false
 }
+roster.add_subscription_callback(0, nil, subscription_callback)
+roster.add_subscription_request_callback(0, nil, subscription_callback)
 
 # Send initial presence
 # this is important for receiving presence of subscribed users
