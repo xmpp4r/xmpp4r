@@ -5,7 +5,7 @@ require 'gtk2'
 $:.unshift '../../../../../lib'
 require 'xmpp4r'
 require 'xmpp4r/helpers/simplemucclient'
-require 'xmpp4r/helpers/version'
+require 'xmpp4r/helpers/simpleversion'
 
 #Jabber::debug = true
 
@@ -198,7 +198,7 @@ class ChatWindow < Gtk::Window
     print_buffer "Commands start with a slash, type \"/help\" for a list"
     
     @client = Jabber::Client.new(jid)
-    Jabber::Helpers::Version.new(@client, "XMPP4R example: GtkMUCClient", Jabber::XMPP4R_VERSION, IO.popen("uname -sr").readlines.to_s.strip)
+    Jabber::Helpers::SimpleVersion.new(@client, "XMPP4R example: GtkMUCClient", Jabber::XMPP4R_VERSION, IO.popen("uname -sr").readlines.to_s.strip)
     Thread.new {
       begin
         print_buffer "Connecting for domain #{jid.domain}..."
