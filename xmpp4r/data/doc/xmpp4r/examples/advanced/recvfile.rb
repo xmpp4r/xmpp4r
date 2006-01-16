@@ -39,6 +39,7 @@ ft.add_incoming_callback { |iq,file|
       puts "Accepting #{file.fname}"
       stream = ft.accept(iq, offset)
       if stream.kind_of?(Jabber::Helpers::SOCKS5Bytestreams)
+        stream.connect_timeout = 5
         stream.add_streamhost_callback { |streamhost,state,e|
           case state
             when :connecting
