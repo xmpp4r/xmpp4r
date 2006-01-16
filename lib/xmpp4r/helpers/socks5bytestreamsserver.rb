@@ -9,12 +9,12 @@ module Jabber
     # You can use it if you're reachable by your SOCKS5Bytestreams peers,
     # thus avoiding use of an external proxy.
     #
-    # =Usage:
+    # ==Usage:
     # * Instantiate with an unfirewalled port
     # * Add your external IP addresses with SOCKS5BytestreamsServer#add_address
     # * Once you've got an *outgoing* SOCKS5BytestreamsInitiator, do
     #   <tt>SOCKS5BytestreamsInitiator#add_streamhost(my_socks5bytestreamsserver)</tt>
-    #   *before* you do <tt>SOCKS5BytestreamsInitiator#start</tt>
+    #   *before* you do <tt>SOCKS5BytestreamsInitiator#open</tt>
     class SOCKS5BytestreamsServer
       ##
       # Start a local SOCKS5BytestreamsServer
