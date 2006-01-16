@@ -1,30 +1,36 @@
 require 'socket'
 require 'thread'
+require 'timeout'
 require 'digest/sha1'
+
 require 'callbacks'
 require 'xmpp4r/iq/query/bytestreams'
 
 module Jabber
   module Helpers
     ##
-    # Can be thrown upon communication error with
-    # a streamhost by SOCKS5BytestreamsInitiator#open
-    # and SOCKS5BytestreamsTarget#accept
-    class SOCKSError < RuntimeError; end
-
-    ##
     # SOCKS5 Bytestreams (JEP-0065) implementation
     #
     # Don't use directly, use SOCKS5BytestreamsInitiator
     # and SOCKS5BytestreamsTarget
     class SOCKS5Bytestreams
+      ##
+      # [StreamHost] the SOCKS connection is using
       attr_reader :streamhost_used
+
+      ##
+      # SOCKS connection timeout (for trying multiple streamhosts)
+      #
+      # default: nil, use the OS' default timeout
+      attr_accessor :connect_timeout
+      
       def initialize(stream, session_id, initiator_jid, target_jid)
         @stream = stream
         @session_id = session_id
         @initiator_jid = (initiator_jid.kind_of?(String) ? JID.new(initiator_jid) : initiator_jid)
         @target_jid = (target_jid.kind_of?(String) ? JID.new(target_jid) : target_jid)
         @socks = nil
+        @connect_timeout = nil
         @streamhost_used = nil
         @streamhost_cbs = CallbackList.new
       end
@@ -117,32 +123,24 @@ module Jabber
 
       ##
       # Try a streamhost
-      # result:: [TCPSocket]
+      # result:: [SOCKS5Socket]
       def connect_socks(streamhost)
-        host = streamhost.host
-        port = streamhost.port
+        Timeout::timeout(@connect_timeout, Errno::ETIMEDOUT) {
+          Jabber::debuglog("SOCKS5 Bytestreams: connecting to proxy #{streamhost.jid} (#{streamhost.host}:#{streamhost.port})")
+          @streamhost_cbs.process(streamhost, :connecting, nil)
+          socks = SOCKS5Socket.new(streamhost.host, streamhost.port)
 
-        Jabber::debuglog("SOCKS5 Bytestreams: connecting to proxy #{host}:#{port}")
-        @streamhost_cbs.process(streamhost, :connecting, nil)
-        socks = TCPSocket.new(host, port)
+          Jabber::debuglog("SOCKS5 Bytestreams: connected, authenticating")
+          @streamhost_cbs.process(streamhost, :authenticating, nil)
+          socks.auth
 
-        Jabber::debuglog("SOCKS5 Bytestreams: connected, authenticating")
-        @streamhost_cbs.process(streamhost, :authenticating, nil)
-        socks.write("\x05\x01\x00")
-        recv = socks.read(2)
-        if recv.nil? or recv != "\x05\x00"
-          socks.close
-          raise SOCKSError.new("Invalid SOCKS5 authentication: #{recv.inspect}")
-        end
-        socks.write("\x05\x01\x00\x03#{stream_address.size.chr}#{stream_address}\x00\x00")
-        recv = socks.read(7 + stream_address.size)
-        if recv.nil? or recv[0..1] != "\005\000"
-          socks.close
-          raise SOCKSError.new("Invalid SOCKS5 connect: #{recv.inspect}")
-        end
-        Jabber::debuglog("SOCKS5 Bytestreams: authenticated")
-        @streamhost_cbs.process(streamhost, :success, nil)
-        socks
+          socks.connect_domain(stream_address, 0)
+
+          Jabber::debuglog("SOCKS5 Bytestreams: connected")
+          @streamhost_cbs.process(streamhost, :success, nil)
+
+          socks
+        }
       end
     end
   end
