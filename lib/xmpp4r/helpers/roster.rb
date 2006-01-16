@@ -34,6 +34,7 @@ module Jabber
         @update_cbs = CallbackList.new
         @presence_cbs = CallbackList.new
         @subscription_cbs = CallbackList.new
+        @subscription_request_cbs = CallbackList.new
 
         # Register cbs
         stream.add_iq_callback(120, "Helpers::Roster") { |iq|
@@ -98,26 +99,39 @@ module Jabber
       # * :unsubscribe
       # * :unsubscribed
       #
-      # If type is :subscribe and your callback returns +true+
-      # the subscription request will be accepted. Otherwise it
-      # will be declined.
+      # The block receives two objects:
+      # * the Jabber::Helpers::RosterItem (or nil)
+      # * the <tt><presence/></tt> stanza
+      def add_subscription_callback(prio = 0, ref = nil, proc = nil, &block)
+        block = proc if proc
+        @subscription_cbs.add(prio, ref, block)
+      end
+
+      ##
+      # Add a callback for subscription requests,
+      # which will be called upon receiving a <tt><presence type='subscribe'/></tt> stanza
       #
       # The block receives two objects:
       # * the Jabber::Helpers::RosterItem (or nil)
       # * the <tt><presence/></tt> stanza
       #
+      # Response to this event can be taken with accept_subscription
+      # and decline_subscription.
+      #
       # Example usage:
       #  my_roster.add_subscription_callback do |item,presence|
-      #    if presence.type == :subscribe and accept_subscription_requests
-      #      true
+      #    if accept_subscription_requests
+      #      my_roster.accept_subscription(presence.from)
       #    else
-      #      false
+      #      my_roster.decline_subscription(presence.from)
       #    end
       #  end
-      def add_subscription_callback(prio = 0, ref = nil, proc = nil, &block)
+      def add_subscription_request_callback(prio = 0, ref = nil, proc = nil, &block)
         block = proc if proc
-        @subscription_cbs.add(prio, ref, block)
+        @subscription_request_cbs.add(prio, ref, block)
       end
+
+      private
 
       ##
       # Handle received <tt><iq/></tt> stanzas,
@@ -162,11 +176,7 @@ module Jabber
           @subscription_cbs.process(item, pres)
           true
         elsif pres.type == :subscribe
-          if @subscription_cbs.process(item, pres)
-            @stream.send(Presence.new.set_to(pres.from.strip).set_type(:subscribed))
-          else
-            @stream.send(Presence.new.set_to(pres.from.strip).set_type(:unsubscribed))
-          end
+          @subscription_request_cbs.process(item, pres)
           true
         else
           unless item.nil?
@@ -188,6 +198,8 @@ module Jabber
         item.add_presence(pres)
         @presence_cbs.process(item, oldpres, pres)
       end
+
+      public
 
       ##
       # Get an item by jid
@@ -284,6 +296,31 @@ module Jabber
           @stream.send(pres)
         end
       end
+
+      ##
+      # Accept a subscription request
+      # * Sends a <presence type='subscribed'/> stanza
+      # * Adds the contact to your roster
+      # jid:: [JID] of contact
+      # iname:: [String] Optional roster item name
+      def accept_subscription(jid, iname=nil)
+        pres = Presence.new.set_type(:subscribed).set_to(jid.strip)
+        @stream.send(pres)
+
+        unless self[jid.strip]
+          request = Iq.new_rosterset
+          request.query.add(Jabber::RosterItem.new(jid.strip, iname))
+          @stream.send_with_id(request) { true }
+        end
+      end
+
+      ##
+      # Decline a subscription request
+      # * Sends a <presence type='unsubscribed'/> stanza
+      def decline_subscription(jid)
+        pres = Presence.new.set_type(:unsubscribed).set_to(jid.strip)
+        @stream.send(pres)
+      end
     end
 
     ##
@@ -371,13 +408,6 @@ module Jabber
           }
         }
         nil
-      end
-
-      ##
-      # Same as presence
-      # jid:: [JID] Full JID
-      def presences[](jid)
-        presence(jid)
       end
 
       ##
