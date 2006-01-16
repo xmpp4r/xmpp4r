@@ -2,6 +2,7 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
+require 'callbacks'
 require 'xmpp4r/iq'
 require 'xmpp4r/iq/query/version'
 
@@ -10,34 +11,38 @@ module Jabber
     ##
     # A class to answer version requests using IqQueryVersion
     #
-    # This is simplification as one doesn't need dynamic
-    # version answering normally.
-    #
-    # Example usage:
-    #  Jabber::Helpers::Version.new(my_client, "My cool XMPP4R script", "1.0", "Younicks")
+    # If you don't need the flexibility of dynamic responses with
+    # the callback you can register with add_version_callback,
+    # take a look at SimpleVersion
     class Version
-      attr_accessor :name
-      attr_accessor :version
-      attr_accessor :os
-
       ##
       # Initialize a new version responder
       #
       # Registers it's callback (prio = 180, ref = "Helpers::Version")
       # stream:: [Stream] Where to register callback handlers
-      # name:: [String] Software name for answers
-      # version:: [String] Software versio for answers
-      # os:: [String] Optional operating system name for answers
-      def initialize(stream, name, version, os=nil)
+      def initialize(stream)
         @stream = stream
-
-        @name = name
-        @version = version
-        @os = os
+        @versioncbs = CallbackList.new
 
         stream.add_iq_callback(180, "Helpers::Version") { |iq|
           iq_callback(iq)
         }
+      end
+
+      ##
+      # Add a callback for Iq stanzas with IqQueryVersion
+      #
+      # First argument passed to proc/block is the Iq stanza,
+      # second argument is a block, which can be called with
+      # software name, version and os
+      #
+      # Example:
+      #   my_version_helper.add_version_callback { |iq,block|
+      #     block.call('Cool client', '6.0', 'Cool OS')
+      #   }
+      def add_version_callback(priority = 0, ref = nil, proc=nil, &block)
+        block = proc if proc
+        @versioncbs.add(priority, ref, block)
       end
 
       ##
@@ -48,14 +53,19 @@ module Jabber
       def iq_callback(iq)
         if iq.type == :get
           if iq.query.kind_of?(IqQueryVersion)
-            iq.from, iq.to = iq.to, iq.from
-            iq.type = :result
-            iq.query.set_iname(@name).set_version(@version).set_os(@os)
+            replyblock = lambda { |name,version,os|
+              answer = iq.answer
+              answer.type = :result
+              answer.query.set_iname(name).set_version(version).set_os(os)
 
-            @stream.send(iq)
-
-            true
+              @stream.send(answer)
+            }
+            @versioncbs.process(iq, replyblock)
+          else
+            false
           end
+        else
+          false
         end
       end
     end
