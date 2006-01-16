@@ -1,8 +1,5 @@
 require 'base64'
 
-# TODO:
-# * error handling
-
 module Jabber
   module Helpers
     ##
@@ -40,32 +37,6 @@ module Jabber
         @pending.lock
 
         @block_size = 4096  # Recommended by JEP0047
-
-        @stream.add_message_callback(200, "#{callback_ref} close") { |msg|
-          data = msg.first_element('data')
-          if msg.from == @peer_jid and msg.to == @my_jid and data and data.attributes['sid'] == @session_id
-            @queue_lock.synchronize {
-              @queue << msg
-              @pending.unlock
-            }
-            true
-          else
-            false
-          end
-        }
-
-        @stream.add_iq_callback(200, callback_ref) { |iq|
-          close = iq.first_element('close')
-          if close and close.attributes['sid'] == @session_id
-            @queue_lock.synchronize {
-              @queue << iq
-              @pending.unlock
-            }
-            true
-          else
-            false
-          end
-        }
       end
 
       ##
@@ -79,7 +50,7 @@ module Jabber
         data = msg.add REXML::Element.new('data')
         data.add_namespace NS_IBB
         data.attributes['sid'] = @session_id
-        data.attributes['seq'] = @seq_send
+        data.attributes['seq'] = @seq_send.to_s
         data.text = Base64::encode64 buf
 
         # TODO: Implement AMP correctly
@@ -110,35 +81,29 @@ module Jabber
 
         while res.nil?
           @queue_lock.synchronize {
-            @queue.each { |stanza|
-              data = stanza.first_element('data')
-              if data and data.attributes['seq'] == @seq_recv.to_s
-                res = stanza
+            @queue.each { |item|
+              # Find next data
+              if item.type == :data and item.seq == @seq_recv.to_s
+                res = item
+                break
+              # No data? Find close
+              elsif item.type == :close and res.nil?
+                res = item
               end
             }
-            
-            unless res  # No data in queue, look for close
-              @queue.each { |stanza|
-                if stanza.kind_of?(Iq) and stanza.first_element('close')
-                  answer = stanza.answer(false)
-                  answer.type = :result
-                  @stream.send(answer)
 
-                  res = stanza
-                end
-              }
-            end
-            @queue.delete_if { |stanza| stanza == res }
+            @queue.delete_if { |item| item == res }
           }
 
+          # No data? Wait for next to arrive...
           @pending.lock unless res
         end
 
-        if res.kind_of?(Message)
+        if res.type == :data
           @seq_recv += 1
           @seq_recv = 0 if @seq_recv > 65535
-          Base64::decode64(res.first_element('data').text.to_s)
-        else
+          res.data
+        elsif res.type == :close
           nil # Closed
         end
       end
@@ -149,7 +114,7 @@ module Jabber
       # Waits for acknowledge from peer,
       # may throw ErrorException
       def close
-        @stream.delete_message_callback(callback_ref)
+        deactivate
 
         iq = Iq.new(:set, @peer_jid)
         close = iq.add REXML::Element.new('close')
@@ -163,8 +128,76 @@ module Jabber
 
       private
 
+      def activate
+        @stream.add_message_callback(200, callback_ref) { |msg|
+          data = msg.first_element('data')
+          if msg.from == @peer_jid and msg.to == @my_jid and data and data.attributes['sid'] == @session_id
+            if msg.type == nil
+              @queue_lock.synchronize {
+                @queue.push IBBQueueItem.new(:data, data.attributes['seq'], data.text.to_s)
+                @pending.unlock
+              }
+            elsif msg.type == :error
+              @queue_lock.synchronize {
+                @queue << IBBQueueItem.new(:close)
+                @pending.unlock
+              }
+            end
+            true
+          else
+            false
+          end
+        }
+
+        @stream.add_iq_callback(200, callback_ref) { |iq|
+          close = iq.first_element('close')
+          if close and close.attributes['sid'] == @session_id
+            answer = iq.answer(false)
+            answer.type = :result
+            @stream.send(answer)
+
+            @queue_lock.synchronize {
+              @queue << IBBQueueItem.new(:close)
+              @pending.unlock
+            }
+            true
+          else
+            false
+          end
+        }
+      end
+
+      def deactivate
+        @stream.delete_message_callback(callback_ref)
+        @stream.delete_iq_callback(callback_ref)
+      end
+
       def callback_ref
         "Jabber::Helpers::IBB #{@session_id} #{@initiator_jid} #{@target_jid}"
+      end
+    end
+
+    ##
+    # Represents an item in the internal data queue
+    class IBBQueueItem
+      attr_reader :type, :seq
+      def initialize(type, seq=nil, data_text='')
+        unless [:data, :close].include? type
+          raise "Unknown IBBQueueItem type: #{type}"
+        end
+
+        @type = type
+        @seq = seq
+        @data = data_text
+      end
+
+      ##
+      # Return the Base64-*decoded* data
+      #
+      # There's no need to catch Exceptions here,
+      # as none are thrown.
+      def data
+        Base64::decode64(@data)
       end
     end
   end
