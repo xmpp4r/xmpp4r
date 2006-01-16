@@ -18,6 +18,8 @@ module Jabber
         @stream.send_with_id(iq) { |answer|
           answer.type == :result
         }
+
+        activate
       end
     end
   end
