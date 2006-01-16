@@ -13,6 +13,8 @@ module Jabber
           open = iq.first_element('open')
           if iq.type == :set and iq.from == @peer_jid and iq.to == @my_jid and open and open.attributes['sid'] == @session_id
             @stream.delete_iq_callback("#{callback_ref} open")
+            activate
+            @block_size = (open.attributes['block-size'] || 4096).to_i
 
             reply = iq.answer(false)
             reply.type = :result
