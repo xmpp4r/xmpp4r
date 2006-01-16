@@ -1,6 +1,10 @@
 XMPP4R 0.3 (**/**/****)
 =======================
 * SRV lookup capability in Client#connect
+* Stringprep support for JIDs
+* Multi-User Chat Helpers
+* Helpers for File-Transfer, SOCKS5 Bytestreams, In-Band Bytestreams
+* Helpers::Version moved to Helpers::SimpleVersion
 
 XMPP4R 0.2 (20/10/2005)
 =======================
