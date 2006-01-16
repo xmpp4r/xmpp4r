@@ -1,6 +1,5 @@
 require 'xmpp4r'
 require 'xmpp4r/helpers/filetransfer'
-require 'xmpp4r/helpers/socks5bytestreamsserver'
 require 'yaml'
 
 #Jabber::debug = true
