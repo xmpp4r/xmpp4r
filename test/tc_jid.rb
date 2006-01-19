@@ -112,10 +112,10 @@ class JIDTest < Test::Unit::TestCase
 
   def test_create14
     j = JID::new('nOdE@dOmAiN/rEsOuRcE')
-    assert_equal('nOdE', j.node)
-    assert_equal('dOmAiN', j.domain)
+    assert_equal('node', j.node)
+    assert_equal('domain', j.domain)
     assert_equal('rEsOuRcE', j.resource)
-    assert_equal('nOdE@dOmAiN/rEsOuRcE', j.to_s)
+    assert_equal('node@domain/rEsOuRcE', j.to_s)
   end
 
   def test_tos
