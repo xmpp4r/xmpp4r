@@ -35,6 +35,9 @@ module Jabber
         @node = IDN::Stringprep.nodeprep(@node) if @node
         @domain = IDN::Stringprep.nameprep(@domain) if @domain
         @resource = IDN::Stringprep.resourceprep(@resource) if @resource
+      else
+        @node.downcase! if @node
+        @domain.downcase! if @domain
       end
 
       raise ArgumentError, 'Node too long' if (@node || '').length > 1023
