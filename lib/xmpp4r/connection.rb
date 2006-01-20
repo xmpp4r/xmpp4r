@@ -2,14 +2,26 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
+require 'openssl'
 require 'xmpp4r/stream'
+require 'xmpp4r/errorexception'
 
 module Jabber
   ##
   # The connection class manages the TCP connection to the Jabber server
   #
   class Connection  < Stream
-    attr_reader :host, :port, :input, :output
+    attr_reader :host, :port
+
+    # How many seconds to wait for <stream:features/>
+    # before proceeding
+    attr_accessor :features_timeout
+
+    # Optional CA-Path for TLS-handshake
+    attr_accessor :ssl_capath
+
+    # Optional callback for verification of SSL peer
+    attr_accessor :ssl_verifycb
 
     ##
     # Create a new connection to the given host and port, using threaded mode
@@ -18,19 +30,108 @@ module Jabber
       super(threaded)
       @host = nil
       @port = nil
+      @tls = false
+      @ssl_capath = nil
+      @ssl_verifycb = nil
+      @features_timeout = 10
     end
 
     ##
     # Connects to the Jabber server through a TCP Socket and
     # starts the Jabber parser.
-    #
     def connect(host, port)
       @host = host
       @port = port
 
       Jabber::debuglog("CONNECTING:\n#{@host}:#{@port}")
       @socket = TCPSocket.new(@host, @port)
-      start(@socket)
+      start
+
+      begin
+        Timeout::timeout(@features_timeout) {
+          @features_lock.lock
+          @features_lock.unlock
+        }
+      rescue Timeout::Error
+        Jabber::debuglog("FEATURES:\ntimed out when waiting, stream peer seems not XMPP compliant")
+      end
+
+      if @stream_features['starttls'] == 'urn:ietf:params:xml:ns:xmpp-tls'
+        begin
+          starttls
+        rescue
+          Jabber::debuglog("STARTTLS:\nFailure: #{$!}")
+        end
+      end
+    end
+
+    ##
+    # Start the parser on the previously connected socket
+    def start
+      super(@socket)
+    end
+
+    ##
+    # Do a <starttls/>
+    # (will be automatically done by connect if stream peer supports this)
+    def starttls
+      stls = REXML::Element.new('starttls')
+      stls.add_namespace('urn:ietf:params:xml:ns:xmpp-tls')
+
+      reply = nil
+      send(stls) { |r|
+        reply = r
+        true
+      }
+      if reply.name != 'proceed'
+        raise ErrorException(reply.first_element('error'))
+      end
+      # Don't be interrupted
+      stop
+
+      begin
+        error = nil
+
+        # Context/user set-able stuff
+        ctx = OpenSSL::SSL::SSLContext.new('TLSv1')
+        if @ssl_capath
+          ctx.verify_mode = OpenSSL::SSL::VERIFY_PEER
+          ctx.ca_path = @ssl_capath
+        else
+          ctx.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        end
+        ctx.verify_callback = @ssl_verifycb
+
+        # SSL connection establishing
+        sslsocket = OpenSSL::SSL::SSLSocket.new(@socket, ctx)
+        sslsocket.sync_close = true
+        Jabber::debuglog("TLSv1: OpenSSL handshake in progress")
+        sslsocket.connect
+
+        # Make REXML believe it's a real socket
+        class << sslsocket
+          def kind_of?(o)
+            o == IO ? true : super
+          end
+        end
+
+        # We're done and will use it
+        @tls = true
+        @socket = sslsocket
+      rescue
+        error = $!
+      ensure
+        Jabber::debuglog("TLSv1: restarting parser")
+        start
+        raise error if error
+      end
+    end
+
+    ##
+    # Have we gone to TLS mode?
+    # result:: [true] or [false]
+    def is_tls?
+      @tls
     end
   end  
 end

@@ -40,14 +40,18 @@ module Jabber
       @iqcbs = CallbackList::new
       @presencecbs = CallbackList::new
       @threaded = threaded
-      @StanzaQueue = []
-      @StanzaQueueMutex = Mutex::new
+      @stanzaqueue = []
+      @stanzaqueue_lock = Mutex::new
       @exception_block = nil
-      @threadBlocks = {}
+      @threadblocks = {}
 #      @pollCounter = 10
-      @waitingThread = nil
-      @wakeupThread = nil
+      @waiting_thread = nil
+      @wakeup_thread = nil
       @streamid = nil
+      @stream_mechanisms = []
+      @stream_features = {}
+      @features_lock = Mutex.new
+      @features_lock.lock
     end
 
     ##
@@ -78,6 +82,11 @@ module Jabber
 #        end
 #      end
       @status = CONNECTED
+    end
+
+    def stop
+      @parserThread.kill
+      @parser = nil
     end
 
     ##
@@ -131,37 +140,61 @@ module Jabber
     # element:: [REXML::Element] The received element
     def receive(element)
       Jabber::debuglog("RECEIVED:\n#{element.to_s}")
-      case element.name
+      case element.prefix
       when 'stream'
-        stanza = element
-      	i = element.attribute("id")
-        @streamid = i.value if i
-      when 'message'
-        stanza = Message::import(element)
-      when 'iq'
-        stanza = Iq::import(element)
-      when 'presence'
-        stanza = Presence::import(element)
+        case element.name
+          when 'stream'
+            stanza = element
+            @streamid = element.attributes['id']
+            unless element.attributes['version']  # isn't XMPP compliant, so
+              @features_lock.unlock               # don't wait for <stream:features/>
+            end
+          when 'features'
+            stanza = element
+            element.each { |e|
+              if e.name == 'mechanisms' and e.namespace == 'urn:ietf:params:xml:ns:xmpp-sasl'
+                e.each_element('mechanism') { |mech|
+                  @stream_mechanisms.push(mech.text)
+                }
+              else
+                @stream_features[e.name] = e.namespace
+              end
+            }
+            @features_lock.unlock
+          else
+            stanza = element
+        end
       else
-        stanza = element
+        case element.name
+          when 'message'
+            stanza = Message::import(element)
+          when 'iq'
+            stanza = Iq::import(element)
+          when 'presence'
+            stanza = Presence::import(element)
+          else
+            stanza = element
+        end
       end
+
       # Iterate through blocked theads (= waiting for an answer)
-      @threadBlocks.each { |thread, proc|
+      @threadblocks.each { |thread, proc|
         r = proc.call(stanza)
         if r == true
-          @threadBlocks.delete(thread)
+          @threadblocks.delete(thread)
           thread.wakeup if thread.alive?
           return
         end
       }
+
       if @threaded
         process_one(stanza)
       else
-        # StanzaQueue will be read when the user call process
-        @StanzaQueueMutex.lock
-        @StanzaQueue.push(stanza)
-        @StanzaQueueMutex.unlock
-        @waitingThread.wakeup if @waitingThread
+        # stanzaqueue will be read when the user call process
+        @stanzaqueue_lock.lock
+        @stanzaqueue.push(stanza)
+        @stanzaqueue_lock.unlock
+        @waiting_thread.wakeup if @waiting_thread
       end
     end
 
@@ -190,15 +223,15 @@ module Jabber
     # all available)
     def process(max = nil)
       n = 0
-      @StanzaQueueMutex.lock
-      while @StanzaQueue.size > 0 and (max == nil or n < max)
-        e = @StanzaQueue.shift
-        @StanzaQueueMutex.unlock
+      @stanzaqueue_lock.lock
+      while @stanzaqueue.size > 0 and (max == nil or n < max)
+        e = @stanzaqueue.shift
+        @stanzaqueue_lock.unlock
         process_one(e)
         n += 1
-        @StanzaQueueMutex.lock
+        @stanzaqueue_lock.lock
       end
-      @StanzaQueueMutex.unlock
+      @stanzaqueue_lock.unlock
       n
     end
 
@@ -212,25 +245,25 @@ module Jabber
       if time == 0 
         return process(1)
       end
-      @StanzaQueueMutex.lock
-      if @StanzaQueue.size > 0
-        e = @StanzaQueue.shift
-        @StanzaQueueMutex.unlock
+      @stanzaqueue_lock.lock
+      if @stanzaqueue.size > 0
+        e = @stanzaqueue.shift
+        @stanzaqueue_lock.unlock
         process_one(e)
         return 1
       end
 
-      @waitingThread = Thread.current
-      @wakeupThread = Thread.new { sleep time ; @waitingThread.wakeup if @waitingThread }
-      @waitingThread.stop
-      @wakeupThread.kill if @wakeupThread
-      @wakeupThread = nil
-      @waitingThread = nil
+      @waiting_thread = Thread.current
+      @wakeup_thread = Thread.new { sleep time ; @waiting_thread.wakeup if @waiting_thread }
+      @waiting_thread.stop
+      @wakeup_thread.kill if @wakeup_thread
+      @wakeup_thread = nil
+      @waiting_thread = nil
 
-      @StanzaQueueMutex.lock
-      if @StanzaQueue.size > 0
-        e = @StanzaQueue.shift
-        @StanzaQueueMutex.unlock
+      @stanzaqueue_lock.lock
+      if @stanzaqueue.size > 0
+        e = @stanzaqueue.shift
+        @stanzaqueue_lock.unlock
         process_one(e)
         return 1
       end
@@ -253,7 +286,7 @@ module Jabber
       Jabber::debuglog("SENDING:\n#{ xml.kind_of?(String) ? xml : xml.to_s }")
       xml = xml.to_s if not xml.kind_of? String
       block = proc if proc
-      @threadBlocks[Thread.current]=block if block
+      @threadblocks[Thread.current]=block if block
       Thread.critical = true # we don't want to be interupted before we stop!
       begin
         @fd << xml

@@ -21,8 +21,6 @@ module Jabber
     # Stream#process from time to time.
     #
     # Remember to *always* put a resource in your JID!
-    #
-    # TODO SSL mode is not implemented yet.
     def initialize(jid, threaded = true)
       super(threaded)
       @jid = jid
@@ -66,10 +64,6 @@ module Jabber
       end
       
       super(host.nil? ? jid.domain : host, port)
-      send("<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:client' to='#{@jid.domain}'>") { |b| 
-        # TODO sanity check : is b a stream ? get version, etc.
-        true
-      }
       self
     end
 
@@ -79,6 +73,13 @@ module Jabber
     def close
       send("</stream:stream>")
       super
+    end
+
+    ##
+    # Start the stream-parser and send the client-specific stream opening element
+    def start
+      super
+      send("<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:client' to='#{@jid.domain}' version='1.0'>") { true }
     end
 
     ##
