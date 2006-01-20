@@ -37,13 +37,6 @@ module Jabber
     # return:: self
     def connect
       super(@server_address, @server_port)
-      send("<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:component:accept' to='#{@jid}'>") { |e|
-        if e.name == 'stream'
-          true
-        else
-          false
-        end
-      }
       self
     end
 
@@ -55,6 +48,20 @@ module Jabber
       super
     end
 
+    ##
+    # Start the stream-parser and send the component-specific stream opening element
+    def start
+      super
+      send("<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:component:accept' to='#{@jid}' version='1.0'>") { |e|
+        if e.name == 'stream'
+          true
+        else
+          false
+        end
+      }
+    end
+
+    ##
     # Send auth with given secret and wait for result
     #
     # Throws AuthenticationFailure
