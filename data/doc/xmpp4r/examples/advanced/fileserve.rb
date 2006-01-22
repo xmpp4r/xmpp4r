@@ -134,12 +134,12 @@ end
 
 class Download < Transfer
   def initialize(filetransfer, peer, filename, msgblock, socksconf)
-    raise "No regular file" unless File.file? filename
-
     super filetransfer, peer, filename, File.size(filename), msgblock
 
     Thread.new {
       begin
+        raise "No regular file" unless File.file? filename
+
         source = Jabber::Helpers::FileSource.new filename
         stream = filetransfer.offer peer, source
         unless stream
@@ -225,7 +225,7 @@ class FileServe
       @client.send(Jabber::Presence.new(:chat, status)) if status != old_status
       old_status = status
 
-      sleep 5
+      sleep 1
     }
   end
 
@@ -286,7 +286,7 @@ class FileServe
         Dir.foreach(@directory) { |file|
           next if file =~ /^\./
           path = "#{@directory}/#{file}"
-          text += "#{file} (#{human_readable File.size(path)})\n"
+          text += "#{file} (#{human_readable File.size(path)})\n" if File.file? path
         }
         say.call(text.strip)
       when 'stat'
