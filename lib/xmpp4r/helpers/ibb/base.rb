@@ -42,7 +42,7 @@ module Jabber
       ##
       # Send data
       # buf:: [String]
-      def send(buf)
+      def write(buf)
         msg = Message.new
         msg.from = @my_jid
         msg.to = @peer_jid
@@ -76,7 +76,7 @@ module Jabber
       #
       # Will wait until the Message with the next sequence number
       # is in the stanza queue.
-      def receive
+      def read
         res = nil
 
         while res.nil?

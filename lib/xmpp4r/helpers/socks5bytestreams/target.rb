@@ -3,14 +3,17 @@ module Jabber
     ##
     # SOCKS5 Bytestreams implementation of the target site
     class SOCKS5BytestreamsTarget < SOCKS5Bytestreams
-      def initialize(stream, session_id, initiator_jid, target_jid)
-        super
-
-        @connect_lock = Mutex.new
-        @error = nil
+      ##
+      # Wait until the stream has been established
+      #
+      # May raise various exceptions
+      def accept
+        error = nil
+        connect_lock = Mutex.new
+        connect_lock.lock
 
         @stream.add_iq_callback(200, callback_ref) { |iq|
-          if iq.type == :set and iq.from == @initiator_jid and iq.to == target_jid and iq.query.kind_of?(IqQueryBytestreams)
+          if iq.type == :set and iq.from == @initiator_jid and iq.to == @target_jid and iq.query.kind_of?(IqQueryBytestreams)
             begin
               @stream.delete_iq_callback(callback_ref)
 
@@ -37,27 +40,19 @@ module Jabber
               end
               @stream.send(reply)
             rescue Exception => e
-              @error = e
+              error = e
             end
               
-            @connect_lock.unlock
+            connect_lock.unlock
             true
           else
             false
           end
         }
 
-        @connect_lock.lock
-      end
-
-      ##
-      # Wait until the stream has been established
-      #
-      # May raise various exceptions
-      def accept
-        @connect_lock.lock
-        @connect_lock.unlock
-        raise @error if @error
+        connect_lock.lock
+        connect_lock.unlock
+        raise error if error
         (@socks != nil)
       end
 

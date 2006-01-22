@@ -59,7 +59,7 @@ if stream
   while buf = source.read
     print "."
     $stdout.flush
-    stream.send buf
+    stream.write buf
   end
   puts "!"
   stream.close
