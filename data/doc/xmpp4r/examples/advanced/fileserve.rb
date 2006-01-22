@@ -257,7 +257,7 @@ class FileServe
 
     roster = Jabber::Helpers::Roster.new(@client)
     roster.add_subscription_request_callback { |item,presence|
-      my_roster.accept_subscription(presence.from)
+      roster.accept_subscription(presence.from)
     }
   end
 
