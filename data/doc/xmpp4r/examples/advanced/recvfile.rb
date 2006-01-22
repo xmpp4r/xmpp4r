@@ -27,7 +27,7 @@ ft.add_incoming_callback { |iq,file|
     if File::size(filename) < file.size and file.range
       offset = File::size(filename)
       puts "Peer supports <range/>, will retrieve #{file.fname} starting at #{offset}"
-    elsif File::size(filename) >= file.size
+    else
       puts "#{file.fname} is already fully retrieved, declining file-transfer"
       ft.decline(iq)
       next
@@ -56,7 +56,7 @@ ft.add_incoming_callback { |iq,file|
       if stream.accept
         puts "Stream established"
         outfile = File.new(filename, (offset ? 'a' : 'w'))
-        while buf = stream.receive
+        while buf = stream.read
           outfile.write(buf)
           print '.'
           $stdout.flush

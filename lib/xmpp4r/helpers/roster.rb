@@ -119,7 +119,7 @@ module Jabber
       # and decline_subscription.
       #
       # Example usage:
-      #  my_roster.add_subscription_callback do |item,presence|
+      #  my_roster.add_subscription_request_callback do |item,presence|
       #    if accept_subscription_requests
       #      my_roster.accept_subscription(presence.from)
       #    else
