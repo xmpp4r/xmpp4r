@@ -54,7 +54,7 @@ module Jabber
       # Receive from the stream-host
       # length:: [Fixnum] Amount of bytes
       # result:: [String] (or [nil] if finished)
-      def receive(length=512)
+      def read(length=512)
         @socks.read(length)
       end
 
@@ -62,7 +62,7 @@ module Jabber
       # Send to the stream-host
       # buf:: [String] Data
       # result:: [Fixnum] Amount of bytes sent
-      def send(buf)
+      def write(buf)
         @socks.write(buf)
         # FIXME: On FreeBSD this throws Errno::EPERM after it has already written a few
         # kilobytes, and when there are multiple sockets. ktrace told, that this originates

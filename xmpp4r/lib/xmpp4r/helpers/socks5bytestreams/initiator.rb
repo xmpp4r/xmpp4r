@@ -64,6 +64,7 @@ module Jabber
           # This is our own JID, so the target chose SOCKS5BytestreamsServer
           @socks = @streamhost_used.server.peer_sock(stream_address)
           raise "Target didn't connect" unless @socks
+          @streamhost_cbs.process(@streamhost_used, :success, nil)
         else
           begin
             @socks = connect_socks(@streamhost_used)

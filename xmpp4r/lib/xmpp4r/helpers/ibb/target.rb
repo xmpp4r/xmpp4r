@@ -6,8 +6,14 @@ module Jabber
       def initialize(stream, session_id, initiator_jid, target_jid)
         # Target and Initiator are swapped here, because we're the target
         super(stream, session_id, target_jid, initiator_jid)
+      end
 
-        @connect_lock = Mutex.new
+      ##
+      # Wait for the initiator side to start
+      # the stream.
+      def accept
+        connect_lock = Mutex.new
+        connect_lock.lock
 
         @stream.add_iq_callback(200, "#{callback_ref} open") { |iq|
           open = iq.first_element('open')
@@ -20,22 +26,15 @@ module Jabber
             reply.type = :result
             @stream.send(reply)
               
-            @connect_lock.unlock
+            connect_lock.unlock
             true
           else
             false
           end
         }
 
-        @connect_lock.lock
-      end
-
-      ##
-      # Wait for the initiator side to start
-      # the stream.
-      def accept
-        @connect_lock.lock
-        @connect_lock.unlock
+        connect_lock.lock
+        connect_lock.unlock
         true
       end
     end
