@@ -35,40 +35,39 @@ module Jabber
         @queue_lock = Mutex.new
         @pending = Mutex.new
         @pending.lock
+        @sendbuf = ''
+        @sendbuf_lock = Mutex.new
 
         @block_size = 4096  # Recommended by JEP0047
       end
 
       ##
       # Send data
+      #
+      # Data is buffered to match block_size in each packet.
+      # If you need the data to be sent immediately, use
+      # flush afterwards.
       # buf:: [String]
       def write(buf)
-        msg = Message.new
-        msg.from = @my_jid
-        msg.to = @peer_jid
-        
-        data = msg.add REXML::Element.new('data')
-        data.add_namespace NS_IBB
-        data.attributes['sid'] = @session_id
-        data.attributes['seq'] = @seq_send.to_s
-        data.text = Base64::encode64 buf
+        @sendbuf_lock.synchronize {
+          @sendbuf += buf
 
-        # TODO: Implement AMP correctly
-        amp = msg.add REXML::Element.new('amp')
-        amp.add_namespace 'http://jabber.org/protocol/amp'
-        deliver_at = amp.add REXML::Element.new('rule')
-        deliver_at.attributes['condition'] = 'deliver-at'
-        deliver_at.attributes['value'] = 'stored'
-        deliver_at.attributes['action'] = 'error'
-        match_resource = amp.add REXML::Element.new('rule')
-        match_resource.attributes['condition'] = 'match-resource'
-        match_resource.attributes['value'] = 'exact'
-        match_resource.attributes['action'] = 'error'
- 
-        @stream.send(msg)
+          while @sendbuf.size >= @block_size
+            send_data(@sendbuf[0..@block_size-1])
+            @sendbuf = @sendbuf[@block_size..-1].to_s
+          end
+        }
+      end
 
-        @seq_send += 1
-        @seq_send = 0 if @seq_send > 65535
+      ##
+      # Empty the send-buffer by sending remaining data
+      def flush
+        @sendbuf_lock.synchronize {
+          while @sendbuf.size > 0
+            send_data(@sendbuf[0..@block_size-1])
+            @sendbuf = @sendbuf[@block_size..-1].to_s
+          end
+        }
       end
 
       ##
@@ -114,6 +113,7 @@ module Jabber
       # Waits for acknowledge from peer,
       # may throw ErrorException
       def close
+        flush
         deactivate
 
         iq = Iq.new(:set, @peer_jid)
@@ -127,6 +127,38 @@ module Jabber
       end
 
       private
+
+      ##
+      # Send data directly
+      # data:: [String]
+      def send_data(databuf)
+        msg = Message.new
+        msg.from = @my_jid
+        msg.to = @peer_jid
+        
+        data = msg.add REXML::Element.new('data')
+        data.add_namespace NS_IBB
+        data.attributes['sid'] = @session_id
+        data.attributes['seq'] = @seq_send.to_s
+        data.text = Base64::encode64 databuf
+
+        # TODO: Implement AMP correctly
+        amp = msg.add REXML::Element.new('amp')
+        amp.add_namespace 'http://jabber.org/protocol/amp'
+        deliver_at = amp.add REXML::Element.new('rule')
+        deliver_at.attributes['condition'] = 'deliver-at'
+        deliver_at.attributes['value'] = 'stored'
+        deliver_at.attributes['action'] = 'error'
+        match_resource = amp.add REXML::Element.new('rule')
+        match_resource.attributes['condition'] = 'match-resource'
+        match_resource.attributes['value'] = 'exact'
+        match_resource.attributes['action'] = 'error'
+ 
+        @stream.send(msg)
+
+        @seq_send += 1
+        @seq_send = 0 if @seq_send > 65535
+      end
 
       def activate
         @stream.add_message_callback(200, callback_ref) { |msg|

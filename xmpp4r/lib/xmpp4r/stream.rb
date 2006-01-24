@@ -48,15 +48,15 @@ module Jabber
       @waiting_thread = nil
       @wakeup_thread = nil
       @streamid = nil
-      @stream_mechanisms = []
-      @stream_features = {}
       @features_lock = Mutex.new
-      @features_lock.lock
     end
 
     ##
     # Start the XML parser on the fd
     def start(fd)
+      @stream_mechanisms = []
+      @stream_features = {}
+
       @fd = fd
       @parser = StreamParser.new(@fd, self)
       @parserThread = Thread.new do
@@ -147,6 +147,7 @@ module Jabber
             stanza = element
             @streamid = element.attributes['id']
             unless element.attributes['version']  # isn't XMPP compliant, so
+              Jabber::debuglog("FEATURES: server not XMPP compliant, will not wait for features")
               @features_lock.unlock               # don't wait for <stream:features/>
             end
           when 'features'
@@ -160,6 +161,7 @@ module Jabber
                 @stream_features[e.name] = e.namespace
               end
             }
+            Jabber::debuglog("FEATURES: received")
             @features_lock.unlock
           else
             stanza = element
