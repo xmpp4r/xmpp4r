@@ -3,6 +3,9 @@ module Jabber
     ##
     # Implementation of IBB at the target side
     class IBBTarget < IBB
+      # You may read the block-size after accept
+      attr_reader :block_size
+
       def initialize(stream, session_id, initiator_jid, target_jid)
         # Target and Initiator are swapped here, because we're the target
         super(stream, session_id, target_jid, initiator_jid)

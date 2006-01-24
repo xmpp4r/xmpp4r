@@ -3,6 +3,9 @@ module Jabber
     ##
     # Implementation of IBB at the initiator side
     class IBBInitiator < IBB
+      # You may set the block-size before open
+      attr_accessor :block_size
+      
       ##
       # Open the stream to the peer,
       # waits for successful result
