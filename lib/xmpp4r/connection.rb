@@ -13,6 +13,9 @@ module Jabber
   class Connection  < Stream
     attr_reader :host, :port
 
+    # Allow TLS negotiation? Defaults to true
+    attr_accessor :allow_tls
+
     # How many seconds to wait for <stream:features/>
     # before proceeding
     attr_accessor :features_timeout
@@ -30,6 +33,7 @@ module Jabber
       super(threaded)
       @host = nil
       @port = nil
+      @allow_tls = true
       @tls = false
       @ssl_capath = nil
       @ssl_verifycb = nil
@@ -47,16 +51,22 @@ module Jabber
       @socket = TCPSocket.new(@host, @port)
       start
 
+      accept_features
+    end
+
+    def accept_features
       begin
         Timeout::timeout(@features_timeout) {
+          Jabber::debuglog("FEATURES: waiting...")
           @features_lock.lock
           @features_lock.unlock
+          Jabber::debuglog("FEATURES: waiting finished")
         }
       rescue Timeout::Error
-        Jabber::debuglog("FEATURES:\ntimed out when waiting, stream peer seems not XMPP compliant")
+        Jabber::debuglog("FEATURES: timed out when waiting, stream peer seems not XMPP compliant")
       end
 
-      if @stream_features['starttls'] == 'urn:ietf:params:xml:ns:xmpp-tls'
+      if @allow_tls and not is_tls? and @stream_features['starttls'] == 'urn:ietf:params:xml:ns:xmpp-tls'
         begin
           starttls
         rescue
@@ -68,6 +78,8 @@ module Jabber
     ##
     # Start the parser on the previously connected socket
     def start
+      @features_lock.lock
+
       super(@socket)
     end
 
@@ -123,6 +135,7 @@ module Jabber
       ensure
         Jabber::debuglog("TLSv1: restarting parser")
         start
+        accept_features
         raise error if error
       end
     end
