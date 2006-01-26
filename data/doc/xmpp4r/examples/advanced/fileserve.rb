@@ -86,7 +86,7 @@ class Upload < Transfer
     super(filetransfer, iq.from, filename, filesize, msgblock)
 
     if filename.size < 1
-      say "What file is this for?"
+      say "What is this file for?"
       @done = true
       return
     end
@@ -134,7 +134,13 @@ end
 
 class Download < Transfer
   def initialize(filetransfer, peer, filename, msgblock, socksconf)
-    super filetransfer, peer, filename, File.size(filename), msgblock
+    begin
+      filesize = File.size(filename)
+    rescue
+      filesize = 0
+    end
+
+    super filetransfer, peer, filename, filesize, msgblock
 
     Thread.new {
       begin
@@ -202,6 +208,11 @@ class FileServe
     Thread.new { presence }
 
     Thread.new { cleaner }
+
+    # Panic reboot ;-)
+    @client.on_exception {
+      initialize(conf)
+    }
   end
 
   def presence

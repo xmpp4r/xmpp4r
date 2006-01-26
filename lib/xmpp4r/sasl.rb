@@ -81,6 +81,8 @@ module Jabber
             challenge_text = Base64::decode64(reply.text)
             challenge_text.split(/,/).each { |s|
               key, value = s.split(/=/, 2)
+              value.sub!(/^"/, '')
+              value.sub!(/"$/, '')
               challenge[key] = value
             }
           else
@@ -90,7 +92,8 @@ module Jabber
         }
         raise error if error
 
-        @nonce = challenge['nonce'].gsub(/"/, '')
+        @nonce = challenge['nonce']
+        @realm = challenge['realm']
       end
 
       ##
@@ -102,7 +105,7 @@ module Jabber
         response['nonce'] = @nonce
         response['charset'] = 'utf-8'
         response['username'] = @stream.jid.node
-        response['realm'] = @stream.jid.domain
+        response['realm'] = @realm || @stream.jid.domain
         response['cnonce'] = generate_nonce
         response['nc'] = '00000001'
         response['qop'] = 'auth'
