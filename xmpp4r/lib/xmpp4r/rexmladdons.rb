@@ -70,6 +70,10 @@ module REXML
       self
     end
 
+    def self.import(xmlelement)
+      self.new.import(xmlelement)
+    end
+
     ##
     # Deletes one or more children elements,
     # not just one like REXML::Element#delete_element
