@@ -48,11 +48,16 @@ module Jabber
       super
     end
 
+    def generate_stream_start(to=nil, from=nil, id=nil, xml_lang="en", xmlns="jabber:component:accept", version="1.0")
+      super
+    end
+    private :generate_stream_start
+
     ##
     # Start the stream-parser and send the component-specific stream opening element
     def start
       super
-      send("<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:component:accept' to='#{@jid}' version='1.0'>") { |e|
+      send(generate_stream_start(@jid)) { |e|
         if e.name == 'stream'
           true
         else
