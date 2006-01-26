@@ -146,5 +146,19 @@ module Jabber
     def is_tls?
       @tls
     end
+
+    def generate_stream_start(to=nil, from=nil, id=nil, xml_lang="en", xmlns="jabber:client", version="1.0")
+      stream_start_string = "<stream:stream xmlns:stream='http://etherx.jabber.org/streams' "
+      stream_start_string += "xmlns='#{xmlns}' " unless xmlns.nil?
+      stream_start_string += "to='#{to}' " unless to.nil?
+      stream_start_string += "from='#{from}' " unless from.nil?
+      stream_start_string += "id='#{id}' " unless id.nil?      
+      stream_start_string += "xml:lang='#{xml_lang}' " unless xml_lang.nil?
+      stream_start_string += "version='#{version}' " unless version.nil?
+      stream_start_string += ">"
+      stream_start_string
+    end
+    private :generate_stream_start
+    
   end  
 end

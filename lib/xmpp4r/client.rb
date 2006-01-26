@@ -85,7 +85,7 @@ module Jabber
     # Start the stream-parser and send the client-specific stream opening element
     def start
       super
-      send("<stream:stream xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:client' to='#{@jid.domain}' version='1.0'>") { |e|
+      send(generate_stream_start(@jid.domain)) { |e|
         if e.name == 'stream'
           true
         else
