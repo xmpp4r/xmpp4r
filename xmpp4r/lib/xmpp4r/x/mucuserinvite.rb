@@ -28,7 +28,7 @@ module Jabber
     end
 
     def from=(j)
-      attributes['from'] = j.nil? ? nil : j.from_s
+      attributes['from'] = j.nil? ? nil : j.from.to_s
     end
 
     def set_from(j)
