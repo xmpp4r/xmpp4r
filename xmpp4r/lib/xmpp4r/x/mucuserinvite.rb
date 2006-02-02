@@ -11,7 +11,7 @@ module Jabber
     end
 
     def to
-      attributes['to'].nil ? nil : JID::new(attributes['to'])
+      attributes['to'].nil? ? nil : JID::new(attributes['to'])
     end
 
     def to=(j)
@@ -24,11 +24,11 @@ module Jabber
     end
 
     def from
-      attributes['from'].nil ? nil : JID::new(attributes['from'])
+      attributes['from'].nil? ? nil : JID::new(attributes['from'])
     end
 
     def from=(j)
-      attributes['from'] = j.nil? ? nil : j.from.to_s
+      attributes['from'] = (j.nil? ? nil : j.to_s)
     end
 
     def set_from(j)
@@ -37,14 +37,15 @@ module Jabber
     end
 
     def reason
-      text = nil
-      each_element('reason') { |xe| text = xe.text }
-      text
+      first_element_text('reason')
     end
 
     def reason=(s)
-      delete_elements('reasion')
-      add_element('reason').text = s
+      if s
+        replace_element_text('reason', s)
+      else
+        delete_elements('reason')
+      end
     end
 
     def set_reason(s)
