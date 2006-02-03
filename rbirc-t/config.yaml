@@ -1,0 +1,11 @@
+jabber:
+  jid: irc.server.net
+  server: 217.160.179.236
+  port: 5347
+  password: password
+  identity: "RbIRC-t (Ruby IRC-transport)"
+irc:
+  server: 127.0.0.1
+  port: 6667
+  charset: UTF-8
+  channels: ["#spaceboyz"]
