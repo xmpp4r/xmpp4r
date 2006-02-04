@@ -97,6 +97,11 @@ class IRCTransport < Jabber::Component
     end
   end
 
+  ##
+  # Shutdown the component
+  #
+  # Instructs all clients to quit and
+  # waits until no active clients left
   def shutdown!
     puts "Beginning shutdown"
 
@@ -123,8 +128,17 @@ class IRCTransport < Jabber::Component
   end
 end
 
+
+##
+# main function ;-)
+
+if ARGV.size != 1
+  puts "Usage: #{$0} <config.yaml>"
+  exit
+end
+
 begin
-  t = IRCTransport.new 'config.yaml'
+  t = IRCTransport.new ARGV[0]
   Thread.stop
 rescue Interrupt => e
   t.shutdown!

@@ -1,18 +1,40 @@
 require 'socket'
 require 'ircevents'
 
+##
+# The IRC module is a layer to make Ruby speak the IRC protocol (RFC1459)
+#
+# This has been originally developed for the "Backchannel-Bot" of the
+# 22nd Chaos Communication Congress. The module has been extended to fit
+# the needs of RbIRC-t. It could be repackaged sometimes if there is need
+# for another Ruby IRC library.
 module IRC
+  ##
+  # Exception to be raised by Connection#recv_line
   class ConnectionClosed < RuntimeError; end
   
+  ##
+  # Cares about low-level connection and line-based IRC communication.
   class Connection
+    ##
+    # Actually does nothing
     def initialize
       @socket = nil
     end
 
+    ##
+    # Connect to an IRC server
+    # host:: [String] Hostname
+    # port:: [Fixnum] TCP port
     def connect(host, port=6667)
       @socket = TCPSocket.new(host, port)
     end
 
+    ##
+    # Receive a line from the opened socket
+    #
+    # May throw ConnectionClosed
+    # result:: [String] Received line
     def recv_line
       begin
         line = @socket.gets
@@ -32,32 +54,59 @@ module IRC
       line
     end
 
+    ##
+    # Send a line
+    # (\r\n will be appended)
+    # line:: [String]
     def send_line(line)
       puts "SENDING: #{line.inspect}"
       @socket.write("#{line}\r\n")
     end
   end
 
+  ##
+  # The Client class cares about IRC commands and events
+  #
+  # Classes that want to handle those events should derive from
+  # IRC::Client and overwrite the methods defined in Client::IRCEvents
   class Client < Connection
+    # Information we may get from the server when having connected
     attr_reader :servername, :serverversion, :usermodes, :channelmodes
-    
+
+    # Definition of event handlers
+    # (these should be overwritten, but this ensures presence of all
+    # of them and gives a good reference)
     include IRCEvents
     
+    ##
+    # Connect to the IRC server,
+    # set nick,
+    # set username and realname
+    # nick:: [String] Initial nick to use
+    # user:: [String] Username
+    # realname:: [String] Client's realname
+    # host:: [String] Address of IRC server
+    # port:: [Fixnum] TCP port of IRC server
     def connect(nick, user, realname, host, port=6667)
       super(host, port)
       self.nick = nick
       send_line("USER #{user} no no :#{realname}")
     end
 
+    ##
+    # return:: [String] Nick being used by this client
     def nick
       @nick
     end
 
+    ##
+    # Change your nick
     def nick=(newnick)
       send_line("NICK #{newnick}")
-      @nick = newnick
     end
 
+    ##
+    # Join channels with optional keys
     def join(channel, password=nil)
       if password
         send_line("JOIN #{channel} #{password}")
@@ -66,7 +115,9 @@ module IRC
       end
     end
 
-    def part(channel, reason)
+    ##
+    # Leave a channel
+    def part(channel, reason=nil)
       if reason
         send_line("PART #{channel} :#{reason}")
       else
@@ -74,6 +125,8 @@ module IRC
       end
     end
 
+    ##
+    # Quit from IRC network
     def quit(reason=nil)
       if reason
         send_line("QUIT :#{reason}")
@@ -82,6 +135,8 @@ module IRC
       end
     end
 
+    ##
+    # Kick somebody from a channel
     def kick(channel, nick, reason=nil)
       if reason
         send_line("KICK #{channel} #{nick} :#{reason}")
@@ -90,14 +145,20 @@ module IRC
       end
     end
 
+    ##
+    # Do a CTCP request
     def ctcp(receivers, text)
       msg(receivers, "\x01#{text}\x01")
     end
 
+    ##
+    # Send a CTCP reply
     def ctcp_reply(receivers, text)
       notice(receivers, "\x01#{text}\x01")
     end
 
+    ##
+    # Send a PRIVMSG
     def msg(receivers, text)
       if receivers.kind_of?(Array)
         receivers = receivers.join(',')
@@ -105,6 +166,8 @@ module IRC
       send_line("PRIVMSG #{receivers} :#{text}")
     end
 
+    ##
+    # Send a NOTICE
     def notice(receivers, text)
       if receivers.kind_of?(Array)
         receivers = receivers.join(',')
@@ -112,6 +175,8 @@ module IRC
       send_line("NOTICE #{receivers} :#{text}")
     end
 
+    ##
+    # Change topic of a channel
     def topic(channel, text=nil)
       if text
         send_line("TOPIC #{channel} :#{text}")
@@ -120,18 +185,26 @@ module IRC
       end
     end
 
+    ##
+    # Do a MODE
     def mode(*args)
       send_line("MODE #{args.join(' ')}")
     end
 
+    ##
+    # Send a WHOIS request
     def whois(user)
       send_line("WHOIS #{user}")
     end
 
+    ##
+    # Attempt to get OPER privileges
     def oper(user, password)
       send_line("OPER #{user} #{password}")
     end
 
+    ##
+    # Away (reason != nil) or Un-Away (reason == nil)
     def away(reason=nil)
       if reason
         send_line("AWAY :#{reason}")
@@ -140,6 +213,12 @@ module IRC
       end
     end
 
+    ##
+    # Invoked by Client#run
+    #
+    # Handles events and invokes event-handlers
+    #
+    # PING events will be answered with PONG immediately
     def handle_line(line)
       line.chomp!
       from = nil
@@ -199,6 +278,8 @@ module IRC
           nick, reason = line.split(/ :/, 2)
           on_kill(from, nick, reason)
         when 'NICK' then
+	  nick = line.sub(/^:/, '')
+	  @nick = nick if from == @nick
           on_nick(from, line.sub(/^:/, ''))
         when '311' then
           line.scan(/^.+? (.+?) (.+?) (.+?) \* :(.+)$/) { |nick,user,host,realname|
@@ -268,6 +349,9 @@ module IRC
       end
     end
 
+    ##
+    # Run the main loop
+    # which receives line by line
     def run
       loop {
         line = recv_line

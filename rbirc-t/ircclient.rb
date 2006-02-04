@@ -2,18 +2,24 @@ require 'timeout'
 require 'iconv'
 require 'irc'
 
+##
+# Represents a user known from a channel
 class ChannelUser
+  # Attributes to keep track of
   attr_accessor :nick, :hostmask, :modes
   def initialize(nick)
     @nick = nick
     @modes = {}
-    @modes_sent = {}
+    @modes_sent = {:dirty=>true}  # Dummy value to be different to @modes upon initialization
   end
 
+  # Compares modes with the modes when the last presence was retrieved
   def dirty?
     not (@modes == @modes_sent)
   end
 
+  ##
+  # Give the user prefixes like @%+
   def give_flags(flags)
     flags.scan(/./) { |flag|
       case flag
@@ -24,43 +30,71 @@ class ChannelUser
     }
   end
 
+  ##
+  # Is this channel-operator (+o)?
   def op?
     @modes.has_key? 'o'
   end
 
+  ##
+  # Is this a half-op (+h)?
   def halfop?
     @modes.has_key? 'h'
   end
 
+  ##
+  # Has voice (+v)?
   def voice?
     @modes.has_key? 'v'
   end
 
+  ##
+  # Compose a XMucUserItem element with nick and the
+  # appropriate role and affiliation set
+  def item(room_jid=nil)
+    i = Jabber::XMucUserItem.new
+    i.jid = Jabber::JID.new @nick, room_jid.domain if room_jid
+    i.nick = @nick
+    if op?
+      i.role = :moderator
+      i.affiliation = :owner
+    elsif halfop?
+      i.role = :moderator
+      i.affiliation = :admin
+    elsif voice?
+      i.role = :participant
+      i.affiliation = :member
+    else
+      i.role = :visitor
+      i.affiliation = :none
+    end
+    i
+  end
+
+  ##
+  # Return a Jabber::Presence stanza
+  # with IRC-chanmodes mapped to Jabber::XMucUserItem
+  # room_jid:: [Jabber::JID] JID of the component to set from-attribute
+  # to:: [Jabber::JID] JID of destination to set to-attribute
+  # result:: [Jabber::Presence]
   def presence(room_jid, to=nil)
     pres = Jabber::Presence.new
     pres.from = jid room_jid
     pres.to = to
 
-    item = pres.add(Jabber::XMucUser.new).add(Jabber::XMucUserItem.new)
-    if op?
-      item.role = :moderator
-      item.affiliation = :owner
-    elsif halfop?
-      item.role = :moderator
-      item.affiliation = :admin
-    elsif voice?
-      item.role = :participant
-      item.affiliation = :member
-    else
-      item.role = :visitor
-      item.affiliation = :none
-    end
+    pres.add(Jabber::XMucUser.new).add(item(room_jid))
 
     @modes_sent = @modes.dup
 
     pres
   end
 
+  ##
+  # Same as presence,
+  # but to indicate that this user is currently leaving.
+  # code:: [Fixnum] Optional MUC status-code
+  # reason:: [String] Optional leaving reason
+  # result:: [Jabber::Presence]
   def unavailable_presence(room_jid, to=nil, code=nil, reason=nil)
     pres = presence(room_jid, to)
     pres.type = :unavailable
@@ -70,25 +104,35 @@ class ChannelUser
       x.add(REXML::Element.new('status')).attributes['code'] = code.to_s
     end
 
-    item = x.first_element 'item'
-    item.affiliation = :none
-    item.role = :none
-    item.reason = reason
+    i = x.first_element 'item'
+    i.affiliation = :none
+    i.role = :none
+    i.reason = reason
 
     pres
   end
 
+  ##
+  # Return the JID of the user according to the rooms' JID
+  # room_jid:: [Jabber::JID]
+  # result:: [Jabber::JID]
   def jid(room_jid)
     Jabber::JID.new room_jid.node, room_jid.domain, nick
   end
 end
 
+##
+# Track a WHOIS request to compose a vCard
 class WhoisRequest
   attr_reader :nick, :stanza_id
+  # Attributes to be set by event-handlers in IRCClient
   attr_accessor :hostmask, :realname
   attr_accessor :server, :serverinfo
   attr_accessor :idleinfo
   attr_accessor :channels
+  ##
+  # nick:: [String] Nick of whom WHOIS was requested
+  # stanza_id:: [String] Optional id-attribute of the Jabber::Iq stanza which asked for vCard
   def initialize(nick, stanza_id)
     @nick = nick
     @stanza_id = stanza_id
@@ -100,6 +144,8 @@ class WhoisRequest
     @channels = []
   end
 
+  ##
+  # Compose a vCard from WHOIS information
   def vcard
     @idleinfo.each { |k,v|
       if k =~ /time/
@@ -116,22 +162,42 @@ class WhoisRequest
   end
 end
 
+##
+# Tracking a jabber:iq:version request,
 class VersionRequest
   attr_reader :nick, :stanza_id
+  # Attribute to be fed by IRCClient#on_ctcp_reply
   attr_accessor :version
 
+  ##
+  # See WhoisRequest#initialize
   def initialize(nick, stanza_id)
     @nick = nick
     @stanza_id = stanza_id
     @version = ''
   end
 
+  ##
+  # Compose an IqQueryVersion <query/> element to be included into
+  # answer.
+  #
+  # Because CTCP returns a String, only IqQueryVersion#iname will be set
   def query
     Jabber::IqQueryVersion.new(@version)
   end
 end
 
+##
+# The class forming a MUC (JEP-0045) room whilst acting as an IRC client.
+#
+# There is no extra layer of seperation between these two things to keep
+# overhead small and allow interaction as closely as possible.
 class IRCClient < IRC::Client
+  # Default character encoding for IRC if none was given in config-file. Also fallback.
+  IRC_DEFAULT_CHARSET = 'ISO-8859-1'
+  # Character encoding for Jabber is always UTF-8.
+  XMPP_CHARSET = 'UTF-8'
+
   def initialize(transport, client_jid, room_jid)
     @transport = transport
     @client_jid = client_jid
@@ -158,11 +224,13 @@ class IRCClient < IRC::Client
   end
 
   ##
-  # Are we connected?
+  # Is the IRC connection alive?
   def active?
     @active
   end
 
+  ##
+  # Start IRC::Client#run in a seperate thread after having connected
   def activate
     @active = true
     Thread.new {
@@ -175,6 +243,8 @@ class IRCClient < IRC::Client
     }
   end
 
+  ##
+  # Send a presence from the room to indicate room unavailability
   def send_error_presence(error, text=nil)
     pres = Jabber::Presence.new
     pres.from = @room_jid.strip
@@ -184,6 +254,9 @@ class IRCClient < IRC::Client
     @transport.send pres
   end
 
+  ##
+  # Look at the last presence received from the client
+  # and update or clear the IRC AWAY-message
   def update_away
     if active?
       if [:away, :dnd, :xa].include? @client_presence.show
@@ -195,6 +268,13 @@ class IRCClient < IRC::Client
     end
   end
 
+  ##
+  # Handle a Jabber::Message stanza received by XMPP:
+  # * New subjects
+  # * Messages to the room
+  # * Private messages to room participants
+  # * Invitation to other JIDs
+  # * Invalid messages if the originating user hasn't joined
   def handle_message(message)
     if active?
       if message.subject and message.type == :groupchat   # Subject
@@ -247,9 +327,13 @@ class IRCClient < IRC::Client
     end
   end
 
+  ##
+  # Handle a Jabber::Presence
+  # * Updates IRC AWAY-message
+  # * Connect to IRC server (when user attempts to join the room)
+  # * QUIT from IRC server (when user leaves the room)
   def handle_presence(pres)
     @client_presence = pres
-    update_away
 
     unless active?
       if pres.type != :unavailable and pres.type != :error
@@ -281,7 +365,11 @@ class IRCClient < IRC::Client
         end
         
         # The field may have been present but empty...
-        realname = 'RbIRC-t user' if realname.to_s.strip.size < 1
+        if realname.to_s.strip.size < 1
+          realname = "xmpp:#{@client_jid}"
+        else
+          realname = "#{realname.to_s.strip} (xmpp:#{@client_jid})"
+        end
         
         begin
           connect pres.to.resource, pres.from.node, realname, @transport.irc_conf['server'], @transport.irc_conf['port']
@@ -293,12 +381,23 @@ class IRCClient < IRC::Client
     else
       if pres.type == :unavailable or pres.type == :error
         quit(pres.show)
-      elsif pres.to != @room_jid
-        self.nick = pres.to.resource
+      else
+        update_away
+
+        if pres.to != @room_jid
+          self.nick = pres.to.resource
+        end
       end
     end
   end
 
+  ##
+  # Handle a Jabber::Iq
+  # * Translate jabber:iq:version results to CTCP VERSION and jabber:iq:time to CTCP TIME replies
+  # * Start WHOIS upon vCard get-request
+  # * Send CTCP VERSION upon jabber:iq:version get-request
+  # * MODE-changes for MUC Admin use-cases
+  # * Service Discovery
   def handle_iq(iq)
     # Translate iq-results to CTCP-replies
     if iq.type == :result and active?
@@ -325,31 +424,117 @@ class IRCClient < IRC::Client
     end
 
     # MODE changes (moderator/admin use-cases)
-    if iq.type == :set and iq.queryns == 'http://jabber.org/protocol/muc#admin' and active?
-      # TODO: Rather implement Jabber::IqQueryMucAdmin...
-      modes = ''
-      mode_args = []
-      iq.query.each_element('item') { |item|
-        nick = item.attributes['nick']
-        case item.attributes['role']
-          when 'moderator' then
-            modes += '+o'
-            mode_args.push nick
-          when 'participant' then
-            modes += '+v-o'
-            mode_args.push nick, nick
-          when 'visitor' then
-            modes += '-v-o'
-            mode_args.push nick, nick
-          when 'none' then
-            kick(@room_jid.node, nick, item.first_element_text('reason'))
-        end
-      }
-      mode(@room_jid.node, modes, mode_args.join(' ')) if modes != ''
+    if iq.queryns == 'http://jabber.org/protocol/muc#admin' and active?
 
-      reply = iq.answer(false)
-      reply.type = :result
-      @transport.send reply
+      # Retrieval of affiliation/role lists
+      if iq.type == :get
+        # Compose answer with all users first...
+        reply = iq.answer false
+        reply.type = :result
+        query = reply.add REXML::Element.new('query')
+        query.add_namespace iq.queryns
+        all_items = []
+        @users_lock.synchronize {
+          @users.each { |nick,user|
+            all_items.push user.item @room_jid
+          }
+        }
+        
+        # Filter by what the user requested
+        filter = iq.query.first_element 'item'
+        if filter
+          frole = filter.attributes['role']
+          faffiliation = filter.attributes['affiliation']
+
+          all_items.each { |item|
+            role = item.attributes['role']
+            affiliation = item.attributes['affiliation']
+            if frole and role != frole
+              # Skip
+            elsif faffiliation and affiliation != faffiliation
+              # Skip
+            else
+              query.add item
+            end
+          }
+        end
+
+        @transport.send reply
+        
+      # MODE changes (moderator/admin use-cases)
+      elsif iq.type == :set
+        # TODO: Rather implement Jabber::IqQueryMucAdmin...
+
+        # New modes of a user
+        modes = {}
+
+        iq.query.each_element('item') { |item|
+          nick = (item.attributes['nick'] || Jabber::JID.new(item.attributes['jid']).node).downcase
+          next if nick.to_s.size < 1
+
+          # Change of role list
+          if item.attributes['role']
+            case item.attributes['role']
+              when 'moderator' then
+                modes[nick] = 'ov'
+              when 'participant' then
+                modes[nick] = 'v'
+              when 'visitor' then
+                modes[nick] = ''
+              when 'none' then
+                kick(@room_jid.node, nick, item.first_element_text('reason'))
+            end
+          # Change of affiliation list
+          # (no support of half-op here, as many IRC networks don't support it)
+          elsif item.attributes['affiliation']
+            case item.attributes['affiliation']
+              when 'owner' then
+                modes[nick] = 'ov'
+              when 'admin' then
+                modes[nick] = 'ov'
+              when 'member' then
+                modes[nick] = 'v'
+              when 'none' then
+                modes[nick] = ''
+            end
+          end
+        }
+
+        # Find mode differentials...
+        flags_set = ''
+        flags_delete = ''
+        flags_users_set = []
+        flags_users_delete = []
+        # Find modes to set
+        @users_lock.synchronize {
+          @users.each { |nick,user|
+            nick = nick.downcase
+            # Only for users which the requester wanted to modify
+            next unless modes.has_key? nick
+
+            # Find modes to set
+            (modes[nick] || '').scan(/./) { |flag|
+              unless user.modes[flag] # If user hasn't this flag already
+                flags_set += flag
+                flags_users_set.push user.nick
+              end
+            }
+            # Find modes to delete
+            user.modes.each { |flag,flagv|
+              unless (modes[nick] || '').include? flag
+                flags_delete += flag
+                flags_users_delete.push user.nick
+              end
+            }
+          }
+        }
+
+        mode(@room_jid.node, "+#{flags_set}-#{flags_delete}", (flags_users_set + flags_users_delete).join(' '))
+
+        reply = iq.answer(false)
+        reply.type = :result
+        @transport.send reply
+      end
     end
 
     # Service Discovery
@@ -371,7 +556,12 @@ class IRCClient < IRC::Client
     end
   end
 
-  def user(nick)
+  ##
+  # Get a channel user by nick,
+  # removes optional prefixes and sets corresponding channel modes,
+  # removes optional hostmask and updates user
+  # add_new_user:: [Boolean] Whether to add unknown users to the list (to ignore users which are not in channel)
+  def user(nick, add_new_user=true)
     @users_lock.synchronize {
       flags = ''
       while @prefixes.include? nick[0..0]
@@ -380,18 +570,23 @@ class IRCClient < IRC::Client
       end
       nick, hostmask = nick.split(/!/, 2)
 
-      u = (@users.has_key? nick) ? @users[nick] : (@users[nick] = ChannelUser.new(nick))
+      u = (@users.has_key? nick) ? @users[nick] : ChannelUser.new(nick)
+      @users[nick] = u if add_new_user
       u.give_flags flags
       u.hostmask = hostmask if hostmask
       u
     }
   end
 
-  IRC_DEFAULT_CHARSET = 'ISO-8859-1'
-  XMPP_CHARSET = 'UTF-8'
-
   ##
   # Strip IRC color codes and optionally convert charsets
+  #
+  # Charset conversion as follows:
+  # * Try to convert to user set charset
+  # * When not succeeded, try to convert to default IRC charset
+  # * When not succeeded, escape non-ASCII characters
+  # str:: [String] Text with possibly bogus characters
+  # result:: [String] UTF-8 encoded text suitable for XMPP
   def irc_to_xmpp(str)
     str.gsub!(/\x02/, '')
     str.gsub!(/\x03\d\d?,\d\d?/, '')
@@ -411,10 +606,18 @@ class IRCClient < IRC::Client
     end
   end
 
+  ##
+  # Convert XMPP (UTF-8 charset) to IRC
+  #
+  # There's no fall-back mechanism as Jabber servers usually disconnect
+  # clients sending invalid encoded characters
   def xmpp_to_irc(str)
     Iconv.new(@transport.irc_conf['charset'] || IRC_DEFAULT_CHARSET, XMPP_CHARSET).iconv(str)
   end
 
+  ##
+  # Iterate through all pending WHOIS requests
+  # filtered by nick
   def with_whois_request(nick)
     @whois_requests_lock.synchronize {
       @whois_requests.each { |request|
@@ -423,9 +626,9 @@ class IRCClient < IRC::Client
     }
   end
 
-  def on_whoisuser(nick, user, host, realname)
+  def on_whoisuser(nick, username, host, realname)
     with_whois_request(nick) { |request|
-      request.hostmask = irc_to_xmpp "#{user}@#{host}"
+      request.hostmask = irc_to_xmpp "#{username}@#{host}"
       request.realname = irc_to_xmpp realname
     }
   end
@@ -452,7 +655,7 @@ class IRCClient < IRC::Client
       @whois_requests.delete_if { |request|
         if request.nick == nick
           iq = Jabber::Iq.new(:result)
-          iq.from = user(nick).jid(@room_jid)
+          iq.from = user(nick, false).jid(@room_jid)
           iq.to = @client_jid
           iq.id = request.stanza_id
           iq.add request.vcard
@@ -465,6 +668,11 @@ class IRCClient < IRC::Client
     }
   end
 
+  ##
+  # Somebody is being renamed
+  # * Send unavailable_presence for old nick
+  # * Update user-list
+  # * Send new presence for new nick
   def on_nick(from, to)
     u = user(from)
 
@@ -566,7 +774,7 @@ class IRCClient < IRC::Client
     f = user(from)
     presence = f.unavailable_presence(@room_jid, @client_jid)
     presence.type = :unavailable
-    presence.status = irc_to_xmpp reason
+    presence.status = irc_to_xmpp reason if reason
     @transport.send presence
 
     @users_lock.synchronize {
@@ -579,7 +787,7 @@ class IRCClient < IRC::Client
       f = user(from)
       t = user(nick)
 
-      @transport.send t.unavailable_presence(@room_jid, @client_jid, 307, "Kicked by #{f.nick}: #{irc_to_xmpp reason}")
+      @transport.send t.unavailable_presence(@room_jid, @client_jid, 307, "Kicked by #{f.nick}: #{irc_to_xmpp reason.to_s}")
 
       if t.nick == @room_jid.resource # Is it ourself?
         quit
@@ -600,7 +808,7 @@ class IRCClient < IRC::Client
     f = user(from)
     t = user(nick)
     if t.nick == @room_jid.resource
-      @transport.send t.unavailable_presence(@room_jid, @client_jid, 307, "Killed by #{f.nick}: #{irc_to_xmpp reason}")
+      @transport.send t.unavailable_presence(@room_jid, @client_jid, 307, "Killed by #{f.nick}: #{irc_to_xmpp reason.to_s}")
 
       if t.nick == @room_jid.resource # Is it ourself?
         quit
@@ -620,25 +828,34 @@ class IRCClient < IRC::Client
     end
   end
 
+  ##
+  # Receiving a PRIVMSG from IRC
+  # * either to channel (groupchat)
+  # * or to other destination (chat)
   def on_msg(from, to, text)
     if to == @room_jid.node
       message = Jabber::Message.new(@client_jid, irc_to_xmpp(text))
       message.type = :groupchat
-      message.from = user(from).jid(@room_jid)
+      message.from = user(from, false).jid(@room_jid)
       @transport.send message
     else
       message = Jabber::Message.new(@client_jid, irc_to_xmpp(text))
       message.type = :chat
-      message.from = user(from).jid(@room_jid)
+      message.from = user(from, false).jid(@room_jid)
       @transport.send message
     end
   end
 
+  ##
+  # MODE change on channel
+  # * Echo to user
+  # * Update users
+  # * Send updated presence for users with changed flags
   def on_mode(from, target, flags, params)
     if target == @room_jid.node
       # Announce...
 
-      message = Jabber::Message.new(@client_jid, "#{user(from).nick} set mode: #{target} #{flags} #{params.join(' ')}")
+      message = Jabber::Message.new(@client_jid, "#{user(from, false).nick} set mode: #{target} #{flags} #{params.join(' ')}")
       message.type = :groupchat
       message.from = @room_jid.strip
       @transport.send message
@@ -655,13 +872,13 @@ class IRCClient < IRC::Client
         elsif op == :set and (@prefixes.include? ch or @chanmodes[1].include? ch or @chanmodes[2].include? 'ch')
           arg = params.shift
           if @prefixes.include? ch
-            u = user(arg)
+            u = user(arg, false)
             u.modes[ch] = true
           end
         elsif op == :delete and (@prefixes.include? ch or @chanmodes[1].include? ch)
           arg = params.shift
           if @prefixes.include? ch
-            u = user(arg)
+            u = user(arg, false)
             u.modes.delete ch
           end
         end
@@ -677,11 +894,13 @@ class IRCClient < IRC::Client
     end
   end
 
+  ##
+  # Topic change
   def on_topic(from, channel, text)
     if channel == @room_jid.node
-      message = Jabber::Message.new(@client_jid, irc_to_xmpp("* #{user(from).nick} has changed the topic to: #{text}"))
+      message = Jabber::Message.new(@client_jid, irc_to_xmpp("* #{user(from, false).nick} has changed the topic to: #{text}"))
       message.type = :groupchat
-      message.from = user(from).jid(@room_jid)
+      message.from = user(from, false).jid(@room_jid)
       message.subject = irc_to_xmpp text
       @transport.send message
     end
@@ -708,9 +927,9 @@ class IRCClient < IRC::Client
         rescue Timeout::Error
         end
 
-        message = Jabber::Message.new(@client_jid, irc_to_xmpp("* #{@topic_info_nick ? user(@topic_info_nick).nick : 'Somebody'} has set the topic to: #{text}"))
+        message = Jabber::Message.new(@client_jid, irc_to_xmpp("* #{@topic_info_nick ? user(@topic_info_nick, false).nick : 'Somebody'} has set the topic to: #{text}"))
         message.type = :groupchat
-        message.from = (@topic_info_nick ? user(@topic_info_nick).jid(@room_jid) : @room_jid.strip)
+        message.from = (@topic_info_nick ? user(@topic_info_nick, false).jid(@room_jid) : @room_jid.strip)
         message.subject = irc_to_xmpp text
         message.add(Jabber::XDelay.new).stamp = @topic_info_time if @topic_info_time
         @transport.send message
@@ -738,6 +957,15 @@ class IRCClient < IRC::Client
     end
   end
 
+  ##
+  # Received a CTCP request
+  #
+  # Translates ACTION into /me
+  #
+  # Translates VERSION and TIME to jabber:iq:version and jabber:iq:time,
+  # sends Jabber::Iq. There is no need to track the stanza, because
+  # it is originated from the specific sender nick. handle_iq will simply
+  # translate the answer to a CTCP-reply.
   def on_ctcp(from, to, text)
     request, text = text.split(/ /, 2)
     query_method = case request
@@ -749,22 +977,28 @@ class IRCClient < IRC::Client
 
     if query_method
       iq = Jabber::Iq.new_query :get, @client_jid
-      iq.from = user(from).jid(@room_jid)
+      iq.from = user(from, false).jid(@room_jid)
       iq.type = :get
       iq.query.add_namespace query_method
       @transport.send iq
     end
   end
 
+  ##
+  # Received a CTCP-reply
+  #
+  # VERSION responses will be translated into
+  # jabber:iq:version by pending version_requests
+  # to keep track of stanza-id.
   def on_ctcp_reply(from, to, text)
     type, text = text.split(/ /, 2)
     if type == 'VERSION'
       @version_requests_lock.synchronize {
         @version_requests.delete_if { |request|
-          if request.nick == user(from).nick
+          if request.nick == user(from, false).nick
             request.version = text
             iq = Jabber::Iq.new(:result)
-            iq.from = user(from).jid(@room_jid)
+            iq.from = user(from, false).jid(@room_jid)
             iq.to = @client_jid
             iq.id = request.stanza_id
             iq.add request.query
