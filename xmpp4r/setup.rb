@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 # setup.rb
 #
 # Copyright (c) 2000-2004 Minero Aoki
