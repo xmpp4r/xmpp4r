@@ -1,5 +1,5 @@
 # TODO:
-# * Discovery
+# * Room configuration
 # * Handle tons of different JOIN failures
 
 require 'xmpp4r'

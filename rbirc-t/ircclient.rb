@@ -11,6 +11,7 @@ class ChannelUser
     @nick = nick
     @modes = {}
     @modes_sent = {:dirty=>true}  # Dummy value to be different to @modes upon initialization
+    @hostmask = 'localhost'       # Sane default...
   end
 
   # Compares modes with the modes when the last presence was retrieved
@@ -51,10 +52,11 @@ class ChannelUser
   ##
   # Compose a XMucUserItem element with nick and the
   # appropriate role and affiliation set
-  def item(room_jid=nil)
+  # with_nick:: [Boolean] Whether to include a nick attribute (nick-changes etc.)
+  def item(room_jid=nil, with_nick=false)
     i = Jabber::XMucUserItem.new
-    i.jid = Jabber::JID.new @nick, room_jid.domain if room_jid
-    i.nick = @nick
+    i.jid = "#{@nick}!#{@hostmask}"
+    i.nick = @nick if with_nick
     if op?
       i.role = :moderator
       i.affiliation = :owner
@@ -118,6 +120,85 @@ class ChannelUser
   # result:: [Jabber::JID]
   def jid(room_jid)
     Jabber::JID.new room_jid.node, room_jid.domain, nick
+  end
+
+  ##
+  # Is it the (case-insensitive) nick of myself?
+  def is_me?(room_jid)
+    @nick.downcase == room_jid.resource.downcase
+  end
+end
+
+##
+# Represents somewhat like an array,
+# indexed by case-insensitivy nicknames
+class ChannelUserlist
+  def initialize(prefixes)
+    @lock = Mutex.new
+    @prefixes = prefixes
+    @list = {}
+  end
+
+  ##
+  # Get a channel user by nick,
+  # removes optional prefixes and sets corresponding channel modes,
+  # removes optional hostmask and updates user
+  # add:: [Boolean] Whether to add unknown users to the list (to ignore users which are not in channel)
+  def user(nick, add=false)
+    @lock.synchronize {
+      flags = ''
+      while @prefixes.include? nick[0..0]
+        flags += nick[0..0]
+        nick = nick[1..-1]
+      end
+      nick, hostmask = nick.split(/!/, 2)
+
+      u = (@list.has_key? nick.downcase) ? @list[nick.downcase] : ChannelUser.new(nick)
+      @list[nick.downcase] = u if add
+      u.give_flags flags
+      u.hostmask = hostmask if hostmask
+      u
+    }
+  end
+
+  ##
+  # Same as ChannelUserlist#user
+  def [](nick)
+    user nick
+  end
+
+  ##
+  # Delete a user by nick
+  def delete(nick)
+    u = user(nick)
+    @lock.synchronize {
+      @list.delete u.nick.downcase
+    }
+  end
+
+  ##
+  # Rename a user (delete and add)
+  def rename(from, to)
+    u = user(from)
+    @lock.synchronize {
+      @list.delete u.nick.downcase
+
+      u.nick = to
+      @list[to.downcase] = u
+    }
+  end
+
+  ##
+  # Iterate through all
+  def each
+    keys = @lock.synchronize {
+      @list.keys
+    }
+    keys.each { |key|
+      yield @lock.synchronize {
+        @list[key]
+      }
+    }
   end
 end
 
@@ -209,8 +290,7 @@ class IRCClient < IRC::Client
     @client_presence = nil
     @prefixes = []
     @chanmodes = []
-    @users = {}
-    @users_lock = Mutex.new
+    @users = ChannelUserlist.new('')
 
     @whois_requests = []
     @whois_requests_lock = Mutex.new
@@ -237,7 +317,7 @@ class IRCClient < IRC::Client
       begin
         run
       rescue IRC::ConnectionClosed => e
-        @transport.send user(@room_jid.resource).unavailable_presence(@room_jid, @client_jid, 332, e.to_s)
+        @transport.send @users[@room_jid.resource].unavailable_presence(@room_jid, @client_jid, 332, e.to_s)
       end
       @active = false
     }
@@ -384,7 +464,9 @@ class IRCClient < IRC::Client
       else
         update_away
 
+        puts "POSSIBLE SELF Renaming from #{@room_jid} to #{pres.to}"
         if pres.to != @room_jid
+          puts "SELF Renaming from #{@room_jid} to #{pres.to}"
           self.nick = pres.to.resource
         end
       end
@@ -434,10 +516,8 @@ class IRCClient < IRC::Client
         query = reply.add REXML::Element.new('query')
         query.add_namespace iq.queryns
         all_items = []
-        @users_lock.synchronize {
-          @users.each { |nick,user|
-            all_items.push user.item @room_jid
-          }
+        @users.each { |u|
+          all_items.push u.item(@room_jid, true)
         }
         
         # Filter by what the user requested
@@ -469,7 +549,7 @@ class IRCClient < IRC::Client
         modes = {}
 
         iq.query.each_element('item') { |item|
-          nick = (item.attributes['nick'] || Jabber::JID.new(item.attributes['jid']).node).downcase
+          nick = (item.attributes['nick'] || item.attributes['jid'].to_s.split(/!/).first).downcase
           next if nick.to_s.size < 1
 
           # Change of role list
@@ -506,26 +586,24 @@ class IRCClient < IRC::Client
         flags_users_set = []
         flags_users_delete = []
         # Find modes to set
-        @users_lock.synchronize {
-          @users.each { |nick,user|
-            nick = nick.downcase
-            # Only for users which the requester wanted to modify
-            next unless modes.has_key? nick
+        @users.each { |u|
+          nick = u.nick.dup.downcase
+          # Only for users which the requester wanted to modify
+          next unless modes.has_key? nick
 
-            # Find modes to set
-            (modes[nick] || '').scan(/./) { |flag|
-              unless user.modes[flag] # If user hasn't this flag already
-                flags_set += flag
-                flags_users_set.push user.nick
-              end
-            }
-            # Find modes to delete
-            user.modes.each { |flag,flagv|
-              unless (modes[nick] || '').include? flag
-                flags_delete += flag
-                flags_users_delete.push user.nick
-              end
-            }
+          # Find modes to set
+          (modes[nick] || '').scan(/./) { |flag|
+            unless u.modes[flag] # If user hasn't this flag already
+              flags_set += flag
+              flags_users_set.push u.nick
+            end
+          }
+          # Find modes to delete
+          u.modes.each { |flag,flagv|
+            unless (modes[nick] || '').include? flag
+              flags_delete += flag
+              flags_users_delete.push u.nick
+            end
           }
         }
 
@@ -554,28 +632,6 @@ class IRCClient < IRC::Client
         @transport.send reply
       end
     end
-  end
-
-  ##
-  # Get a channel user by nick,
-  # removes optional prefixes and sets corresponding channel modes,
-  # removes optional hostmask and updates user
-  # add_new_user:: [Boolean] Whether to add unknown users to the list (to ignore users which are not in channel)
-  def user(nick, add_new_user=true)
-    @users_lock.synchronize {
-      flags = ''
-      while @prefixes.include? nick[0..0]
-        flags += nick[0..0]
-        nick = nick[1..-1]
-      end
-      nick, hostmask = nick.split(/!/, 2)
-
-      u = (@users.has_key? nick) ? @users[nick] : ChannelUser.new(nick)
-      @users[nick] = u if add_new_user
-      u.give_flags flags
-      u.hostmask = hostmask if hostmask
-      u
-    }
   end
 
   ##
@@ -655,7 +711,7 @@ class IRCClient < IRC::Client
       @whois_requests.delete_if { |request|
         if request.nick == nick
           iq = Jabber::Iq.new(:result)
-          iq.from = user(nick, false).jid(@room_jid)
+          iq.from = @users[nick].jid(@room_jid)
           iq.to = @client_jid
           iq.id = request.stanza_id
           iq.add request.vcard
@@ -674,22 +730,16 @@ class IRCClient < IRC::Client
   # * Update user-list
   # * Send new presence for new nick
   def on_nick(from, to)
-    u = user(from)
+    u = @users.user(from, true)
 
     pres = u.unavailable_presence(@room_jid, @client_jid, 303)
     pres.first_element('x/item').nick = to
     @transport.send pres
 
-    @users_lock.synchronize {
-      @users.delete from
-
-      if @room_jid.resource == u.nick  # That's ourself!
-        @room_jid = Jabber::JID.new @room_jid.node, @room_jid.domain, to
-      end
-      u.nick = to
-
-      @users[u.nick] = u
-    }
+    @users.rename from, to
+    if u.is_me? @room_jid  # That's ourself!
+      @room_jid = Jabber::JID.new @room_jid.node, @room_jid.domain, to
+    end
 
     @transport.send u.presence(@room_jid, @client_jid)
   end
@@ -726,6 +776,7 @@ class IRCClient < IRC::Client
   def on_features(features, msg)
     if features.has_key? 'PREFIX'
       @prefixes = features['PREFIX']
+      @users = ChannelUserlist.new(@prefixes)
     end
     if features.has_key? 'CHANMODES'  # xchat-2.6.0/src/common/modes.c:414 mode_has_arg()
       # Type A, Type B, Type C, Type D
@@ -739,19 +790,16 @@ class IRCClient < IRC::Client
 
   def on_names(channel, names)
     if channel == @room_jid.node
-      unless @sent_own_presence
-        @transport.send user(@room_jid.resource).presence(@room_jid, @client_jid)
-        @sent_own_presence = true
-      end
-
       names.each { |name|
-        @transport.send user(name).presence(@room_jid, @client_jid)
+        u = @users.user(name, true)
+        @transport.send u.presence(@room_jid, @client_jid) unless u.is_me? @room_jid
       }
     end
   end
 
   def on_endofnames(channel)
-    #topic(channel)
+    @transport.send @users.user(@room_jid.resource, true).presence(@room_jid, @client_jid)
+    @sent_own_presence = true
   end
 
   def on_err_badchannelkey(channel, text)
@@ -764,37 +812,33 @@ class IRCClient < IRC::Client
 
   def on_join(from, channel)
     if channel == @room_jid.node
-      @sent_own_presence = true if from == @room_jid.resource
-
-      @transport.send user(from).presence(@room_jid, @client_jid)
+      unless @users[from].is_me? @room_jid and !@sent_own_presence
+        @transport.send @users.user(from, true).presence(@room_jid, @client_jid)
+      end
     end
   end
 
   def on_quit(from, reason)
-    f = user(from)
+    f = @users[from]
     presence = f.unavailable_presence(@room_jid, @client_jid)
     presence.type = :unavailable
     presence.status = irc_to_xmpp reason if reason
     @transport.send presence
 
-    @users_lock.synchronize {
-      @users.delete f.nick
-    }
+    @users.delete f.nick
   end
 
   def on_kick(from, channel, nick, reason)
     if channel == @room_jid.node
-      f = user(from)
-      t = user(nick)
+      f = @users[from]
+      t = @users[nick]
 
       @transport.send t.unavailable_presence(@room_jid, @client_jid, 307, "Kicked by #{f.nick}: #{irc_to_xmpp reason.to_s}")
 
-      if t.nick == @room_jid.resource # Is it ourself?
+      if t.is_me? == @room_jid  # Is it ourself?
         quit
       else                            # Somebody else has been kicked
-        @users_lock.synchronize {
-          @users.delete t.nick
-        }
+        @users.delete t.nick
       end
     end
   end
@@ -805,17 +849,15 @@ class IRCClient < IRC::Client
   # We only handle ourselves here, because KILLing of others
   # appears as QUIT.
   def on_kill(from, nick, reason)
-    f = user(from)
-    t = user(nick)
-    if t.nick == @room_jid.resource
+    f = @users[from]
+    t = @users[nick]
+    if t.is_me? @room_jid
       @transport.send t.unavailable_presence(@room_jid, @client_jid, 307, "Killed by #{f.nick}: #{irc_to_xmpp reason.to_s}")
 
-      if t.nick == @room_jid.resource # Is it ourself?
+      if t.is_me? @room_jid # Is it ourself?
         quit
       else                            # Somebody else has been killed
-        @users_lock.synchronize {
-          @users.delete t.nick
-        }
+        @users.delete t.nick
       end
     end
   end
@@ -836,12 +878,24 @@ class IRCClient < IRC::Client
     if to == @room_jid.node
       message = Jabber::Message.new(@client_jid, irc_to_xmpp(text))
       message.type = :groupchat
-      message.from = user(from, false).jid(@room_jid)
+      message.from = @users[from].jid(@room_jid)
       @transport.send message
     else
       message = Jabber::Message.new(@client_jid, irc_to_xmpp(text))
       message.type = :chat
-      message.from = user(from, false).jid(@room_jid)
+      message.from = @users[from].jid(@room_jid)
+      @transport.send message
+    end
+  end
+
+  ##
+  # Receiving a PRIVMSG from IRC,
+  # simply send to channel (if user has joined it)
+  def on_notice(from, to, text)
+    if @sent_own_presence
+      message = Jabber::Message.new(@client_jid, "NOTICE: #{irc_to_xmpp(text)}")
+      message.type = :groupchat
+      message.from = @users[from].jid(@room_jid)
       @transport.send message
     end
   end
@@ -855,7 +909,7 @@ class IRCClient < IRC::Client
     if target == @room_jid.node
       # Announce...
 
-      message = Jabber::Message.new(@client_jid, "#{user(from, false).nick} set mode: #{target} #{flags} #{params.join(' ')}")
+      message = Jabber::Message.new(@client_jid, "#{@users[from].nick} set mode: #{target} #{flags} #{params.join(' ')}")
       message.type = :groupchat
       message.from = @room_jid.strip
       @transport.send message
@@ -872,24 +926,22 @@ class IRCClient < IRC::Client
         elsif op == :set and (@prefixes.include? ch or @chanmodes[1].include? ch or @chanmodes[2].include? 'ch')
           arg = params.shift
           if @prefixes.include? ch
-            u = user(arg, false)
+            u = @users[arg]
             u.modes[ch] = true
           end
         elsif op == :delete and (@prefixes.include? ch or @chanmodes[1].include? ch)
           arg = params.shift
           if @prefixes.include? ch
-            u = user(arg, false)
+            u = @users[arg]
             u.modes.delete ch
           end
         end
       }
       # Send updated presences
-      @users_lock.synchronize {
-        @users.each { |nick,u|
-          if u.dirty?
-            @transport.send u.presence(@room_jid, @client_jid)
-          end
-        }
+      @users.each { |u|
+        if u.dirty?
+          @transport.send u.presence(@room_jid, @client_jid)
+        end
       }
     end
   end
@@ -898,9 +950,9 @@ class IRCClient < IRC::Client
   # Topic change
   def on_topic(from, channel, text)
     if channel == @room_jid.node
-      message = Jabber::Message.new(@client_jid, irc_to_xmpp("* #{user(from, false).nick} has changed the topic to: #{text}"))
+      message = Jabber::Message.new(@client_jid, irc_to_xmpp("* #{@users[from].nick} has changed the topic to: #{text}"))
       message.type = :groupchat
-      message.from = user(from, false).jid(@room_jid)
+      message.from = @users[from].jid(@room_jid)
       message.subject = irc_to_xmpp text
       @transport.send message
     end
@@ -927,9 +979,9 @@ class IRCClient < IRC::Client
         rescue Timeout::Error
         end
 
-        message = Jabber::Message.new(@client_jid, irc_to_xmpp("* #{@topic_info_nick ? user(@topic_info_nick, false).nick : 'Somebody'} has set the topic to: #{text}"))
+        message = Jabber::Message.new(@client_jid, irc_to_xmpp("* #{@topic_info_nick ? @users[@topic_info_nick].nick : 'Somebody'} has set the topic to: #{text}"))
         message.type = :groupchat
-        message.from = (@topic_info_nick ? user(@topic_info_nick, false).jid(@room_jid) : @room_jid.strip)
+        message.from = (@topic_info_nick ? @users[@topic_info_nick].jid(@room_jid) : @room_jid.strip)
         message.subject = irc_to_xmpp text
         message.add(Jabber::XDelay.new).stamp = @topic_info_time if @topic_info_time
         @transport.send message
@@ -977,7 +1029,7 @@ class IRCClient < IRC::Client
 
     if query_method
       iq = Jabber::Iq.new_query :get, @client_jid
-      iq.from = user(from, false).jid(@room_jid)
+      iq.from = @users[from].jid(@room_jid)
       iq.type = :get
       iq.query.add_namespace query_method
       @transport.send iq
@@ -995,10 +1047,10 @@ class IRCClient < IRC::Client
     if type == 'VERSION'
       @version_requests_lock.synchronize {
         @version_requests.delete_if { |request|
-          if request.nick == user(from, false).nick
+          if request.nick == @users[from].nick
             request.version = text
             iq = Jabber::Iq.new(:result)
-            iq.from = user(from, false).jid(@room_jid)
+            iq.from = @users[from].jid(@room_jid)
             iq.to = @client_jid
             iq.id = request.stanza_id
             iq.add request.query
