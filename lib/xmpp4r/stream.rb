@@ -328,7 +328,7 @@ module Jabber
 
       error = nil
       send(xml) do |received|
-        if received.id == xml.id
+        if received.kind_of? XMLStanza and received.id == xml.id
           if received.type == :error
             error = received.error
             true
