@@ -24,12 +24,12 @@ module Jabber
     # Remember to *always* put a resource in your JID unless the server can do SASL.
     def initialize(jid, threaded = true)
       unless threaded
-        puts "Non-threaded mode is currently broken, re-enabling threaded"
+        $stderr.puts "Non-threaded mode is currently broken, re-enabling threaded"
         threaded = true
       end
 
       super(threaded)
-      @jid = jid
+      @jid = (jid.kind_of?(JID) ? jid : JID.new(jid.to_s))
     end
 
     ##
@@ -64,7 +64,7 @@ module Jabber
             end
           }
         rescue NameError
-          puts "Resolv::DNS does not support SRV records. Please upgrade to ruby-1.8.3 or later!"
+          $stderr.puts "Resolv::DNS does not support SRV records. Please upgrade to ruby-1.8.3 or later!"
         end
         # Fallback to normal connect method
       end

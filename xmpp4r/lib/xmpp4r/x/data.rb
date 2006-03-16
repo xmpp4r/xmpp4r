@@ -128,7 +128,8 @@ module Jabber
 
     ##
     # Type of this field
-    # result:: * :boolean
+    # result::
+    #          * :boolean
     #          * :fixed
     #          * :hidden
     #          * :jid_multi
