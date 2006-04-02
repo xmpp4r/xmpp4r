@@ -46,6 +46,8 @@ module Jabber
     def connect(host, port)
       @host = host
       @port = port
+      # Reset is_tls?, so that it works when reconnecting
+      @tls = false
 
       Jabber::debuglog("CONNECTING:\n#{@host}:#{@port}")
       @socket = TCPSocket.new(@host, @port)
