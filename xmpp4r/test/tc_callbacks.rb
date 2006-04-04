@@ -96,4 +96,33 @@ class CallbacksTest < Test::Unit::TestCase
     assert(called3)
     assert(!called4)
   end
+
+  def test_nested
+    cbl = CallbackList.new
+    called_outer = 0
+    called_inner = 0
+
+    cbl.add(100, nil) {
+      called_outer += 1
+
+      if called_outer == 1
+        cbl.add(200, nil) {
+          called_inner += 1
+        }
+      end
+    }
+
+    assert_equal(0, called_inner)
+    assert_equal(0, called_outer)
+
+    cbl.process
+
+    assert_equal(0, called_inner)
+    assert_equal(1, called_outer)
+
+    cbl.process
+
+    assert_equal(1, called_inner)
+    assert_equal(2, called_outer)
+  end
 end

@@ -82,8 +82,14 @@ class CallbackList
   # several, but of course, you block must know how to handle them.
   # return:: [Boolean] true if the element has been consumed
   def process(*e)
+    # If somebody adds a new callback the list will get modified
+    # and sorted(!) while still iterating through it. So we use a
+    # local copy of @list. Any freshly added callback will receive
+    # the next stanzas, not the current.
+    list = @list.dup
+
     # process through callbacks
-    @list.each do |item|
+    list.each do |item|
       return true if item.block.call(*e) == true
     end
     false
