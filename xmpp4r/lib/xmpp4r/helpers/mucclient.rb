@@ -68,6 +68,7 @@ module Jabber
       # fails.
       # jid:: [JID] room@component/nick
       # password:: [String] Optional password
+      # return:: [MUCClient] self (chain-able)
       def join(jid, password=nil)
         if active?
           raise "MUCClient already active"
@@ -104,6 +105,8 @@ module Jabber
         }
 
         raise ErrorException.new(error) if error
+
+        self
       end
 
       ##
@@ -134,6 +137,8 @@ module Jabber
         }
 
         deactivate
+
+        self
       end
 
       ##
