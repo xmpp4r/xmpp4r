@@ -43,7 +43,7 @@ module Jabber
       @stanzaqueue = []
       @stanzaqueue_lock = Mutex::new
       @exception_block = nil
-      @threadblocks = {}
+      @threadblocks = []
 #      @pollCounter = 10
       @waiting_thread = nil
       @wakeup_thread = nil
@@ -137,8 +137,18 @@ module Jabber
     # Processes a received REXML::Element and executes 
     # registered thread blocks and filters against it.
     #
+    # If in threaded mode, a new thread will be spawned
+    # for the call to receive_nonthreaded.
     # element:: [REXML::Element] The received element
     def receive(element)
+      if @threaded
+        Thread.new { receive_nonthreaded(element) }
+      else
+        receive_nonthreaded(element)
+      end
+    end
+    
+    def receive_nonthreaded(element)
       Jabber::debuglog("RECEIVED:\n#{element.to_s}")
       case element.prefix
       when 'stream'
@@ -179,12 +189,12 @@ module Jabber
         end
       end
 
-      # Iterate through blocked theads (= waiting for an answer)
-      @threadblocks.each { |thread, proc|
-        r = proc.call(stanza)
+      # Iterate through blocked threads (= waiting for an answer)
+      @threadblocks.each { |threadblock|
+        r = threadblock.call(stanza)
         if r == true
-          @threadblocks.delete(thread)
-          thread.wakeup if thread.alive?
+          @threadblocks.delete(threadblock)
+          threadblock.wakeup
           return
         end
       }
@@ -199,6 +209,7 @@ module Jabber
         @waiting_thread.wakeup if @waiting_thread
       end
     end
+    private :receive_nonthreaded
 
     ##
     # Process |element| until it is consumed. Returns element.consumed?
@@ -273,13 +284,25 @@ module Jabber
     end
 
     ##
+    # This is used by Jabber::Stream internally to
+    # keep track of any blocks which were passed to
+    # Stream#send.
+    class ThreadBlock
+      def initialize(block)
+        @thread = Thread.current
+        @block = block
+      end
+      def call(*args)
+        @block.call(*args)
+      end
+      def wakeup
+        @thread.wakeup if @thread.alive?
+      end
+    end
+
+    ##
     # Sends XML data to the socket and (optionally) waits
     # to process received data.
-    #
-    # If you invoke this method again in &block, you cannot
-    # define a second block. It will return immediately.
-    # If you need this, move your second Stream#send outside
-    # the &block.
     #
     # xml:: [String] The xml data to send
     # proc:: [Proc = nil] The optional proc
@@ -288,7 +311,7 @@ module Jabber
       Jabber::debuglog("SENDING:\n#{ xml.kind_of?(String) ? xml : xml.to_s }")
       xml = xml.to_s if not xml.kind_of? String
       block = proc if proc
-      @threadblocks[Thread.current]=block if block
+      @threadblocks.unshift(ThreadBlock.new(block)) if block
       Thread.critical = true # we don't want to be interupted before we stop!
       begin
         @fd << xml
