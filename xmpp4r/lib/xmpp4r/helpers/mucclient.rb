@@ -92,6 +92,7 @@ module Jabber
           if from_room?(r.from) and r.kind_of?(Presence) and r.type == :error
             # Error from room
             error = r.error
+            true
           # type='unavailable' may occur when the MUC kills our previous instance,
           # but all join-failures should be type='error'
           elsif r.from == jid and r.kind_of?(Presence) and r.type != :unavailable
@@ -242,7 +243,7 @@ module Jabber
 
       private
 
-      def handle_presence(pres)
+      def handle_presence(pres) # :nodoc:
         if pres.type == :unavailable or pres.type == :error
           @leave_cbs.process(pres)
           @roster_lock.synchronize {
@@ -265,7 +266,7 @@ module Jabber
         end
       end
 
-      def handle_message(msg)
+      def handle_message(msg) # :nodoc:
         if msg.type == :chat
           @private_message_cbs.process(msg)
         else  # type == :groupchat or anything else
@@ -273,11 +274,11 @@ module Jabber
         end
       end
 
-      def activate
+      def activate  # :nodoc:
         @active = true
 
         # Callbacks
-        @stream.add_presence_callback(150, callback_ref) { |presence|
+        @stream.add_presence_callback(150, self) { |presence|
           if from_room?(presence.from)
             handle_presence(presence)
             true
@@ -286,7 +287,7 @@ module Jabber
           end
         }
 
-        @stream.add_message_callback(150, callback_ref) { |message|
+        @stream.add_message_callback(150, self) { |message|
           if from_room?(message.from)
             handle_message(message)
             true
@@ -296,20 +297,12 @@ module Jabber
         }
       end
 
-      def deactivate
+      def deactivate  # :nodoc:
         @active = false
 
         # Callbacks
-        @stream.delete_presence_callback(callback_ref)
-        @stream.delete_message_callback(callback_ref)
-      end
-
-      ##
-      # A callback identification for this instance,
-      # so own callbacks can be removed safely upon
-      # deactivation.
-      def callback_ref
-        "Helpers::MUCClient #{my_jid} #{jid}"
+        @stream.delete_presence_callback(self)
+        @stream.delete_message_callback(self)
       end
     end
   end

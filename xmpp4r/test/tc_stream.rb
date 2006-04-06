@@ -8,6 +8,7 @@ require 'socket'
 require 'xmpp4r/stream'
 include Jabber
 
+
 class StreamTest < Test::Unit::TestCase
   def setup
     @tmpfile = Tempfile::new("StreamSendTest")
@@ -111,5 +112,51 @@ class StreamTest < Test::Unit::TestCase
     @stream.process
     assert_equal(22, @nbcalls)
     assert(@called)
+  end
+
+  # Check that <message><message/></message> is recognized as one Message
+  def test_similar_children
+    n = 0
+    @stream.add_message_callback { n += 1 }
+    assert_equal(0, n)
+    @server.puts('<stream:stream><message/>')
+    @server.flush
+    @stream.process
+    assert_equal(1, n)
+    @server.puts('<message>')
+    @server.flush
+    @stream.process
+    assert_equal(1, n)
+    @server.puts('<message/>')
+    @server.flush
+    @stream.process
+    assert_equal(1, n)
+    @server.puts('</message>')
+    @server.flush
+    @stream.process
+    assert_equal(2, n)
+  end
+
+  def test_send
+    @server.puts('<stream:stream>')
+    @server.flush
+    @stream.process
+
+    Thread.new {
+      assert_equal(Iq.new(:get).to_s, @server.gets('>'))
+      @stream.receive(Iq.new(:result))
+    }
+
+    called = 0
+    @stream.send(Iq.new(:get)) { |reply|
+      called += 1
+      if reply.kind_of? Iq and reply.type == :result
+        true
+      else
+        false
+      end
+    }
+
+    assert_equal(1, called)
   end
 end
