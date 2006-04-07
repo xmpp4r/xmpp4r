@@ -41,7 +41,7 @@ module Jabber
     end
 
     def jid
-      attributes['jid'].nil ? nil : JID::new(attributes['jid'])
+      attributes['jid'].nil? ? nil : JID::new(attributes['jid'])
     end
 
     def jid=(j)
