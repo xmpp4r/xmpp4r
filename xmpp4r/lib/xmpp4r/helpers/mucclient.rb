@@ -130,6 +130,7 @@ module Jabber
         pres = Presence.new
         pres.type = :unavailable
         pres.to = jid
+        pres.from = @my_jid
         pres.status = reason if reason
         @stream.send(pres) { |r|
           if r.kind_of?(Presence) and r.type == :unavailable and r.from == jid
