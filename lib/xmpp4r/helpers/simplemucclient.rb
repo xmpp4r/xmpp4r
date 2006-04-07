@@ -90,17 +90,16 @@ module Jabber
             time = x.stamp
           end
         }
-        # Sender nick
-        nick = msg.from.resource
+        sender_nick = msg.from.resource
 
 
         if msg.subject
           @subject = msg.subject
-          @subject_block.call(time, nick, @subject) if @subject_block
+          @subject_block.call(time, sender_nick, @subject) if @subject_block
         end
         
         if msg.body
-          if nick.nil?
+          if sender_nick.nil?
             @room_message_block.call(time, msg.body) if @room_message_block
           else
             if msg.type == :chat
@@ -133,22 +132,6 @@ module Jabber
         msg = Message.new
         msg.subject = s
         send(msg)
-      end
-
-      ##
-      # The MUCClient's own nick
-      # (= resource)
-      # result:: [String] Nickname
-      def nick
-        @jid.resource
-      end
-
-      ##
-      # The room name
-      # (= node)
-      # result:: [String] Room name
-      def room
-        @jid.node
       end
 
       ##
