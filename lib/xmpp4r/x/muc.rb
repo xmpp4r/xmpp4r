@@ -80,6 +80,17 @@ module Jabber
         nil
       end
     end
+
+    ##
+    # Get all <item/> elements
+    # result:: [Array] of [XMucUserItem]
+    def items
+      res = []
+      each_element('item') { |item|
+        res << item
+      }
+      res
+    end
   end
 
   X.add_namespaceclass('http://jabber.org/protocol/muc', XMuc)

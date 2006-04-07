@@ -105,7 +105,10 @@ module Jabber
           end
         }
 
-        raise ErrorException.new(error) if error
+        if error
+          deactivate
+          raise ErrorException.new(error)
+        end
 
         self
       end
