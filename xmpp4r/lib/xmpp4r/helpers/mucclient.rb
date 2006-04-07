@@ -157,6 +157,81 @@ module Jabber
       end
 
       ##
+      # The MUCClient's own nick
+      # (= resource)
+      # result:: [String] Nickname
+      def nick
+        @jid ? @jid.resource : nil
+      end
+
+      ##
+      # Change nick
+      #
+      # Threading is, again, suggested. This method waits for two
+      # <presence/> stanzas, one indicating unavailabilty of the old
+      # transient JID, one indicating availability of the new
+      # transient JID.
+      #
+      # If the service denies nick-change, ErrorException will be raisen.
+      def nick=(new_nick)
+        unless active?
+          raise "MUCClient not active"
+        end
+        
+        new_jid = JID.new(@jid.node, @jid.domain, new_nick)
+
+        # Joining
+        pres = Presence.new
+        pres.to = new_jid
+        pres.from = @my_jid
+
+        error = nil
+        # Keeping track of the two stanzas enables us to process stanzas
+        # which don't arrive in the order specified by JEP-0045
+        presence_unavailable = false
+        presence_available = false
+        # We don't use Stream#send_with_id here as it's unknown
+        # if the MUC component *always* uses our stanza id.
+        @stream.send(pres) { |r|
+          if from_room?(r.from) and r.kind_of?(Presence) and r.type == :error
+            # Error from room
+            error = r.error
+          elsif r.from == @jid and r.kind_of?(Presence) and r.type == :unavailable and
+                r.x and r.x.status_code == 303
+            # Old JID is offline, but wait for the new JID and let stanza be handled
+            # by the standard callback
+            presence_unavailable = true
+            handle_presence(r)
+          elsif r.from == new_jid and r.kind_of?(Presence) and r.type != :unavailable
+            # Our own presence reflected back - success
+            presence_available = true
+            handle_presence(r)
+          end
+
+          if error or (presence_available and presence_unavailable)
+            true
+          else
+            false
+          end
+        }
+
+        if error
+          raise ErrorException.new(error)
+        end
+
+        # Apply new JID
+        @jid = new_jid
+      end
+
+      ##
+      # The room name
+      # (= node)
+      # result:: [String] Room name
+      def room
+        @jid ? @jid.node : nil
+      end
+
+      ##
       # Send a stanza to the room
       #
       # If stanza is a Jabber::Message, <tt>stanza.type</tt> will be
@@ -260,7 +335,7 @@ module Jabber
             @roster.delete(pres.from.resource)
           }
 
-          if pres.from == jid
+          if pres.from == jid and !(pres.x and pres.x.status_code == 303)
             deactivate
           end
         else

@@ -472,6 +472,8 @@ class MUCClientTest < Test::Unit::TestCase
       assert_equal(JID.new('hag66@shakespeare.lit/pda'), stanza.from)
       assert_equal(JID.new('darkcave@macbeth.shakespeare.lit'), stanza.to)
       assert_equal('First message', stanza.body)
+
+      finished.unlock
     }
     state { |stanza|
       assert_kind_of(Message, stanza)
@@ -479,6 +481,8 @@ class MUCClientTest < Test::Unit::TestCase
       assert_equal(JID.new('hag66@shakespeare.lit/pda'), stanza.from)
       assert_equal(JID.new('darkcave@macbeth.shakespeare.lit/secondwitch'), stanza.to)
       assert_equal('Second message', stanza.body)
+
+      finished.unlock
     }
     state { |stanza|
       assert_kind_of(Message, stanza)
@@ -497,9 +501,61 @@ class MUCClientTest < Test::Unit::TestCase
     assert(m.active?)
 
     m.send(Jabber::Message.new(nil, 'First message'))
-    m.send(Jabber::Message.new(nil, 'Second message'), 'secondwitch')
-    m.send(Jabber::Message.new('secondwitch', 'Third message'), 'firstwitch')
-
     finished.lock
+    m.send(Jabber::Message.new(nil, 'Second message'), 'secondwitch')
+    finished.lock
+    m.send(Jabber::Message.new('secondwitch', 'Third message'), 'firstwitch')
+    finished.lock
+  end
+
+  def test_nick
+    state { |pres|
+      assert_kind_of(Presence, pres)
+      assert_nil(pres.x.password)
+      send("<presence from='darkcave@macbeth.shakespeare.lit/thirdwitch' to='hag66@shakespeare.lit/pda'>" +
+           "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='member' role='participant'/></x>" +
+           "</presence>")
+    }
+    state { |pres|
+      assert_kind_of(Presence, pres)
+      assert_equal(JID.new('hag66@shakespeare.lit/pda'), pres.from)
+      assert_equal(JID.new('darkcave@macbeth.shakespeare.lit/secondwitch'), pres.to)
+      assert_nil(pres.type)
+      send("<presence from='darkcave@macbeth.shakespeare.lit' to='hag66@shakespeare.lit/pda' type='error'>" +
+           "<error code='409' type='cancel'><conflict xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/></error>" +
+           "</presence>")
+    }
+    state { |pres|
+      assert_kind_of(Presence, pres)
+      assert_equal(JID.new('hag66@shakespeare.lit/pda'), pres.from)
+      assert_equal(JID.new('darkcave@macbeth.shakespeare.lit/oldhag'), pres.to)
+      assert_nil(pres.type)
+      send("<presence from='darkcave@macbeth.shakespeare.lit/thirdwitch' to='hag66@shakespeare.lit/pda' type='unavailable'>" +
+           "<x xmlns='http://jabber.org/protocol/muc#user'>" +
+           "<item affiliation='member' jid='hag66@shakespeare.lit/pda' nick='oldhag' role='participant'/>" +
+           "<status code='303'/>" +
+           "</x></presence>" +
+           "<presence from='darkcave@macbeth.shakespeare.lit/oldhag' to='hag66@shakespeare.lit/pda'>" +
+           "<x xmlns='http://jabber.org/protocol/muc#user'>" +
+           "<item affiliation='member' jid='hag66@shakespeare.lit/pda' role='participant'/>" +
+           "</x></presence>")
+    }
+
+    m = Helpers::MUCClient.new(@client)
+    m.my_jid = 'hag66@shakespeare.lit/pda'
+
+    assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch'))
+    assert(m.active?)
+    assert_equal('thirdwitch', m.nick)
+
+    assert_raises(ErrorException) {
+      m.nick = 'secondwitch'
+    }
+    assert(m.active?)
+    assert_equal('thirdwitch', m.nick)
+
+    m.nick = 'oldhag'
+    assert(m.active?)
+    assert_equal('oldhag', m.nick)
   end
 end
