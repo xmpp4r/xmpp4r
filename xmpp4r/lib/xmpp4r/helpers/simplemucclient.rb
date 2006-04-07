@@ -132,7 +132,7 @@ module Jabber
       def subject=(s)
         msg = Message.new
         msg.subject = s
-        send_message(msg)
+        send(msg)
       end
 
       ##
@@ -156,7 +156,7 @@ module Jabber
       # text:: [String] Message body
       # to:: [String] Optional nick if directed to specific user
       def say(text, to=nil)
-        send_message(Message.new(nil, text), to)
+        send(Message.new(nil, text), to)
       end
 
       ##

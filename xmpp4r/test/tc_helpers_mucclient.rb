@@ -104,8 +104,10 @@ class MUCClientTest < Test::Unit::TestCase
     assert_raises(ErrorException) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
+    assert(!m.active?)
 
     assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch', 'cauldron'))
+    assert(m.active?)
   end
 
   def test_members_only_room
@@ -121,6 +123,7 @@ class MUCClientTest < Test::Unit::TestCase
     assert_raises(ErrorException) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
+    assert(!m.active?)
   end
 
   def test_banned_users
@@ -136,6 +139,7 @@ class MUCClientTest < Test::Unit::TestCase
     assert_raises(ErrorException) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
+    assert(!m.active?)
   end
 
   def test_nickname_conflict
@@ -151,6 +155,7 @@ class MUCClientTest < Test::Unit::TestCase
     assert_raises(ErrorException) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
+    assert(!m.active?)
   end
 
   def test_max_users
@@ -166,6 +171,7 @@ class MUCClientTest < Test::Unit::TestCase
     assert_raises(ErrorException) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
+    assert(!m.active?)
   end
 
   def test_locked_room
@@ -181,6 +187,7 @@ class MUCClientTest < Test::Unit::TestCase
     assert_raises(ErrorException) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
+    assert(!m.active?)
   end
 
   def test_exit_room
@@ -235,5 +242,264 @@ class MUCClientTest < Test::Unit::TestCase
 
     assert_equal(m, m.exit('gone where the goblins go'))
     assert(!m.active?)
+  end
+
+  def test_joins
+    state { |pres|
+      assert_kind_of(Presence, pres)
+      assert_nil(pres.type)
+      assert_equal(JID.new('hag66@shakespeare.lit/pda'), pres.from)
+      assert_equal(JID.new('darkcave@macbeth.shakespeare.lit/thirdwitch'), pres.to)
+      send("<presence from='darkcave@macbeth.shakespeare.lit/thirdwitch' to='hag66@shakespeare.lit/pda'>" +
+           "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='member' role='participant'/></x>" +
+           "</presence>")
+    }
+    state { |pres|
+      assert_kind_of(Presence, pres)
+      assert_equal(:unavailable, pres.type)
+      assert_equal(JID.new('hag66@shakespeare.lit/pda'), pres.from)
+      assert_equal(JID.new('darkcave@macbeth.shakespeare.lit/thirdwitch'), pres.to)
+      assert_nil(pres.status)
+      send("<presence from='darkcave@macbeth.shakespeare.lit/thirdwitch' to='hag66@shakespeare.lit/pda' type='unavailable'>" +
+           "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='member' role='none'/></x>" +
+           "</presence>")
+    }
+    state { |pres|
+      assert_kind_of(Presence, pres)
+      assert_nil(pres.type)
+      assert_equal(JID.new('hag66@shakespeare.lit/pda'), pres.from)
+      assert_equal(JID.new('darkcave@macbeth.shakespeare.lit/fourthwitch'), pres.to)
+      send("<presence from='darkcave@macbeth.shakespeare.lit/fourthwitch' to='hag66@shakespeare.lit/pda'>" +
+           "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='member' role='participant'/></x>" +
+           "</presence>")
+    }
+    state { |pres|
+      assert_kind_of(Presence, pres)
+      assert_equal(:unavailable, pres.type)
+      assert_equal(JID.new('hag66@shakespeare.lit/pda'), pres.from)
+      assert_equal(JID.new('darkcave@macbeth.shakespeare.lit/fourthwitch'), pres.to)
+      assert_equal(pres.status, 'Exiting one last time')
+      send("<presence from='darkcave@macbeth.shakespeare.lit/fourthwitch' to='hag66@shakespeare.lit/pda' type='unavailable'>" +
+           "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='member' role='none'/></x>" +
+           "</presence>")
+    }
+
+    m = Helpers::MUCClient.new(@client)
+    m.my_jid = 'hag66@shakespeare.lit/pda'
+    assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch'))
+    assert(m.active?)
+
+    assert_raises(RuntimeError) { m.join('darkcave@macbeth.shakespeare.lit/thirdwitch') }
+    assert_raises(RuntimeError) { m.join('darkcave@macbeth.shakespeare.lit/fourthwitch') }
+    assert(m.active?)
+
+    assert_equal(m, m.exit)
+    assert(!m.active?)
+    assert_raises(RuntimeError) { m.exit }
+    assert(!m.active?)
+
+    assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/fourthwitch'))
+    assert(m.active?)
+
+    assert_raises(RuntimeError) { m.join('darkcave@macbeth.shakespeare.lit/thirdwitch') }
+    assert_raises(RuntimeError) { m.join('darkcave@macbeth.shakespeare.lit/fourthwitch') }
+    assert(m.active?)
+
+    assert_equal(m, m.exit('Exiting one last time'))
+    assert(!m.active?)
+    assert_raises(RuntimeError) { m.exit }
+    assert(!m.active?)
+  end
+
+  def test_message_callback
+    state { |pres|
+      assert_kind_of(Presence, pres)
+      assert_equal('cauldron', pres.x.password)
+      send("<presence from='darkcave@macbeth.shakespeare.lit/thirdwitch' to='hag66@shakespeare.lit/pda'>" +
+           "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='member' role='participant'/></x>" +
+           "</presence>")
+    }
+
+    message_lock = Mutex.new
+    message_lock.lock
+
+    messages_client = 0
+    @client.add_message_callback { |msg|
+      messages_client += 1
+      message_lock.unlock
+    }
+    
+    m = Helpers::MUCClient.new(@client)
+    m.my_jid = 'hag66@shakespeare.lit/pda'
+    messages_muc = 0
+    m.add_message_callback { |msg|
+      messages_muc += 1
+      message_lock.unlock
+    }
+    messages_muc_private = 0
+    m.add_private_message_callback { |msg|
+      messages_muc_private += 1
+      message_lock.unlock
+    }
+
+    assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch', 'cauldron'))
+    assert(m.active?)
+
+    assert_equal(0, messages_client)
+    assert_equal(0, messages_muc)
+    assert_equal(0, messages_muc_private)
+
+    send("<message from='darkcave@macbeth.shakespeare.lit/firstwitch' to='hag66@shakespeare.lit/pda'><body>Hello</body></message>")
+    message_lock.lock
+
+    assert_equal(0, messages_client)
+    assert_equal(1, messages_muc)
+    assert_equal(0, messages_muc_private)
+
+    send("<message from='user@domain/resource' to='hag66@shakespeare.lit/pda'><body>Hello</body></message>")
+    message_lock.lock
+
+    assert_equal(1, messages_client)
+    assert_equal(1, messages_muc)
+    assert_equal(0, messages_muc_private)
+
+    send("<message type='chat' from='darkcave@macbeth.shakespeare.lit/firstwitch' to='hag66@shakespeare.lit/pda'><body>Hello</body></message>")
+    message_lock.lock
+
+    assert_equal(1, messages_client)
+    assert_equal(1, messages_muc)
+    assert_equal(1, messages_muc_private)
+  end
+
+  def test_presence_callbacks
+    state { |pres|
+      assert_kind_of(Presence, pres)
+      assert_nil(pres.x.password)
+      send("<presence from='darkcave@macbeth.shakespeare.lit/thirdwitch' to='hag66@shakespeare.lit/pda'>" +
+           "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='member' role='participant'/></x>" +
+           "</presence>")
+    }
+
+    presence_lock = Mutex.new
+    presence_lock.lock
+
+    presences_client = 0
+    @client.add_presence_callback { |pres|
+      presences_client += 1
+      presence_lock.unlock
+    }   
+    m = Helpers::MUCClient.new(@client)
+    m.my_jid = 'hag66@shakespeare.lit/pda'
+    presences_join = 0
+    m.add_join_callback { |pres|
+      presences_join += 1
+      presence_lock.unlock
+    }
+    presences_leave = 0
+    m.add_leave_callback { |pres|
+      presences_leave += 1
+      presence_lock.unlock
+    }
+    presences_muc = 0
+    m.add_presence_callback { |pres|
+      presences_muc += 1
+      presence_lock.unlock
+    }
+
+    assert_equal(0, presences_client)
+    assert_equal(0, presences_join)
+    assert_equal(0, presences_leave)
+    assert_equal(0, presences_muc)
+
+    assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch'))
+    assert(m.active?)
+
+    presence_lock.lock
+    assert_equal(0, presences_client)
+    assert_equal(1, presences_join)
+    assert_equal(0, presences_leave)
+    assert_equal(0, presences_muc)
+
+    send("<presence from='darkcave@macbeth.shakespeare.lit/firstwitch' to='hag66@shakespeare.lit/pda'>" +
+         "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='member' role='participant'/></x>" +
+         "</presence>")
+    presence_lock.lock
+    assert_equal(0, presences_client)
+    assert_equal(2, presences_join)
+    assert_equal(0, presences_leave)
+    assert_equal(0, presences_muc)
+
+    send("<presence from='user@domain/resource' to='hag66@shakespeare.lit/pda'>" +
+         "<show>chat</show>" +
+         "</presence>")
+    presence_lock.lock
+    assert_equal(1, presences_client)
+    assert_equal(2, presences_join)
+    assert_equal(0, presences_leave)
+    assert_equal(0, presences_muc)
+
+    send("<presence from='darkcave@macbeth.shakespeare.lit/firstwitch' to='hag66@shakespeare.lit/pda'>" +
+         "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='member' role='participant'/></x>" +
+         "<show>away</show></presence>")
+    presence_lock.lock
+    assert_equal(1, presences_client)
+    assert_equal(2, presences_join)
+    assert_equal(0, presences_leave)
+    assert_equal(1, presences_muc)
+
+    send("<presence from='darkcave@macbeth.shakespeare.lit/firstwitch' to='hag66@shakespeare.lit/pda' type='unavailable'/>")
+    presence_lock.lock
+    assert_equal(1, presences_client)
+    assert_equal(2, presences_join)
+    assert_equal(1, presences_leave)
+    assert_equal(1, presences_muc)
+  end
+
+  def test_send
+    finished = Mutex.new
+    finished.lock
+    
+    state { |pres|
+      assert_kind_of(Presence, pres)
+      assert_nil(pres.x.password)
+      send("<presence from='darkcave@macbeth.shakespeare.lit/thirdwitch' to='hag66@shakespeare.lit/pda'>" +
+           "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='member' role='participant'/></x>" +
+           "</presence>")
+    }
+    state { |stanza|
+      assert_kind_of(Message, stanza)
+      assert(:groupchat, stanza.type)
+      assert_equal(JID.new('hag66@shakespeare.lit/pda'), stanza.from)
+      assert_equal(JID.new('darkcave@macbeth.shakespeare.lit'), stanza.to)
+      assert_equal('First message', stanza.body)
+    }
+    state { |stanza|
+      assert_kind_of(Message, stanza)
+      assert(:chat, stanza.type)
+      assert_equal(JID.new('hag66@shakespeare.lit/pda'), stanza.from)
+      assert_equal(JID.new('darkcave@macbeth.shakespeare.lit/secondwitch'), stanza.to)
+      assert_equal('Second message', stanza.body)
+    }
+    state { |stanza|
+      assert_kind_of(Message, stanza)
+      assert(:chat, stanza.type)
+      assert_equal(JID.new('hag66@shakespeare.lit/pda'), stanza.from)
+      assert_equal(JID.new('darkcave@macbeth.shakespeare.lit/firstwitch'), stanza.to)
+      assert_equal('Third message', stanza.body)
+
+      finished.unlock
+    }
+    
+    m = Helpers::MUCClient.new(@client)
+    m.my_jid = 'hag66@shakespeare.lit/pda'
+
+    assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch'))
+    assert(m.active?)
+
+    m.send(Jabber::Message.new(nil, 'First message'))
+    m.send(Jabber::Message.new(nil, 'Second message'), 'secondwitch')
+    m.send(Jabber::Message.new('secondwitch', 'Third message'), 'firstwitch')
+
+    finished.lock
   end
 end

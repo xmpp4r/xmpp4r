@@ -158,9 +158,16 @@ module Jabber
 
       ##
       # Send a stanza to the room
+      #
+      # If stanza is a Jabber::Message, <tt>stanza.type</tt> will be
+      # automatically set to :groupchat if directed to room or :chat
+      # if directed to participant.
       # stanza:: [XMLStanza] to send
       # to:: [String] Stanza destination recipient, or room if +nil+
       def send(stanza, to=nil)
+        if stanza.kind_of? Message
+          stanza.type = to ? :chat : :groupchat
+        end
         stanza.from = @my_jid
         stanza.to = JID::new(jid.node, jid.domain, to)
         @stream.send(stanza)
@@ -173,8 +180,7 @@ module Jabber
       # to room or :chat if directed to participant.
       # stanza:: [XMLStanza] to send
       # to:: [String] Stanza destination recipient, or room if +nil+
-      def send_message(stanza, to=nil)
-        stanza.type = to ? :chat : :groupchat
+      def send_message(stanza, to=nil)  # :nodoc:
         send(stanza, to)
       end
 
@@ -234,7 +240,7 @@ module Jabber
       # but are some sort of private messaging.
       def add_private_message_callback(prio = 0, ref = nil, proc = nil, &block)
         block = proc if proc
-        @message_cbs.add(prio, ref, block)
+        @private_message_cbs.add(prio, ref, block)
       end
 
       ##
