@@ -135,6 +135,14 @@ class StreamTest < Test::Unit::TestCase
     @server.flush
     @stream.process
     assert_equal(2, n)
+    @server.puts('<message><stream:stream><message/></stream:stream>')
+    @server.flush
+    @stream.process
+    assert_equal(2, n)
+    @server.puts('</message>')
+    @server.flush
+    @stream.process
+    assert_equal(3, n)
   end
 
   def test_send
