@@ -308,13 +308,12 @@ module Jabber
     # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
     def send(xml, proc=nil, &block)
-      Jabber::debuglog("SENDING:\n#{ xml.kind_of?(String) ? xml : xml.to_s }")
-      xml = xml.to_s if not xml.kind_of? String
+      Jabber::debuglog("SENDING:\n#{xml}")
       block = proc if proc
       @threadblocks.unshift(ThreadBlock.new(block)) if block
       Thread.critical = true # we don't want to be interupted before we stop!
       begin
-        @fd << xml
+        @fd << xml.to_s
         @fd.flush
       rescue
         if @exception_block 

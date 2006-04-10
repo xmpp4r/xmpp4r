@@ -43,23 +43,24 @@ module Jabber
           e.add_attributes attributes
           @current = @current.nil? ? e : @current.add_element(e)
 
-          if @current.name == 'stream'
-            @listener.receive(@current)
+          if @current.name == 'stream' and !@started
             @started = true
+            @listener.receive(@current)
+            @current = nil
           end
         end
 
         parser.listen( :end_element ) do  |uri, localname, qname|
-          if qname == "stream:stream"
+          if qname == 'stream:stream' and @current.nil?
             @started = false
           else
-            @listener.receive(@current) if @current.parent.name == 'stream'
+            @listener.receive(@current) unless @current.parent
             @current = @current.parent
           end
         end
 
         parser.listen( :characters ) do | text |
-          @current.text = @current.text.to_s + text
+          @current.text = @current.text.to_s + text if @current
         end
 
         parser.listen( :cdata ) do | text |
