@@ -147,7 +147,7 @@ class ChannelUserlist
   def user(nick, add=false)
     @lock.synchronize {
       flags = ''
-      while @prefixes.include? nick[0..0]
+      while @prefixes.include? (nick||'')[0..0]
         flags += nick[0..0]
         nick = nick[1..-1]
       end
