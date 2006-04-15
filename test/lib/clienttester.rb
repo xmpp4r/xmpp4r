@@ -47,6 +47,8 @@ module Jabber
 
       @state = 0
       @states = []
+      @state_wait = Mutex.new
+      @state_wait.lock
       @server.add_stanza_callback { |stanza|
         if @state < @states.size
           @states[@state].call(stanza)
@@ -54,6 +56,8 @@ module Jabber
         else
           raise "Out of states"
         end
+        @state_wait.unlock
+
         false
       }
     end
@@ -86,6 +90,10 @@ module Jabber
 
     def state(&block)
       @states << block
+    end
+
+    def wait_state
+      @state_wait.lock
     end
   end
 end

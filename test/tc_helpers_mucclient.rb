@@ -456,9 +456,6 @@ class MUCClientTest < Test::Unit::TestCase
   end
 
   def test_send
-    finished = Mutex.new
-    finished.lock
-    
     state { |pres|
       assert_kind_of(Presence, pres)
       assert_nil(pres.x.password)
@@ -472,8 +469,6 @@ class MUCClientTest < Test::Unit::TestCase
       assert_equal(JID.new('hag66@shakespeare.lit/pda'), stanza.from)
       assert_equal(JID.new('darkcave@macbeth.shakespeare.lit'), stanza.to)
       assert_equal('First message', stanza.body)
-
-      finished.unlock
     }
     state { |stanza|
       assert_kind_of(Message, stanza)
@@ -481,8 +476,6 @@ class MUCClientTest < Test::Unit::TestCase
       assert_equal(JID.new('hag66@shakespeare.lit/pda'), stanza.from)
       assert_equal(JID.new('darkcave@macbeth.shakespeare.lit/secondwitch'), stanza.to)
       assert_equal('Second message', stanza.body)
-
-      finished.unlock
     }
     state { |stanza|
       assert_kind_of(Message, stanza)
@@ -490,22 +483,21 @@ class MUCClientTest < Test::Unit::TestCase
       assert_equal(JID.new('hag66@shakespeare.lit/pda'), stanza.from)
       assert_equal(JID.new('darkcave@macbeth.shakespeare.lit/firstwitch'), stanza.to)
       assert_equal('Third message', stanza.body)
-
-      finished.unlock
     }
     
     m = Helpers::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
 
     assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch'))
+    wait_state
     assert(m.active?)
 
     m.send(Jabber::Message.new(nil, 'First message'))
-    finished.lock
+    wait_state
     m.send(Jabber::Message.new(nil, 'Second message'), 'secondwitch')
-    finished.lock
+    wait_state
     m.send(Jabber::Message.new('secondwitch', 'Third message'), 'firstwitch')
-    finished.lock
+    wait_state
   end
 
   def test_nick
