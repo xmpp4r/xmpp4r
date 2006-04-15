@@ -2,7 +2,7 @@ require 'xmpp4r/helpers/mucclient'
 require 'xmpp4r/x/delay'
 
 module Jabber
-  module Helpers
+  module MUC
     ##
     # This class attempts to implement a lot of complexity of the
     # Multi-User Chat protocol. If you want to implement JEP0045

@@ -8,7 +8,7 @@ require 'xmpp4r/x/muc'
 require 'thread'
 
 module Jabber
-  module Helpers
+  module MUC
     ##
     # The MUCClient Helper handles low-level stuff of the
     # Multi-User Chat (JEP 0045).
