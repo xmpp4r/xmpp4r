@@ -7,7 +7,7 @@ require 'xmpp4r/iq/query/discoinfo'
 require 'xmpp4r/iq/query/discoitems'
 
 module Jabber
-  module Helpers
+  module MUC
     ##
     # The MUCBrowser helper can be used to discover
     # Multi-User-Chat components via Service Discovery
