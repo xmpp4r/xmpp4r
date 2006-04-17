@@ -2,11 +2,6 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
-require 'callbacks'
-require 'xmpp4r/presence'
-require 'xmpp4r/x/muc'
-require 'thread'
-
 module Jabber
   module MUC
     ##

@@ -1,7 +1,7 @@
 require 'socket'
 
 module Jabber
-  module Helpers
+  module Bytestreams
     ##
     # Can be thrown upon communication error with
     # a SOCKS5 proxy

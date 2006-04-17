@@ -6,7 +6,7 @@ require 'xmpp4r/helpers/ibb'
 require 'callbacks'
 
 module Jabber
-  module Helpers
+  module FileTransfer
     ##
     # The TransferSource is an interface (Mix-in)
     # which sources for FileTransfer#offer should include
@@ -120,7 +120,7 @@ module Jabber
     ##
     # The FileTransfer helper provides the ability to respond
     # to incoming and to offer outgoing file-transfers.
-    class FileTransfer
+    class Helper
       ##
       # Set this if you want to use this helper in a Component
       attr_accessor :my_jid

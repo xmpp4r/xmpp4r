@@ -2,14 +2,14 @@
 
 
 require 'lib/clienttester'
-require 'xmpp4r/helpers/mucclient'
+require 'xmpp4r/muc'
 include Jabber
 
 class MUCClientTest < Test::Unit::TestCase
   include ClientTester
 
   def test_new1
-    m = Helpers::MUCClient.new(@client)
+    m = MUC::MUCClient.new(@client)
     assert_equal(nil, m.jid)
     assert_equal(nil, m.my_jid)
     assert_equal({}, m.roster)
@@ -43,7 +43,7 @@ class MUCClientTest < Test::Unit::TestCase
     }
 
 
-    m = Helpers::MUCClient.new(@client)
+    m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
     assert(!m.active?)
 
@@ -62,7 +62,7 @@ class MUCClientTest < Test::Unit::TestCase
       assert_kind_of(String, resource)
       assert_kind_of(Presence, pres)
       assert(%w(firstwitch secondwitch thirdwitch).include?(resource))
-      assert_kind_of(XMucUser, pres.x)
+      assert_kind_of(MUC::XMucUser, pres.x)
       assert_kind_of(Array, pres.x.items)
       assert_equal(1, pres.x.items.size)
     }
@@ -99,7 +99,7 @@ class MUCClientTest < Test::Unit::TestCase
            "</presence>")
     }
     
-    m = Helpers::MUCClient.new(@client)
+    m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
     assert_raises(ErrorException) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
@@ -118,7 +118,7 @@ class MUCClientTest < Test::Unit::TestCase
            "</presence>")
     }
 
-    m = Helpers::MUCClient.new(@client)
+    m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
     assert_raises(ErrorException) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
@@ -134,7 +134,7 @@ class MUCClientTest < Test::Unit::TestCase
            "</presence>")
     }
 
-    m = Helpers::MUCClient.new(@client)
+    m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
     assert_raises(ErrorException) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
@@ -150,7 +150,7 @@ class MUCClientTest < Test::Unit::TestCase
            "</presence>")
     }
 
-    m = Helpers::MUCClient.new(@client)
+    m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
     assert_raises(ErrorException) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
@@ -166,7 +166,7 @@ class MUCClientTest < Test::Unit::TestCase
            "</presence>")
     }
 
-    m = Helpers::MUCClient.new(@client)
+    m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
     assert_raises(ErrorException) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
@@ -182,7 +182,7 @@ class MUCClientTest < Test::Unit::TestCase
            "</presence>")
     }
 
-    m = Helpers::MUCClient.new(@client)
+    m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
     assert_raises(ErrorException) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
@@ -208,7 +208,7 @@ class MUCClientTest < Test::Unit::TestCase
            "</presence>")
     }
     
-    m = Helpers::MUCClient.new(@client)
+    m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
     assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch'))
     assert(m.active?)
@@ -235,7 +235,7 @@ class MUCClientTest < Test::Unit::TestCase
            "</presence>")
     }
     
-    m = Helpers::MUCClient.new(@client)
+    m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
     assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch'))
     assert(m.active?)
@@ -284,7 +284,7 @@ class MUCClientTest < Test::Unit::TestCase
            "</presence>")
     }
 
-    m = Helpers::MUCClient.new(@client)
+    m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
     assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch'))
     assert(m.active?)
@@ -329,7 +329,7 @@ class MUCClientTest < Test::Unit::TestCase
       message_lock.unlock
     }
     
-    m = Helpers::MUCClient.new(@client)
+    m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
     messages_muc = 0
     m.add_message_callback { |msg|
@@ -388,7 +388,7 @@ class MUCClientTest < Test::Unit::TestCase
       presences_client += 1
       presence_lock.unlock
     }   
-    m = Helpers::MUCClient.new(@client)
+    m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
     presences_join = 0
     m.add_join_callback { |pres|
@@ -485,7 +485,7 @@ class MUCClientTest < Test::Unit::TestCase
       assert_equal('Third message', stanza.body)
     }
     
-    m = Helpers::MUCClient.new(@client)
+    m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
 
     assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch'))
@@ -533,7 +533,7 @@ class MUCClientTest < Test::Unit::TestCase
            "</x></presence>")
     }
 
-    m = Helpers::MUCClient.new(@client)
+    m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
 
     assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch'))

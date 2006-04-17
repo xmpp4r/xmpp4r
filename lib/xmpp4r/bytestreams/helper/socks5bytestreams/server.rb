@@ -1,5 +1,5 @@
 module Jabber
-  module Helpers
+  module Bytestreams
     ##
     # The SOCKS5BytestreamsServer is an implementation of a SOCKS5 server.
     #

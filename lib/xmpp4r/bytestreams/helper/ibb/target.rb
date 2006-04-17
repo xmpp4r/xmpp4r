@@ -1,5 +1,5 @@
 module Jabber
-  module Helpers
+  module Bytestreams
     ##
     # Implementation of IBB at the target side
     class IBBTarget < IBB

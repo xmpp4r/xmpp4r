@@ -4,10 +4,9 @@ require 'timeout'
 require 'digest/sha1'
 
 require 'callbacks'
-require 'xmpp4r/iq/query/bytestreams'
 
 module Jabber
-  module Helpers
+  module Bytestreams
     ##
     # SOCKS5 Bytestreams (JEP-0065) implementation
     #
