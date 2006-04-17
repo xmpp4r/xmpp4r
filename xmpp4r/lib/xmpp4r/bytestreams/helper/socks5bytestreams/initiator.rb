@@ -1,5 +1,5 @@
 module Jabber
-  module Helpers
+  module Bytestreams
     ##
     # SOCKS5Bytestreams implementation for the initiator side
     class SOCKS5BytestreamsInitiator < SOCKS5Bytestreams

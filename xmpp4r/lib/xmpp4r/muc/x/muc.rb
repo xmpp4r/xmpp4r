@@ -2,11 +2,6 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
-require 'xmpp4r/x'
-require 'xmpp4r/jid'
-require 'xmpp4r/x/mucuseritem'
-require 'xmpp4r/x/mucuserinvite'
-
 module Jabber
   module MUC
     ##

@@ -1,5 +1,5 @@
 module Jabber
-  module Helpers
+  module Bytestreams
     ##
     # SOCKS5 Bytestreams implementation of the target site
     class SOCKS5BytestreamsTarget < SOCKS5Bytestreams

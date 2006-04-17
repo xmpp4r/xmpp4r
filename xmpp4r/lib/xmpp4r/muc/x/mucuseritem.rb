@@ -2,8 +2,6 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
-require 'xmpp4r/jid'
-
 module Jabber
   module MUC
     class XMucUserItem < REXML::Element

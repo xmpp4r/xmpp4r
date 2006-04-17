@@ -2,10 +2,6 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
-require 'xmpp4r/iq'
-require 'xmpp4r/iq/query/discoinfo'
-require 'xmpp4r/iq/query/discoitems'
-
 module Jabber
   module MUC
     ##

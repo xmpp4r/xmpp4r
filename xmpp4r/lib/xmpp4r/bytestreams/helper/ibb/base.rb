@@ -1,7 +1,7 @@
 require 'base64'
 
 module Jabber
-  module Helpers
+  module Bytestreams
     ##
     # In-Band Bytestreams (JEP-0047) implementation
     #
