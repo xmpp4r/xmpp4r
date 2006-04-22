@@ -8,7 +8,7 @@ require 'callbacks'
 require 'thread'
 
 module Jabber
-  module Helpers
+  module Roster
     ##
     # The Roster helper intercepts <tt><iq/></tt> stanzas with Jabber::IqQueryRoster
     # and <tt><presence/></tt> stanzas, but provides cbs which allow the programmer
@@ -321,7 +321,7 @@ module Jabber
         pres = Presence.new.set_type(:unsubscribed).set_to(jid.strip)
         @stream.send(pres)
       end
-    end
+    end #Class Roster
 
     ##
     # These are extensions to RosterItem to carry presence information.
@@ -484,6 +484,6 @@ module Jabber
         @stream.send_with_id(pres)
       end
     end
-  end
-end
+  end #Module Roster
+end #Module Jabber
 
