@@ -9,7 +9,7 @@ module Jabber
     # with namespace http://jabber.org/protocol/muc
     #
     # See JEP-0045 for details
-    class XMuc < X
+    class XMUC < X
       ##
       # Initialize an <x/> element
       # and set namespace to http://jabber.org/protocol/muc
@@ -41,7 +41,7 @@ module Jabber
     # with namespace http://jabber.org/protocol/muc#user
     #
     # See JEP-0058 for details
-    class XMucUser < X
+    class XMUCUser < X
       ##
       # Initialize an <x/> element
       # and set namespace to http://jabber.org/protocol/muc#user
@@ -52,12 +52,12 @@ module Jabber
 
       ##
       # Add a children element,
-      # will be imported to [XMucUserItem] if name is "item"
+      # will be imported to [XMUCUserItem] if name is "item"
       def typed_add(element)
         if element.kind_of?(REXML::Element) && (element.name == 'item')
-          super(XMucUserItem::new.import(element))
+          super(XMUCUserItem::new.import(element))
         elsif element.kind_of?(REXML::Element) && (element.name == 'invite')
-          super(XMucUserInvite::new.import(element))
+          super(XMUCUserInvite::new.import(element))
         else
           super(element)
         end
@@ -79,7 +79,7 @@ module Jabber
 
       ##
       # Get all <item/> elements
-      # result:: [Array] of [XMucUserItem]
+      # result:: [Array] of [XMUCUserItem]
       def items
         res = []
         each_element('item') { |item|
@@ -89,7 +89,7 @@ module Jabber
       end
     end
 
-    X.add_namespaceclass('http://jabber.org/protocol/muc', XMuc)
-    X.add_namespaceclass('http://jabber.org/protocol/muc#user', XMucUser)
+    X.add_namespaceclass('http://jabber.org/protocol/muc', XMUC)
+    X.add_namespaceclass('http://jabber.org/protocol/muc#user', XMUCUser)
   end
 end

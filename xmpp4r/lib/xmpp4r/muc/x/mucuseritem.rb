@@ -4,7 +4,7 @@
 
 module Jabber
   module MUC
-    class XMucUserItem < REXML::Element
+    class XMUCUserItem < REXML::Element
       def initialize(affiliation=nil, role=nil, jid=nil)
         super('item')
         set_affiliation(affiliation)

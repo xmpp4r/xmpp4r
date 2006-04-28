@@ -234,5 +234,5 @@ end
 # but then they would be unable to call Iq.add_elementclass
 # because it hasn't just been defined.
 
-require 'xmpp4r/iq/query'
-require 'xmpp4r/iq/vcard'
+require 'xmpp4r/query'
+require 'xmpp4r/vcard/iq/vcard'

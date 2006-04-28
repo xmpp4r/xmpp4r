@@ -1,6 +1,4 @@
 require 'time'  # For Time#xmlschema
-require 'xmpp4r/iq'
-require 'xmpp4r/iq/feature'
 
 module Jabber
   module Bytestreams

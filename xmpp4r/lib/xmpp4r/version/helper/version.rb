@@ -4,17 +4,16 @@
 
 require 'callbacks'
 require 'xmpp4r/iq'
-require 'xmpp4r/iq/query/version'
 
 module Jabber
-  module Helpers
+  module Version
     ##
     # A class to answer version requests using IqQueryVersion
     #
     # If you don't need the flexibility of dynamic responses with
     # the callback you can register with add_version_callback,
     # take a look at SimpleVersion
-    class Version
+    class Helper
       ##
       # Initialize a new version responder
       #

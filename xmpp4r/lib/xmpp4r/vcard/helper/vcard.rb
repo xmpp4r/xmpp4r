@@ -6,10 +6,10 @@ require 'xmpp4r/iq'
 require 'xmpp4r/errorexception'
 
 module Jabber
-  module Helpers
+  module Vcard
     ##
     # The Vcard helper retrieves vCards
-    class Vcard
+    class Helper
       ##
       # Initialize a new Vcard helper
       def initialize(stream)
