@@ -88,7 +88,7 @@ module Jabber
       send("<handshake>#{hash}</handshake>") { |r|
         if r.prefix == 'stream' and r.name == 'error'
           true
-        elsif r.name == 'handshake' and r.namespace == 'jabber:component:accept'
+        elsif r.name == 'handshake'
           authenticated = true
           true
         else

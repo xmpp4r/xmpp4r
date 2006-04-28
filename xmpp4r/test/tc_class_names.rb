@@ -36,11 +36,11 @@ class JIDTest < Test::Unit::TestCase
   def test_roster
     require 'xmpp4r/roster'
     assert_kind_of(Module, Jabber::Roster)
-    assert_kind_of(Class, abber::Roster::Roster)
-    assert_kind_of(Class, abber::Roster::RosterItem)  # Defined in roster/helper/roster.rb & roster/iq/roster.rb?
-    assert_kind_of(Class, abber::Roster::IqQueryRoster)
-    assert_kind_of(Class, abber::Roster::XRoster)
-    assert_kind_of(Class, abber::Roster::XRosterItem)
+    assert_kind_of(Class, Jabber::Roster::Roster)
+    assert_kind_of(Class, Jabber::Roster::RosterItem)  # Defined in roster/helper/roster.rb & roster/iq/roster.rb?
+    assert_kind_of(Class, Jabber::Roster::IqQueryRoster)
+    assert_kind_of(Class, Jabber::Roster::XRoster)
+    assert_kind_of(Class, Jabber::Roster::XRosterItem)
   end
 =end
 
