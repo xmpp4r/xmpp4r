@@ -62,11 +62,14 @@ module Jabber
       @parserThread = Thread.new do
         begin
           @parser.parse
-        rescue
+        rescue Exception => e
+          Jabber::debuglog("EXCEPTION:\n#{e.class}\n#{e.message}\n#{e.backtrace.join("\n")}")
+
           if @exception_block
-            Thread.new { @exception_block.call($!, self, :start) }
+            Thread.new { close; @exception_block.call(e, self, :start) }
           else
             puts "Exception caught in Parser thread!"
+            close
             raise
           end
         end
@@ -97,24 +100,37 @@ module Jabber
     # The block has to take three arguments:
     # * the Exception
     # * the Jabber::Stream object (self)
-    # * a symbol where it happened, namely :start, :parser and :sending
+    # * a symbol where it happened, namely :start, :parser, :sending and :end
     def on_exception(&block)
       @exception_block = block
     end
 
     ##
     # This method is called by the parser when a failure occurs
-    def parse_failure
+    def parse_failure(e)
+      Jabber::debuglog("EXCEPTION:\n#{e.class}\n#{e.message}\n#{e.backtrace.join("\n")}")
+
+      close
       # A new thread has to be created because close will cause the thread
-      # to commit suicide
+      # to commit suicide(???)
       if @exception_block
-        Thread.new { @exception_block.call($!, self, :parser) }
+        Thread.new { close; @exception_block.call(e, self, :parser) }
       else
         puts "Stream#parse_failure was called by XML parser. Dumping " +
-        "backtrace...\n" + $!.exception + "\n"
-        puts $!.backtrace
+        "backtrace...\n" + e.exception + "\n"
+        puts e.backtrace
         close
         raise
+      end
+    end
+
+    ##
+    # This method is called by the parser upon receiving <tt></stream:stream></tt>
+    def parser_end
+      if @exception_block
+        Thread.new { close; @exception_block.call(nil, self, :close) }
+      else
+        close
       end
     end
 
@@ -191,11 +207,21 @@ module Jabber
 
       # Iterate through blocked threads (= waiting for an answer)
       @threadblocks.each { |threadblock|
-        r = threadblock.call(stanza)
+        exception = nil
+        r = false
+        begin
+          r = threadblock.call(stanza)
+        rescue Exception => e
+          exception = e
+        end
+
         if r == true
           @threadblocks.delete(threadblock)
           threadblock.wakeup
           return
+        elsif exception
+          @threadblocks.delete(threadblock)
+          threadblock.raise(exception)
         end
       }
 
@@ -298,6 +324,9 @@ module Jabber
       def wakeup
         @thread.wakeup if @thread.alive?
       end
+      def raise(exception)
+        @thread.raise(exception) if @thread.alive?
+      end
     end
 
     ##
@@ -315,11 +344,14 @@ module Jabber
       begin
         @fd << xml.to_s
         @fd.flush
-      rescue
+      rescue Exception => e
+        Jabber::debuglog("EXCEPTION:\n#{e.class}\n#{e.message}\n#{e.backtrace.join("\n")}")
+
         if @exception_block 
-          @exception_block.call($!, self, :sending)
+          Thread.new { close!; @exception_block.call(e, self, :sending) }
         else
           puts "Exception caught while sending!"
+          close!
           raise
         end
       end
@@ -352,7 +384,7 @@ module Jabber
       send(xml) do |received|
         if received.kind_of? XMLStanza and received.id == xml.id
           if received.type == :error
-            error = received.error
+            error = (received.error ? received.error : Error.new)
             true
           else
             yield(received)
@@ -491,9 +523,13 @@ module Jabber
     ##
     # Closes the connection to the Jabber service
     def close
+      close!
+    end
+
+    def close!
       @parserThread.kill if @parserThread
 #      @pollThread.kill
-      @fd.close if @fd
+      @fd.close if @fd and !@fd.closed?
       @status = DISCONNECTED
     end
   end
