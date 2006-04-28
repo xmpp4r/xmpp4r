@@ -4,7 +4,7 @@
 
 module Jabber
   module MUC
-    class XMucUserInvite < REXML::Element
+    class XMUCUserInvite < REXML::Element
       def initialize(to=nil, reason=nil)
         super('invite')
         set_to(to)

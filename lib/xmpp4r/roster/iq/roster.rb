@@ -23,8 +23,8 @@ module Jabber
       # Create a new <query xmlns='jabber:iq:roster'/>
       # stream:: [Stream] Stream to handle
       def initialize
-	super
-	add_namespace('jabber:iq:roster')
+        super
+        add_namespace('jabber:iq:roster')
       end
       
       ##
@@ -35,22 +35,22 @@ module Jabber
       # Previous RosterItems with the same JID will
       # *not* be deleted!
       def typed_add(element)
-	if element.kind_of?(REXML::Element) && (element.name == 'item')
-	  item = RosterItem::new.import(element)
-	  super(item)
-	else
-	  super(element)
-	end
+        if element.kind_of?(REXML::Element) && (element.name == 'item')
+          item = RosterItem::new.import(element)
+          super(item)
+        else
+          super(element)
+        end
       end
       
       ##
       # Iterate through all items
       # &block:: Yield for every [RosterItem]
       def each(&block)
-	each_element { |item|
-	  # XPath won't work here as it's missing a prefix...
-	  yield(item) if item.kind_of?(RosterItem)
-	}
+        each_element { |item|
+          # XPath won't work here as it's missing a prefix...
+          yield(item) if item.kind_of?(RosterItem)
+        }
       end
       
       ##
@@ -58,21 +58,21 @@ module Jabber
       # jid:: [JID] or [Nil]
       # result:: [RosterItem]
       def [](jid)
-	each { |item|
-	  return(item) if item.jid == jid
-	}
-	nil
+        each { |item|
+          return(item) if item.jid == jid
+        }
+        nil
       end
       
       ##
       # Get all items
       # result:: [Array] of [RosterItem]
       def to_a
-	a = []
-	each { |item|
-	  a.push(item)
-	}
-	a
+        a = []
+        each { |item|
+          a.push(item)
+        }
+        a
       end
       
       ##
@@ -81,11 +81,11 @@ module Jabber
       # iq:: [Iq] Containing new roster
       # filter:: [Boolean] If false import non-roster-like results too
       def receive_iq(iq, filter=true)
-	if filter && (((iq.type != :set) && (iq.type != :result)) || (iq.queryns != 'jabber:iq:roster'))
-	  return
-	end
-	
-	import(iq.query)
+        if filter && (((iq.type != :set) && (iq.type != :result)) || (iq.queryns != 'jabber:iq:roster'))
+          return
+        end
+        
+        import(iq.query)
       end
       
       ##
@@ -94,8 +94,8 @@ module Jabber
       # JIDs of all contained [RosterItem] elements are joined with a comma
       # result:: [String]
       def inspect
-	jids = to_a.collect { |item| item.jid.inspect }
-	jids.join(', ')
+        jids = to_a.collect { |item| item.jid.inspect }
+        jids.join(', ')
       end
     end
     
@@ -113,34 +113,34 @@ module Jabber
       # subscription:: [String] Type of subscription (see RosterItem#subscription=)
       # ask:: [String] or [Nil] Can be "ask"
       def initialize(jid=nil, iname=nil, subscription=nil, ask=nil)
-	super('item')
-	self.jid = jid
-	self.iname = iname
-	self.subscription = subscription
-	self.ask = ask
+        super('item')
+        self.jid = jid
+        self.iname = iname
+        self.subscription = subscription
+        self.ask = ask
       end
       
       ##
       # Create new RosterItem from REXML::Element
       # item:: [REXML::Element] source element to copy attributes and children from
       def RosterItem.import(item)
-	RosterItem::new.import(item)
+        RosterItem::new.import(item)
       end
-      
+    
       ##
       # Get name of roster item
       #
       # names can be set by the roster's owner himself
       # return:: [String]
       def iname
-	attributes['name']
+        attributes['name']
       end
       
       ##
       # Set name of roster item
       # val:: [String] Name for this item
       def iname=(val)
-	attributes['name'] = val
+        attributes['name'] = val
       end
       
       ##
@@ -148,14 +148,14 @@ module Jabber
       # Resource of the JID will _not_ be stripped
       # return:: [JID]
       def jid
-	JID::new(attributes['jid'])
+        JID::new(attributes['jid'])
       end
       
       ##
       # Set JID of roster item
       # val:: [JID] or nil
       def jid=(val)
-	attributes['jid'] = val.nil? ? nil : val.to_s
+        attributes['jid'] = val.nil? ? nil : val.to_s
       end
       
       ##
@@ -167,59 +167,59 @@ module Jabber
       # * :remove
       # * :to
       def subscription
-	case attributes['subscription']
-        when 'both' then :both
-        when 'from' then :from
-        when 'none' then :none
-        when 'remove' then :remove
-        when 'to' then :to
-        else nil
-	end
+        case attributes['subscription']
+          when 'both' then :both
+          when 'from' then :from
+          when 'none' then :none
+          when 'remove' then :remove
+          when 'to' then :to
+          else nil
+        end
       end
       
       ##
       # Set subscription type of roster item
       # val:: [Symbol] or [Nil] See subscription for possible Symbols
       def subscription=(val)
-	case val
-        when :both then attributes['subscription'] = 'both'
-        when :from then attributes['subscription'] = 'from'
-        when :none then attributes['subscription'] = 'none'
-        when :remove then attributes['subscription'] = 'remove'
-        when :to then attributes['subscription'] = 'to'
-        else attributes['subscription'] = nil
-	end
+        case val
+          when :both then attributes['subscription'] = 'both'
+          when :from then attributes['subscription'] = 'from'
+          when :none then attributes['subscription'] = 'none'
+          when :remove then attributes['subscription'] = 'remove'
+          when :to then attributes['subscription'] = 'to'
+          else attributes['subscription'] = nil
+        end
       end
       
       ##
       # Get if asking for subscription
       # result:: [Symbol] nil or :subscribe
       def ask
-	case attributes['ask']
-        when 'subscribe' then :subscribe
-        else nil
-	end
+        case attributes['ask']
+          when 'subscribe' then :subscribe
+          else nil
+        end
       end
       
       ##
       # Set if asking for subscription
       # val:: [Symbol] nil or :subscribe
       def ask=(val)
-	case val
-        when :subscribe then attributes['ask'] = 'subscribe'
-        else attributes['ask'] = nil
-	end
+        case val
+          when :subscribe then attributes['ask'] = 'subscribe'
+          else attributes['ask'] = nil
+        end
       end
       
       ##
       # Get groups the item belongs to
       # result:: [Array] of [String] The groups
       def groups
-      result = []
-	each_element('group') { |group|
-	  result.push(group.text)
-	}
-	result
+        result = []
+        each_element('group') { |group|
+          result.push(group.text)
+        }
+        result
       end
       
       ##
@@ -229,13 +229,13 @@ module Jabber
       # See JEP 0083 for nested groups
       # ary:: [Array] New groups, duplicate values will be removed
       def groups=(ary)
-	# Delete old group elements
-	delete_elements('group')
-	
-	# Add new group elements
-	ary.uniq.each { |group|
-	  add_element('group').text = group
-	}
+        # Delete old group elements
+        delete_elements('group')
+        
+        # Add new group elements
+        ary.uniq.each { |group|
+          add_element('group').text = group
+        }
       end
     end
     

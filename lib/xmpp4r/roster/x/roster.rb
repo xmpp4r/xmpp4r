@@ -20,8 +20,8 @@ module Jabber
       ##
       # Initialize a new XRoster element
       def initialize
-	super()
-	add_namespace('http://jabber.org/protocol/rosterx')
+        super()
+        add_namespace('http://jabber.org/protocol/rosterx')
       end
       
       ##
@@ -29,11 +29,11 @@ module Jabber
       #
       # Converts <item/> elements to XRosterItem
       def typed_add(element)
-	if element.kind_of?(REXML::Element) && (element.name == 'item')
-	  super(XRosterItem::new.import(element))
-	else
-	  super(element)
-	end
+        if element.kind_of?(REXML::Element) && (element.name == 'item')
+          super(XRosterItem::new.import(element))
+        else
+          super(element)
+        end
       end
     end #Class XRoster
     
@@ -56,16 +56,16 @@ module Jabber
       # jid:: [JID] Jabber ID
       # iname:: [String] Name in the roster
       def initialize(jid=nil, iname=nil)
-	super('item')
-	self.jid = jid
-	self.iname = iname
+        super('item')
+        self.jid = jid
+        self.iname = iname
       end
       
       ##
       # Create new XRosterItem from REXML::Element
       # item:: [REXML::Element] source element to copy attributes and children from
       def XRosterItem.import(item)
-	XRosterItem::new.import(item)
+        XRosterItem::new.import(item)
       end
       
       ##
@@ -74,14 +74,14 @@ module Jabber
       # names can be set by the roster's owner himself
       # return:: [String]
       def iname
-	attributes['name']
+        attributes['name']
       end
       
       ##
       # Set name of roster item
       # val:: [String] Name for this item
       def iname=(val)
-	attributes['name'] = val
+        attributes['name'] = val
       end
       
       ##
@@ -89,14 +89,14 @@ module Jabber
       # Resource of the JID will _not_ be stripped
       # return:: [JID]
       def jid
-	JID::new(attributes['jid'])
+        JID::new(attributes['jid'])
       end
       
       ##
       # Set JID of roster item
       # val:: [JID] or nil
       def jid=(val)
-	attributes['jid'] = val.nil? ? nil : val.to_s
+        attributes['jid'] = val.nil? ? nil : val.to_s
       end
       
       ##
@@ -106,33 +106,33 @@ module Jabber
       # * :delete
       # result:: [Symbol] (defaults to :add according to JEP-0144)
       def action
-	case attributes['action']
-        when 'modify' then :modify
-        when 'delete' then :delete
-        else :add
-	end
+        case attributes['action']
+          when 'modify' then :modify
+          when 'delete' then :delete
+          else :add
+        end
       end
       
       ##
       # Set action for this roster item
       # (see action)
       def action=(a)
-	case a
-        when :modify then attributes['action'] = 'modify'
-        when :delete then attributes['action'] = 'delete'
-        else attributes['action'] = 'add'
-	end
+        case a
+          when :modify then attributes['action'] = 'modify'
+          when :delete then attributes['action'] = 'delete'
+          else attributes['action'] = 'add'
+        end
       end
 
       ##
       # Get groups the item belongs to
       # result:: [Array] of [String] The groups
       def groups
-	result = []
-	each_element('group') { |group|
-	  result.push(group.text)
-	}
-	result
+        result = []
+        each_element('group') { |group|
+          result.push(group.text)
+        }
+        result
       end
       
       ##
@@ -142,13 +142,13 @@ module Jabber
       # See JEP 0083 for nested groups
       # ary:: [Array] New groups, duplicate values will be removed
       def groups=(ary)
-	# Delete old group elements
-	delete_elements('group')
-	
-	# Add new group elements
-	ary.uniq.each { |group|
-	  add_element('group').text = group
-	}
+        # Delete old group elements
+        delete_elements('group')
+        
+        # Add new group elements
+        ary.uniq.each { |group|
+          add_element('group').text = group
+        }
       end
     end #Class XRosterItem
   end #Module Roster

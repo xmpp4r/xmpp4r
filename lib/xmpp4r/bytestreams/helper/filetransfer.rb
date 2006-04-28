@@ -1,8 +1,3 @@
-require 'xmpp4r/x/data'
-require 'xmpp4r/iq/si'
-require 'xmpp4r/iq/query/bytestreams'
-require 'xmpp4r/helpers/socks5bytestreams'
-require 'xmpp4r/helpers/ibb'
 require 'callbacks'
 
 module Jabber
