@@ -150,9 +150,12 @@ module Jabber
         end
 
         send_with_id(iq) { |reply|
-          reported_jid = reply.first_element('jid')
-          if reply.type == :result and reported_jid and reported_jid.text
-            @jid = JID.new(reported_jid.text)
+          reply_bind = reply.first_element('bind')
+          if reply_bind
+            reported_jid = reply_bind.first_element('jid')
+            if reply.type == :result and reported_jid and reported_jid.text
+              @jid = JID.new(reported_jid.text)
+            end
           end
 
           true
