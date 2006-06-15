@@ -1,15 +1,15 @@
 #!/usr/bin/ruby
 
-$:.unshift '../lib'
+$:.unshift '../../lib'
 
 require 'test/unit'
 require 'xmpp4r/rexmladdons'
-require 'xmpp4r/iq/query/roster'
+require 'xmpp4r/roster/iq/roster'
 include Jabber
 
-class IqQueryRosterTest < Test::Unit::TestCase
+class Roster::IqQueryRosterTest < Test::Unit::TestCase
   def test_create
-    r = IqQueryRoster::new
+    r = Roster::IqQueryRoster::new
     assert_equal('jabber:iq:roster', r.namespace)
     assert_equal(r.to_a.size, 0)
     assert_equal(r.to_a, [])
@@ -22,13 +22,13 @@ class IqQueryRosterTest < Test::Unit::TestCase
     q.add_namespace('jabber:iq:roster')
     iq.add(q)
     iq2 = Iq::new.import(iq)
-    assert_equal(IqQueryRoster, iq2.query.class)
+    assert_equal(Roster::IqQueryRoster, iq2.query.class)
   end
 
   def test_items
-    r = IqQueryRoster::new
-    r.add(RosterItem.new)
-    r.add(RosterItem.new(JID.new('a@b/d'), 'ABC', :none, :subscribe)).groups = ['a']
+    r = Roster::IqQueryRoster::new
+    r.add(Roster::RosterItem.new)
+    r.add(Roster::RosterItem.new(JID.new('a@b/d'), 'ABC', :none, :subscribe)).groups = ['a']
     itemstr = "<item jid='astro@spaceboyz.net' name='Astro' subscribtion='both'>" \
             + "<group>SpaceBoyZ</group><group>xmpp4r</group></item>"
     r.typed_add(REXML::Document.new(itemstr).root)
@@ -55,10 +55,10 @@ class IqQueryRosterTest < Test::Unit::TestCase
   end
 
   def test_dupitems
-    r = IqQueryRoster::new
+    r = Roster::IqQueryRoster::new
     jid = JID::new('a@b')
     jid2 = JID::new('c@d')
-    ri = RosterItem::new(jid, 'ab')
+    ri = Roster::RosterItem::new(jid, 'ab')
     r.add(ri)
     assert_equal('ab', ri.iname)
     assert_equal('ab', r[jid].iname)
@@ -86,15 +86,15 @@ class IqQueryRosterTest < Test::Unit::TestCase
   end
 end
 
-class RosterItemTest < Test::Unit::TestCase
+class Roster::RosterItemTest < Test::Unit::TestCase
   def test_create
-    ri = RosterItem::new
+    ri = Roster::RosterItem::new
     assert_equal(JID.new, ri.jid)
     assert_equal(nil, ri.iname)
     assert_equal(nil, ri.subscription)
     assert_equal(nil, ri.ask)
 
-    ri = RosterItem::new(JID.new('a@b/c'), 'xyz', :both, nil)
+    ri = Roster::RosterItem::new(JID.new('a@b/c'), 'xyz', :both, nil)
     assert_equal(JID.new('a@b/c'), ri.jid)
     assert_equal('xyz', ri.iname)
     assert_equal(:both, ri.subscription)
@@ -102,7 +102,7 @@ class RosterItemTest < Test::Unit::TestCase
   end
 
   def test_modify
-    ri = RosterItem::new(JID.new('a@b/c'), 'xyz', :both, :subscribe)
+    ri = Roster::RosterItem::new(JID.new('a@b/c'), 'xyz', :both, :subscribe)
 
     assert_equal(JID.new('a@b/c'), ri.jid)
     ri.jid = nil
@@ -122,7 +122,7 @@ class RosterItemTest < Test::Unit::TestCase
   end
 
   def test_groupdeletion
-    ri = RosterItem::new
+    ri = Roster::RosterItem::new
     g1 = ['a', 'b', 'c']
     ri.groups = g1
     assert_equal(g1, ri.groups.sort)
@@ -132,7 +132,7 @@ class RosterItemTest < Test::Unit::TestCase
   end
 
   def test_dupgroups
-    ri = RosterItem::new
+    ri = Roster::RosterItem::new
     mygroups = ['a', 'a', 'b']
     ri.groups = mygroups
     assert_equal(mygroups.uniq, ri.groups)

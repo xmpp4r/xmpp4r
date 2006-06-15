@@ -158,7 +158,9 @@ module Jabber
     # element:: [REXML::Element] The received element
     def receive(element)
       if @threaded
-        Thread.new { receive_nonthreaded(element) }
+        # Don't spawn a new thread here. An implicit feature
+        # of XMPP is constant order of stanzas.
+        receive_nonthreaded(element)
       else
         receive_nonthreaded(element)
       end
