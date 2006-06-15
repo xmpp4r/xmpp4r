@@ -319,169 +319,169 @@ module Jabber
         pres = Presence.new.set_type(:unsubscribed).set_to(jid.strip)
         @stream.send(pres)
       end
-    end #Class Roster
-
-    ##
-    # These are extensions to RosterItem to carry presence information.
-    # This information is *not* stored in XML!
-    class RosterItem < Jabber::RosterItem
-      ##
-      # Tracked (online) presences of this RosterItem
-      attr_reader :presences
 
       ##
-      # Initialize an empty RosterItem
-      def initialize(stream)
-        super()
-        @stream = stream
-        @presences = []
-        @presences_lock = Mutex.new
-      end
+      # These are extensions to RosterItem to carry presence information.
+      # This information is *not* stored in XML!
+      class RosterItem < Jabber::Roster::RosterItem
+        ##
+        # Tracked (online) presences of this RosterItem
+        attr_reader :presences
 
-      ##
-      # Import another element,
-      # also import presences if xe is a RosterItem
-      # return:: [RosterItem] self
-      def import(xe)
-        super
-        if xe.kind_of?(RosterItem)
-          xe.each_presence { |pres|
-            add_presence(Presence.new.import(pres))
+        ##
+        # Initialize an empty RosterItem
+        def initialize(stream)
+          super()
+          @stream = stream
+          @presences = []
+          @presences_lock = Mutex.new
+        end
+
+        ##
+        # Import another element,
+        # also import presences if xe is a RosterItem
+        # return:: [RosterItem] self
+        def import(xe)
+          super
+          if xe.kind_of?(RosterItem)
+            xe.each_presence { |pres|
+              add_presence(Presence.new.import(pres))
+            }
+          end
+          self
+        end
+
+        ##
+        # Send the updated RosterItem to the server,
+        # i.e. if you modified iname, groups, ...
+        def send
+          request = Iq.new_rosterset
+          request.query.add(self)
+          @stream.send(request)
+        end
+        
+        ##
+        # Remove item
+        #
+        # This cancels both subscription *from* the contact to you
+        # and from you *to* the contact.
+        #
+        # The methods waits for a roster push from the server (success)
+        # or throws ErrorException upon failure.
+        def remove
+          request = Iq.new_rosterset
+          request.query.add(Jabber::RosterItem.new(jid, nil, :remove))
+          @stream.send_with_id(request) { true }
+          # Removing from list is handled by Roster#handle_iq
+        end
+
+        ##
+        # Is any presence of this person on-line?
+        #
+        # (Or is there any presence? Unavailable presences are
+        # deleted.)
+        def online?
+          @presences_lock.synchronize {
+            @presences.size > 0
           }
         end
-        self
-      end
-
-      ##
-      # Send the updated RosterItem to the server,
-      # i.e. if you modified iname, groups, ...
-      def send
-        request = Iq.new_rosterset
-        request.query.add(self)
-        @stream.send(request)
-      end
-      
-      ##
-      # Remove item
-      #
-      # This cancels both subscription *from* the contact to you
-      # and from you *to* the contact.
-      #
-      # The methods waits for a roster push from the server (success)
-      # or throws ErrorException upon failure.
-      def remove
-        request = Iq.new_rosterset
-        request.query.add(Jabber::RosterItem.new(jid, nil, :remove))
-        @stream.send_with_id(request) { true }
-        # Removing from list is handled by Roster#handle_iq
-      end
-
-      ##
-      # Is any presence of this person on-line?
-      #
-      # (Or is there any presence? Unavailable presences are
-      # deleted.)
-      def online?
-        @presences_lock.synchronize {
-          @presences.size > 0
-        }
-      end
-      
-      ##
-      # Iterate through all received <tt><presence/></tt> stanzas
-      def each_presence(&block)
-        # Don't lock here, we don't know what block does...
-        @presences.each { |pres|
-          yield(pres)
-        }
-      end
-      
-      ##
-      # Get specific presence
-      # jid:: [JID] Full JID
-      def presence(jid)
-        @presences_lock.synchronize {
+        
+        ##
+        # Iterate through all received <tt><presence/></tt> stanzas
+        def each_presence(&block)
+          # Don't lock here, we don't know what block does...
           @presences.each { |pres|
-            return(pres) if pres.from == jid
+            yield(pres)
           }
-        }
-        nil
-      end
+        end
+        
+        ##
+        # Get specific presence
+        # jid:: [JID] Full JID
+        def presence(jid)
+          @presences_lock.synchronize {
+            @presences.each { |pres|
+              return(pres) if pres.from == jid
+            }
+          }
+          nil
+        end
 
-      ##
-      # Add presence
-      # (unless type is :unavailable or :error)
-      #
-      # This overwrites previous stanzas with the same destination
-      # JID to keep track of resources. Presence stanzas with
-      # <tt>type == :unavailable</tt> or <tt>type == :error</tt> will
-      # be deleted as this indicates that this resource has gone
-      # offline.
-      #
-      # If <tt>type == :error</tt> and the presence's origin has no
-      # specific resource the contact is treated completely offline.
-      def add_presence(newpres)
-        @presences_lock.synchronize {
-          # Delete old presences with the same JID
-          @presences.delete_if do |pres|
-            pres.from == newpres.from
-          end
-          # Add new presence
-          if newpres.type == :error
-            # Error from no specific resource - contact is completely offline
-            if newpres.from.resource.nil?
-              @presences = []
+        ##
+        # Add presence
+        # (unless type is :unavailable or :error)
+        #
+        # This overwrites previous stanzas with the same destination
+        # JID to keep track of resources. Presence stanzas with
+        # <tt>type == :unavailable</tt> or <tt>type == :error</tt> will
+        # be deleted as this indicates that this resource has gone
+        # offline.
+        #
+        # If <tt>type == :error</tt> and the presence's origin has no
+        # specific resource the contact is treated completely offline.
+        def add_presence(newpres)
+          @presences_lock.synchronize {
+            # Delete old presences with the same JID
+            @presences.delete_if do |pres|
+              pres.from == newpres.from
             end
-          elsif newpres.type != :unavailable
-            @presences.push(newpres)
-          end
-        }
-      end
+            # Add new presence
+            if newpres.type == :error
+              # Error from no specific resource - contact is completely offline
+              if newpres.from.resource.nil?
+                @presences = []
+              end
+            elsif newpres.type != :unavailable
+              @presences.push(newpres)
+            end
+          }
+        end
 
-      ##
-      # Send subscription request to the user
-      #
-      # The block given to Jabber::Helpers::Roster#add_update_callback will
-      # be called, carrying the RosterItem with ask="subscribe"
-      #
-      # This function returns immediately after sending the subscription
-      # request and will not wait of approval or declination as it may
-      # take months for the contact to decide. ;-)
-      def subscribe
-        pres = Presence.new.set_type(:subscribe).set_to(jid)
-        @stream.send(pres)
-      end
+        ##
+        # Send subscription request to the user
+        #
+        # The block given to Jabber::Helpers::Roster#add_update_callback will
+        # be called, carrying the RosterItem with ask="subscribe"
+        #
+        # This function returns immediately after sending the subscription
+        # request and will not wait of approval or declination as it may
+        # take months for the contact to decide. ;-)
+        def subscribe
+          pres = Presence.new.set_type(:subscribe).set_to(jid)
+          @stream.send(pres)
+        end
 
-      ##
-      # Unsubscribe from a contact's presence
-      #
-      # This method waits for a presence with type='unsubscribed'
-      # from the contact. It may throw ErrorException upon failure.
-      #
-      # subscription attribute of the item is *from* or *none*
-      # afterwards. As long as you don't remove that item and
-      # subscription='from' the contact is subscribed to your
-      # presence.
-      def unsubscribe
-        pres = Presence.new.set_type(:unsubscribe).set_to(jid)
-        @stream.send_with_id(pres) { |answer|
-          answer.type == :unsubscribed
-        }
-      end
+        ##
+        # Unsubscribe from a contact's presence
+        #
+        # This method waits for a presence with type='unsubscribed'
+        # from the contact. It may throw ErrorException upon failure.
+        #
+        # subscription attribute of the item is *from* or *none*
+        # afterwards. As long as you don't remove that item and
+        # subscription='from' the contact is subscribed to your
+        # presence.
+        def unsubscribe
+          pres = Presence.new.set_type(:unsubscribe).set_to(jid)
+          @stream.send_with_id(pres) { |answer|
+            answer.type == :unsubscribed
+          }
+        end
 
-      ##
-      # Deny the contact to see your presence.
-      #
-      # This method will not wait and returns immediately
-      # as you will need no confirmation for this action.
-      #
-      # Though, you will get a roster update for that item,
-      # carrying either subscription='to' or 'none'.
-      def cancel_subscription
-        pres = Presence.new.set_type(:unsubscribed).set_to(jid)
-        @stream.send_with_id(pres)
+        ##
+        # Deny the contact to see your presence.
+        #
+        # This method will not wait and returns immediately
+        # as you will need no confirmation for this action.
+        #
+        # Though, you will get a roster update for that item,
+        # carrying either subscription='to' or 'none'.
+        def cancel_subscription
+          pres = Presence.new.set_type(:unsubscribed).set_to(jid)
+          @stream.send_with_id(pres)
+        end
       end
-    end
+    end #Class Roster
   end #Module Roster
 end #Module Jabber
 

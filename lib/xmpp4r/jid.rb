@@ -41,7 +41,7 @@ module Jabber
       end
 
       raise ArgumentError, 'Node too long' if (@node || '').length > 1023
-      raise ArgumentError, 'Domain too long' if @domain.length > 1023
+      raise ArgumentError, 'Domain too long' if (@domain || '').length > 1023
       raise ArgumentError, 'Resource too long' if (@resource || '').length > 1023
     end
 
@@ -89,6 +89,14 @@ module Jabber
     # String representations are compared, see JID#to_s
     def eql?(o)
       to_s.eql?(o.to_s)
+    end
+
+    ##
+    # Ccompare to another JID
+    #
+    # String representations are compared, see JID#to_s
+    def ==(o)
+      to_s == o.to_s
     end
 
     ##

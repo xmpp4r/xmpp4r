@@ -1,7 +1,7 @@
 $:.unshift '../lib'
 require 'xmpp4r'
 require 'test/unit'
-require 'tempfile'
+require 'socket'
 
 module Jabber
   ##
@@ -15,14 +15,13 @@ module Jabber
   #
   # ClientTester is written to test complex helper classes.
   module ClientTester
-    def setup
-      tmpfile = Tempfile::new("StreamSendTest")
-      @tmpfilepath = tmpfile.path()
-      tmpfile.unlink
+    SOCKET_PORT = 65223
 
-      servlisten = UNIXServer::new(@tmpfilepath)
+    def setup
+      servlisten = TCPServer.new(SOCKET_PORT)
       Thread.new {
         serversock = servlisten.accept
+        servlisten.close
         serversock.sync = true
         @server = Stream.new(true)
         @server.add_xml_callback { |xml|
@@ -36,7 +35,7 @@ module Jabber
         @server.start(serversock)
       }
 
-      clientsock = UNIXSocket::new(@tmpfilepath)
+      clientsock = TCPSocket.new('localhost', SOCKET_PORT)
       clientsock.sync = true
       @client = Stream.new(true)
       @client.start(clientsock)
@@ -53,8 +52,6 @@ module Jabber
         if @state < @states.size
           @states[@state].call(stanza)
           @state += 1
-        else
-          raise "Out of states"
         end
         @state_wait.unlock
 
@@ -65,7 +62,6 @@ module Jabber
     def teardown
       @client.close
       @server.close
-      File::unlink(@tmpfilepath)
     end
 
     def send(xml)
