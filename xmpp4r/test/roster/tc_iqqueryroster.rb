@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-$:.unshift '../../lib'
+$:.unshift File::dirname(__FILE__) + '/../../lib'
 
 require 'test/unit'
 require 'xmpp4r/rexmladdons'

@@ -110,11 +110,14 @@ module Jabber
     def parse_failure(e)
       Jabber::debuglog("EXCEPTION:\n#{e.class}\n#{e.message}\n#{e.backtrace.join("\n")}")
 
-      close
       # A new thread has to be created because close will cause the thread
       # to commit suicide(???)
       if @exception_block
-        Thread.new { close; @exception_block.call(e, self, :parser) }
+        # New thread, because close will kill the current thread
+        Thread.new {
+          close
+          @exception_block.call(e, self, :parser)
+        }
       else
         puts "Stream#parse_failure was called by XML parser. Dumping " +
         "backtrace...\n" + e.exception + "\n"
@@ -128,7 +131,10 @@ module Jabber
     # This method is called by the parser upon receiving <tt></stream:stream></tt>
     def parser_end
       if @exception_block
-        Thread.new { close; @exception_block.call(nil, self, :close) }
+        Thread.new {
+          close
+          @exception_block.call(nil, self, :close)
+        }
       else
         close
       end

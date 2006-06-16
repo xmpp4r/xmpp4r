@@ -1,9 +1,9 @@
 #!/usr/bin/ruby
 
-$:.unshift '../../lib'
+$:.unshift File::dirname(__FILE__) + '/../../lib'
 
 require 'test/unit'
-require '../lib/clienttester'
+require File::dirname(__FILE__) + '/../lib/clienttester'
 
 require 'xmpp4r'
 require 'xmpp4r/bytestreams'

@@ -1,8 +1,10 @@
 #!/usr/bin/ruby
 
 
-$:.unshift '../../lib'
-require '../lib/clienttester'
+$:.unshift File::dirname(__FILE__) + '/../../lib'
+
+require 'test/unit'
+require File::dirname(__FILE__) + '/../lib/clienttester'
 require 'xmpp4r/muc'
 include Jabber
 
