@@ -1,15 +1,15 @@
 #!/usr/bin/ruby
 
-$:.unshift '../lib'
+$:.unshift '../../lib'
 
 require 'test/unit'
 require 'xmpp4r/rexmladdons'
-require 'xmpp4r/iq/query/version'
+require 'xmpp4r/version/iq/version'
 include Jabber
 
-class IqQueryVersionTest < Test::Unit::TestCase
+class Version::IqQueryVersionTest < Test::Unit::TestCase
   def test_create_empty
-    x = IqQueryVersion::new
+    x = Version::IqQueryVersion::new
     assert_equal('jabber:iq:version', x.namespace)
     assert_equal('', x.iname)
     assert_equal('', x.version)
@@ -17,7 +17,7 @@ class IqQueryVersionTest < Test::Unit::TestCase
   end
 
   def test_create
-    x = IqQueryVersion::new('my test', 'XP')
+    x = Version::IqQueryVersion::new('my test', 'XP')
     assert_equal('jabber:iq:version', x.namespace)
     assert_equal('my test', x.iname)
     assert_equal('XP', x.version)
@@ -25,7 +25,7 @@ class IqQueryVersionTest < Test::Unit::TestCase
   end
 
   def test_create_with_os
-    x = IqQueryVersion::new('superbot', '1.0-final', 'FreeBSD 5.4-RELEASE-p4')
+    x = Version::IqQueryVersion::new('superbot', '1.0-final', 'FreeBSD 5.4-RELEASE-p4')
     assert_equal('jabber:iq:version', x.namespace)
     assert_equal('superbot', x.iname)
     assert_equal('1.0-final', x.version)
@@ -38,7 +38,7 @@ class IqQueryVersionTest < Test::Unit::TestCase
     q.add_namespace('jabber:iq:version')
     iq.add(q)
     iq2 = Iq::new.import(iq)
-    assert_equal(IqQueryVersion, iq2.query.class)
+    assert_equal(Version::IqQueryVersion, iq2.query.class)
   end
 
   def test_import2
@@ -50,14 +50,14 @@ class IqQueryVersionTest < Test::Unit::TestCase
     q.add_element('os').text = 'FreeDOS'
     iq.add(q)
     iq = Iq::new.import(iq)
-    assert_equal(IqQueryVersion, iq.query.class)
+    assert_equal(Version::IqQueryVersion, iq.query.class)
     assert_equal('AstroBot', iq.query.iname)
     assert_equal('XP', iq.query.version)
     assert_equal('FreeDOS', iq.query.os)
   end
 
   def test_replace
-    x = IqQueryVersion::new('name', 'version', 'os')
+    x = Version::IqQueryVersion::new('name', 'version', 'os')
 
     num = 0
     x.each_element('name') { |e| num += 1 }
