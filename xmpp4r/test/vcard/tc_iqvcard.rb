@@ -1,20 +1,20 @@
 #!/usr/bin/ruby
 
-$:.unshift '../lib'
+$:.unshift '../../lib'
 
 require 'test/unit'
 require 'xmpp4r/rexmladdons'
-require 'xmpp4r/iq/vcard'
+require 'xmpp4r/vcard/iq/vcard'
 include Jabber
 
 class IqVcardTest < Test::Unit::TestCase
   def test_create
-    v = IqVcard.new
+    v = Vcard::IqVcard.new
     assert_equal([], v.fields)
   end
 
   def test_create_with_fields
-    v = IqVcard.new({'FN' => 'B C', 'NICKNAME' => 'D'})
+    v = Vcard::IqVcard.new({'FN' => 'B C', 'NICKNAME' => 'D'})
     assert_equal(['FN', 'NICKNAME'], v.fields.sort)
     assert_equal('B C', v['FN'])
     assert_equal('D', v['NICKNAME'])
@@ -22,7 +22,7 @@ class IqVcardTest < Test::Unit::TestCase
   end
 
   def test_fields
-    v = IqVcard.new
+    v = Vcard::IqVcard.new
     f = ['a', 'b', 'c', 'd', 'e']
     f.each { |s|
       v[s.downcase] = s.upcase
@@ -37,7 +37,7 @@ class IqVcardTest < Test::Unit::TestCase
   end
 
   def test_deep
-    v = IqVcard.new({
+    v = Vcard::IqVcard.new({
       'FN' => 'John D. Random',
       'PHOTO/TYPE' => 'image/png',
       'PHOTO/BINVAL' => '===='})

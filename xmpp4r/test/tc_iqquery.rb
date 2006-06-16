@@ -4,7 +4,7 @@ $:.unshift '../lib'
 
 require 'test/unit'
 require 'xmpp4r/rexmladdons'
-require 'xmpp4r/iq/query'
+require 'xmpp4r/query'
 include Jabber
 
 class IqQueryTest < Test::Unit::TestCase

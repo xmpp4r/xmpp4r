@@ -2,6 +2,8 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
+require 'xmpp4r/muc/x/muc'
+
 module Jabber
   module MUC
     ##
@@ -76,7 +78,7 @@ module Jabber
         pres = Presence.new
         pres.to = @jid
         pres.from = @my_jid
-        xmuc = XMuc.new
+        xmuc = XMUC.new
         xmuc.password = password
         pres.add(xmuc)
 

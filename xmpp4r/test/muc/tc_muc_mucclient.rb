@@ -1,7 +1,8 @@
 #!/usr/bin/ruby
 
 
-require 'lib/clienttester'
+$:.unshift '../../lib'
+require '../lib/clienttester'
 require 'xmpp4r/muc'
 include Jabber
 
@@ -62,7 +63,7 @@ class MUCClientTest < Test::Unit::TestCase
       assert_kind_of(String, resource)
       assert_kind_of(Presence, pres)
       assert(%w(firstwitch secondwitch thirdwitch).include?(resource))
-      assert_kind_of(MUC::XMucUser, pres.x)
+      assert_kind_of(MUC::XMUCUser, pres.x)
       assert_kind_of(Array, pres.x.items)
       assert_equal(1, pres.x.items.size)
     }
