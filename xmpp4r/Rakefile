@@ -74,7 +74,8 @@ end
 
 if RCOV
 	Rcov::RcovTask.new do |t|
-		t.test_files = FileList['test/tc_*.rb'] + FileList['test/*/tc_*.rb'] - ['test/tc_streamError.rb']
+		#t.test_files = FileList['test/tc_*.rb'] + FileList['test/*/tc_*.rb'] - ['test/tc_streamError.rb']
+		t.test_files = ['test/ts_xmpp4r.rb']
 	end
 end
 
