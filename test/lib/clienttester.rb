@@ -15,10 +15,12 @@ module Jabber
   #
   # ClientTester is written to test complex helper classes.
   module ClientTester
-    SOCKET_PORT = 65223
+    @@SOCKET_PORT = 65223
 
     def setup
-      servlisten = TCPServer.new(SOCKET_PORT)
+      servlisten = TCPServer.new(@@SOCKET_PORT)
+      serverwait = Mutex.new
+      serverwait.lock
       Thread.new {
         serversock = servlisten.accept
         servlisten.close
@@ -33,9 +35,11 @@ module Jabber
           end
         }
         @server.start(serversock)
+
+        serverwait.unlock
       }
 
-      clientsock = TCPSocket.new('localhost', SOCKET_PORT)
+      clientsock = TCPSocket.new('localhost', @@SOCKET_PORT)
       clientsock.sync = true
       @client = Stream.new(true)
       @client.start(clientsock)
@@ -57,6 +61,8 @@ module Jabber
 
         false
       }
+
+      serverwait.lock
     end
 
     def teardown

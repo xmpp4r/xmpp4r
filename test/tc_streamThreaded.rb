@@ -89,6 +89,7 @@ class StreamThreadedTest < Test::Unit::TestCase
     @server.puts('<stream:stream>')
     @server.flush
     finished = Mutex.new
+    finished.lock
 
     Thread.new {
       assert_equal(Iq.new(:get).to_s, @server.gets('>'))
@@ -134,7 +135,7 @@ class StreamThreadedTest < Test::Unit::TestCase
     assert_equal(2, called_outer)
     assert_equal(1, called_inner)
 
-    2.times { finished.lock }
+    finished.lock
   end
 
   def test_bidi
