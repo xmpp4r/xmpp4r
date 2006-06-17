@@ -209,15 +209,6 @@ module Jabber
     end
 
     ##
-    # Create a new Iq stanza with a vCard child
-    # type:: [String] or "get" if omitted
-    def Iq.new_vcard(type = :get, to = nil)
-      iq = Iq::new(type, to)
-      iq.add(IqVcard::new)
-      iq
-    end
-
-    ##
     # Add a class by name.
     # Elements with this name will be automatically converted
     # to the specific class.

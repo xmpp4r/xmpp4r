@@ -330,6 +330,7 @@ module Jabber
         @block.call(*args)
       end
       def wakeup
+        # TODO: Handle threadblock removal if !alive?
         @thread.wakeup if @thread.alive?
       end
       def raise(exception)
