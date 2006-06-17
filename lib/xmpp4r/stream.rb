@@ -214,7 +214,13 @@ module Jabber
       end
 
       # Iterate through blocked threads (= waiting for an answer)
-      @threadblocks.each { |threadblock|
+      #
+      # We're dup'ping the @threadblocks here, so that we won't end up in an
+      # endless loop if Stream#send is being nested. That means, the nested
+      # threadblock won't receive the stanza currently processed, but the next
+      # one.
+      threadblocks = @threadblocks.dup
+      threadblocks.each { |threadblock|
         exception = nil
         r = false
         begin
