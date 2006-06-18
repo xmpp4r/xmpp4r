@@ -23,11 +23,6 @@ module Jabber
     #
     # Remember to *always* put a resource in your JID unless the server can do SASL.
     def initialize(jid, threaded = true)
-      unless threaded
-        $stderr.puts "Non-threaded mode is currently broken, re-enabling threaded"
-        threaded = true
-      end
-
       super(threaded)
       @jid = (jid.kind_of?(JID) ? jid : JID.new(jid.to_s))
     end

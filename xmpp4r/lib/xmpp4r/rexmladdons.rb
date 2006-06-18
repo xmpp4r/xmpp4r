@@ -6,6 +6,10 @@ require 'rexml/document'
 require 'rexml/parsers/xpathparser'
 require 'rexml/source'
 
+# Turn $VERBOSE off to suppress warnings about redefinition
+oldverbose = $VERBOSE
+$VERBOSE = false
+
 # REXML module. This file only adds a few methods to the REXML module, to
 # ease the coding.
 module REXML
@@ -817,4 +821,6 @@ module REXML
 ############################################################################
 end
 
+# Restore the old $VERBOSE setting
+$VERBOSE = oldverbose
 

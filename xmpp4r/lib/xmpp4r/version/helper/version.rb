@@ -3,7 +3,7 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'callbacks'
-require 'xmpp4r/iq'
+require 'xmpp4r/version/iq/version'
 
 module Jabber
   module Version

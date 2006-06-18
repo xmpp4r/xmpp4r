@@ -3,6 +3,10 @@ require 'xmpp4r'
 require 'test/unit'
 require 'socket'
 
+# Turn $VERBOSE off to suppress warnings about redefinition
+oldverbose = $VERBOSE
+$VERBOSE = false
+
 module Jabber
   ##
   # The ClientTester is a mix-in which provides a setup and teardown
@@ -99,3 +103,6 @@ module Jabber
     end
   end
 end
+
+# Restore the old $VERBOSE setting
+$VERBOSE = oldverbose
