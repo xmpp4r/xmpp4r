@@ -39,6 +39,10 @@ module Jabber
       @messagecbs = CallbackList::new
       @iqcbs = CallbackList::new
       @presencecbs = CallbackList::new
+      unless threaded
+        $stderr.puts "Non-threaded mode is currently broken, re-enabling threaded"
+        threaded = true
+      end
       @threaded = threaded
       @stanzaqueue = []
       @stanzaqueue_lock = Mutex::new

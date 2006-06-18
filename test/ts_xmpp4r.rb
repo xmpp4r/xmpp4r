@@ -7,7 +7,7 @@ $:.unshift File.join(File.dirname(__FILE__), 'lib')
 $:.unshift File.join(File.dirname(__FILE__), 'test')
 
 require 'tc_streamThreaded'
-require 'bytestreams/tc_bytestreams'
+require 'bytestreams/tc_ibb'
 require 'delay/tc_xdelay'
 require 'muc/tc_muc_simplemucclient'
 require 'muc/tc_muc_mucclient'
@@ -21,6 +21,7 @@ require 'vcard/tc_iqvcard'
 require 'roster/tc_iqqueryroster'
 require 'roster/tc_xroster'
 require 'version/tc_iqqueryversion'
+require 'version/tc_helper'
 require 'tc_streamSend'
 require 'tc_jid'
 require 'tc_iq'
