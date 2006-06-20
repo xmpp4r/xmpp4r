@@ -70,6 +70,13 @@ class IBBTest < Test::Unit::TestCase
   end
   
   def test_ibb_pingpong
+    ignored_stanzas = 0
+    wait = Mutex.new
+    wait.lock
+    @server.add_message_callback { ignored_stanzas += 1; wait.unlock }
+    @server.add_iq_callback { ignored_stanzas += 1; wait.unlock }
+
+
     target = Bytestreams::IBBTarget.new(@server, '1', nil, '1@a.com/1')
     initiator = Bytestreams::IBBInitiator.new(@client, '1', nil, '1@a.com/1')
 
@@ -85,24 +92,29 @@ class IBBTest < Test::Unit::TestCase
     end
 
 
-    initiator.open
-
-    ignored_stanzas = 0
-    wait = Mutex.new
-    wait.lock
-    @client.add_message_callback { ignored_stanzas += 1; wait.unlock }
-    @client.add_iq_callback { ignored_stanzas += 1; wait.unlock }
     assert_equal(0, ignored_stanzas)
-    @server.send("<message from='1@a.com/1' type='error'>
-                    <data xmlns='http://jabber.org/protocol/ibb' sid='another session id' seq='0'/>
-                  </message>")
-    wait.lock
-    assert_equal(1, ignored_stanzas)
-    @server.send("<iq from='1@a.com/1' type='set'>
+    @client.send("<iq from='1@a.com/1' type='set'>
                     <close xmlns='http://jabber.org/protocol/ibb' sid='another session id'/>
                   </iq>")
     wait.lock
+    assert_equal(1, ignored_stanzas)
+
+
+    initiator.open
+
+
+    assert_equal(1, ignored_stanzas)
+    @client.send("<message from='1@a.com/1' type='error'>
+                    <data xmlns='http://jabber.org/protocol/ibb' sid='another session id' seq='0'/>
+                  </message>")
+    wait.lock
     assert_equal(2, ignored_stanzas)
+    @client.send("<iq from='1@a.com/1' type='set'>
+                    <close xmlns='http://jabber.org/protocol/ibb' sid='another session id'/>
+                  </iq>")
+    wait.lock
+    assert_equal(3, ignored_stanzas)
+
 
     10.times do
       buf = create_buffer(9999)
@@ -118,7 +130,8 @@ class IBBTest < Test::Unit::TestCase
 
     initiator.close
 
-    assert_equal(2, ignored_stanzas)
+
+    assert_equal(3, ignored_stanzas)
   end
   
   def test_ibb_error
