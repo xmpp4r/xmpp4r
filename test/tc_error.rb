@@ -33,6 +33,49 @@ class ErrorTest < Test::Unit::TestCase
     assert_equal('User moved to afterlife.gov', e.text)
   end
 
+  def test_create_invalid
+    assert_raise(RuntimeError) {
+      e = Error::new('invalid error')
+    }
+  end
+
+  def test_type
+    e = Error::new
+    assert_nil(e.type)
+    e.type = :auth
+    assert_equal(:auth, e.type)
+    e.type = :cancel
+    assert_equal(:cancel, e.type)
+    e.type = :continue
+    assert_equal(:continue, e.type)
+    e.type = :modify
+    assert_equal(:modify, e.type)
+    e.type = :wait
+    assert_equal(:wait, e.type)
+    e.type = nil
+    assert_nil(e.type)
+  end
+
+  def test_code
+    e = Error::new
+    assert_nil(e.code)
+    e.code = 404
+    assert_equal(404, e.code)
+    assert_equal("<error code='404'/>", e.to_s)
+    e.code = nil
+    assert_nil(e.code)
+  end
+
+  def test_error
+    e = Error::new
+    assert_nil(e.error)
+    e.error = 'gone'
+    assert_equal('gone', e.error)
+    assert_raise(RuntimeError) {
+      e.error = nil
+    }
+  end
+
   def test_stanzas
     m = Message.new
     assert_equal(nil, m.error)

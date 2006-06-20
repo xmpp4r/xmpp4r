@@ -51,10 +51,16 @@ module Jabber
 
       ##
       # Receive from the stream-host
-      # length:: [Fixnum] Amount of bytes
+      # length:: [Fixnum] Amount of bytes (Will be passed to TCPSocket#read for the underlying SOCKS5 connection)
       # result:: [String] (or [nil] if finished)
-      def read(length=512)
+      def read(length=nil)
         @socks.read(length)
+      end
+
+      ##
+      # Flush the SOCKS5 socket
+      def flush
+        @socks.flush
       end
 
       ##
