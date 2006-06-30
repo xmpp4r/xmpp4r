@@ -1,3 +1,5 @@
+require 'xmpp4r/delay/x/delay'
+
 module Jabber
   module MUC
     ##
@@ -44,7 +46,7 @@ module Jabber
           # Presence time
           time = nil
           pres.each_element('x') { |x|
-            if x.kind_of?(XDelay)
+            if x.kind_of?(Delay::XDelay)
               time = x.stamp
             end
           }
@@ -67,7 +69,7 @@ module Jabber
 
           # Invoke...
           if pres.from == jid
-            @self_leave_block.call(time) if @leave_block
+            @self_leave_block.call(time) if @self_leave_block
           else
             @leave_block.call(time, pres.from.resource) if @leave_block
           end

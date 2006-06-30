@@ -22,6 +22,8 @@ module Jabber
     @@SOCKET_PORT = 65223
 
     def setup
+      Thread::abort_on_exception = true
+
       servlisten = TCPServer.new(@@SOCKET_PORT)
       serverwait = Mutex.new
       serverwait.lock
