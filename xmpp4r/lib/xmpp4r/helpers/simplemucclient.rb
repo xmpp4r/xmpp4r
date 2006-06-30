@@ -70,7 +70,7 @@ module Jabber
 
           # Invoke...
           if pres.from == jid
-            @self_leave_block.call(time) if @leave_block
+            @self_leave_block.call(time) if @self_leave_block
           else
             @leave_block.call(time, pres.from.resource) if @leave_block
           end
