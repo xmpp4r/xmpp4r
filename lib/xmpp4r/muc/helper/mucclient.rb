@@ -94,7 +94,7 @@ module Jabber
           # but all join-failures should be type='error'
           elsif r.from == jid and r.kind_of?(Presence) and r.type != :unavailable
             # Our own presence reflected back - success
-            handle_presence(r)
+            handle_presence(r, false)
             true
           else
             # Everything else
@@ -130,6 +130,7 @@ module Jabber
         pres.from = @my_jid
         pres.status = reason if reason
         @stream.send(pres) { |r|
+          Jabber::debuglog "exit: #{r.to_s.inspect}"
           if r.kind_of?(Presence) and r.type == :unavailable and r.from == jid
             @leave_cbs.process(r)
             true
@@ -246,17 +247,6 @@ module Jabber
       end
 
       ##
-      # Send a message stanza to the room
-      #
-      # <tt>stanza.type</tt> will be automatically set to :groupchat if directed
-      # to room or :chat if directed to participant.
-      # stanza:: [XMLStanza] to send
-      # to:: [String] Stanza destination recipient, or room if +nil+
-      def send_message(stanza, to=nil)  # :nodoc:
-        send(stanza, to)
-      end
-
-      ##
       # Add a callback for <presence/> stanzas indicating availability
       # of a MUC participant
       #
@@ -325,7 +315,9 @@ module Jabber
 
       private
 
-      def handle_presence(pres) # :nodoc:
+      ##
+      # call_join_cbs:: [Bool] Do not call them if we receive initial presences from room
+      def handle_presence(pres, call_join_cbs=true) # :nodoc:
         if pres.type == :unavailable or pres.type == :error
           @leave_cbs.process(pres)
           @roster_lock.synchronize {
@@ -340,7 +332,7 @@ module Jabber
           @roster_lock.synchronize {
             @roster[pres.from.resource] = pres
           }
-          if is_join
+          if is_join and call_join_cbs
             @join_cbs.process(pres)
           else
             @presence_cbs.process(pres)
@@ -381,6 +373,7 @@ module Jabber
 
       def deactivate  # :nodoc:
         @active = false
+        @jid = nil
 
         # Callbacks
         @stream.delete_presence_callback(self)

@@ -49,14 +49,17 @@ class MUCClientTest < Test::Unit::TestCase
     m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
     assert(!m.active?)
+    assert_nil(m.room)
 
     assert_raises(ErrorException) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
     assert(!m.active?)
+    assert_nil(m.room)
 
     assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch'))
     assert(m.active?)
+    assert_equal('darkcave', m.room)
     assert_equal(3, m.roster.size)
     m.roster.each { |resource,pres|
       assert_equal(resource, pres.from.resource)
@@ -206,18 +209,29 @@ class MUCClientTest < Test::Unit::TestCase
       assert_equal(:unavailable, pres.type)
       assert_equal(JID.new('hag66@shakespeare.lit/pda'), pres.from)
       assert_nil(pres.status)
+      send("<presence from='darkcave@macbeth.shakespeare.lit/secondwitch' to='hag66@shakespeare.lit/pda'>" +
+           "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='member' role='participant'/></x>" +
+           "</presence>")
       send("<presence from='darkcave@macbeth.shakespeare.lit/thirdwitch' to='hag66@shakespeare.lit/pda' type='unavailable'>" +
            "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='member' role='none'/></x>" +
            "</presence>")
     }
+
+    ignored_stanzas = 0
+    @client.add_stanza_callback { |stanza|
+      ignored_stanzas += 1
+    }
     
     m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
+    assert_equal(0, ignored_stanzas)
     assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch'))
     assert(m.active?)
 
+    assert_equal(0, ignored_stanzas)
     assert_equal(m, m.exit)
     assert(!m.active?)
+    assert_equal(1, ignored_stanzas)
   end
 
   def test_custom_exit_message
