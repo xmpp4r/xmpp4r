@@ -5,7 +5,7 @@ module Jabber
     ##
     # This class attempts to implement a lot of complexity of the
     # Multi-User Chat protocol. If you want to implement JEP0045
-    # yourself, use Jabber::Helpers::MUCClient for some minor
+    # yourself, use Jabber::MUC::MUCClient for some minor
     # abstraction.
     #
     # Minor flexibility penalty: the on_* callbacks are no
@@ -16,13 +16,13 @@ module Jabber
     # send it.
     #
     # Example usage:
-    #   my_muc = Jabber::Helpers::SimpleMUCClient.new(my_client)
+    #   my_muc = Jabber::MUC::SimpleMUCClient.new(my_client)
     #   my_muc.on_message { |time,nick,text|
     #     puts (time || Time.new).strftime('%I:%M') + " <#{nick}> #{text}"
     #   }
     #   my_muc.join(Jabber::JID.new('jdev@conference.jabber.org/XMPP4R-Bot'))
     #
-    # Please take a look at Jabber::Helpers::MUCClient for
+    # Please take a look at Jabber::MUC::MUCClient for
     # derived methods, such as MUCClient#join, MUCClient#exit,
     # ...
     class SimpleMUCClient < MUCClient

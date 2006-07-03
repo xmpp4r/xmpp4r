@@ -14,13 +14,13 @@ module Jabber
     class Roster
       ##
       # All items in your roster
-      # items:: [Hash] ([JID] => [Helpers::RosterItem])
+      # items:: [Hash] ([JID] => [Roster::RosterItem])
       attr_reader :items
 
       ##
       # Initialize a new Roster helper
       #
-      # Registers its cbs (prio = 120, ref = "Helpers::Roster")
+      # Registers its cbs (prio = 120, ref = self)
       #
       # Request a roster
       # (Remember to send initial presence afterwards!)
@@ -35,10 +35,10 @@ module Jabber
         @subscription_request_cbs = CallbackList.new
 
         # Register cbs
-        stream.add_iq_callback(120, "Helpers::Roster") { |iq|
+        stream.add_iq_callback(120, self) { |iq|
           handle_iq(iq)
         }
-        stream.add_presence_callback(120, "Helpers::Roster") { |pres|
+        stream.add_presence_callback(120, self) { |pres|
           handle_presence(pres)
         }
         
@@ -59,14 +59,14 @@ module Jabber
       end
 
       ##
-      # Add a callback for Jabber::Helpers::RosterItem updates
+      # Add a callback for Jabber::Roster::RosterItem updates
       #
       # Note that this will be called much after initialization
       # for the answer of the initial roster request
       #
       # The block receives two objects:
-      # * the old Jabber::Helpers::RosterItem
-      # * the new Jabber::Helpers::RosterItem
+      # * the old Jabber::Roster::RosterItem
+      # * the new Jabber::Roster::RosterItem
       def add_update_callback(prio = 0, ref = nil, &block)
         @update_cbs.add(prio, ref, block)
       end
@@ -78,7 +78,7 @@ module Jabber
       # Unknown JIDs may still pass and can be caught via Jabber::Stream#add_presence_callback.
       #
       # The block receives three objects:
-      # * the Jabber::Helpers::RosterItem
+      # * the Jabber::Roster::RosterItem
       # * the old Jabber::Presence (or nil)
       # * the new Jabber::Presence (or nil)
       def add_presence_callback(prio = 0, ref = nil, &block)
@@ -95,7 +95,7 @@ module Jabber
       # * :unsubscribed
       #
       # The block receives two objects:
-      # * the Jabber::Helpers::RosterItem (or nil)
+      # * the Jabber::Roster::RosterItem (or nil)
       # * the <tt><presence/></tt> stanza
       def add_subscription_callback(prio = 0, ref = nil, &block)
         @subscription_cbs.add(prio, ref, block)
@@ -106,7 +106,7 @@ module Jabber
       # which will be called upon receiving a <tt><presence type='subscribe'/></tt> stanza
       #
       # The block receives two objects:
-      # * the Jabber::Helpers::RosterItem (or nil)
+      # * the Jabber::Roster::RosterItem (or nil)
       # * the <tt><presence/></tt> stanza
       #
       # Response to this event can be taken with accept_subscription
@@ -263,7 +263,7 @@ module Jabber
       # Threading is encouraged as the function waits for
       # a result. ErrorException is thrown upon error.
       #
-      # See Jabber::Helpers::RosterItem#subscribe for details
+      # See Jabber::Roster::RosterItem#subscribe for details
       # about subscribing. (This method isn't used here but the
       # same functionality applies.)
       #
@@ -435,7 +435,7 @@ module Jabber
         ##
         # Send subscription request to the user
         #
-        # The block given to Jabber::Helpers::Roster#add_update_callback will
+        # The block given to Jabber::Roster::Roster#add_update_callback will
         # be called, carrying the RosterItem with ask="subscribe"
         #
         # This function returns immediately after sending the subscription

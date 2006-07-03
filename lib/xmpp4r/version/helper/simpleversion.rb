@@ -13,7 +13,7 @@ module Jabber
     # version answering normally.
     #
     # Example usage:
-    #  Jabber::Helpers::SimpleVersion.new(my_client, "My cool XMPP4R script", "1.0", "Younicks")
+    #  Jabber::Version::SimpleVersion.new(my_client, "My cool XMPP4R script", "1.0", "Younicks")
     class SimpleHelper < Helper
       attr_accessor :name
       attr_accessor :version
@@ -22,7 +22,7 @@ module Jabber
       ##
       # Initialize a new version responder
       #
-      # Registers it's callback (prio = 180, ref = "Helpers::Version")
+      # Registers it's callback (prio = 180, ref = self)
       # stream:: [Stream] Where to register callback handlers
       # name:: [String] Software name for answers
       # version:: [String] Software versio for answers
@@ -34,7 +34,7 @@ module Jabber
         @version = version
         @os = os
 
-        add_version_callback(180, "Helpers::SimpleVersion") { |iq,block|
+        add_version_callback(180, self) { |iq,block|
           block.call(@name, @version, @os)
         }
       end
