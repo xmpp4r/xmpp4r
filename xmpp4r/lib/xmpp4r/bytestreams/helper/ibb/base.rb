@@ -229,7 +229,7 @@ module Jabber
       end
 
       def callback_ref
-        "Jabber::Helpers::IBB #{@session_id} #{@initiator_jid} #{@target_jid}"
+        "Jabber::Helpers::IBB #{@session_id} #{@my_jid} #{@peer_jid}"
       end
     end
 

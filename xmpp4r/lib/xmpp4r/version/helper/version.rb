@@ -31,7 +31,7 @@ module Jabber
       ##
       # Add a callback for Iq stanzas with IqQueryVersion
       #
-      # First argument passed to proc/block is the Iq stanza,
+      # First argument passed to block is the Iq stanza,
       # second argument is a block, which can be called with
       # software name, version and os
       #
@@ -39,8 +39,7 @@ module Jabber
       #   my_version_helper.add_version_callback { |iq,block|
       #     block.call('Cool client', '6.0', 'Cool OS')
       #   }
-      def add_version_callback(priority = 0, ref = nil, proc=nil, &block)
-        block = proc if proc
+      def add_version_callback(priority = 0, ref = nil, &block)
         @versioncbs.add(priority, ref, block)
       end
 

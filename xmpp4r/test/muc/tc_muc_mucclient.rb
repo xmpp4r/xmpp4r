@@ -431,9 +431,8 @@ class MUCClientTest < Test::Unit::TestCase
     assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch'))
     assert(m.active?)
 
-    presence_lock.lock
     assert_equal(0, presences_client)
-    assert_equal(1, presences_join)
+    assert_equal(0, presences_join) # Joins before own join won't be called back
     assert_equal(0, presences_leave)
     assert_equal(0, presences_muc)
 
@@ -442,7 +441,7 @@ class MUCClientTest < Test::Unit::TestCase
          "</presence>")
     presence_lock.lock
     assert_equal(0, presences_client)
-    assert_equal(2, presences_join)
+    assert_equal(1, presences_join)
     assert_equal(0, presences_leave)
     assert_equal(0, presences_muc)
 
@@ -451,7 +450,7 @@ class MUCClientTest < Test::Unit::TestCase
          "</presence>")
     presence_lock.lock
     assert_equal(1, presences_client)
-    assert_equal(2, presences_join)
+    assert_equal(1, presences_join)
     assert_equal(0, presences_leave)
     assert_equal(0, presences_muc)
 
@@ -460,14 +459,14 @@ class MUCClientTest < Test::Unit::TestCase
          "<show>away</show></presence>")
     presence_lock.lock
     assert_equal(1, presences_client)
-    assert_equal(2, presences_join)
+    assert_equal(1, presences_join)
     assert_equal(0, presences_leave)
     assert_equal(1, presences_muc)
 
     send("<presence from='darkcave@macbeth.shakespeare.lit/firstwitch' to='hag66@shakespeare.lit/pda' type='unavailable'/>")
     presence_lock.lock
     assert_equal(1, presences_client)
-    assert_equal(2, presences_join)
+    assert_equal(1, presences_join)
     assert_equal(1, presences_leave)
     assert_equal(1, presences_muc)
   end

@@ -24,8 +24,7 @@ class SimpleMUCClientTest < Test::Unit::TestCase
 
     block_args = []
     wait = Mutex.new
-    wait.lock
-    block = lambda { |*a| puts a.inspect;block_args = a; wait.unlock }
+    block = lambda { |*a| block_args = a; wait.unlock }
     m.on_room_message(&block)
     m.on_message(&block)
     m.on_private_message(&block)
@@ -63,6 +62,7 @@ class SimpleMUCClientTest < Test::Unit::TestCase
       send(msg.set_from('darkcave@macbeth.shakespeare.lit/thirdwitch').set_to('hag66@shakespeare.lit/pda'))
     }
     assert_nil(m.subject)
+    wait.lock
     m.subject = 'TestCasing room'
     wait.lock
     assert_equal([nil, 'thirdwitch', 'TestCasing room'], block_args)
