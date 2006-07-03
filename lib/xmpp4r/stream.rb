@@ -353,11 +353,9 @@ module Jabber
     # to process received data.
     #
     # xml:: [String] The xml data to send
-    # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
-    def send(xml, proc=nil, &block)
+    def send(xml, &block)
       Jabber::debuglog("SENDING:\n#{xml}")
-      block = proc if proc
       @threadblocks.unshift(ThreadBlock.new(block)) if block
       Thread.critical = true # we don't want to be interupted before we stop!
       begin
@@ -440,14 +438,12 @@ module Jabber
     end
 
     ##
-    # Adds a callback block/proc to process received XML messages
+    # Adds a callback block to process received XML messages
     # 
     # priority:: [Integer] The callback's priority, the higher, the sooner
     # ref:: [String] The callback's reference 
-    # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
-    def add_xml_callback(priority = 0, ref = nil, proc=nil, &block)
-      block = proc if proc
+    def add_xml_callback(priority = 0, ref = nil, &block)
       @xmlcbs.add(priority, ref, block)
     end
 
@@ -460,14 +456,12 @@ module Jabber
     end
 
     ##
-    # Adds a callback block/proc to process received Messages
+    # Adds a callback block to process received Messages
     # 
     # priority:: [Integer] The callback's priority, the higher, the sooner
     # ref:: [String] The callback's reference 
-    # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
-    def add_message_callback(priority = 0, ref = nil, proc=nil, &block)
-      block = proc if proc
+    def add_message_callback(priority = 0, ref = nil, &block)
       @messagecbs.add(priority, ref, block)
     end
 
@@ -480,14 +474,12 @@ module Jabber
     end
 
     ##
-    # Adds a callback block/proc to process received Stanzas
+    # Adds a callback block to process received Stanzas
     # 
     # priority:: [Integer] The callback's priority, the higher, the sooner
     # ref:: [String] The callback's reference 
-    # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
-    def add_stanza_callback(priority = 0, ref = nil, proc=nil, &block)
-      block = proc if proc
+    def add_stanza_callback(priority = 0, ref = nil, &block)
       @stanzacbs.add(priority, ref, block)
     end
 
@@ -500,14 +492,12 @@ module Jabber
     end
     
     ##
-    # Adds a callback block/proc to process received Presences 
+    # Adds a callback block to process received Presences 
     # 
     # priority:: [Integer] The callback's priority, the higher, the sooner
     # ref:: [String] The callback's reference 
-    # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
-    def add_presence_callback(priority = 0, ref = nil, proc=nil, &block)
-      block = proc if proc
+    def add_presence_callback(priority = 0, ref = nil, &block)
       @presencecbs.add(priority, ref, block)
     end
 
@@ -520,14 +510,12 @@ module Jabber
     end
     
     ##
-    # Adds a callback block/proc to process received Iqs
+    # Adds a callback block to process received Iqs
     # 
     # priority:: [Integer] The callback's priority, the higher, the sooner
     # ref:: [String] The callback's reference 
-    # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
-    def add_iq_callback(priority = 0, ref = nil, proc=nil, &block)
-      block = proc if proc
+    def add_iq_callback(priority = 0, ref = nil, &block)
       @iqcbs.add(priority, ref, block)
     end
 

@@ -161,8 +161,7 @@ module Jabber
       # * Iq
       # * IqSiFile in the Iq
       # You may then invoke accept or decline
-      def add_incoming_callback(priority = 0, ref = nil, proc=nil, &block)
-        block = proc if proc
+      def add_incoming_callback(priority = 0, ref = nil, &block)
         @incoming_cbs.add(priority, ref, block)
       end
 

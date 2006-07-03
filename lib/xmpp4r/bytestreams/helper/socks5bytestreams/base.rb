@@ -40,12 +40,11 @@ module Jabber
       #
       # Usage of this callback is optional and serves informational purposes only.
       #
-      # proc/block takes three arguments:
+      # block takes three arguments:
       # * The StreamHost instance that is currently being tried
       # * State information (is either :connecting, :authenticating, :success or :failure)
       # * The exception value for the state :failure, else nil
-      def add_streamhost_callback(priority = 0, ref = nil, proc=nil, &block)
-        block = proc if proc
+      def add_streamhost_callback(priority = 0, ref = nil, &block)
         @streamhost_cbs.add(priority, ref, block)
       end
 

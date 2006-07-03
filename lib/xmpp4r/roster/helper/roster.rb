@@ -54,8 +54,7 @@ module Jabber
       # this may be appropriate to notify that *anything* has updated.
       #
       # Arguments for callback block: The received <tt><iq/></tt> stanza
-      def add_query_callback(prio = 0, ref = nil, proc = nil, &block)
-        block = proc if proc
+      def add_query_callback(prio = 0, ref = nil, &block)
         @query_cbs.add(prio, ref, block)
       end
 
@@ -68,8 +67,7 @@ module Jabber
       # The block receives two objects:
       # * the old Jabber::Helpers::RosterItem
       # * the new Jabber::Helpers::RosterItem
-      def add_update_callback(prio = 0, ref = nil, proc = nil, &block)
-        block = proc if proc
+      def add_update_callback(prio = 0, ref = nil, &block)
         @update_cbs.add(prio, ref, block)
       end
 
@@ -83,8 +81,7 @@ module Jabber
       # * the Jabber::Helpers::RosterItem
       # * the old Jabber::Presence (or nil)
       # * the new Jabber::Presence (or nil)
-      def add_presence_callback(prio = 0, ref = nil, proc = nil, &block)
-        block = proc if proc
+      def add_presence_callback(prio = 0, ref = nil, &block)
         @presence_cbs.add(prio, ref, block)
       end
 
@@ -100,8 +97,7 @@ module Jabber
       # The block receives two objects:
       # * the Jabber::Helpers::RosterItem (or nil)
       # * the <tt><presence/></tt> stanza
-      def add_subscription_callback(prio = 0, ref = nil, proc = nil, &block)
-        block = proc if proc
+      def add_subscription_callback(prio = 0, ref = nil, &block)
         @subscription_cbs.add(prio, ref, block)
       end
 
@@ -124,8 +120,7 @@ module Jabber
       #      my_roster.decline_subscription(presence.from)
       #    end
       #  end
-      def add_subscription_request_callback(prio = 0, ref = nil, proc = nil, &block)
-        block = proc if proc
+      def add_subscription_request_callback(prio = 0, ref = nil, &block)
         @subscription_request_cbs.add(prio, ref, block)
       end
 

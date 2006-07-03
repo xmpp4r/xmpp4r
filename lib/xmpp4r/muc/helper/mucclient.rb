@@ -250,12 +250,14 @@ module Jabber
       # Add a callback for <presence/> stanzas indicating availability
       # of a MUC participant
       #
+      # This callback will *not* be called for initial presences when
+      # a client joins a room, but only for the presences afterwards.
+      #
       # The callback will be called from MUCClient#handle_presence with
       # one argument: the <presence/> stanza.
       # Note that this stanza will have been already inserted into
       # MUCClient#roster.
-      def add_join_callback(prio = 0, ref = nil, proc = nil, &block)
-        block = proc if proc
+      def add_join_callback(prio = 0, ref = nil, &block)
         @join_cbs.add(prio, ref, block)
       end
 
@@ -271,8 +273,7 @@ module Jabber
       #
       # If the presence's origin is your MUC JID, the MUCClient will be
       # deactivated *afterwards*.
-      def add_leave_callback(prio = 0, ref = nil, proc = nil, &block)
-        block = proc if proc
+      def add_leave_callback(prio = 0, ref = nil, &block)
         @leave_cbs.add(prio, ref, block)
       end
 
@@ -280,8 +281,7 @@ module Jabber
       # Add a callback for a <presence/> stanza which is neither a join
       # nor a leave. This will be called when a room participant simply
       # changes his status.
-      def add_presence_callback(prio = 0, ref = nil, proc = nil, &block)
-        block = proc if proc
+      def add_presence_callback(prio = 0, ref = nil, &block)
         @presence_cbs.add(prio, ref, block)
       end
 
@@ -290,8 +290,7 @@ module Jabber
       #
       # See MUCClient#add_private_message_callback for private messages
       # between MUC participants.
-      def add_message_callback(prio = 0, ref = nil, proc = nil, &block)
-        block = proc if proc
+      def add_message_callback(prio = 0, ref = nil, &block)
         @message_cbs.add(prio, ref, block)
       end
 
@@ -300,8 +299,7 @@ module Jabber
       #
       # These stanza are normally not broadcasted to all room occupants
       # but are some sort of private messaging.
-      def add_private_message_callback(prio = 0, ref = nil, proc = nil, &block)
-        block = proc if proc
+      def add_private_message_callback(prio = 0, ref = nil, &block)
         @private_message_cbs.add(prio, ref, block)
       end
 
@@ -332,8 +330,8 @@ module Jabber
           @roster_lock.synchronize {
             @roster[pres.from.resource] = pres
           }
-          if is_join and call_join_cbs
-            @join_cbs.process(pres)
+          if is_join
+            @join_cbs.process(pres) if call_join_cbs
           else
             @presence_cbs.process(pres)
           end
