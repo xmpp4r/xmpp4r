@@ -12,10 +12,10 @@ module Jabber
         connect_lock = Mutex.new
         connect_lock.lock
 
-        @stream.add_iq_callback(200, callback_ref) { |iq|
+        @stream.add_iq_callback(200, self) { |iq|
           if iq.type == :set and iq.from == @initiator_jid and iq.to == @target_jid and iq.query.kind_of?(IqQueryBytestreams)
             begin
-              @stream.delete_iq_callback(callback_ref)
+              @stream.delete_iq_callback(self)
 
               iq.query.each_element('streamhost') { |streamhost|
                 if streamhost.host and streamhost.port and not @socks
@@ -54,12 +54,6 @@ module Jabber
         connect_lock.unlock
         raise error if error
         (@socks != nil)
-      end
-
-      private
-
-      def callback_ref
-        "Jabber::Helpers::SOCKS5BytestreamsTarget #{@session_id} #{@initiator_jid} #{@target_jid}"
       end
     end
   end

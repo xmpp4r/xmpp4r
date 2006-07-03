@@ -136,7 +136,7 @@ module Jabber
 
         @incoming_cbs = CallbackList.new
 
-        @stream.add_iq_callback(150, "Helpers::FileTransfer #{my_jid}") { |iq|
+        @stream.add_iq_callback(150, self) { |iq|
           if iq.type == :set
             file = iq.first_element('si/file')
             field = nil
@@ -293,9 +293,9 @@ module Jabber
         end
 
         if stream_method == IqQueryBytestreams::NS_BYTESTREAMS and @allow_bytestreams
-          Helpers::SOCKS5BytestreamsInitiator.new(@stream, session_id, @my_jid || @stream.jid, jid)
+          Bytestreams::SOCKS5BytestreamsInitiator.new(@stream, session_id, @my_jid || @stream.jid, jid)
         elsif stream_method == IBB::NS_IBB and @allow_ibb
-          Helpers::IBBInitiator.new(@stream, session_id, @my_jid || @stream.jid, jid)
+          Bytestreams::IBBInitiator.new(@stream, session_id, @my_jid || @stream.jid, jid)
         else  # Target responded with a stream_method we didn't offer
           eanswer = response.answer
           eanswer.type = :error

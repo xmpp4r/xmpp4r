@@ -17,13 +17,13 @@ module Jabber
       ##
       # Initialize a new version responder
       #
-      # Registers it's callback (prio = 180, ref = "Helpers::Version")
+      # Registers it's callback (prio = 180, ref = self)
       # stream:: [Stream] Where to register callback handlers
       def initialize(stream)
         @stream = stream
         @versioncbs = CallbackList.new
 
-        stream.add_iq_callback(180, "Helpers::Version") { |iq|
+        stream.add_iq_callback(180, self) { |iq|
           iq_callback(iq)
         }
       end

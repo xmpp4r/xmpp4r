@@ -178,7 +178,7 @@ module Jabber
 
       def activate
         unless active?
-          @stream.add_message_callback(200, callback_ref) { |msg|
+          @stream.add_message_callback(200, self) { |msg|
             data = msg.first_element('data')
             if msg.from == @peer_jid and msg.to == @my_jid and data and data.attributes['sid'] == @session_id
               if msg.type == nil
@@ -198,7 +198,7 @@ module Jabber
             end
           }
 
-          @stream.add_iq_callback(200, callback_ref) { |iq|
+          @stream.add_iq_callback(200, self) { |iq|
             close = iq.first_element('close')
             if iq.type == :set and close and close.attributes['sid'] == @session_id
               answer = iq.answer(false)
@@ -221,15 +221,11 @@ module Jabber
 
       def deactivate
         if active?
-          @stream.delete_message_callback(callback_ref)
-          @stream.delete_iq_callback(callback_ref)
+          @stream.delete_message_callback(self)
+          @stream.delete_iq_callback(self)
 
           @active = false
         end
-      end
-
-      def callback_ref
-        "Jabber::Helpers::IBB #{@session_id} #{@my_jid} #{@peer_jid}"
       end
     end
 
