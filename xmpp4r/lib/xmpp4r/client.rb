@@ -10,7 +10,13 @@ require 'xmpp4r/sasl'
 
 module Jabber
 
-  # The client class provides everything needed to build a basic XMPP Client.
+  # The client class provides everything needed to build a basic XMPP
+  # Client.
+  #
+  # If you want your connection to survive disconnects and timeouts,
+  # catch exception in Stream#on_exception and re-call Client#connect
+  # and Client#auth. Don't forget to re-send initial Presence and
+  # everything else you need to setup your session.
   class Client  < Connection
 
     # The client's JID
