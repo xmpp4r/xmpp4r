@@ -102,7 +102,7 @@ module Jabber
             @room_message_block.call(time, msg.body) if @room_message_block
           else
             if msg.type == :chat
-              @private_message_block.call(time, msg.from.resource, msg.body) if @message_block
+              @private_message_block.call(time, msg.from.resource, msg.body) if @private_message_block
             elsif msg.type == :groupchat
               @message_block.call(time, msg.from.resource, msg.body) if @message_block
             else
