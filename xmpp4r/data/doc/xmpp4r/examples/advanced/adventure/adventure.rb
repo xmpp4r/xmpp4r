@@ -3,9 +3,8 @@
 $:.unshift '../../lib'
 
 require 'xmpp4r'
-require 'xmpp4r/iq/query/discoinfo'
-require 'xmpp4r/iq/query/discoitems'
-require 'xmpp4r/x/muc'
+require 'xmpp4r/discovery'
+require 'xmpp4r/muc/x/muc'
 
 require 'adventuremuc'
 

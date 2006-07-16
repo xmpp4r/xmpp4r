@@ -3,12 +3,10 @@
 require 'judconfig'
 require "mysql"
 require 'date'
-require 'xmpp4r'
 require 'xmpp4r/component'
 require 'xmpp4r/iq/query/discoitems'
 require 'xmpp4r/iq/query/discoinfo'
 include Jabber
-Thread::abort_on_exception = true
 
 # TODO list
 # - add helpers for browsing and use them.
@@ -16,15 +14,6 @@ Thread::abort_on_exception = true
 # Debug function
 def dputs(s)
   puts Time::now.to_s + ": " + s + " (#{caller(1)[0]})"
-end
-
-def memstats
-  puts "---------------"
-  GC.start
-  d = Hash::new(0)
-  ObjectSpace.each_object { |o| d[o.class] += 1 }
-  d2 = d.to_a.sort { |a, b| b[1] <=> a[1] }
-  d2[0..15].each { |l| puts "#{l[1]} #{l[0]}" }
 end
 
 # jabber:iq:browse handling
@@ -313,11 +302,10 @@ def queryandreply(jabconnection, iq, fields, type)
         end
         x.add(i)
       end
-    else
+	 else
 		 raise "Type unknown: #{type}"
     end
     jabconnection.send(iq)
-    res.free
   rescue MysqlError => e
     dputs "MySQL Error code: #{e.errno}"
     dputs "MySQL Error message: #{e.error}"
@@ -396,8 +384,8 @@ def registerandreply(jabconnection, iq, jid, ifields)
 end
 
 # connect & auth
-c = Component::new(JUDNAME)
-c.connect(ROUTERHOST, ROUTERPORT)
+c = Component::new(JUDNAME, ROUTERHOST, ROUTERPORT)
+c.connect
 # register the callback for Iq requests
 c.add_iq_callback do |i|
   if i.type == :get
@@ -433,4 +421,5 @@ c.add_iq_callback do |i|
 end
 c.auth(ROUTERPASSWORD)
 dputs "JUD started and connected to the router."
+
 Thread.stop

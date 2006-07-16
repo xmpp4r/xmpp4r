@@ -3,7 +3,7 @@
 $:.unshift '../../../../../lib'
 
 require 'xmpp4r'
-require 'xmpp4r/iq/query/roster'
+require 'xmpp4r/roster/iq/roster'
 
 # Command line argument checking
 
@@ -25,7 +25,7 @@ cl.auth(ARGV[1])
 # The iq stanza
 iq = Jabber::Iq::new(:set)
 # The new roster instance and item element
-iq.add(Jabber::IqQueryRoster.new).add(Jabber::RosterItem.new(ARGV[2], ARGV[3])).groups = ARGV[4..ARGV.size]
+iq.add(Jabber::Roster::IqQueryRoster.new).add(Jabber::Roster::RosterItem.new(ARGV[2], ARGV[3])).groups = ARGV[4..ARGV.size]
 
 # Sending the stanza
 cl.send(iq)

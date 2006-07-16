@@ -36,22 +36,22 @@
 #
 # The following conversion facilities are only executed if the respective
 # library parts are loaded. See below for more details on Non-basic features.
-# * Jabber::IqQuery elements are converted to Jabber::IqQueryRoster if their
+# * Jabber::IqQuery elements are converted to Jabber::Roster::IqQueryRoster if their
 #   namespace is 'jabber:iq:roster'
-# * Jabber::IqQuery elements are converted to Jabber::IqQueryVersion if their
+# * Jabber::IqQuery elements are converted to Jabber::Version::IqQueryVersion if their
 #   namespace is 'jabber:iq:version'
-# * Jabber::IqQuery elements are converted to Jabber::IqQueryDiscoInfo if their
+# * Jabber::IqQuery elements are converted to Jabber::Discovery::IqQueryDiscoInfo if their
 #   namespace is 'http://jabber.org/protocol/disco#info'
-# * Jabber::IqQuery elements are converted to Jabber::IqQueryDiscoItems if their
+# * Jabber::IqQuery elements are converted to Jabber::Discovery::IqQueryDiscoItems if their
 #   namespace is 'http://jabber.org/protocol/disco#items'
-# * <tt><item/></tt> children elements of Jabber::IqQueryRoster are converted
-#   to Jabber::RosterItem
+# * <tt><item/></tt> children elements of Jabber::Roster::IqQueryRoster are converted
+#   to Jabber::Roster::RosterItem
 # * <tt><identity/></tt> children elements of Jabber::IqQueryDiscoInfo are converted
-#   to Jabber::DiscoIdentity
+#   to Jabber::Discovery::DiscoIdentity
 # * <tt><feature/></tt> children elements of Jabber::IqQueryDiscoInfo are converted
-#   to Jabber::DiscoFeature
+#   to Jabber::Discovery::DiscoFeature
 # * <tt><item/></tt> children elements of Jabber::IqQueryDiscoItems are converted
-#   to Jabber::DiscoItem
+#   to Jabber::Discovery::DiscoItem
 #
 # To use this, don't check for:
 # <tt>iq.queryns == 'http://jabber.org/protocol/disco#info'</tt>
@@ -92,15 +92,15 @@
 # use them. The benefit will be that you'll understand the protocols and be
 # going to be more efficient when programming with them.
 #
-# * Jabber::IqQueryDiscoInfo, Jabber::DiscoIdentity, Jabber::DiscoFeature: <tt>require 'xmpp4r/iq/query/discoinfo'</tt>
-# * Jabber::IqQueryDiscoItems, Jabber::DiscoItem: <tt>require 'xmpp4r/iq/query/discoitems'</tt>
-# * Jabber::IqQueryRoster, Jabber::RosterItem: <tt>require 'xmpp4r/iq/query/roster'</tt>
-# * Jabber::IqQueryVersion: <tt>require 'xmpp4r/iq/query/version'</tt>
-# * Jabber::XDelay: <tt>require 'xmpp4r/x/delay'</tt>
-# * Jabber::XRoster, Jabber::XRosterItem: <tt>require 'xmpp4r/x/roster'</tt>
-# * Jabber::XMuc, Jabber::XMucUser: <tt>require 'xmpp4r/x/muc'</tt>
-# * Jabber::XMucUserItem: <tt>require 'xmpp4r/x/mucuseritem'</tt>
-# * Jabber::XMucUserInvite: <tt>require 'xmpp4r/x/mucuserinvite'</tt>
+# * Jabber::Bytestreams, Jabber::FileTransfer: <tt>require 'xmpp4r/bytestreams'</tt>
+# * Jabber::Dataforms: <tt>require 'xmpp4r/dataforms'</tt>
+# * Jabber::Delay: <tt>require 'xmpp4r/delay'</tt>
+# * Jabber::Discovery: <tt>require 'xmpp4r/discovery'</tt>
+# * Jabber::FeatureNegotiation: <tt>require 'xmpp4r/feature_negotiation'</tt>
+# * Jabber::MUC: <tt>require 'xmpp4r/muc'</tt>
+# * Jabber::Roster: <tt>require 'xmpp4r/roster'</tt>
+# * Jabber::Vcard: <tt>require 'xmpp4r/vcard'</tt>
+# * Jabber::Version: <tt>require 'xmpp4r/version'</tt>
 #
 # ===Helpers
 #
@@ -108,15 +108,15 @@
 # of Jabber clients at the cost of flexibility. But you won't need that
 # order of flexibility for the most things.
 #
-# * Jabber::Helpers::Version: <tt>require 'xmpp4r/helpers/version'</tt>
-# * Jabber::Helpers::Roster: <tt>require 'xmpp4r/helpers/roster'</tt>
-# * Jabber::Helpers::Vcard: <tt>require 'xmpp4r/helpers/vcard'</tt>
-# * Jabber::Helpers::FileTransfer: <tt>require 'xmpp4r/helpers/filetransfer'</tt>
+# * Jabber::Roster::Helper: <tt>require 'xmpp4r/roster'</tt>
+# * Jabber::MUC::MUCBrowser, Jabber::MUC::MUCClient, Jabber::MUC::SimpleMUCClient: <tt>require 'xmpp4r/muc'</tt>
+# * Jabber::Version::SimpleResponder, Jabber::Version::Responder: <tt>require 'xmpp4r/version'</tt>
+# * Jabber::Vcard::Helper: <tt>require 'xmpp4r/vcard'</tt>
+# * Jabber::FileTransfer::Helper, Jabber::Bytestreams::SOCKS5BytestreamsServer: <tt>require 'xmpp4r/bytestreams'</tt>
 #
-# Helpers for Multi-User Chat:
-# 
-# * Jabber::Helpers::MUCBrowser: <tt>require 'xmpp4r/helpers/mucbrowser'</tt>
-# * Jabber::Helpers::MUCClient: <tt>require 'xmpp4r/helpers/mucclient'</tt>
-# * Jabber::Helpers::SimpleMUCClient: <tt>require 'xmpp4r/helpers/simplemucclient'</tt>
+# ==Debugging
+#
+# Dumping your Jabber stream can be enabled this way:
+#   Jabber::debug = true
 
 require 'xmpp4r/xmpp4r'

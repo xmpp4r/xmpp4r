@@ -40,7 +40,9 @@ class ConnectionErrorTest < Test::Unit::TestCase
     @server.puts('<stream:stream>')
     @server.flush
     assert(!error)
-    @server.puts('</blop>')
+    assert_raise(Errno::EPIPE) {
+      @server.puts('</blop>')
+    }
     @server.flush
     sleep 0.2
     assert(error)

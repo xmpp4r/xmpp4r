@@ -10,7 +10,13 @@ require 'xmpp4r/sasl'
 
 module Jabber
 
-  # The client class provides everything needed to build a basic XMPP Client.
+  # The client class provides everything needed to build a basic XMPP
+  # Client.
+  #
+  # If you want your connection to survive disconnects and timeouts,
+  # catch exception in Stream#on_exception and re-call Client#connect
+  # and Client#auth. Don't forget to re-send initial Presence and
+  # everything else you need to setup your session.
   class Client  < Connection
 
     # The client's JID
@@ -23,11 +29,6 @@ module Jabber
     #
     # Remember to *always* put a resource in your JID unless the server can do SASL.
     def initialize(jid, threaded = true)
-      unless threaded
-        $stderr.puts "Non-threaded mode is currently broken, re-enabling threaded"
-        threaded = true
-      end
-
       super(threaded)
       @jid = (jid.kind_of?(JID) ? jid : JID.new(jid.to_s))
     end
@@ -150,12 +151,9 @@ module Jabber
         end
 
         send_with_id(iq) { |reply|
-          reply_bind = reply.first_element('bind')
-          if reply_bind
-            reported_jid = reply_bind.first_element('jid')
-            if reply.type == :result and reported_jid and reported_jid.text
-              @jid = JID.new(reported_jid.text)
-            end
+          reported_jid = reply.first_element('jid')
+          if reply.type == :result and reported_jid and reported_jid.text
+            @jid = JID.new(reported_jid.text)
           end
 
           true

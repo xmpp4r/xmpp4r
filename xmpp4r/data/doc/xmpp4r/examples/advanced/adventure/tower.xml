@@ -2,7 +2,7 @@
 
   <place name='the garden'>
     You are in a beautiful garden.
-    There's an impressive tower beneath. It's door is open.
+    There's an impressive tower beneath. Its door is open.
     <go spec='door' place='lower room'/>
     <go spec='east' place='the well'/>
   </place>

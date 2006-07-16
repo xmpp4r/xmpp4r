@@ -24,7 +24,7 @@ end
 
 # settings
 if ARGV.length != 3
-  puts "Run with ./change_password.rb user@server oldpassword newpassword"
+  puts "Run with ./change_password.rb user@server/resource oldpassword newpassword"
   exit 1
 end
 my_jid = JID::new(ARGV[0])

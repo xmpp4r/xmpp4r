@@ -1,10 +1,10 @@
 require 'yaml'
 require 'xmpp4r'
-require 'xmpp4r/helpers/filetransfer'
-require 'xmpp4r/helpers/roster'
-require 'xmpp4r/helpers/simpleversion'
+require 'xmpp4r/bytestreams'
+require 'xmpp4r/roster'
+require 'xmpp4r/version'
 
-#Jabber::debug = true
+Jabber::debug = true
 
 def human_readable(num)
   unit = ''
@@ -75,7 +75,7 @@ class Transfer
   end
 
   def transfer(from, to)
-    while buf = from.read(512)
+    while buf = from.read
       @bytes += to.write buf
     end
   end
@@ -107,9 +107,9 @@ class Upload < Transfer
     Thread.new {
       begin
         stream = filetransfer.accept(iq, offset)
-        if stream.kind_of?(Jabber::Helpers::SOCKS5Bytestreams)
+        if stream.kind_of?(Jabber::Bytestreams::SOCKS5Bytestreams)
           stream.connect_timeout = 5
-          stream.add_streamhost_callback(nil, nil, @streamhost_cb)
+          stream.add_streamhost_callback(nil, nil, &@streamhost_cb)
         end
 
         if stream.accept
@@ -125,6 +125,7 @@ class Upload < Transfer
           @done = true
         end
       rescue
+        puts $!.backtrace.first
         say "Error: #{$!}"
         @done = true
       end
@@ -146,16 +147,16 @@ class Download < Transfer
       begin
         raise "No regular file" unless File.file? filename
 
-        source = Jabber::Helpers::FileSource.new filename
+        source = Jabber::FileTransfer::FileSource.new filename
         stream = filetransfer.offer peer, source
         unless stream
           raise "Well, you should accept what you request..."
           @done = true
         end
 
-        if stream.kind_of? Jabber::Helpers::SOCKS5Bytestreams
+        if stream.kind_of? Jabber::Bytestreams::SOCKS5Bytestreams
           socksconf.call stream
-          stream.add_streamhost_callback(nil, nil, @streamhost_cb)
+          stream.add_streamhost_callback(nil, nil, &@streamhost_cb)
         end
 
         stream.open
@@ -172,6 +173,9 @@ end
 
 class FileServe
   def initialize(conf)
+    @uploads = 0
+    @downloads = 0
+
     @transfers = []
     @transfers_lock = Mutex.new
 
@@ -179,8 +183,8 @@ class FileServe
     @client.connect
     @client.auth conf['jabber']['password']
 
-    @ft = Jabber::Helpers::FileTransfer.new @client
-    Jabber::Helpers::SimpleVersion.new(@client,
+    @ft = Jabber::FileTransfer::Helper.new @client
+    Jabber::Version::SimpleResponder.new(@client,
                                        "XMPP4R FileServe example",
                                        Jabber::XMPP4R_VERSION,
                                        IO.popen('uname -sr').readlines.to_s.strip)
@@ -189,7 +193,7 @@ class FileServe
     @directory = conf['directory']
     @directory.gsub! /\/+$/, ''
 
-    @socksserver = Jabber::Helpers::SOCKS5BytestreamsServer.new(conf['socks']['port'])
+    @socksserver = Jabber::Bytestreams::SOCKS5BytestreamsServer.new(conf['socks']['port'])
     conf['socks']['addresses'].each { |addr|
       @socksserver.add_address addr
     }
@@ -197,16 +201,13 @@ class FileServe
     conf['socks']['proxies'].collect { |jid|
       puts "Querying proxy #{jid}..."
       begin
-        @proxies.push Jabber::Helpers::SOCKS5Bytestreams::query_streamhost(@client, jid)
+        @proxies.push Jabber::Bytestreams::SOCKS5Bytestreams::query_streamhost(@client, jid)
       rescue
         puts "Error: #{$!}"
       end
     }
     
-    @uploads = 0
-    @downloads = 0
     Thread.new { presence }
-
     Thread.new { cleaner }
 
     # Panic reboot ;-)
@@ -266,7 +267,7 @@ class FileServe
       }
     }
 
-    roster = Jabber::Helpers::Roster.new(@client)
+    roster = Jabber::Roster::Helper.new(@client)
     roster.add_subscription_request_callback { |item,presence|
       roster.accept_subscription(presence.from)
     }

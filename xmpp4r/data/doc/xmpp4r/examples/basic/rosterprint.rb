@@ -3,7 +3,7 @@
 $:.unshift '../../../../../lib/'
 
 require 'xmpp4r'
-require 'xmpp4r/helpers/roster'
+require 'xmpp4r/roster/helper/roster'
 
 # Command line argument checking
 
@@ -23,7 +23,7 @@ cl.connect
 cl.auth(ARGV[1])
 
 # The roster instance
-roster = Jabber::Helpers::Roster.new(cl)
+roster = Jabber::Roster::Helper.new(cl)
 
 mainthread = Thread.current
 

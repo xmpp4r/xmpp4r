@@ -39,6 +39,10 @@ module Jabber
       @messagecbs = CallbackList::new
       @iqcbs = CallbackList::new
       @presencecbs = CallbackList::new
+      unless threaded
+        $stderr.puts "Non-threaded mode is currently broken, re-enabling threaded"
+        threaded = true
+      end
       @threaded = threaded
       @stanzaqueue = []
       @stanzaqueue_lock = Mutex::new
@@ -110,11 +114,14 @@ module Jabber
     def parse_failure(e)
       Jabber::debuglog("EXCEPTION:\n#{e.class}\n#{e.message}\n#{e.backtrace.join("\n")}")
 
-      close
       # A new thread has to be created because close will cause the thread
       # to commit suicide(???)
       if @exception_block
-        Thread.new { close; @exception_block.call(e, self, :parser) }
+        # New thread, because close will kill the current thread
+        Thread.new {
+          close
+          @exception_block.call(e, self, :parser)
+        }
       else
         puts "Stream#parse_failure was called by XML parser. Dumping " +
         "backtrace...\n" + e.exception + "\n"
@@ -128,7 +135,10 @@ module Jabber
     # This method is called by the parser upon receiving <tt></stream:stream></tt>
     def parser_end
       if @exception_block
-        Thread.new { close; @exception_block.call(nil, self, :close) }
+        Thread.new {
+          close
+          @exception_block.call(nil, self, :close)
+        }
       else
         close
       end
@@ -158,7 +168,9 @@ module Jabber
     # element:: [REXML::Element] The received element
     def receive(element)
       if @threaded
-        Thread.new { receive_nonthreaded(element) }
+        # Don't spawn a new thread here. An implicit feature
+        # of XMPP is constant order of stanzas.
+        receive_nonthreaded(element)
       else
         receive_nonthreaded(element)
       end
@@ -206,7 +218,13 @@ module Jabber
       end
 
       # Iterate through blocked threads (= waiting for an answer)
-      @threadblocks.each { |threadblock|
+      #
+      # We're dup'ping the @threadblocks here, so that we won't end up in an
+      # endless loop if Stream#send is being nested. That means, the nested
+      # threadblock won't receive the stanza currently processed, but the next
+      # one.
+      threadblocks = @threadblocks.dup
+      threadblocks.each { |threadblock|
         exception = nil
         r = false
         begin
@@ -322,6 +340,7 @@ module Jabber
         @block.call(*args)
       end
       def wakeup
+        # TODO: Handle threadblock removal if !alive?
         @thread.wakeup if @thread.alive?
       end
       def raise(exception)
@@ -334,11 +353,9 @@ module Jabber
     # to process received data.
     #
     # xml:: [String] The xml data to send
-    # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
-    def send(xml, proc=nil, &block)
+    def send(xml, &block)
       Jabber::debuglog("SENDING:\n#{xml}")
-      block = proc if proc
       @threadblocks.unshift(ThreadBlock.new(block)) if block
       Thread.critical = true # we don't want to be interupted before we stop!
       begin
@@ -421,14 +438,12 @@ module Jabber
     end
 
     ##
-    # Adds a callback block/proc to process received XML messages
+    # Adds a callback block to process received XML messages
     # 
     # priority:: [Integer] The callback's priority, the higher, the sooner
     # ref:: [String] The callback's reference 
-    # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
-    def add_xml_callback(priority = 0, ref = nil, proc=nil, &block)
-      block = proc if proc
+    def add_xml_callback(priority = 0, ref = nil, &block)
       @xmlcbs.add(priority, ref, block)
     end
 
@@ -441,14 +456,12 @@ module Jabber
     end
 
     ##
-    # Adds a callback block/proc to process received Messages
+    # Adds a callback block to process received Messages
     # 
     # priority:: [Integer] The callback's priority, the higher, the sooner
     # ref:: [String] The callback's reference 
-    # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
-    def add_message_callback(priority = 0, ref = nil, proc=nil, &block)
-      block = proc if proc
+    def add_message_callback(priority = 0, ref = nil, &block)
       @messagecbs.add(priority, ref, block)
     end
 
@@ -461,14 +474,12 @@ module Jabber
     end
 
     ##
-    # Adds a callback block/proc to process received Stanzas
+    # Adds a callback block to process received Stanzas
     # 
     # priority:: [Integer] The callback's priority, the higher, the sooner
     # ref:: [String] The callback's reference 
-    # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
-    def add_stanza_callback(priority = 0, ref = nil, proc=nil, &block)
-      block = proc if proc
+    def add_stanza_callback(priority = 0, ref = nil, &block)
       @stanzacbs.add(priority, ref, block)
     end
 
@@ -481,14 +492,12 @@ module Jabber
     end
     
     ##
-    # Adds a callback block/proc to process received Presences 
+    # Adds a callback block to process received Presences 
     # 
     # priority:: [Integer] The callback's priority, the higher, the sooner
     # ref:: [String] The callback's reference 
-    # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
-    def add_presence_callback(priority = 0, ref = nil, proc=nil, &block)
-      block = proc if proc
+    def add_presence_callback(priority = 0, ref = nil, &block)
       @presencecbs.add(priority, ref, block)
     end
 
@@ -501,14 +510,12 @@ module Jabber
     end
     
     ##
-    # Adds a callback block/proc to process received Iqs
+    # Adds a callback block to process received Iqs
     # 
     # priority:: [Integer] The callback's priority, the higher, the sooner
     # ref:: [String] The callback's reference 
-    # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
-    def add_iq_callback(priority = 0, ref = nil, proc=nil, &block)
-      block = proc if proc
+    def add_iq_callback(priority = 0, ref = nil, &block)
       @iqcbs.add(priority, ref, block)
     end
 

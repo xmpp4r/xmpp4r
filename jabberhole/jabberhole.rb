@@ -7,13 +7,11 @@ require 'proxy'
 require 'clientserver'
 
 
-Jabber::debug = true
-
 # Find user-scripts
 Dir.new('scripts').each { |file|
   next if file =~ /^\./
 
-  #require("scripts/#{file}")
+  require("scripts/#{file}")
 }
 
 # Open the proxy's server socket

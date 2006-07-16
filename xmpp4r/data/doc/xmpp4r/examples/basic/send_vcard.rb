@@ -10,7 +10,7 @@
 $:.unshift('../../../../../lib')
 
 require 'xmpp4r'
-require 'xmpp4r/helpers/vcard'
+require 'xmpp4r/vcard/helper/vcard'
 include Jabber
 
 
@@ -29,7 +29,7 @@ cl.connect
 cl.auth(myPassword)
 
 # The Vcard helper
-vcard_helper = Helpers::Vcard.new(cl)
+vcard_helper = Vcard::Helper.new(cl)
 
 begin
   puts "Retrieving vCard information for #{cl.jid.strip}"

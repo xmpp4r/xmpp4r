@@ -189,4 +189,14 @@ end
     assert(JID.new("node@domain").bared?)
     assert(!JID.new("node@domain/res").bared?)
   end
+
+  def test_sort
+    assert_equal(-1, JID.new('a@b') <=> JID.new('b@b'))
+    assert_equal(0, JID.new('a@b') <=> JID.new('a@b'))
+    assert_equal(1, JID.new('a@b/r') <=> JID.new('a@b'))
+
+    jids = [JID.new('b@b'), JID.new('a@b/r'), JID.new('a@b')]
+    jids.sort!
+    assert_equal([JID.new('a@b'), JID.new('a@b/r'), JID.new('b@b')], jids)
+  end
 end
