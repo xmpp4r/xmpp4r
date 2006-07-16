@@ -6,8 +6,8 @@
 
 
 require 'xmpp4r'
-require 'xmpp4r/iq/query/version'
-require 'xmpp4r/iq/query/discoinfo'
+require 'xmpp4r/version/iq/version'
+require 'xmpp4r/discovery/iq/discoinfo'
 require 'optparse'
 require 'yaml'
 require 'thread'
@@ -81,11 +81,11 @@ def print_reply(iq, roundtrip)
   roundtrip_s = ((roundtrip * 100).round / 100.0).to_s + " sec"
   output = "Received a #{iq.query.namespace} #{iq.type} from #{iq.from} (#{roundtrip_s}): "
 
-  if iq.query.kind_of?(Jabber::IqQueryVersion)
+  if iq.query.kind_of?(Jabber::Version::IqQueryVersion)
     output += "#{iq.query.iname}-#{iq.query.version} #{iq.query.os}"
   elsif iq.query.namespace == 'jabber:iq:time'
     output += "#{iq.query.first_element_text('display')} (#{iq.query.first_element_text('tz')})"
-  elsif iq.query.kind_of?(Jabber::IqQueryDiscoInfo)
+  elsif iq.query.kind_of?(Jabber::Discovery::IqQueryDiscoInfo)
     identity = iq.query.identity
     if identity
       output += "#{identity.iname} (#{identity.category} #{identity.type})"

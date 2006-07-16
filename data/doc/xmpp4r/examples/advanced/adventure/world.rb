@@ -311,9 +311,9 @@ class Thing < REXML::Element
       xe = Jabber::Presence.import(pres)
     }
     if self.kind_of?(Player)
-      xe.add(Jabber::XMucUser.new).add(Jabber::XMucUserItem.new(:none, :participant))
+      xe.add(Jabber::MUC::XMUCUser.new).add(Jabber::MUC::XMUCUserItem.new(:none, :participant))
     else
-      xe.add(Jabber::XMucUser.new).add(Jabber::XMucUserItem.new(:owner, :moderator))
+      xe.add(Jabber::MUC::XMUCUser.new).add(Jabber::MUC::XMUCUserItem.new(:owner, :moderator))
     end
     xe
   end

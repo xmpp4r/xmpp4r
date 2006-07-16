@@ -1,4 +1,5 @@
 require 'xmpp4r/iq'
+require 'xmpp4r/dataforms/x/data'
 
 module Jabber
   module FeatureNegotiation
@@ -19,7 +20,7 @@ module Jabber
 
       def typed_add(element)
         if element.name == 'x' and element.namespace == 'jabber:x:data'
-          super XData.new.import(element)
+          super Dataforms::XData.new.import(element)
         else
           super element
         end

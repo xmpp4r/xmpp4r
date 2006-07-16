@@ -4,7 +4,7 @@
 
 require 'optparse'
 require 'xmpp4r'
-require 'xmpp4r/iq/query/roster'
+require 'xmpp4r/roster/iq/roster'
 include Jabber
 
 jid = JID::new('lucastest@linux.ensimag.fr/rosterget')
@@ -28,7 +28,7 @@ cl.auth(password)
 cl.send(Iq::new_rosterget)
 exit = false
 cl.add_iq_callback { |i|
-  if i.type == :result and i.query.kind_of?(IqQueryRoster)
+  if i.type == :result and i.query.kind_of?(Roster::IqQueryRoster)
     i.query.each_element { |e|
       e.text = ''
       puts e.to_s

@@ -49,9 +49,9 @@
 # * <tt><identity/></tt> children elements of Jabber::IqQueryDiscoInfo are converted
 #   to Jabber::Discovery::DiscoIdentity
 # * <tt><feature/></tt> children elements of Jabber::IqQueryDiscoInfo are converted
-#   to Jabber::Doiscovery::DiscoFeature
+#   to Jabber::Discovery::DiscoFeature
 # * <tt><item/></tt> children elements of Jabber::IqQueryDiscoItems are converted
-#   to Jabber::Doiscovery::DiscoItem
+#   to Jabber::Discovery::DiscoItem
 #
 # To use this, don't check for:
 # <tt>iq.queryns == 'http://jabber.org/protocol/disco#info'</tt>
@@ -108,9 +108,9 @@
 # of Jabber clients at the cost of flexibility. But you won't need that
 # order of flexibility for the most things.
 #
-# * Jabber::Roster::Roster: <tt>require 'xmpp4r/roster'</tt>
+# * Jabber::Roster::Helper: <tt>require 'xmpp4r/roster'</tt>
 # * Jabber::MUC::MUCBrowser, Jabber::MUC::MUCClient, Jabber::MUC::SimpleMUCClient: <tt>require 'xmpp4r/muc'</tt>
-# * Jabber::Version::SimpleHelper, Jabber::Version::Helper: <tt>require 'xmpp4r/version'</tt>
+# * Jabber::Version::SimpleResponder, Jabber::Version::Responder: <tt>require 'xmpp4r/version'</tt>
 # * Jabber::Vcard::Helper: <tt>require 'xmpp4r/vcard'</tt>
 # * Jabber::FileTransfer::Helper, Jabber::Bytestreams::SOCKS5BytestreamsServer: <tt>require 'xmpp4r/bytestreams'</tt>
 #

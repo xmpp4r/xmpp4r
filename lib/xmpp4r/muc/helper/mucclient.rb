@@ -195,7 +195,7 @@ module Jabber
             # Error from room
             error = r.error
           elsif r.from == @jid and r.kind_of?(Presence) and r.type == :unavailable and
-                r.x and r.x.status_code == 303
+                r.x and r.x.kind_of?(XMUCUser) and r.x.status_code == 303
             # Old JID is offline, but wait for the new JID and let stanza be handled
             # by the standard callback
             presence_unavailable = true
@@ -322,7 +322,7 @@ module Jabber
             @roster.delete(pres.from.resource)
           }
 
-          if pres.from == jid and !(pres.x and pres.x.status_code == 303)
+          if pres.from == jid and !(pres.x and pres.x.kind_of?(XMUCUser) and pres.x.status_code == 303)
             deactivate
           end
         else

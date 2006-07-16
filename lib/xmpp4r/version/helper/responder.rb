@@ -12,8 +12,8 @@ module Jabber
     #
     # If you don't need the flexibility of dynamic responses with
     # the callback you can register with add_version_callback,
-    # take a look at SimpleVersion
-    class Helper
+    # take a look at SimpleResponder
+    class Responder
       ##
       # Initialize a new version responder
       #

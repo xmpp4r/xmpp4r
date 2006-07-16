@@ -2,6 +2,8 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
+require 'xmpp4r/discovery'
+
 module Jabber
   module MUC
     ##
@@ -35,7 +37,7 @@ module Jabber
       def muc_name(jid)
         iq = Iq.new(:get, jid)
         iq.from = @stream.jid  # Enable components to use this
-        iq.add(IqQueryDiscoInfo.new)
+        iq.add(Discovery::IqQueryDiscoInfo.new)
 
         res = nil
 
@@ -73,7 +75,7 @@ module Jabber
       def muc_rooms(jid)
         iq = Iq.new(:get, jid)
         iq.from = @stream.jid  # Enable components to use this
-        iq.add(IqQueryDiscoItems.new)
+        iq.add(Discovery::IqQueryDiscoItems.new)
 
         rooms = {}
         err = nil

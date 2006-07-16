@@ -4,8 +4,8 @@ require 'gtk2'
 
 $:.unshift '../../../../../lib'
 require 'xmpp4r'
-require 'xmpp4r/helpers/simplemucclient'
-require 'xmpp4r/helpers/simpleversion'
+require 'xmpp4r/muc/helper/simplemucclient'
+require 'xmpp4r/version/helper/simpleresponder'
 
 #Jabber::debug = true
 
@@ -198,7 +198,7 @@ class ChatWindow < Gtk::Window
     print_buffer "Commands start with a slash, type \"/help\" for a list"
     
     @client = Jabber::Client.new(jid)
-    Jabber::Helpers::SimpleVersion.new(@client, "XMPP4R example: GtkMUCClient", Jabber::XMPP4R_VERSION, IO.popen("uname -sr").readlines.to_s.strip)
+    Jabber::Version::SimpleResponder.new(@client, "XMPP4R example: GtkMUCClient", Jabber::XMPP4R_VERSION, IO.popen("uname -sr").readlines.to_s.strip)
     Thread.new {
       begin
         print_buffer "Connecting for domain #{jid.domain}..."
@@ -206,7 +206,7 @@ class ChatWindow < Gtk::Window
         print_buffer "Authenticating for #{jid.strip}..."
         @client.auth(password)
         print_buffer "Attempting to join #{mucjid.strip} as #{mucjid.resource}..."
-        @muc = Jabber::Helpers::SimpleMUCClient.new(@client)
+        @muc = Jabber::MUC::SimpleMUCClient.new(@client)
         register_handlers
         @muc.join(mucjid)
       rescue Exception => e

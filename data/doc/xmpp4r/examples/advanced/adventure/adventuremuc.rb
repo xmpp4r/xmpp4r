@@ -4,9 +4,12 @@ class AdventureMUC
   def initialize(jid, secret, addr, port=5347)
     @worlds = {}
     
-    @component = Jabber::Component::new(jid, addr, port)
-    @component.connect
+    @component = Jabber::Component::new(jid)
+    @component.connect(addr, port)
     @component.auth(secret)
+    @component.on_exception { |e,|
+      puts "#{e.class}: #{e}\n#{e.backtrace.join("\n")}"
+    }
 
     @component.add_iq_callback { |iq|
       handle_iq(iq)
@@ -41,10 +44,10 @@ class AdventureMUC
   def handle_iq(iq)
     puts "iq: from #{iq.from} type #{iq.type} to #{iq.to}: #{iq.queryns}"
 
-    if iq.query.kind_of?(Jabber::IqQueryDiscoInfo)
+    if iq.query.kind_of?(Jabber::Discovery::IqQueryDiscoInfo)
       handle_disco_info(iq)
       true
-    elsif iq.query.kind_of?(Jabber::IqQueryDiscoItems)
+    elsif iq.query.kind_of?(Jabber::Discovery::IqQueryDiscoItems)
       handle_disco_items(iq)
       true
     else
@@ -63,20 +66,20 @@ class AdventureMUC
     answer = Jabber::XMLStanza.answer(iq)
     answer.type = :result
     if iq.to.node == nil
-      answer.query.add(Jabber::DiscoIdentity.new('conference', 'Adventure component', 'text'))
-      answer.query.add(Jabber::DiscoFeature.new(Jabber::IqQueryDiscoInfo.new.namespace))
-      answer.query.add(Jabber::DiscoFeature.new(Jabber::IqQueryDiscoItems.new.namespace))
+      answer.query.add(Jabber::Discovery::Identity.new('conference', 'Adventure component', 'text'))
+      answer.query.add(Jabber::Discovery::Feature.new(Jabber::Discovery::IqQueryDiscoInfo.new.namespace))
+      answer.query.add(Jabber::Discovery::Feature.new(Jabber::Discovery::IqQueryDiscoItems.new.namespace))
     else
       world = @worlds[iq.to.node]
       if world.nil?
         answer.type = :error
         answer.query.add(Jabber::Error.new('item-not-found', 'The world you are trying to reach is currently unavailable.'))
       else
-        answer.query.add(Jabber::DiscoIdentity.new('conference', world.iname, 'text'))
-        answer.query.add(Jabber::DiscoFeature.new(Jabber::IqQueryDiscoInfo.new.namespace))
-        answer.query.add(Jabber::DiscoFeature.new(Jabber::IqQueryDiscoItems.new.namespace))
-        answer.query.add(Jabber::DiscoFeature.new(Jabber::XMuc.new.namespace))
-        answer.query.add(Jabber::DiscoFeature.new(Jabber::XMucUser.new.namespace))
+        answer.query.add(Jabber::Discovery::Identity.new('conference', world.iname, 'text'))
+        answer.query.add(Jabber::Discovery::Feature.new(Jabber::Discovery::IqQueryDiscoInfo.new.namespace))
+        answer.query.add(Jabber::Discovery::Feature.new(Jabber::Discovery::IqQueryDiscoItems.new.namespace))
+        answer.query.add(Jabber::Discovery::Feature.new(Jabber::MUC::XMUC.new.namespace))
+        answer.query.add(Jabber::Discovery::Feature.new(Jabber::MUC::XMUCUser.new.namespace))
       end
     end
     @component.send(answer)
@@ -93,7 +96,7 @@ class AdventureMUC
     answer.type = :result
     if iq.to.node == nil
       @worlds.each { |node,world|
-        answer.query.add(Jabber::DiscoItem.new(Jabber::JID::new(node, @component.jid.domain), world.iname))
+        answer.query.add(Jabber::Discovery::Item.new(Jabber::JID::new(node, @component.jid.domain), world.iname))
       }
     end
     @component.send(answer)

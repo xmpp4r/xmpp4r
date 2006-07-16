@@ -32,8 +32,8 @@
 $:.unshift '../../../../../lib/'
 
 require 'xmpp4r'
-require 'xmpp4r/helpers/roster'
-require 'xmpp4r/helpers/vcard'
+require 'xmpp4r/roster/helper/roster'
+require 'xmpp4r/vcard/helper/vcard'
 
 # Command line argument checking
 
@@ -53,7 +53,7 @@ cl.connect
 cl.auth(ARGV[1])
 
 # The roster instance
-roster = Jabber::Helpers::Roster.new(cl)
+roster = Jabber::Roster::Helper.new(cl)
 
 # Callback to handle updated roster items
 roster.add_update_callback { |olditem,item|
@@ -77,7 +77,7 @@ roster.add_update_callback { |olditem,item|
       puts("#{item.jid} has no nickname... getting vCard")
       begin
         # ...get a vCard
-        vcard = Jabber::Helpers::Vcard.new(cl).get(item.jid.strip)
+        vcard = Jabber::Vcard::Helper.new(cl).get(item.jid.strip)
 
         unless vcard.nil?
           # Rename him to vCard's <NICKNAME/> field
@@ -97,7 +97,7 @@ roster.add_update_callback { |olditem,item|
         end
 
       rescue Exception => e
-        # This will be (mostly) thrown by Jabber::Helpers::Vcard#get
+        # This will be (mostly) thrown by Jabber::Vcard::Helper#get
         puts("Error getting vCard for #{item.jid}: #{e.to_s}")
       end
     end
@@ -158,8 +158,8 @@ subscription_callback = lambda { |item,pres|
     else raise "The Roster Helper is buggy!!! subscription callback with type=#{pres.type}"
   end
 }
-roster.add_subscription_callback(0, nil, subscription_callback)
-roster.add_subscription_request_callback(0, nil, subscription_callback)
+roster.add_subscription_callback(0, nil, &subscription_callback)
+roster.add_subscription_request_callback(0, nil, &subscription_callback)
 
 # Send initial presence
 # this is important for receiving presence of subscribed users

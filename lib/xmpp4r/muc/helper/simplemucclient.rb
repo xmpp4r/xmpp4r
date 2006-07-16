@@ -1,4 +1,5 @@
 require 'xmpp4r/delay/x/delay'
+require 'xmpp4r/muc/helper/mucclient'
 
 module Jabber
   module MUC
@@ -62,7 +63,7 @@ module Jabber
           # Presence time
           time = nil
           pres.each_element('x') { |x|
-            if x.kind_of?(XDelay)
+            if x.kind_of?(Delay::XDelay)
               time = x.stamp
             end
           }
@@ -85,7 +86,7 @@ module Jabber
         # Message time (e.g. history)
         time = nil
         msg.each_element('x') { |x|
-          if x.kind_of?(XDelay)
+          if x.kind_of?(Delay::XDelay)
             time = x.stamp
           end
         }

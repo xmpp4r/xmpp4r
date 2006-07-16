@@ -3,6 +3,7 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/iq'
+require 'xmpp4r/version/helper/responder'
 
 module Jabber
   module Version
@@ -13,8 +14,8 @@ module Jabber
     # version answering normally.
     #
     # Example usage:
-    #  Jabber::Version::SimpleVersion.new(my_client, "My cool XMPP4R script", "1.0", "Younicks")
-    class SimpleHelper < Helper
+    #  Jabber::Version::SimpleResponder.new(my_client, "My cool XMPP4R script", "1.0", "Younicks")
+    class SimpleResponder < Responder
       attr_accessor :name
       attr_accessor :version
       attr_accessor :os

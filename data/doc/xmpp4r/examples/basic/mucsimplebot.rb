@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 $:.unshift '../../../../../lib/'
 require 'xmpp4r'
-require 'xmpp4r/helpers/simplemucclient'
+require 'xmpp4r/muc/helper/simplemucclient'
 
 
 if ARGV.size != 3
@@ -19,7 +19,7 @@ def print_line(time, line)
 end
 
 
-Jabber::debug = true
+#Jabber::debug = true
 cl = Jabber::Client.new(Jabber::JID.new(ARGV[0]))
 cl.connect
 cl.auth(ARGV[1])
@@ -28,7 +28,7 @@ cl.auth(ARGV[1])
 mainthread = Thread.current
 
 # This is the SimpleMUCClient helper!
-m = Jabber::Helpers::SimpleMUCClient.new(cl)
+m = Jabber::MUC::SimpleMUCClient.new(cl)
 
 # SimpleMUCClient callback-blocks
 

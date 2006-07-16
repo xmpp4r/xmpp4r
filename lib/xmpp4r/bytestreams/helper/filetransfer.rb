@@ -1,5 +1,10 @@
 require 'callbacks'
 
+require 'xmpp4r/bytestreams/iq/si'
+require 'xmpp4r/dataforms/x/data'
+require 'xmpp4r/bytestreams/helper/ibb/base'
+require 'xmpp4r/bytestreams/helper/socks5bytestreams/base'
+
 module Jabber
   module FileTransfer
     ##
@@ -159,7 +164,7 @@ module Jabber
       #
       # block takes two arguments:
       # * Iq
-      # * IqSiFile in the Iq
+      # * Bytestreams::IqSiFile in the Iq
       # You may then invoke accept or decline
       def add_incoming_callback(priority = 0, ref = nil, &block)
         @incoming_cbs.add(priority, ref, block)
@@ -174,36 +179,37 @@ module Jabber
       # iq:: [Iq] of file-transfer we want to accept
       # offset:: [Fixnum] or [nil]
       # length:: [Fixnum] or [nil]
-      # result:: [SOCKS5BytestreamsTarget] or [IBBTarget] or [nil] if no valid stream-method
+      # result:: [Bytestreams::SOCKS5BytestreamsTarget] or [Bytestreams::IBBTarget] or [nil] if no valid stream-method
       def accept(iq, offset=nil, length=nil)
         oldsi = iq.first_element('si')
 
         answer = iq.answer(false)
         answer.type = :result
 
-        si = answer.add(IqSi.new)
+        si = answer.add(Bytestreams::IqSi.new)
         if (offset or length) and oldsi.file.range
-          si.add(IqSiFile.new)
-          si.file.add(IqSiFileRange.new(offset, length))
+          si.add(Bytestreams::IqSiFile.new)
+          si.file.add(Bytestreams::IqSiFileRange.new(offset, length))
         end
-        si.add(IqFeature.new.import(oldsi.feature))
+        si.add(FeatureNegotiation::IqFeature.new.import(oldsi.feature))
         si.feature.x.type = :submit
         stream_method = si.feature.x.field('stream-method')
 
-        if stream_method.options.keys.include?(IqQueryBytestreams::NS_BYTESTREAMS) and @allow_bytestreams
-          stream_method.values = [IqQueryBytestreams::NS_BYTESTREAMS]
+        if stream_method.options.keys.include?(Bytestreams::IqQueryBytestreams::NS_BYTESTREAMS) and @allow_bytestreams
+          stream_method.values = [Bytestreams::IqQueryBytestreams::NS_BYTESTREAMS]
           stream_method.options = []
           @stream.send(answer)
 
-          SOCKS5BytestreamsTarget.new(@stream, oldsi.id, iq.from, iq.to)
-        elsif stream_method.options.keys.include?(IBB::NS_IBB) and @allow_ibb
-          stream_method.values = [IBB::NS_IBB]
+          Bytestreams::SOCKS5BytestreamsTarget.new(@stream, oldsi.id, iq.from, iq.to)
+        elsif stream_method.options.keys.include?(Bytestreams::IBB::NS_IBB) and @allow_ibb
+          stream_method.values = [Bytestreams::IBB::NS_IBB]
           stream_method.options = []
           @stream.send(answer)
 
-          IBBTarget.new(@stream, oldsi.id, iq.from, iq.to)
+          Bytestreams::IBBTarget.new(@stream, oldsi.id, iq.from, iq.to)
         else
           eanswer = iq.answer(false)
+          eanswer.type = :error
           eanswer.add(Error.new('bad-request')).type = :cancel
           eanswer.error.add(REXML::Element.new('no-valid-streams')).add_namespace('http://jabber.org/protocol/si')
           @stream.send(eanswer)
@@ -236,32 +242,32 @@ module Jabber
       # jid:: [JID] to send the file to
       # source:: File-transfer source, implementing the FileSource interface
       # desc:: [String] or [nil] Optional file description
-      # result:: [SOCKS5BytestreamsInitiator] or [IBBInitiator] or [nil]
+      # result:: [Bytestreams::SOCKS5BytestreamsInitiator] or [Bytestreams::IBBInitiator] or [nil]
       def offer(jid, source, desc=nil)
         session_id = Jabber::IdGenerator.instance.generate_id
 
         offered_methods = {}
         if @allow_bytestreams
-          offered_methods[IqQueryBytestreams::NS_BYTESTREAMS] = nil
+          offered_methods[Bytestreams::IqQueryBytestreams::NS_BYTESTREAMS] = nil
         end
         if @allow_ibb
-          offered_methods[IBB::NS_IBB] = nil
+          offered_methods[Bytestreams::IBB::NS_IBB] = nil
         end
 
         iq = Iq::new(:set, jid)
         iq.from = @my_jid
-        si = iq.add(IqSi.new(session_id, IqSi::PROFILE_FILETRANSFER, source.mime))
+        si = iq.add(Bytestreams::IqSi.new(session_id, Bytestreams::IqSi::PROFILE_FILETRANSFER, source.mime))
 
-        file = si.add(IqSiFile.new(source.filename, source.size))
+        file = si.add(Bytestreams::IqSiFile.new(source.filename, source.size))
         file.hash = source.md5
         file.date = source.date
         file.description = desc if desc
-        file.add(IqSiFileRange.new) if source.can_range?
+        file.add(Bytestreams::IqSiFileRange.new) if source.can_range?
 
         feature = si.add(REXML::Element.new('feature'))
         feature.add_namespace 'http://jabber.org/protocol/feature-neg'
-        x = feature.add(XData.new(:form))
-        stream_method_field = x.add(XDataField.new('stream-method', :list_single))
+        x = feature.add(Dataforms::XData.new(:form))
+        stream_method_field = x.add(Dataforms::XDataField.new('stream-method', :list_single))
         stream_method_field.options = offered_methods
 
         begin
@@ -292,9 +298,9 @@ module Jabber
           end
         end
 
-        if stream_method == IqQueryBytestreams::NS_BYTESTREAMS and @allow_bytestreams
+        if stream_method == Bytestreams::IqQueryBytestreams::NS_BYTESTREAMS and @allow_bytestreams
           Bytestreams::SOCKS5BytestreamsInitiator.new(@stream, session_id, @my_jid || @stream.jid, jid)
-        elsif stream_method == IBB::NS_IBB and @allow_ibb
+        elsif stream_method == Bytestreams::IBB::NS_IBB and @allow_ibb
           Bytestreams::IBBInitiator.new(@stream, session_id, @my_jid || @stream.jid, jid)
         else  # Target responded with a stream_method we didn't offer
           eanswer = response.answer

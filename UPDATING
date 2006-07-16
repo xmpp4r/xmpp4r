@@ -10,7 +10,7 @@ you encounter any problems, read the following instructions.
 
 Roster:
 require 'xmpp4r/roster'
-Jabber::Helpers::Roster -> Jabber::Roster::Roster
+Jabber::Helpers::Roster -> Jabber::Roster::Helper
 
 Multi-User Chat:
 require 'xmpp4r/muc'
@@ -20,7 +20,7 @@ Jabber::Helpers::SimpleMUCClient -> Jabber::MUC::SimpleMUCClient
 
 Software Version:
 require 'xmpp4r/version'
-Jabber::Helpers::Version -> Jabber::Version::SimpleHelper
+Jabber::Helpers::Version -> Jabber::Version::SimpleResponder
 
 vCard:
 require 'xmpp4r/vcard'

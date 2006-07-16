@@ -1,15 +1,20 @@
 #!/usr/bin/env ruby
 
 require 'xmpp4r'
-require 'xmpp4r/helpers/mucbrowser'
+require 'xmpp4r/muc/helper/mucbrowser'
 
-muc_jid = Jabber::JID.new(ARGV.shift)
+if ARGV.size != 3
+  puts "Usage: #{$0} <jid> <password> <muc-jid>"
+  exit
+end
 
-cl = Jabber::Client.new(Jabber::JID.new('collector@jabber.ccc.de/mucbrowser'))
+jid, password, muc_jid = Jabber::JID.new(ARGV.shift), ARGV.shift, Jabber::JID.new(ARGV.shift)
+
+cl = Jabber::Client.new(jid)
 cl.connect
-cl.auth('traversal')
+cl.auth(password)
 
-browser = Jabber::Helpers::MUCBrowser.new(cl)
+browser = Jabber::MUC::MUCBrowser.new(cl)
 
 print "Querying #{muc_jid} for identity..."; $stdout.flush
 name = browser.muc_name(muc_jid)

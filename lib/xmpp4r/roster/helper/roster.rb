@@ -4,6 +4,7 @@
 
 require 'callbacks'
 require 'thread'
+require 'xmpp4r/roster/iq/roster'
 
 module Jabber
   module Roster
@@ -11,10 +12,10 @@ module Jabber
     # The Roster helper intercepts <tt><iq/></tt> stanzas with Jabber::IqQueryRoster
     # and <tt><presence/></tt> stanzas, but provides cbs which allow the programmer
     # to keep track of updates.
-    class Roster
+    class Helper
       ##
       # All items in your roster
-      # items:: [Hash] ([JID] => [Roster::RosterItem])
+      # items:: [Hash] ([JID] => [Roster::Helper::RosterItem])
       attr_reader :items
 
       ##
@@ -59,14 +60,14 @@ module Jabber
       end
 
       ##
-      # Add a callback for Jabber::Roster::RosterItem updates
+      # Add a callback for Jabber::Roster::Helper::RosterItem updates
       #
       # Note that this will be called much after initialization
       # for the answer of the initial roster request
       #
       # The block receives two objects:
-      # * the old Jabber::Roster::RosterItem
-      # * the new Jabber::Roster::RosterItem
+      # * the old Jabber::Roster::Helper::RosterItem
+      # * the new Jabber::Roster::Helper::RosterItem
       def add_update_callback(prio = 0, ref = nil, &block)
         @update_cbs.add(prio, ref, block)
       end
@@ -78,7 +79,7 @@ module Jabber
       # Unknown JIDs may still pass and can be caught via Jabber::Stream#add_presence_callback.
       #
       # The block receives three objects:
-      # * the Jabber::Roster::RosterItem
+      # * the Jabber::Roster::Helper::RosterItem
       # * the old Jabber::Presence (or nil)
       # * the new Jabber::Presence (or nil)
       def add_presence_callback(prio = 0, ref = nil, &block)
@@ -95,7 +96,7 @@ module Jabber
       # * :unsubscribed
       #
       # The block receives two objects:
-      # * the Jabber::Roster::RosterItem (or nil)
+      # * the Jabber::Roster::Helper::RosterItem (or nil)
       # * the <tt><presence/></tt> stanza
       def add_subscription_callback(prio = 0, ref = nil, &block)
         @subscription_cbs.add(prio, ref, block)
@@ -106,7 +107,7 @@ module Jabber
       # which will be called upon receiving a <tt><presence type='subscribe'/></tt> stanza
       #
       # The block receives two objects:
-      # * the Jabber::Roster::RosterItem (or nil)
+      # * the Jabber::Roster::Helper::RosterItem (or nil)
       # * the <tt><presence/></tt> stanza
       #
       # Response to this event can be taken with accept_subscription
@@ -263,7 +264,7 @@ module Jabber
       # Threading is encouraged as the function waits for
       # a result. ErrorException is thrown upon error.
       #
-      # See Jabber::Roster::RosterItem#subscribe for details
+      # See Jabber::Roster::Helper::RosterItem#subscribe for details
       # about subscribing. (This method isn't used here but the
       # same functionality applies.)
       #
@@ -277,7 +278,7 @@ module Jabber
           self[jid].send
         else
           request = Iq.new_rosterset
-          request.query.add(Jabber::RosterItem.new(jid, iname))
+          request.query.add(Jabber::Roster::RosterItem.new(jid, iname))
           @stream.send_with_id(request) { true }
           # Adding to list is handled by handle_iq
         end
@@ -302,7 +303,7 @@ module Jabber
 
         unless self[jid.strip]
           request = Iq.new_rosterset
-          request.query.add(Jabber::RosterItem.new(jid.strip, iname))
+          request.query.add(Jabber::Roster::RosterItem.new(jid.strip, iname))
           @stream.send_with_id(request) { true }
         end
       end
@@ -365,7 +366,7 @@ module Jabber
         # or throws ErrorException upon failure.
         def remove
           request = Iq.new_rosterset
-          request.query.add(Jabber::RosterItem.new(jid, nil, :remove))
+          request.query.add(Jabber::Roster::RosterItem.new(jid, nil, :remove))
           @stream.send_with_id(request) { true }
           # Removing from list is handled by Roster#handle_iq
         end

@@ -18,10 +18,10 @@ module Jabber
         connect_lock = Mutex.new
         connect_lock.lock
 
-        @stream.add_iq_callback(200, "#{callback_ref} open") { |iq|
+        @stream.add_iq_callback(200, self) { |iq|
           open = iq.first_element('open')
           if iq.type == :set and iq.from == @peer_jid and iq.to == @my_jid and open and open.attributes['sid'] == @session_id
-            @stream.delete_iq_callback("#{callback_ref} open")
+            @stream.delete_iq_callback(self)
             activate
             @block_size = (open.attributes['block-size'] || 4096).to_i
 

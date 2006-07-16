@@ -1,5 +1,7 @@
 require 'time'  # For Time#xmlschema
 
+require 'xmpp4r/feature_negotiation/iq/feature'
+
 module Jabber
   module Bytestreams
     ##
@@ -24,7 +26,7 @@ module Jabber
         if element.kind_of?(REXML::Element) and element.name == 'file'
           super IqSiFile.new.import(element)
         elsif element.kind_of?(REXML::Element) and element.name == 'feature'
-          super IqFeature.new.import(element)
+          super FeatureNegotiation::IqFeature.new.import(element)
         else
           super element
         end

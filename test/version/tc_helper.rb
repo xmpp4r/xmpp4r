@@ -6,21 +6,21 @@ require 'test/unit'
 require File::dirname(__FILE__) + '/../lib/clienttester'
 
 require 'xmpp4r'
-require 'xmpp4r/version/helper/version'
+require 'xmpp4r/version/helper/responder'
 include Jabber
 
 class Version::HelperTest < Test::Unit::TestCase
   include ClientTester
 
   def test_create
-    h = Version::Helper::new(@client)
-    assert_kind_of(Version::Helper, h)
+    h = Version::Responder::new(@client)
+    assert_kind_of(Version::Responder, h)
     assert_respond_to(h, :add_version_callback)
   end
 
   def test_callback
     # Prepare helper
-    h = Version::Helper::new(@client)
+    h = Version::Responder::new(@client)
 
     calls = 0
     h.add_version_callback { |iq,responder|

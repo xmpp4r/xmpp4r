@@ -35,8 +35,8 @@ class JIDTest < Test::Unit::TestCase
   def test_roster
     require 'xmpp4r/roster'
     assert_kind_of(Module, Jabber::Roster)
-    assert_kind_of(Class, Jabber::Roster::Roster)
-    assert_kind_of(Class, Jabber::Roster::Roster::RosterItem)
+    assert_kind_of(Class, Jabber::Roster::Helper)
+    assert_kind_of(Class, Jabber::Roster::Helper::RosterItem)
     assert_kind_of(Class, Jabber::Roster::RosterItem)
     assert_kind_of(Class, Jabber::Roster::IqQueryRoster)
     assert_kind_of(Class, Jabber::Roster::XRoster)
@@ -122,8 +122,8 @@ class JIDTest < Test::Unit::TestCase
   def test_version
     require 'xmpp4r/version'
     assert_kind_of(Module, Jabber::Version)
-    assert_kind_of(Class, Jabber::Version::Helper)
-    assert_kind_of(Class, Jabber::Version::SimpleHelper)
+    assert_kind_of(Class, Jabber::Version::Responder)
+    assert_kind_of(Class, Jabber::Version::SimpleResponder)
     assert_kind_of(Class, Jabber::Version::IqQueryVersion)
   end
 end

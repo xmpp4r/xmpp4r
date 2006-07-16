@@ -7,7 +7,7 @@ $:.unshift '../lib'
 
 require 'optparse'
 require 'xmpp4r/client'
-require 'xmpp4r/iq/query/version'
+require 'xmpp4r/version/iq/version'
 include Jabber
 #Jabber::debug = true
 
@@ -60,7 +60,7 @@ cl.add_iq_callback do |i|
           if a.value == 'client'
             activity = true
             iq = Iq::new(:get)
-            iq.query = IqQueryVersion::new
+            iq.query = Version::IqQueryVersion::new
             iq.set_to(JID::new(e.attribute('jid').to_s))
             cl.send(iq)
           end
@@ -70,7 +70,7 @@ cl.add_iq_callback do |i|
   end
 end
 cl.add_iq_callback do |iq|
-  if iq.type == :result and iq.query.class == IqQueryVersion
+  if iq.type == :result and iq.query.class == Version::IqQueryVersion
     activity = true
     r = [ iq.from.to_s, iq.query.iname, iq.query.version, iq.query.os ]
     puts r.inspect
