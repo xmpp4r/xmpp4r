@@ -131,8 +131,8 @@ class PresenceTest < Test::Unit::TestCase
     assert_equal(0, Presence::new(:chat, '', 5) <=> Presence::new(:chat, '', 5))
     assert_equal(-1, Presence::new(:chat, '', 4) <=> Presence::new(:chat, '', 5))
     assert_equal(1, Presence::new(:chat, '', 4) <=> Presence::new(:chat, '', 3))
-    assert_equal(1, Presence::new(:chat, '', nil) <=> Presence::new(:chat, '', 3))
-    assert_equal(-1, Presence::new(:chat, '', 10) <=> Presence::new(:chat, '', nil))
+    assert_equal(-1, Presence::new(:chat, '', nil) <=> Presence::new(:chat, '', 3))
+    assert_equal(1, Presence::new(:chat, '', 10) <=> Presence::new(:chat, '', nil))
     assert_equal(0, Presence::new(:chat, '', nil) <=> Presence::new(:chat, '', nil))
   end
 

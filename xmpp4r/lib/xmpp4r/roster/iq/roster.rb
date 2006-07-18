@@ -110,8 +110,8 @@ module Jabber
       # Construct a new roster item
       # jid:: [JID] Jabber ID
       # iname:: [String] Name in the roster
-      # subscription:: [String] Type of subscription (see RosterItem#subscription=)
-      # ask:: [String] or [Nil] Can be "ask"
+      # subscription:: [Symbol] Type of subscription (see RosterItem#subscription=)
+      # ask:: [Symbol] or [Nil] Can be :subscribe
       def initialize(jid=nil, iname=nil, subscription=nil, ask=nil)
         super('item')
         self.jid = jid
