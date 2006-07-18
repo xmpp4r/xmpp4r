@@ -243,7 +243,7 @@ class FileServe
 
   def register_handlers
     @client.add_message_callback { |msg|
-      if msg.type == :chat and msg.body and msg.from != 'pentabarf@pentabarf.org/rails'
+      if msg.type == :chat and msg.body
         puts "<#{msg.from}> #{msg.body.strip}"
         cmd, arg = msg.body.split(/ /, 2)
 
