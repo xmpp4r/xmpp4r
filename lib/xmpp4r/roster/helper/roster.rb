@@ -140,19 +140,25 @@ module Jabber
               @items_lock.synchronize {
                 @items.delete(item.jid)
               }
-              return(true)
+
+            else
+              olditem = nil
+              @items_lock.synchronize {
+                if @items.has_key?(item.jid)
+                  olditem = RosterItem.new(@stream).import(@items[item.jid])
+
+                  # Clear first, because import doesn't
+                  @items[item.jid].iname = nil
+                  @items[item.jid].subscription = nil
+                  @items[item.jid].ask = nil
+
+                  @items[item.jid].import(item)
+                else
+                  @items[item.jid] = RosterItem.new(@stream).import(item)
+                end
+              }
+              @update_cbs.process(olditem, @items[item.jid])
             end
-            
-            olditem = nil
-            @items_lock.synchronize {
-              if @items.has_key?(item.jid)
-                olditem = RosterItem.new(@stream).import(@items[item.jid])
-                @items[item.jid].import(item)
-              else
-                @items[item.jid] = RosterItem.new(@stream).import(item)
-              end
-            }
-            @update_cbs.process(olditem, @items[item.jid])
           end
 
           @query_cbs.process(iq)
@@ -200,6 +206,8 @@ module Jabber
       #
       # If not available tries to look for it with the resource stripped
       def [](jid)
+        jid = JID.new(jid) unless jid.kind_of? JID
+
         @items_lock.synchronize {
           if @items.has_key?(jid)
             @items[jid]
@@ -215,6 +223,8 @@ module Jabber
       # Returns the list of RosterItems which, stripped, are equal to the
       # one you are looking for. 
       def find(jid)
+        jid = JID.new(jid) unless jid.kind_of? JID
+
         j = jid.strip
         l = {}
         @items_lock.synchronize {
@@ -247,6 +257,7 @@ module Jabber
       #
       # When group is nil, return ungrouped items
       # group:: [String] Group name
+      # result:: Array of [RosterItem]
       def find_by_group(group)
         res = []
         @items_lock.synchronize {
@@ -404,7 +415,7 @@ module Jabber
         end
 
         ##
-        # Add presence
+        # Add presence and sort presences
         # (unless type is :unavailable or :error)
         #
         # This overwrites previous stanzas with the same destination
@@ -421,15 +432,18 @@ module Jabber
             @presences.delete_if do |pres|
               pres.from == newpres.from
             end
-            # Add new presence
+
             if newpres.type == :error
               # Error from no specific resource - contact is completely offline
               if newpres.from.resource.nil?
                 @presences = []
               end
             elsif newpres.type != :unavailable
+              # Add new presence
               @presences.push(newpres)
             end
+
+            @presences.sort!
           }
         end
 

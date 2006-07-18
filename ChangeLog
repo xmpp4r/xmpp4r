@@ -2,10 +2,12 @@ XMPP4R 0.3 (**/**/****)
 =======================
 * SRV lookup capability in Client#connect
 * Stringprep support for JIDs
+* TLS & SASL support
+* Basic Dataforms support
 * Multi-User Chat Helpers
 * Helpers for File-Transfer, SOCKS5 Bytestreams, In-Band Bytestreams
-* Helpers::Version moved to Helpers::SimpleVersion
-* Helpers::Roster has modified subscription-request semantics (see Roster#add_subscription_request_callback)
+* Roster helper has modified subscription-request semantics (see Roster#add_subscription_request_callback)
+* A lot of features have renamed namespaces (see UPDATING file)
 
 XMPP4R 0.2 (20/10/2005)
 =======================
