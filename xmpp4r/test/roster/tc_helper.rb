@@ -149,7 +149,9 @@ class Roster::HelperTest < Test::Unit::TestCase
     h.add_query_callback { |iq|
       query_waiter.unlock
     }
+    cb_item, cb_op, cb_p = nil, nil, nil
     h.add_presence_callback { |item,oldpres,pres|
+      cb_item, cb_op, cb_p = item, oldpres, pres
       presence_waiter.unlock
     }
 
@@ -164,6 +166,10 @@ class Roster::HelperTest < Test::Unit::TestCase
     send("<presence from='a@b.c/r'/>")
     presence_waiter.lock
 
+    assert_kind_of(Roster::Helper::RosterItem, cb_item)
+    assert_nil(cb_op)
+    assert_kind_of(Presence, cb_p)
+    assert_nil(cb_p.type)
     assert_equal(true, h['a@b.c'].online?)
     presences = 0
     h['a@b.c'].each_presence { presences += 1 }
@@ -172,6 +178,10 @@ class Roster::HelperTest < Test::Unit::TestCase
     send("<presence from='a@b.c/r2'/>")
     presence_waiter.lock
 
+    assert_kind_of(Roster::Helper::RosterItem, cb_item)
+    assert_nil(cb_op)
+    assert_kind_of(Presence, cb_p)
+    assert_nil(cb_p.type)
     assert_equal(true, h['a@b.c'].online?)
     presences = 0
     h['a@b.c'].each_presence { presences += 1 }
@@ -180,6 +190,11 @@ class Roster::HelperTest < Test::Unit::TestCase
     send("<presence from='a@b.c/r'/>")
     presence_waiter.lock
 
+    assert_kind_of(Roster::Helper::RosterItem, cb_item)
+    assert_kind_of(Presence, cb_op)
+    assert_nil(cb_op.type)
+    assert_kind_of(Presence, cb_p)
+    assert_nil(cb_p.type)
     assert_equal(true, h['a@b.c'].online?)
     presences = 0
     h['a@b.c'].each_presence { presences += 1 }
@@ -188,42 +203,68 @@ class Roster::HelperTest < Test::Unit::TestCase
     send("<presence from='a@b.c/r' type='error'/>")
     presence_waiter.lock
 
+    assert_kind_of(Roster::Helper::RosterItem, cb_item)
+    assert_kind_of(Presence, cb_op)
+    assert_nil(cb_op.type)
+    assert_kind_of(Presence, cb_p)
+    assert_equal(:error, cb_p.type)
     assert_equal(true, h['a@b.c'].online?)
     presences = 0
     h['a@b.c'].each_presence { presences += 1 }
-    assert_equal(1, presences)
+    assert_equal(2, presences)
 
     send("<presence from='a@b.c/r2' type='unavailable'/>")
     presence_waiter.lock
 
+    assert_kind_of(Roster::Helper::RosterItem, cb_item)
+    assert_kind_of(Presence, cb_op)
+    assert_nil(cb_op.type)
+    assert_kind_of(Presence, cb_p)
+    assert_equal(:unavailable, cb_p.type)
     assert_equal(false, h['a@b.c'].online?)
     presences = 0
     h['a@b.c'].each_presence { presences += 1 }
-    assert_equal(0, presences)
+    assert_equal(2, presences)
 
     send("<presence from='a@b.c/r'/>")
     presence_waiter.lock
 
+    assert_kind_of(Roster::Helper::RosterItem, cb_item)
+    assert_kind_of(Presence, cb_op)
+    assert_equal(:error, cb_op.type)
+    assert_kind_of(Presence, cb_p)
+    assert_nil(cb_p.type)
     assert_equal(true, h['a@b.c'].online?)
     presences = 0
     h['a@b.c'].each_presence { presences += 1 }
-    assert_equal(1, presences)
+    assert_equal(2, presences)
 
     send("<presence from='a@b.c/r2'/>")
     presence_waiter.lock
 
+    assert_kind_of(Roster::Helper::RosterItem, cb_item)
+    assert_kind_of(Presence, cb_op)
+    assert_equal(:unavailable, cb_op.type)
+    assert_kind_of(Presence, cb_p)
+    assert_nil(cb_p.type)
     assert_equal(true, h['a@b.c'].online?)
     presences = 0
     h['a@b.c'].each_presence { presences += 1 }
     assert_equal(2, presences)
 
     send("<presence from='a@b.c' type='error'/>")
-    presence_waiter.lock
+    2.times {
+      presence_waiter.lock
 
+      assert_kind_of(Roster::Helper::RosterItem, cb_item)
+      assert_kind_of(Presence, cb_op)
+      assert_kind_of(Presence, cb_p)
+      assert_equal(:error, cb_p.type)
+    }
     assert_equal(false, h['a@b.c'].online?)
     presences = 0
     h['a@b.c'].each_presence { presences += 1 }
-    assert_equal(0, presences)
+    assert_equal(1, presences)
   end
 end
 
