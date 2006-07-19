@@ -90,7 +90,6 @@ module Jabber
       # Add a callback for subscription updates,
       # which will be called upon receiving a <tt><presence/></tt> stanza
       # with type:
-      # * :subscribe (you may want to answer with :subscribed or :unsubscribed)
       # * :subscribed
       # * :unsubscribe
       # * :unsubscribed
@@ -314,7 +313,7 @@ module Jabber
         if subscribe
           # Actually the item *should* already be known now,
           # but we do it manually to exclude conditions.
-          pres = Presence.new.set_type(:subscribe).set_to(jid)
+          pres = Presence.new.set_type(:subscribe).set_to(jid.strip)
           @stream.send(pres)
         end
       end
@@ -407,7 +406,7 @@ module Jabber
         def online?
           @presences_lock.synchronize {
             @presences.select { |pres|
-              pres.type != :error and pres.type != :unavailable
+              pres.type.nil?
             }.size > 0
           }
         end
@@ -474,7 +473,7 @@ module Jabber
         # request and will not wait of approval or declination as it may
         # take months for the contact to decide. ;-)
         def subscribe
-          pres = Presence.new.set_type(:subscribe).set_to(jid)
+          pres = Presence.new.set_type(:subscribe).set_to(jid.strip)
           @stream.send(pres)
         end
 
