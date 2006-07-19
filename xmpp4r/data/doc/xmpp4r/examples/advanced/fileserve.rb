@@ -115,7 +115,7 @@ class Upload < Transfer
         if stream.accept
           outfile = File.new(filename, (offset ? 'a' : 'w'))
 
-          transfer stream, outfile
+          transfer(stream, outfile)
 
           outfile.close
           stream.close
@@ -141,26 +141,26 @@ class Download < Transfer
       filesize = 0
     end
 
-    super filetransfer, peer, filename, filesize, msgblock
+    super(filetransfer, peer, filename, filesize, msgblock)
 
     Thread.new {
       begin
-        raise "No regular file" unless File.file? filename
+        raise "No regular file" unless File.file?(filename)
 
-        source = Jabber::FileTransfer::FileSource.new filename
-        stream = filetransfer.offer peer, source
+        source = Jabber::FileTransfer::FileSource.new(filename)
+        stream = filetransfer.offer(peer, source)
         unless stream
           raise "Well, you should accept what you request..."
           @done = true
         end
 
-        if stream.kind_of? Jabber::Bytestreams::SOCKS5Bytestreams
-          socksconf.call stream
+        if stream.kind_of?(Jabber::Bytestreams::SOCKS5Bytestreams)
+          socksconf.call(stream)
           stream.add_streamhost_callback(nil, nil, &@streamhost_cb)
         end
 
         stream.open
-        transfer source, stream
+        transfer(source, stream)
         stream.close
         @done = true
       rescue
@@ -181,9 +181,9 @@ class FileServe
 
     @client = Jabber::Client.new Jabber::JID.new(conf['jabber']['jid'])
     @client.connect
-    @client.auth conf['jabber']['password']
+    @client.auth(conf['jabber']['password'])
 
-    @ft = Jabber::FileTransfer::Helper.new @client
+    @ft = Jabber::FileTransfer::Helper.new(@client)
     Jabber::Version::SimpleResponder.new(@client,
                                        "XMPP4R FileServe example",
                                        Jabber::XMPP4R_VERSION,
@@ -191,29 +191,27 @@ class FileServe
     register_handlers
 
     @directory = conf['directory']
-    @directory.gsub! /\/+$/, ''
+    @directory.gsub!(/\/+$/, '')
 
     @socksserver = Jabber::Bytestreams::SOCKS5BytestreamsServer.new(conf['socks']['port'])
-    conf['socks']['addresses'].each { |addr|
-      @socksserver.add_address addr
-    }
+
+    conf['socks']['addresses'].each { |addr| @socksserver.add_address(addr) }
+    
     @proxies = []
     conf['socks']['proxies'].collect { |jid|
       puts "Querying proxy #{jid}..."
       begin
-        @proxies.push Jabber::Bytestreams::SOCKS5Bytestreams::query_streamhost(@client, jid)
+        @proxies.push(Jabber::Bytestreams::SOCKS5Bytestreams::query_streamhost(@client, jid))
       rescue
         puts "Error: #{$!}"
       end
-    }
+    } 
     
     Thread.new { presence }
     Thread.new { cleaner }
 
     # Panic reboot ;-)
-    @client.on_exception {
-      initialize(conf)
-    }
+    @client.on_exception { initialize(conf) }
   end
 
   def presence
@@ -238,12 +236,13 @@ class FileServe
       old_status = status
 
       sleep 1
+
     }
   end
 
   def register_handlers
     @client.add_message_callback { |msg|
-      if msg.type == :chat and msg.body
+      if msg.type == :chat and msg.body and msg.from != 'pentabarf@pentabarf.org/rails'
         puts "<#{msg.from}> #{msg.body.strip}"
         cmd, arg = msg.body.split(/ /, 2)
 
@@ -252,53 +251,59 @@ class FileServe
     }
 
     @ft.add_incoming_callback { |iq,file|
+      
       say = lambda { |text|
-        say iq.from, text
+        say(iq.from, text)
       }
 
       puts "Incoming file transfer from #{iq.from}: #{file.fname} (#{file.size / 1024} KB)"
       filename = file.fname.split(/\//).last
-      filename.gsub! /^\.+/, ''
+      filename.gsub!(/^\.+/, '')
+      
       puts "Range: #{file.range != nil}"
       transfer = Upload.new(@ft, iq, "#{@directory}/#{filename}", file.size, file.range != nil, say)
       @uploads += 1
+      
       @transfers_lock.synchronize {
-        @transfers.push transfer
+        @transfers.push(transfer)
       }
+    
     }
 
     roster = Jabber::Roster::Helper.new(@client)
+    
     roster.add_subscription_request_callback { |item,presence|
       roster.accept_subscription(presence.from)
     }
+    
   end
 
   def command(from, cmd, arg)
     say = lambda { |text|
-      say from, text
+      say(from, text)
     }
     socksconf = lambda { |stream|
-      stream.add_streamhost @socksserver
+      stream.add_streamhost(@socksserver)
       @proxies.each { |sh|
-        stream.add_streamhost sh
+        stream.add_streamhost(sh)
       }
     }
 
     case cmd
       when 'get'
-        arg.gsub! /\//, ''
-        arg.gsub! /^\.+/, ''
+        arg.gsub!(/\//, '')
+        arg.gsub!(/^\.+/, '')
         transfer = Download.new(@ft, from, "#{@directory}/#{arg}", say, socksconf)
         @downloads += 1
         @transfers_lock.synchronize {
-          @transfers.push transfer
+          @transfers.push(transfer)
         }
       when 'ls'
         text = ""
         Dir.foreach(@directory) { |file|
           next if file =~ /^\./
           path = "#{@directory}/#{file}"
-          text += "#{file} (#{human_readable File.size(path)})\n" if File.file? path
+          text += "#{file} (#{human_readable File.size(path)})\n" if File.file?(path)
         }
         say.call(text.strip)
       when 'stat'
@@ -318,14 +323,16 @@ class FileServe
 
   def say(to, text)
     puts ">#{to}< #{text.strip}"
-    @client.send Jabber::Message.new(to, text).set_type(:chat)
+    @client.send(Jabber::Message.new(to, text).set_type(:chat))
   end
 
   def cleaner
     loop {
+    
       @transfers_lock.synchronize {
         @transfers.delete_if { |t| t.done? }
       }
+    
       sleep 1
     }
   end

@@ -488,9 +488,10 @@ module Jabber
         # subscription='from' the contact is subscribed to your
         # presence.
         def unsubscribe
-          pres = Presence.new.set_type(:unsubscribe).set_to(jid)
-          @stream.send_with_id(pres) { |answer|
-            answer.type == :unsubscribed
+          pres = Presence.new.set_type(:unsubscribe).set_to(jid.strip)
+          @stream.send(pres) { |answer|
+            answer.type == :unsubscribed and
+            answer.from.strip == pres.to
           }
         end
 
@@ -504,7 +505,7 @@ module Jabber
         # carrying either subscription='to' or 'none'.
         def cancel_subscription
           pres = Presence.new.set_type(:unsubscribed).set_to(jid)
-          @stream.send_with_id(pres)
+          @stream.send(pres)
         end
       end
     end #Class Roster
