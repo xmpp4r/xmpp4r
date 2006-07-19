@@ -265,6 +265,125 @@ class Roster::HelperTest < Test::Unit::TestCase
     presences = 0
     h['a@b.c'].each_presence { presences += 1 }
     assert_equal(1, presences)
+
+    send("<presence from='a@b.c/r'/>")
+    presence_waiter.lock
+
+    assert_kind_of(Roster::Helper::RosterItem, cb_item)
+    assert_nil(cb_op)
+    assert_kind_of(Presence, cb_p)
+    assert_nil(cb_p.type)
+    assert_equal(true, h['a@b.c'].online?)
+    presences = 0
+    h['a@b.c'].each_presence { presences += 1 }
+    assert_equal(1, presences)
+  end
+
+  def test_subscribe
+    state { |iq|
+      send("<iq type='result' id='#{iq.id}'>
+              <query xmlns='jabber:iq:roster'/>
+            </iq>")
+    }
+
+    query_waiter = Mutex.new
+    query_waiter.lock
+    h = Roster::Helper::new(@client)
+    h.add_query_callback { |iq| query_waiter.unlock }
+    wait_state
+    query_waiter.lock
+
+    state { |iq|
+      assert_kind_of(Iq, iq)
+      assert_equal('jabber:iq:roster', iq.queryns)
+      assert_equal(JID.new('contact@example.org'), iq.query.first_element('item').jid)
+      assert_equal('MyContact', iq.query.first_element('item').iname)
+      send("<iq type='set'>
+              <query xmlns='jabber:iq:roster'>
+                <item jid='contact@example.org' subscription='none' name='MyContact'/>
+              </query>
+            </iq>
+            <iq type='result' id='#{iq.id}'/>")
+    }
+    state { |pres|
+      assert_kind_of(Presence, pres)
+      assert_equal(:subscribe, pres.type)
+      assert_equal(JID.new('contact@example.org'), pres.to)
+    }
+    h.add('contact@example.org', 'MyContact', true)
+    wait_state
+    query_waiter.lock
+    wait_state
+  end
+
+  def test_accept_subscription
+    state { |iq|
+      send("<iq type='result' id='#{iq.id}'>
+              <query xmlns='jabber:iq:roster'/>
+            </iq>")
+    }
+
+    query_waiter = Mutex.new
+    query_waiter.lock
+    h = Roster::Helper::new(@client)
+    h.add_query_callback { |iq| query_waiter.unlock }
+    wait_state
+    query_waiter.lock
+
+    cb_lock = Mutex.new
+    cb_lock.lock
+    h.add_subscription_request_callback { |item,pres|
+      assert_nil(item)
+      assert_kind_of(Presence, pres)
+      h.accept_subscription(pres.from)
+
+      cb_lock.unlock
+    }
+
+    send("<presence type='subscribe' from='contact@example.org' to='user@example.com'/>")
+    cb_lock.lock
+
+    state { |pres|
+      assert_kind_of(Presence, pres)
+      assert_equal(:subscribed, pres.type)
+      assert_equal(JID.new('contact@example.org'), pres.to)
+    }
+    wait_state
+  end
+
+  def test_decline_subscription
+    state { |iq|
+      send("<iq type='result' id='#{iq.id}'>
+              <query xmlns='jabber:iq:roster'/>
+            </iq>")
+    }
+
+    query_waiter = Mutex.new
+    query_waiter.lock
+    h = Roster::Helper::new(@client)
+    h.add_query_callback { |iq| query_waiter.unlock }
+    wait_state
+    query_waiter.lock
+
+    cb_lock = Mutex.new
+    cb_lock.lock
+    h.add_subscription_request_callback { |item,pres|
+      assert_nil(item)
+      assert_kind_of(Presence, pres)
+      h.decline_subscription(pres.from)
+
+      cb_lock.unlock
+    }
+
+    send("<presence type='subscribe' from='contact@example.org' to='user@example.com'/>")
+    cb_lock.lock
+
+    state { |pres|
+      assert_kind_of(Presence, pres)
+      assert_equal(:unsubscribed, pres.type)
+      assert_equal(JID.new('contact@example.org'), pres.to)
+    }
+    wait_state
   end
 end
 
