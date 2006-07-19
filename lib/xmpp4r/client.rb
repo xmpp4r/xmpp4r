@@ -10,7 +10,13 @@ require 'xmpp4r/sasl'
 
 module Jabber
 
-  # The client class provides everything needed to build a basic XMPP Client.
+  # The client class provides everything needed to build a basic XMPP
+  # Client.
+  #
+  # If you want your connection to survive disconnects and timeouts,
+  # catch exception in Stream#on_exception and re-call Client#connect
+  # and Client#auth. Don't forget to re-send initial Presence and
+  # everything else you need to setup your session.
   class Client  < Connection
 
     # The client's JID
@@ -23,13 +29,8 @@ module Jabber
     #
     # Remember to *always* put a resource in your JID unless the server can do SASL.
     def initialize(jid, threaded = true)
-      unless threaded
-        puts "Non-threaded mode is currently broken, re-enabling threaded"
-        threaded = true
-      end
-
       super(threaded)
-      @jid = jid
+      @jid = (jid.kind_of?(JID) ? jid : JID.new(jid.to_s))
     end
 
     ##
@@ -64,7 +65,7 @@ module Jabber
             end
           }
         rescue NameError
-          puts "Resolv::DNS does not support SRV records. Please upgrade to ruby-1.8.3 or later!"
+          $stderr.puts "Resolv::DNS does not support SRV records. Please upgrade to ruby-1.8.3 or later!"
         end
         # Fallback to normal connect method
       end

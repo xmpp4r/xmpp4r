@@ -3,8 +3,8 @@
 $:.unshift '../../../../../lib'
 
 require 'xmpp4r'
-require 'xmpp4r/iq/query/version'
-require 'xmpp4r/helpers/simpleversion'
+require 'xmpp4r/version/iq/version'
+require 'xmpp4r/version/helper/simpleresponder'
 
 
 # A Hash containing all Version Query answers with their JIDs as keys:
@@ -27,14 +27,19 @@ cl = Jabber::Client.new(jid, false)
 cl.connect
 cl.auth(ARGV[1])
 
+cl.on_exception { |*a|
+  p a[0].backtrace
+  exit!
+}
+
 # I'm not sure about the portability of 'uname -sr' here ;-)
 # but that's all needed to answer version queries:
-Jabber::Helpers::SimpleVersion.new(cl, 'xmpp4r Versionbot example', Jabber::XMPP4R_VERSION, IO.popen('uname -sr').readlines.to_s.strip)
+Jabber::Version::SimpleResponder.new(cl, 'xmpp4r Versionbot example', Jabber::XMPP4R_VERSION, IO.popen('uname -sr').readlines.to_s.strip)
 
 
 cl.add_iq_callback { |iq|
   # Filter for version query results
-  if (iq.type == :result) && iq.query.kind_of?(Jabber::IqQueryVersion)
+  if (iq.type == :result) && iq.query.kind_of?(Jabber::Version::IqQueryVersion)
     puts "Version query result from #{iq.from}"
     # Keep track of results per JID
     versions[iq.from] = iq.query
@@ -51,7 +56,7 @@ cl.add_presence_callback { |pres|
     # Construct a new query
     iq = Jabber::Iq.new(:get, pres.from)
     # and ask for the version
-    iq.query = Jabber::IqQueryVersion.new
+    iq.query = Jabber::Version::IqQueryVersion.new
     puts "Asking #{iq.to} for his/her/its version"
     versions[pres.from] = :asking
     cl.send(iq)

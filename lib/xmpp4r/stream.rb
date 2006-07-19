@@ -39,11 +39,15 @@ module Jabber
       @messagecbs = CallbackList::new
       @iqcbs = CallbackList::new
       @presencecbs = CallbackList::new
+      unless threaded
+        $stderr.puts "Non-threaded mode is currently broken, re-enabling threaded"
+        threaded = true
+      end
       @threaded = threaded
       @stanzaqueue = []
       @stanzaqueue_lock = Mutex::new
       @exception_block = nil
-      @threadblocks = {}
+      @threadblocks = []
 #      @pollCounter = 10
       @waiting_thread = nil
       @wakeup_thread = nil
@@ -62,11 +66,14 @@ module Jabber
       @parserThread = Thread.new do
         begin
           @parser.parse
-        rescue
+        rescue Exception => e
+          Jabber::debuglog("EXCEPTION:\n#{e.class}\n#{e.message}\n#{e.backtrace.join("\n")}")
+
           if @exception_block
-            Thread.new { @exception_block.call($!, self, :start) }
+            Thread.new { close; @exception_block.call(e, self, :start) }
           else
             puts "Exception caught in Parser thread!"
+            close
             raise
           end
         end
@@ -97,24 +104,43 @@ module Jabber
     # The block has to take three arguments:
     # * the Exception
     # * the Jabber::Stream object (self)
-    # * a symbol where it happened, namely :start, :parser and :sending
+    # * a symbol where it happened, namely :start, :parser, :sending and :end
     def on_exception(&block)
       @exception_block = block
     end
 
     ##
     # This method is called by the parser when a failure occurs
-    def parse_failure
+    def parse_failure(e)
+      Jabber::debuglog("EXCEPTION:\n#{e.class}\n#{e.message}\n#{e.backtrace.join("\n")}")
+
       # A new thread has to be created because close will cause the thread
-      # to commit suicide
+      # to commit suicide(???)
       if @exception_block
-        Thread.new { @exception_block.call($!, self, :parser) }
+        # New thread, because close will kill the current thread
+        Thread.new {
+          close
+          @exception_block.call(e, self, :parser)
+        }
       else
         puts "Stream#parse_failure was called by XML parser. Dumping " +
-        "backtrace...\n" + $!.exception + "\n"
-        puts $!.backtrace
+        "backtrace...\n" + e.exception + "\n"
+        puts e.backtrace
         close
         raise
+      end
+    end
+
+    ##
+    # This method is called by the parser upon receiving <tt></stream:stream></tt>
+    def parser_end
+      if @exception_block
+        Thread.new {
+          close
+          @exception_block.call(nil, self, :close)
+        }
+      else
+        close
       end
     end
 
@@ -137,8 +163,20 @@ module Jabber
     # Processes a received REXML::Element and executes 
     # registered thread blocks and filters against it.
     #
+    # If in threaded mode, a new thread will be spawned
+    # for the call to receive_nonthreaded.
     # element:: [REXML::Element] The received element
     def receive(element)
+      if @threaded
+        # Don't spawn a new thread here. An implicit feature
+        # of XMPP is constant order of stanzas.
+        receive_nonthreaded(element)
+      else
+        receive_nonthreaded(element)
+      end
+    end
+    
+    def receive_nonthreaded(element)
       Jabber::debuglog("RECEIVED:\n#{element.to_s}")
       case element.prefix
       when 'stream'
@@ -179,13 +217,29 @@ module Jabber
         end
       end
 
-      # Iterate through blocked theads (= waiting for an answer)
-      @threadblocks.each { |thread, proc|
-        r = proc.call(stanza)
+      # Iterate through blocked threads (= waiting for an answer)
+      #
+      # We're dup'ping the @threadblocks here, so that we won't end up in an
+      # endless loop if Stream#send is being nested. That means, the nested
+      # threadblock won't receive the stanza currently processed, but the next
+      # one.
+      threadblocks = @threadblocks.dup
+      threadblocks.each { |threadblock|
+        exception = nil
+        r = false
+        begin
+          r = threadblock.call(stanza)
+        rescue Exception => e
+          exception = e
+        end
+
         if r == true
-          @threadblocks.delete(thread)
-          thread.wakeup if thread.alive?
+          @threadblocks.delete(threadblock)
+          threadblock.wakeup
           return
+        elsif exception
+          @threadblocks.delete(threadblock)
+          threadblock.raise(exception)
         end
       }
 
@@ -199,6 +253,7 @@ module Jabber
         @waiting_thread.wakeup if @waiting_thread
       end
     end
+    private :receive_nonthreaded
 
     ##
     # Process |element| until it is consumed. Returns element.consumed?
@@ -273,31 +328,47 @@ module Jabber
     end
 
     ##
+    # This is used by Jabber::Stream internally to
+    # keep track of any blocks which were passed to
+    # Stream#send.
+    class ThreadBlock
+      def initialize(block)
+        @thread = Thread.current
+        @block = block
+      end
+      def call(*args)
+        @block.call(*args)
+      end
+      def wakeup
+        # TODO: Handle threadblock removal if !alive?
+        @thread.wakeup if @thread.alive?
+      end
+      def raise(exception)
+        @thread.raise(exception) if @thread.alive?
+      end
+    end
+
+    ##
     # Sends XML data to the socket and (optionally) waits
     # to process received data.
     #
-    # If you invoke this method again in &block, you cannot
-    # define a second block. It will return immediately.
-    # If you need this, move your second Stream#send outside
-    # the &block.
-    #
     # xml:: [String] The xml data to send
-    # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
-    def send(xml, proc=nil, &block)
-      Jabber::debuglog("SENDING:\n#{ xml.kind_of?(String) ? xml : xml.to_s }")
-      xml = xml.to_s if not xml.kind_of? String
-      block = proc if proc
-      @threadblocks[Thread.current]=block if block
+    def send(xml, &block)
+      Jabber::debuglog("SENDING:\n#{xml}")
+      @threadblocks.unshift(ThreadBlock.new(block)) if block
       Thread.critical = true # we don't want to be interupted before we stop!
       begin
-        @fd << xml
+        @fd << xml.to_s
         @fd.flush
-      rescue
+      rescue Exception => e
+        Jabber::debuglog("EXCEPTION:\n#{e.class}\n#{e.message}\n#{e.backtrace.join("\n")}")
+
         if @exception_block 
-          @exception_block.call($!, self, :sending)
+          Thread.new { close!; @exception_block.call(e, self, :sending) }
         else
           puts "Exception caught while sending!"
+          close!
           raise
         end
       end
@@ -328,9 +399,9 @@ module Jabber
 
       error = nil
       send(xml) do |received|
-        if received.id == xml.id
+        if received.kind_of? XMLStanza and received.id == xml.id
           if received.type == :error
-            error = received.error
+            error = (received.error ? received.error : Error.new)
             true
           else
             yield(received)
@@ -367,14 +438,12 @@ module Jabber
     end
 
     ##
-    # Adds a callback block/proc to process received XML messages
+    # Adds a callback block to process received XML messages
     # 
     # priority:: [Integer] The callback's priority, the higher, the sooner
     # ref:: [String] The callback's reference 
-    # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
-    def add_xml_callback(priority = 0, ref = nil, proc=nil, &block)
-      block = proc if proc
+    def add_xml_callback(priority = 0, ref = nil, &block)
       @xmlcbs.add(priority, ref, block)
     end
 
@@ -387,14 +456,12 @@ module Jabber
     end
 
     ##
-    # Adds a callback block/proc to process received Messages
+    # Adds a callback block to process received Messages
     # 
     # priority:: [Integer] The callback's priority, the higher, the sooner
     # ref:: [String] The callback's reference 
-    # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
-    def add_message_callback(priority = 0, ref = nil, proc=nil, &block)
-      block = proc if proc
+    def add_message_callback(priority = 0, ref = nil, &block)
       @messagecbs.add(priority, ref, block)
     end
 
@@ -407,14 +474,12 @@ module Jabber
     end
 
     ##
-    # Adds a callback block/proc to process received Stanzas
+    # Adds a callback block to process received Stanzas
     # 
     # priority:: [Integer] The callback's priority, the higher, the sooner
     # ref:: [String] The callback's reference 
-    # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
-    def add_stanza_callback(priority = 0, ref = nil, proc=nil, &block)
-      block = proc if proc
+    def add_stanza_callback(priority = 0, ref = nil, &block)
       @stanzacbs.add(priority, ref, block)
     end
 
@@ -427,14 +492,12 @@ module Jabber
     end
     
     ##
-    # Adds a callback block/proc to process received Presences 
+    # Adds a callback block to process received Presences 
     # 
     # priority:: [Integer] The callback's priority, the higher, the sooner
     # ref:: [String] The callback's reference 
-    # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
-    def add_presence_callback(priority = 0, ref = nil, proc=nil, &block)
-      block = proc if proc
+    def add_presence_callback(priority = 0, ref = nil, &block)
       @presencecbs.add(priority, ref, block)
     end
 
@@ -447,14 +510,12 @@ module Jabber
     end
     
     ##
-    # Adds a callback block/proc to process received Iqs
+    # Adds a callback block to process received Iqs
     # 
     # priority:: [Integer] The callback's priority, the higher, the sooner
     # ref:: [String] The callback's reference 
-    # proc:: [Proc = nil] The optional proc
     # &block:: [Block] The optional block
-    def add_iq_callback(priority = 0, ref = nil, proc=nil, &block)
-      block = proc if proc
+    def add_iq_callback(priority = 0, ref = nil, &block)
       @iqcbs.add(priority, ref, block)
     end
 
@@ -469,9 +530,13 @@ module Jabber
     ##
     # Closes the connection to the Jabber service
     def close
+      close!
+    end
+
+    def close!
       @parserThread.kill if @parserThread
 #      @pollThread.kill
-      @fd.close if @fd
+      @fd.close if @fd and !@fd.closed?
       @status = DISCONNECTED
     end
   end

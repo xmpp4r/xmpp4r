@@ -4,6 +4,15 @@ require 'rake/rdoctask'
 require 'rake'
 require 'find'
 
+begin
+  require 'rubygems'
+  require 'rcov/rcovtask'
+  RCOV = true
+rescue LoadError
+  RCOV = false
+end
+
+
 # Globals
 
 PKG_NAME = 'xmpp4r'
@@ -61,6 +70,13 @@ Rake::PackageTask.new(PKG_NAME, PKG_VERSION) do |p|
 	p.need_tar = true
 	p.package_files = PKG_FILES
 	p p.package_files
+end
+
+if RCOV
+	Rcov::RcovTask.new do |t|
+		#t.test_files = FileList['test/tc_*.rb'] + FileList['test/*/tc_*.rb'] - ['test/tc_streamError.rb']
+		t.test_files = ['test/ts_xmpp4r.rb']
+	end
 end
 
 # "Gem" part of the Rakefile

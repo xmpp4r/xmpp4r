@@ -184,7 +184,7 @@ module Jabber
     # Get presence priority, or nil if absent
     # result:: [Integer]
     def priority
-      e = first_element_text('priority')
+       e = first_element_text('priority')
       if e
         return e.to_i
       else
@@ -215,25 +215,26 @@ module Jabber
     end
 
     ##
-    # Compare two presences using priority.
+    # Compare two presences using priority
+    # (with cmp_interest as fall-back).
     def <=>(o)
-      if priority.nil?
-        if o.priority.nil?
-          return 0
-        else
-          return 1
-        end
-      elsif o.priority.nil?
-        return -1
+      if priority.to_i == o.priority.to_i
+        cmp_interest(o)
       else
-        return priority <=> o.priority
+        priority.to_i <=> o.priority.to_i
       end
     end
 
     ##
     # Compare two presences. The most suitable to talk with is the
     # biggest.
-    PRESENCE_STATUS = { :chat => 4, nil => 3, :dnd => 2, :away => 1, :xa => 0 }
+    PRESENCE_STATUS = { :chat => 4,
+                        nil => 3,
+                        :dnd => 2,
+                        :away => 1,
+                        :xa => 0,
+                        :unavailable => -1,
+                        :error => -2 }
     def cmp_interest(o)
       if type.nil?
         if o.type.nil?

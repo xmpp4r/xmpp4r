@@ -21,7 +21,7 @@ module Jabber
     # Constructs a parser for the supplied stream (socket input)
     #
     # stream:: [IO] Socket input stream
-    # listener:: [Object.receive(XMLStanza)] The listener (usually a Jabber::Protocol::Connection instance
+    # listener:: [Object.receive(XMLStanza)] The listener (usually a Jabber::Protocol::Connection instance)
     #
     def initialize(stream, listener)
       @stream = stream
@@ -43,23 +43,25 @@ module Jabber
           e.add_attributes attributes
           @current = @current.nil? ? e : @current.add_element(e)
 
-          if @current.name == 'stream'
-            @listener.receive(@current)
+          if @current.name == 'stream' and !@started
             @started = true
+            @listener.receive(@current)
+            @current = nil
           end
         end
 
         parser.listen( :end_element ) do  |uri, localname, qname|
-          if qname == "stream:stream"
+          if qname == 'stream:stream' and @current.nil?
             @started = false
+            @listener.parser_end
           else
-            @listener.receive(@current) if @current.parent.name == 'stream'
+            @listener.receive(@current) unless @current.parent
             @current = @current.parent
           end
         end
 
         parser.listen( :characters ) do | text |
-          @current.text = @current.text.to_s + text
+          @current.text = @current.text.to_s + text if @current
         end
 
         parser.listen( :cdata ) do | text |
@@ -67,8 +69,8 @@ module Jabber
         end
 
         parser.parse
-      rescue REXML::ParseException
-        @listener.parse_failure
+      rescue REXML::ParseException => e
+        @listener.parse_failure(e)
       end
     end
   end

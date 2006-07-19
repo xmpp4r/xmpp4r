@@ -23,20 +23,31 @@ module Jabber
 
     # Create a new Component
     # jid:: [JID]
-    # server_address:: [String] Hostname
-    # server_port:: [Integer] TCP port (5347)
-    def initialize(jid, server_address, server_port=5347, threaded = true)
+    def initialize(jid, server_address=nil, server_port=5347, threaded = true)
       super(threaded)
-      @jid = jid
-      @server_address = server_address
-      @server_port = server_port
+      @jid = (jid.kind_of?(JID) ? jid : JID.new(jid.to_s))
+
+      if server_address
+        $stderr.puts "Passing server and port to Jabber::Component::new is " +
+                     "obsolete and will vanish in some later XMPP4R release. " +
+                     "Please use these arguments when calling " +
+                     "Jabber::Client#connect"
+        @server_address = server_address
+        @server_port = server_port
+      end
     end
     
     # Connect to the server
     # (chaining-friendly)
+    # server:: [String] Hostname
+    # port:: [Integer] TCP port (5347)
     # return:: self
-    def connect
-      super(@server_address, @server_port)
+    def connect(server=nil, port=5347)
+      if server
+        super(server, port)
+      else
+        super(@server_address, @server_port)
+      end
       self
     end
 
@@ -77,7 +88,7 @@ module Jabber
       send("<handshake>#{hash}</handshake>") { |r|
         if r.prefix == 'stream' and r.name == 'error'
           true
-        elsif r.name == 'handshake' and r.namespace == 'jabber:component:accept'
+        elsif r.name == 'handshake'
           authenticated = true
           true
         else
