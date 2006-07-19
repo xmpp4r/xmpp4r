@@ -194,9 +194,26 @@ module Jabber
       #
       # Callbacks are called here
       def update_presence(item, pres)
-        oldpres = item.presence(pres.from).nil? ? nil : Presence.new.import(item.presence(pres.from))
-        item.add_presence(pres)
-        @presence_cbs.process(item, oldpres, pres)
+
+        # This requires special handling, to announce all resources offline
+        if pres.from.resource.nil? and pres.type == :error
+          oldpresences = []
+          item.each_presence do |oldpres|
+            oldpresences << oldpres
+          end
+
+          item.add_presence(pres)
+          oldpresences.each { |oldpres|
+            @presence_cbs.process(item, oldpres, pres)
+          }
+        else
+          oldpres = item.presence(pres.from).nil? ?
+            nil :
+            Presence.new.import(item.presence(pres.from))
+
+          item.add_presence(pres)
+          @presence_cbs.process(item, oldpres, pres)
+        end
       end
 
       public
@@ -389,7 +406,9 @@ module Jabber
         # deleted.)
         def online?
           @presences_lock.synchronize {
-            @presences.size > 0
+            @presences.select { |pres|
+              pres.type != :error and pres.type != :unavailable
+            }.size > 0
           }
         end
         
@@ -430,15 +449,13 @@ module Jabber
           @presences_lock.synchronize {
             # Delete old presences with the same JID
             @presences.delete_if do |pres|
-              pres.from == newpres.from
+              pres.from == newpres.from or pres.from.resource.nil?
             end
 
-            if newpres.type == :error
-              # Error from no specific resource - contact is completely offline
-              if newpres.from.resource.nil?
-                @presences = []
-              end
-            elsif newpres.type != :unavailable
+            if newpres.type == :error and newpres.from.resource.nil?
+              # Replace by single error presence
+              @presences = [newpres]
+            else
               # Add new presence
               @presences.push(newpres)
             end
