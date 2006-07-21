@@ -1,4 +1,4 @@
-XMPP4R 0.3 (**/**/****)
+XMPP4R 0.3 (20/07/2006)
 =======================
 * SRV lookup capability in Client#connect
 * Stringprep support for JIDs

@@ -18,7 +18,7 @@ end
 PKG_NAME = 'xmpp4r'
 PKG_VERSION = '0.3'
 
-PKG_FILES = ['ChangeLog', 'README', 'COPYING', 'LICENSE', 'setup.rb', 'Rakefile']
+PKG_FILES = ['ChangeLog', 'README', 'COPYING', 'LICENSE', 'setup.rb', 'Rakefile', 'UPDATING']
 Find.find('lib/', 'data/', 'test/', 'tools/') do |f|
 	if FileTest.directory?(f) and f =~ /\.svn/
 		Find.prune
