@@ -25,6 +25,10 @@ module Jabber
       #
       # Request a roster
       # (Remember to send initial presence afterwards!)
+      #
+      # The initialization will not wait for the roster being received,
+      # use add_query_callback to get notifyed when Roster::Helper#items
+      # has been filled.
       def initialize(stream)
         @stream = stream
         @items = {}
