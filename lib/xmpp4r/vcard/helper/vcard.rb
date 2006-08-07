@@ -71,14 +71,14 @@ module Jabber
       # Quickly initialize a Vcard helper and get
       # a vCard. See Vcard#get
       def self.get(stream, jid=nil)
-        Vcard.new(stream).get(jid)
+        new(stream).get(jid)
       end
 
       ##
       # Quickly initialize a Vcard helper and set
       # your vCard. See Vcard#set
       def self.set(stream, iqvcard)
-        Vcard.new(stream).set(iqvcard)
+        new(stream).set(iqvcard)
       end
     end
   end
