@@ -126,4 +126,11 @@ class JIDTest < Test::Unit::TestCase
     assert_kind_of(Class, Jabber::Version::SimpleResponder)
     assert_kind_of(Class, Jabber::Version::IqQueryVersion)
   end
+
+  def test_rpc
+    require 'xmpp4r/rpc'
+    assert_kind_of(Module, Jabber::RPC)
+    assert_kind_of(Class, Jabber::RPC::Server)
+    assert_kind_of(Class, Jabber::RPC::Client)
+  end
 end
