@@ -348,6 +348,11 @@ module Jabber
       end
     end
 
+    def send_data(data)
+      @fd << data
+      @fd.flush
+    end
+
     ##
     # Sends XML data to the socket and (optionally) waits
     # to process received data.
@@ -359,8 +364,7 @@ module Jabber
       @threadblocks.unshift(ThreadBlock.new(block)) if block
       Thread.critical = true # we don't want to be interupted before we stop!
       begin
-        @fd << xml.to_s
-        @fd.flush
+        send_data(xml.to_s)
       rescue Exception => e
         Jabber::debuglog("EXCEPTION:\n#{e.class}\n#{e.message}\n#{e.backtrace.join("\n")}")
 

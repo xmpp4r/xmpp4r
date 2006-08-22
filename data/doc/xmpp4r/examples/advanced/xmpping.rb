@@ -1,4 +1,8 @@
 #!/usr/bin/env ruby
+# =XMPP4R - XMPP Library for Ruby
+# License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
+# Website::http://home.gna.org/xmpp4r/
+
 
 # This is PING for Jabber
 #
@@ -6,6 +10,7 @@
 
 
 require 'xmpp4r'
+require 'xmpp4r/httpbinding'
 require 'xmpp4r/version/iq/version'
 require 'xmpp4r/discovery/iq/discoinfo'
 require 'optparse'
@@ -69,8 +74,13 @@ end
 # Connection
 ##
 
-cl = Jabber::Client.new(Jabber::JID.new(account['jid']))
-cl.connect(account['host'], (account['port'] ? account['port'].to_i : 5222))
+if account['http bind']
+  cl = Jabber::HTTPBinding::Client.new(Jabber::JID.new(account['jid']))
+  cl.connect(account['http bind'])
+else
+  cl = Jabber::Client.new(Jabber::JID.new(account['jid']))
+  cl.connect(account['host'], (account['port'] ? account['port'].to_i : 5222))
+end
 cl.auth(account['password'])
 
 ##
