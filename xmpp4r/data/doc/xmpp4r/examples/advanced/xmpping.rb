@@ -89,7 +89,7 @@ cl.auth(account['password'])
 
 def print_reply(iq, roundtrip)
   roundtrip_s = ((roundtrip * 100).round / 100.0).to_s + " sec"
-  output = "Received a #{iq.query.namespace} #{iq.type} from #{iq.from} (#{roundtrip_s}): "
+  output = "Received a #{iq.query.namespace} #{iq.type} (id: #{iq.id}) from #{iq.from} (#{roundtrip_s}): "
 
   if iq.query.kind_of?(Jabber::Version::IqQueryVersion)
     output += "#{iq.query.iname}-#{iq.query.version} #{iq.query.os}"
