@@ -38,9 +38,6 @@ module Jabber
       # The server may hold this amount of stanzas
       # to reduce number of HTTP requests
       attr_accessor :http_hold
-      # How many times to try HTTP requests,
-      # increase for flaky lines...
-      attr_accessor :default_retries
 
       ##
       # Initialize
@@ -56,7 +53,6 @@ module Jabber
         @http_wait = 20
         @http_hold = 1
         @http_content_type = 'text/xml; charset=utf-8'
-        @default_retries = 1
       end
 
       ##
@@ -179,6 +175,8 @@ module Jabber
         Jabber::debuglog("HTTP RESPONSE (#{@pending_requests}/#{@http_requests}):\n#{response.body}")
 
         unless response.kind_of? Net::HTTPSuccess
+          # Unfortunately, HTTPResponses aren't exceptions
+          # TODO: rescue'ing code should be able to distinguish
           raise Net::HTTPBadResponse, "#{response.class}"
         end
 
@@ -196,30 +194,35 @@ module Jabber
         req_body = nil
         current_rid = nil
 
-        @lock.synchronize {
-          # Do not send unneeded requests
-          return if data.size < 1 and @pending_requests > 0
-
-          req_body = "<body"
-          req_body += " rid='#{@http_rid += 1}'"
-          req_body += " sid='#{@http_sid}'"
-          req_body += " xmlns='http://jabber.org/protocol/httpbind'"
-          req_body += ">"
-          req_body += data
-          req_body += "</body>"
-          current_rid = @http_rid
-
-          @pending_requests += 1
-          @last_send = Time.now
-        }
-
-        retries = @default_retries
         begin
           begin
+            @lock.synchronize {
+              # Do not send unneeded requests
+              if data.size < 1 and @pending_requests > 0
+                return
+              end
+
+              req_body = "<body"
+              req_body += " rid='#{@http_rid += 1}'"
+              req_body += " sid='#{@http_sid}'"
+              req_body += " xmlns='http://jabber.org/protocol/httpbind'"
+              req_body += ">"
+              req_body += data
+              req_body += "</body>"
+              current_rid = @http_rid
+
+              @pending_requests += 1
+              @last_send = Time.now
+            }
+
             res_body = post(req_body)
+
           ensure
             @lock.synchronize { @pending_requests -= 1 }
           end
+
+          receive_elements_with_rid(current_rid, res_body.children)
+          ensure_one_pending_request
 
         rescue REXML::ParseException
           if @exception_block
@@ -231,25 +234,14 @@ module Jabber
           end
 
         rescue StandardError => e
-          Jabber::debuglog("POST error: #{e.class}: #{e}")
-          if retries > 0
-            retries -= 1
-            retry
-          else
-            if @exception_block
-              Thread.new { @exception_block.call(e, self, :sending) }
-            else
-              puts "Exception caught when doing HTTP request!"
-              raise
-            end
-          end
-
+          Jabber::debuglog("POST error (will retry): #{e.class}: #{e}")
+          receive_elements_with_rid(current_rid, [])
+          # It's not good to resend on *any* exception,
+          # but there are too many cases (Timeout, 404, 502)
+          # where resending is appropriate
+          # TODO: recognize these conditions and act appropriate
+          send_data(data)
         end
-
-
-        receive_elements_with_rid(current_rid, res_body.children)
-
-        ensure_one_pending_request
       end
 
       ##
