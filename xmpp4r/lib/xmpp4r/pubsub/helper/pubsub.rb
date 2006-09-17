@@ -1,3 +1,5 @@
+require 'xmpp4r/pubsub/iq/pubsub'
+
 module Jabber
   module PubSub
     class Helper
@@ -7,14 +9,12 @@ module Jabber
 
       def create(jid, node=nil)
         rnode = nil
-
-        iq = Jabber::Iq::new(:set, jid)
-        pubsub = iq.add(REXML::Element.new('pubsub'))
-        pubsub.add_namespace('http://jabber.org/protocol/pubsub')
-        pubsub.add(REXML::Element.new('create')).attributes['node'] = node
+        iq = basic_pubsub_query(:set,jid)
+        iq.pubsub.add(REXML::Element.new('create')).attributes['node'] = node
         @client.send_with_id(iq) { |reply|
-          create = reply.first_element('pubsub/create')
-          rnode = create.attributes['node'] if create
+          if (create = reply.first_element('pubsub/create'))
+            rnode = create.attributes['node']
+          end
           true
         }
 
@@ -22,11 +22,8 @@ module Jabber
       end
 
       def delete(jid, node)
-        iq = Jabber::Iq::new(:set, jid)
-        pubsub = iq.add(REXML::Element.new('pubsub'))
-        pubsub.add_namespace('http://jabber.org/protocol/pubsub')
-        del = pubsub.add(REXML::Element.new('delete'))
-        del.attributes['node'] = node
+        iq = basic_pubsub_query(:set,jid)
+        iq.pubsub.add(REXML::Element.new('delete')).attributes['node'] = node
 
         @client.send_with_id(iq) { |reply|
           true
@@ -36,10 +33,8 @@ module Jabber
       ##
       # items: Hash { item_id => rexml::element }
       def publish(jid, node, items)
-        iq = Jabber::Iq::new(:set, jid)
-        pubsub = iq.add(REXML::Element.new('pubsub'))
-        pubsub.add_namespace('http://jabber.org/protocol/pubsub')
-        publish = pubsub.add(REXML::Element.new('publish'))
+        iq = basic_pubsub_query(:set,jid)
+        publish = iq.pubsub.add(REXML::Element.new('publish'))
         publish.attributes['node'] = node
         items.each { |id,element|
           item = publish.add(REXML::Element.new('item'))
@@ -53,53 +48,70 @@ module Jabber
       end
 
       def items(jid, node)
-        iq = Jabber::Iq::new(:get, jid)
-        pubsub = iq.add(REXML::Element.new('pubsub'))
-        pubsub.add_namespace('http://jabber.org/protocol/pubsub')
-        pubsub.add(REXML::Element.new('items')).attributes['node'] = node
+        iq = basic_pubsub_query(:get,jid)
+        iq.pubsub.add(REXML::Element.new('items')).attributes['node'] = node
 
         res = nil
         @client.send_with_id(iq) { |reply|
-          reply.each_element('/query/pubsub/items') { |items|
-            res = items
-          }
+          if reply.kind_of? Iq and reply.pubsub and reply.pubsub.first_element('items')
+            res = {}
+            reply.pubsub.first_element('items').each_element('item') do |item|
+              res[item.attributes['id']] = item.children.first if item.children.first
+            end
+          end
           true
         }
         res
       end
 
       def affiliations(jid)
-        iq = Jabber::Iq::new(:get, jid)
-        pubsub = iq.add(REXML::Element.new('pubsub'))
-        pubsub.add_namespace('http://jabber.org/protocol/pubsub')
-        pubsub.add(REXML::Element.new('affiliations'))
+        iq = basic_pubsub_query(:get,jid)
+        iq.pubsub.add(REXML::Element.new('affiliations'))
 
+        res = nil
         @client.send_with_id(iq) { |reply|
-          puts "affiliations reply: #{reply.to_s.inspect}"
+          if reply.pubsub.first_element('affiliations')
+            res = {}
+            reply.pubsub.first_element('affiliations').each_element('affiliation') do |affiliation|
+              # TODO: This should be handled by an affiliation element class
+              aff = case affiliation.attributes['affiliation']
+                      when 'owner' then :owner
+                      when 'publisher' then :publisher
+                      when 'none' then :none
+                      when 'outcast' then :outcast
+                      else nil
+                    end
+              res[affiliation.attributes['node']] = aff
+            end
+          end
+
           true
         }
-        # TODO
+        res
       end
 
-      def entities(jid, node)
-        iq = Jabber::Iq::new(:get, jid)
-        pubsub = iq.add(REXML::Element.new('pubsub'))
-        pubsub.add_namespace('http://jabber.org/protocol/pubsub')
-        entities = pubsub.add(REXML::Element.new('entities'))
+      def subscriptions(jid, node)
+        iq = basic_pubsub_query(:get, jid)
+        entities = iq.pubsub.add(REXML::Element.new('subscriptions'))
         entities.attributes['node'] = node
 
+        res = nil
         @client.send_with_id(iq) { |reply|
-          puts "entities reply: #{reply.to_s.inspect}"
+          if reply.pubsub.first_element('subscriptions')
+            res = []
+            reply.pubsub.first_element('subscriptions').each_element('subscription') do |subscription|
+              res << subscription
+            end
+          end
+
           true
         }
-        # TODO
+        res
       end
 
       def subscribers(jid, node)
-        iq = Jabber::Iq::new(:get, jid)
-        pubsub = iq.add(REXML::Element.new('pubsub'))
-        pubsub.add_namespace('http://jabber.org/protocol/pubsub')
-        sub = pubsub.add(REXML::Element.new('subscriptions'))
+        iq = basic_pubsub_query(:get,jid)
+        sub = iq.pubsub.add(REXML::Element.new('subscriptions'))
         sub.attributes['node'] = node
 
         res = []
@@ -114,6 +126,14 @@ module Jabber
           true
         }
         res
+      end
+
+      private
+
+      def basic_pubsub_query(type, jid)
+        iq = Jabber::Iq::new(type, jid)
+        iq.add(IqPubSub.new)
+        iq
       end
     end
   end

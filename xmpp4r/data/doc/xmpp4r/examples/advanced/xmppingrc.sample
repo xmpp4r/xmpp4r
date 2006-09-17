@@ -7,3 +7,8 @@ other_account:
   password: xxx
   host: 127.0.0.1
   port: 65222
+
+web_account:
+  jid: me@domain/ping
+  password: xxx
+  http bind: http://domain/http-bind/

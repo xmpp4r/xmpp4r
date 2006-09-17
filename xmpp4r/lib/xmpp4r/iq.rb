@@ -88,7 +88,7 @@ module Jabber
     ##
     # Returns the iq's query's namespace, or nil
     # result:: [String]
-    def queryns 
+    def queryns
       e = first_element('query')
       if e
         return e.namespace
@@ -100,8 +100,15 @@ module Jabber
     ##
     # Returns the iq's <vCard/> child, or nil
     # result:: [IqVcard]
-    def vcard 
+    def vcard
       first_element('vCard')
+    end
+
+    ##
+    # Returns the iq's <pubsub/> child, or nil
+    # result:: [IqVcard]
+    def pubsub
+      first_element('pubsub')
     end
 
     ##
