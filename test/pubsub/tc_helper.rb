@@ -6,15 +6,15 @@ require 'test/unit'
 require File::dirname(__FILE__) + '/../lib/clienttester'
 
 require 'xmpp4r'
-require 'xmpp4r/pubsub/helper/pubsub'
+require 'xmpp4r/pubsub/helper/servicehelper'
 include Jabber
 
-class PubSub::HelperTest < Test::Unit::TestCase
+class PubSub::ServiceHelperTest < Test::Unit::TestCase
   include ClientTester
 
   def test_create
-    h = PubSub::Helper.new(@client)
-    assert_kind_of(PubSub::Helper, h)
+    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
+    assert_kind_of(PubSub::ServiceHelper, h)
 
     state { |iq|
       assert_kind_of(Jabber::Iq, iq)
@@ -30,11 +30,11 @@ class PubSub::HelperTest < Test::Unit::TestCase
               </pubsub>
             </iq>")
     }
-    assert_equal('mynode', h.create('pubsub.example.org', 'mynode'))
+    assert_equal('mynode', h.create('mynode'))
   end
 
   def test_delete
-    h = PubSub::Helper.new(@client)
+    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 
     state { |iq|
       assert_kind_of(Jabber::Iq, iq)
@@ -45,7 +45,7 @@ class PubSub::HelperTest < Test::Unit::TestCase
       assert_equal('mynode', iq.pubsub.children.first.attributes['node'])
       send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
     }
-    h.delete('pubsub.example.org', 'mynode')
+    h.delete('mynode')
   end
 
   def test_publish
@@ -56,7 +56,7 @@ class PubSub::HelperTest < Test::Unit::TestCase
     item2.attributes['bar'] = 'foo'
     item2.text = 'barfoo'
 
-    h = PubSub::Helper.new(@client)
+    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 
     state { |iq|
       assert_kind_of(Jabber::Iq, iq)
@@ -71,7 +71,7 @@ class PubSub::HelperTest < Test::Unit::TestCase
       assert_equal(item1.to_s, iq.pubsub.children[0].children[0].children[0].to_s)
       send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
     }
-    h.publish('pubsub.example.org', 'mynode', {nil=>item1})
+    h.publish('mynode', {nil=>item1})
 
     state { |iq|
       assert_kind_of(Jabber::Iq, iq)
@@ -90,7 +90,7 @@ class PubSub::HelperTest < Test::Unit::TestCase
       assert_equal(item2.to_s, iq.pubsub.children[0].children[1].children[0].to_s)
       send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
     }
-    h.publish('pubsub.example.org', 'mynode', {'1'=>item1, '2'=>item2})
+    h.publish('mynode', {'1'=>item1, '2'=>item2})
   end
 
   def test_items
@@ -101,7 +101,7 @@ class PubSub::HelperTest < Test::Unit::TestCase
     item2.attributes['bar'] = 'foo'
     item2.text = 'barfoo'
 
-    h = PubSub::Helper.new(@client)
+    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 
     state { |iq|
       assert_kind_of(Jabber::Iq, iq)
@@ -119,7 +119,7 @@ class PubSub::HelperTest < Test::Unit::TestCase
             </iq>")
     }
 
-    items = h.items('pubsub.example.org', 'mynode')
+    items = h.items('mynode')
     assert_equal(2, items.size)
     assert_kind_of(REXML::Element, items['1'])
     assert_kind_of(REXML::Element, items['2'])
@@ -128,7 +128,7 @@ class PubSub::HelperTest < Test::Unit::TestCase
   end
 
   def test_affiliations
-    h = PubSub::Helper.new(@client)
+    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 
     state { |iq|
       assert_kind_of(Jabber::Iq, iq)
@@ -147,7 +147,7 @@ class PubSub::HelperTest < Test::Unit::TestCase
             </iq>")
     }
 
-    a = h.affiliations('pubsub.example.org')
+    a = h.affiliations
     assert_kind_of(Hash, a)
     assert_equal(4, a.size)
     assert_equal(:owner, a['node1'])
@@ -157,7 +157,7 @@ class PubSub::HelperTest < Test::Unit::TestCase
   end
 
   def test_subscriptions
-    h = PubSub::Helper.new(@client)
+    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 
     state { |iq|
       assert_kind_of(Jabber::Iq, iq)
@@ -176,6 +176,68 @@ class PubSub::HelperTest < Test::Unit::TestCase
             </iq>")
     }
 
-    s = h.subscriptions('pubsub.example.org', 'mynode')
+    s = h.subscriptions('mynode')
+    assert_kind_of(Array,s)
+    assert_equal(4,s.size)
+    assert_kind_of(REXML::Element,s[0])
+    assert_kind_of(REXML::Element,s[1])
+    assert_kind_of(REXML::Element,s[2])
+    assert_kind_of(REXML::Element,s[3])
+  end
+  def test_get_all_subscriptions
+    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
+
+    state { |iq|
+      assert_kind_of(Jabber::Iq, iq)
+      assert_equal(:get, iq.type)
+      assert_equal(1, iq.pubsub.children.size)
+      assert_equal('subscriptions', iq.pubsub.children.first.name)
+      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'>
+            <pubsub xmlns='http://jabber.org/protocol/pubsub'>
+	        <subscriptions>
+		  <subscription node='node1' jid='francisco@denmark.lit' subscription='subscribed'/>
+		  <subscription node='node2' jid='francisco@denmark.lit' subscription='subscribed'/>
+		  <subscription node='node5' jid='francisco@denmark.lit' subscription='unconfigured'/>
+		  <subscription node='node6' jid='francisco@denmark.lit' subscription='pending'/>
+		</subscriptions>
+	     </pubsub>
+	     </iq>")
+    }
+
+    s = h.get_all_subscriptions
+    assert_kind_of(Array,s)
+    assert_equal(4,s.size)
+    assert_kind_of(REXML::Element,s[0])
+    assert_kind_of(REXML::Element,s[1])
+    assert_kind_of(REXML::Element,s[2])
+    assert_kind_of(REXML::Element,s[3])
+
+  end
+  def test_subscribers
+    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
+
+    state { |iq|
+      assert_kind_of(Jabber::Iq, iq)
+      assert_equal(:get, iq.type)
+      assert_equal(1, iq.pubsub.children.size)
+      assert_equal('subscriptions', iq.pubsub.children.first.name)
+      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'>
+            <pubsub xmlns='http://jabber.org/protocol/pubsub'>
+	        <subscriptions node='princely_musings'>
+		  <subscription jid='peter@denmark.lit' subscription='subscribed'/>
+		  <subscription jid='frank@denmark.lit' subscription='subscribed'/>
+		  <subscription jid='albrecht@denmark.lit' subscription='unconfigured'/>
+		  <subscription jid='hugo@denmark.lit' subscription='pending'/>
+		</subscriptions>
+	     </pubsub>
+	     </iq>")
+    }
+
+    s = h.subscribers('princely_musings')
+    assert_equal(4,s.size)
+    assert_kind_of(String,s[0])
+    assert_kind_of(String,s[1])
+    assert_kind_of(String,s[2])
+    assert_kind_of(String,s[3])
   end
 end
