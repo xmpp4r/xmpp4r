@@ -1,1 +1,1 @@
-require 'xmpp4r/pubsub/helper/pubsub'
+require 'xmpp4r/pubsub/helper/servicehelper'
