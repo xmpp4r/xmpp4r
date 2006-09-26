@@ -19,29 +19,7 @@ module Jabber
     #
     # This <query/> contains multiple <item/> children. See RosterItem.
     class IqQueryRoster < IqQuery
-      ##
-      # Create a new <query xmlns='jabber:iq:roster'/>
-      # stream:: [Stream] Stream to handle
-      def initialize
-        super
-        add_namespace('jabber:iq:roster')
-      end
-      
-      ##
-      # Add an element to the roster
-      #
-      # Converts <item/> elements to RosterItem
-      #
-      # Previous RosterItems with the same JID will
-      # *not* be deleted!
-      def typed_add(element)
-        if element.kind_of?(REXML::Element) && (element.name == 'item')
-          item = RosterItem::new.import(element)
-          super(item)
-        else
-          super(element)
-        end
-      end
+      name_xmlns 'query', 'jabber:iq:roster'
       
       ##
       # Iterate through all items
@@ -105,7 +83,9 @@ module Jabber
     # The 'name' attribute has been renamed to 'iname' here
     # as 'name' is already used by REXML::Element for the
     # element's name. It's still name='...' in XML.
-    class RosterItem < REXML::Element
+    class RosterItem < XMPPElement
+      name_xmlns 'item', 'jabber:iq:roster'
+
       ##
       # Construct a new roster item
       # jid:: [JID] Jabber ID
@@ -113,18 +93,11 @@ module Jabber
       # subscription:: [Symbol] Type of subscription (see RosterItem#subscription=)
       # ask:: [Symbol] or [Nil] Can be :subscribe
       def initialize(jid=nil, iname=nil, subscription=nil, ask=nil)
-        super('item')
+        super()
         self.jid = jid
         self.iname = iname
         self.subscription = subscription
         self.ask = ask
-      end
-      
-      ##
-      # Create new RosterItem from REXML::Element
-      # item:: [REXML::Element] source element to copy attributes and children from
-      def RosterItem.import(item)
-        RosterItem::new.import(item)
       end
     
       ##
@@ -238,7 +211,5 @@ module Jabber
         }
       end
     end
-    
-    IqQuery.add_namespaceclass('jabber:iq:roster', IqQueryRoster)
   end #Module Roster
 end #Module Jabber

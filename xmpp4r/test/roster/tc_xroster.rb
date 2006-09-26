@@ -10,9 +10,12 @@ include Jabber
 
 class Roster::XRosterTest < Test::Unit::TestCase
   def test_create
-    r = Roster::XRoster.new
-    assert_equal('x', r.name)
-    assert_equal('http://jabber.org/protocol/rosterx', r.namespace)
+    r1 = Roster::XRoster.new
+    assert_equal('x', r1.name)
+    assert_equal('jabber:x:roster', r1.namespace)
+    r2 = Roster::RosterX.new
+    assert_equal('x', r2.name)
+    assert_equal('http://jabber.org/protocol/rosterx', r2.namespace)
   end
 
   def test_import

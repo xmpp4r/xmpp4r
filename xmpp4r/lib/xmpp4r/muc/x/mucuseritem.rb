@@ -4,9 +4,11 @@
 
 module Jabber
   module MUC
-    class XMUCUserItem < REXML::Element
+    class XMUCUserItem < XMPPElement
+      name_xmlns 'item', 'http://jabber.org/protocol/muc#user'
+
       def initialize(affiliation=nil, role=nil, jid=nil)
-        super('item')
+        super()
         set_affiliation(affiliation)
         set_role(role)
         set_jid(jid)

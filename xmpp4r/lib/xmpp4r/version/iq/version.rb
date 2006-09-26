@@ -13,25 +13,15 @@ module Jabber
     # Notice that according to JEP 0092 only the <os/> element can be omitted,
     # <name/> (iname) and <version/> must be present
     class IqQueryVersion < IqQuery
-      ##
-      # Create a new <query xmlns='jabber:iq:version'/> element
-      def initialize(iname='', version='', os=nil)
-        super()
-        add_namespace('jabber:iq:version')
-        set_iname(iname)
-        set_version(version)
-        set_os(os)
-      end
+      name_xmlns 'query', 'jabber:iq:version'
 
       ##
-      # Import an element,
-      # deletes <name/>, <version/> and <os/> elements first
-      # xe:: [REXML::Element]
-      def import(xe)
-        delete_element('name')
-        delete_element('version')
-        delete_element('os')
-        super
+      # Create a new <query xmlns='jabber:iq:version'/> element
+      def initialize(iname=nil, version=nil, os=nil)
+        super()
+        set_iname(iname) if iname
+        set_version(version) if version
+        set_os(os) if os
       end
 
       ##
@@ -111,8 +101,6 @@ module Jabber
         self
       end
     end
-
-    IqQuery.add_namespaceclass('jabber:iq:version', IqQueryVersion)
   end
 end
 

@@ -2,39 +2,28 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
-require 'xmpp4r/xmlstanza'
+require 'xmpp4r/xmppstanza'
 require 'xmpp4r/x'
 
 module Jabber
   ##
   # The Message class manages the <message/> stanzas,
   # which is used for all messaging communication.
-  class Message < XMLStanza
+  class Message < XMPPStanza
+
+    name_xmlns 'message', ''
 
     ##
     # Create a new message
     # >to:: a JID or a String object to send the message to.
     # >body:: the message's body
     def initialize(to = nil, body = nil)
-      super("message")
+      super()
       if not to.nil?
         set_to(to)
       end
       if !body.nil?
         add_element(REXML::Element::new("body").add_text(body))
-      end
-    end
-
-    ##
-    # Add a sub-element
-    #
-    # Will be converted to [X] if named "x"
-    # element:: [REXML::Element] to add
-    def typed_add(element)
-      if element.kind_of?(REXML::Element) && (element.name == 'x')
-        super(X::import(element))
-      else
-        super(element)
       end
     end
 
@@ -92,15 +81,6 @@ module Jabber
     # This is the message's plain-text content.
     def body
       first_element_text('body')
-    end
-
-    ##
-    # Create a new message from a stanza,
-    # by copying all attributes and children from it.
-    # xmlstanza:: [REXML::Element] Source
-    # return:: [Message] Result
-    def Message.import(xmlstanza)
-      Message::new.import(xmlstanza)
     end
 
     ##

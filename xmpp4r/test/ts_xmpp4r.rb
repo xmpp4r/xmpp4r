@@ -1,5 +1,6 @@
 #!/usr/bin/ruby -w
 
+require 'xmpp4r'
 
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 $:.unshift File.join(File.dirname(__FILE__), '..', 'test')
@@ -24,6 +25,7 @@ require 'roster/tc_iqqueryroster'
 require 'roster/tc_xroster'
 require 'roster/tc_helper'
 require 'rpc/tc_helper'
+require 'pubsub/tc_helper'
 require 'version/tc_iqqueryversion'
 require 'version/tc_helper'
 require 'tc_streamSend'
@@ -31,6 +33,6 @@ require 'tc_jid'
 require 'tc_iq'
 require 'tc_client'
 require 'tc_callbacks'
-require 'tc_xmlstanza'
+require 'tc_xmppstanza'
 require 'tc_message'
 require 'tc_class_names'

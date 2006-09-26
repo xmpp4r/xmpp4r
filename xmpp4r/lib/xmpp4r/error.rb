@@ -6,7 +6,9 @@ module Jabber
   ##
   # A class used to build/parse <error/> elements.
   # Look at JEP 0086 for explanation.
-  class Error < REXML::Element
+  class Error < XMPPElement
+    name_xmlns 'error'
+
     ##
     # errorcondition:: [nil] or [String] of the following:
     # * "bad-request"
@@ -38,7 +40,7 @@ module Jabber
     # text: [nil] or [String] Error text
     def initialize(errorcondition=nil, text=nil)
       if errorcondition.nil?
-        super('error')
+        super()
         set_text(text) unless text.nil?
       else
         errortype = nil
@@ -54,7 +56,7 @@ module Jabber
           raise("Unknown error condition when initializing Error")
         end
         
-        super("error")
+        super()
         set_error(errorcondition)
         set_type(errortype)
         set_code(errorcode)
@@ -62,13 +64,6 @@ module Jabber
       end
     end
 
-    ##
-    # Create a new <error/> element and import from existing
-    # element:: [REXML::Element] to import
-    def Error.import(element)
-      Error::new.import(element)
-    end
-    
     ##
     # Get the 'Legacy error code' or nil
     # result:: [Integer] Error code

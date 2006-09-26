@@ -72,10 +72,13 @@ class RPC::HelperTest < Test::Unit::TestCase
     sv.add_handler("add") do |a,b| a+b end
 
     cl = RPC::Client.new(@client, 'a@b/c')
+    correct = true
     100.times {
       a, b = rand(1000), rand(1000)
-      assert_equal(a+b, cl.call('add', a, b))
+      correct &&= (cl.call('add', a, b) == a + b)
     }
+
+    assert(correct)
   end
 end
 

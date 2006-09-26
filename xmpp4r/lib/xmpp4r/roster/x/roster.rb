@@ -17,28 +17,12 @@ module Jabber
   # Pay attention to the namespace which is <tt>jabber:x:roster</tt>
   # for JEP-0093!
     class XRoster < X
-      ##
-      # Initialize a new XRoster element
-      def initialize
-        super()
-        add_namespace('http://jabber.org/protocol/rosterx')
-      end
-      
-      ##
-      # Add an element to the roster attachment
-      #
-      # Converts <item/> elements to XRosterItem
-      def typed_add(element)
-        if element.kind_of?(REXML::Element) && (element.name == 'item')
-          super(XRosterItem::new.import(element))
-        else
-          super(element)
-        end
-      end
+      name_xmlns 'x', 'jabber:x:roster'
     end #Class XRoster
-    
-    X.add_namespaceclass('jabber:x:roster', XRoster)
-    X.add_namespaceclass('http://jabber.org/protocol/rosterx', XRoster)
+
+    class RosterX < XRoster
+      name_xmlns 'x', 'http://jabber.org/protocol/rosterx'
+    end
     
     ##
     # Class containing an <item/> element
@@ -50,22 +34,17 @@ module Jabber
     # This is all a bit analoguous to Jabber::RosterItem, used by
     # Jabber::IqQueryRoster. But this class lacks the subscription and
     # ask attributes.
-    class XRosterItem < REXML::Element
+    class XRosterItem < XMPPElement
+      name_xmlns 'item', 'jabber:x:roster'
+
       ##
       # Construct a new roster item
       # jid:: [JID] Jabber ID
       # iname:: [String] Name in the roster
       def initialize(jid=nil, iname=nil)
-        super('item')
+        super()
         self.jid = jid
         self.iname = iname
-      end
-      
-      ##
-      # Create new XRosterItem from REXML::Element
-      # item:: [REXML::Element] source element to copy attributes and children from
-      def XRosterItem.import(item)
-        XRosterItem::new.import(item)
       end
       
       ##
@@ -151,5 +130,9 @@ module Jabber
         }
       end
     end #Class XRosterItem
+
+    class RosterXItem < XRosterItem
+      name_xmlns 'item', 'http://jabber.org/protocol/rosterx'
+    end
   end #Module Roster
 end #Module Jabber

@@ -21,13 +21,14 @@ module Jabber
     # <x/> elements with the specific namespace will then be
     # converted to XDelay automatically.
     class XDelay < X
+      name_xmlns 'x', 'jabber:x:delay'
+
       ##
       # Initialize a new XDelay element
       #
       # insertnow:: [Boolean] Set the stamp to [Time::now]
       def initialize(insertnow=true)
         super()
-        add_namespace('jabber:x:delay')
 
         if insertnow
           set_stamp(Time.now)
@@ -94,7 +95,5 @@ module Jabber
         self
       end
     end
-
-    X.add_namespaceclass('jabber:x:delay', XDelay)
   end
 end

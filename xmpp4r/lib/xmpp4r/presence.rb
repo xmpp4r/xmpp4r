@@ -2,14 +2,16 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
-require 'xmpp4r/xmlstanza'
+require 'xmpp4r/xmppstanza'
 require 'xmpp4r/x'
 
 module Jabber
   ##
   # The presence class is used to construct presence messages to 
   # send to the Jabber service.
-  class Presence < XMLStanza
+  class Presence < XMPPStanza
+    name_xmlns 'presence', ''
+
     include Comparable
 
     ##
@@ -18,29 +20,10 @@ module Jabber
     # status:: [String] Initial status message
     # priority:: [Fixnum] Initial priority value
     def initialize(show=nil, status=nil, priority=nil)
-      super("presence")
+      super()
       set_show(show) if show
       set_status(status) if status
       set_priority(priority) if priority
-    end
-
-    ##
-    # Add an element to the presence stanza
-    # * <x/> elements are converted to [X]
-    # element:: [REXML::Element] to add
-    def typed_add(element)
-      if element.kind_of?(REXML::Element) && (element.name == 'x')
-        super(X::import(element))
-      else
-        super(element)
-      end
-    end
-
-    ##
-    # Create a new presence from a stanza
-    # result:: [Presence] Imported XMLStanza
-    def Presence.import(xmlstanza)
-      Presence::new.import(xmlstanza)
     end
 
     ##

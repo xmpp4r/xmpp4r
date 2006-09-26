@@ -29,7 +29,8 @@ class JIDTest < Test::Unit::TestCase
     assert_kind_of(Class, Jabber::Stream)
     assert_kind_of(Class, Jabber::StreamParser)
     assert_kind_of(Class, Jabber::X)
-    assert_kind_of(Class, Jabber::XMLStanza)
+    assert_kind_of(Class, Jabber::XMPPElement)
+    assert_kind_of(Class, Jabber::XMPPStanza)
   end
 
   def test_roster

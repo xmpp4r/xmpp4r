@@ -7,19 +7,10 @@ require 'xmpp4r/iq'
 module Jabber
   module PubSub
     NS_PUBSUB = 'http://jabber.org/protocol/pubsub'
-    class IqPubSub < REXML::Element
-      ##
-      # Initialize a <pubsub/> element with the PubSub namespace
+    class IqPubSub < XMPPElement
+      name_xmlns 'pubsub', NS_PUBSUB
       def initialize
-        super("pubsub")
-        add_namespace(NS_PUBSUB)
-      end
-
-      ##
-      # element:: [REXML::Element] to import
-      # result:: [IqPubSub] with all attributes and children copied from element
-      def self.import(element)
-        new.import(element)
+        super(true)
       end
     end
   end

@@ -365,20 +365,6 @@ module Jabber
         end
 
         ##
-        # Import another element,
-        # also import presences if xe is a RosterItem
-        # return:: [RosterItem] self
-        def import(xe)
-          super
-          if xe.kind_of?(RosterItem)
-            xe.each_presence { |pres|
-              add_presence(Presence.new.import(pres))
-            }
-          end
-          self
-        end
-
-        ##
         # Send the updated RosterItem to the server,
         # i.e. if you modified iname, groups, ...
         def send

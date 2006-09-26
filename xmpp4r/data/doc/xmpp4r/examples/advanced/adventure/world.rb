@@ -133,7 +133,7 @@ class World < REXML::Element
 
       # Disallow nick changes
       if thing.kind_of?(Player) && (pres.from == thing.jid) && (player != thing)
-        answer = Jabber::XMLStanza.answer(pres, false)
+        answer = pres.answer(false)
         answer.type = :error
         answer.add(Jabber::Error.new('not-acceptable', 'Nickchange not allowed'))
         send(thing.iname, answer)
@@ -143,7 +143,7 @@ class World < REXML::Element
 
     # Either nick-collission or empty nick
     unless (player.nil? || pres.from == player.jid) && (pres.to.resource.to_s.size > 1)
-      answer = Jabber::XMLStanza.answer(pres)
+      answer = pres.answer
       answer.type = :error
       if (pres.to.resource.to_s.size > 1)
         answer.add(Jabber::Error::new('conflict', 'Nickname already used'))
@@ -188,7 +188,7 @@ class World < REXML::Element
     }
 
     if player.nil?
-      answer = Jabber::XMLStanza.answer(msg)
+      answer = msg.answer
       answer.type = :error
       answer.add(Jabber::Error::new('forbidden'))
       send(msg.to.resource, answer)

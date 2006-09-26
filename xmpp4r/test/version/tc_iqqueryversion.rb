@@ -4,6 +4,7 @@ $:.unshift File::dirname(__FILE__) + '/../../lib'
 
 require 'test/unit'
 require 'xmpp4r/rexmladdons'
+require 'xmpp4r/iq'
 require 'xmpp4r/version/iq/version'
 include Jabber
 
@@ -11,9 +12,9 @@ class Version::IqQueryVersionTest < Test::Unit::TestCase
   def test_create_empty
     x = Version::IqQueryVersion::new
     assert_equal('jabber:iq:version', x.namespace)
-    assert_equal('', x.iname)
-    assert_equal('', x.version)
-    assert_equal(nil, x.os)
+    assert_nil(x.iname)
+    assert_nil(x.version)
+    assert_nil(x.os)
   end
 
   def test_create
