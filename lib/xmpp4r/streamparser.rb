@@ -10,7 +10,7 @@ module Jabber
 
   ##
   # The StreamParser uses REXML to parse the incoming XML stream
-  # of the Jabber protocol and fires XMLStanzas at the Connection
+  # of the Jabber protocol and fires XMPPStanza at the Connection
   # instance.
   #
   class StreamParser
@@ -21,7 +21,7 @@ module Jabber
     # Constructs a parser for the supplied stream (socket input)
     #
     # stream:: [IO] Socket input stream
-    # listener:: [Object.receive(XMLStanza)] The listener (usually a Jabber::Protocol::Connection instance)
+    # listener:: [Object.receive(XMPPStanza)] The listener (usually a Jabber::Protocol::Connection instance)
     #
     def initialize(stream, listener)
       @stream = stream

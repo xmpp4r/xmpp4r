@@ -13,13 +13,7 @@ module Jabber
     #
     # See JEP-0045 for details
     class XMUC < X
-      ##
-      # Initialize an <x/> element
-      # and set namespace to http://jabber.org/protocol/muc
-      def initialize
-        super
-        add_namespace('http://jabber.org/protocol/muc')
-      end
+      name_xmlns 'x', 'http://jabber.org/protocol/muc'
 
       ##
       # Text content of the <tt><password/></tt> element
@@ -45,26 +39,7 @@ module Jabber
     #
     # See JEP-0058 for details
     class XMUCUser < X
-      ##
-      # Initialize an <x/> element
-      # and set namespace to http://jabber.org/protocol/muc#user
-      def initialize
-        super
-        add_namespace('http://jabber.org/protocol/muc#user')
-      end
-
-      ##
-      # Add a children element,
-      # will be imported to [XMUCUserItem] if name is "item"
-      def typed_add(element)
-        if element.kind_of?(REXML::Element) && (element.name == 'item')
-          super(XMUCUserItem::new.import(element))
-        elsif element.kind_of?(REXML::Element) && (element.name == 'invite')
-          super(XMUCUserInvite::new.import(element))
-        else
-          super(element)
-        end
-      end
+      name_xmlns 'x', 'http://jabber.org/protocol/muc#user'
 
       ##
       # Retrieve the three-digit code in
@@ -91,8 +66,5 @@ module Jabber
         res
       end
     end
-
-    X.add_namespaceclass('http://jabber.org/protocol/muc', XMUC)
-    X.add_namespaceclass('http://jabber.org/protocol/muc#user', XMUCUser)
   end
 end

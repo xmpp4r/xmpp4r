@@ -4,12 +4,14 @@
 
 module Jabber
   module Bytestreams
+    NS_BYTESTREAMS = 'http://jabber.org/protocol/bytestreams'
+
     ##
     # Class for accessing <query/> elements with
     # xmlns='http://jabber.org/protocol/bytestreams'
     # in <iq/> stanzas.
     class IqQueryBytestreams < IqQuery
-      NS_BYTESTREAMS = 'http://jabber.org/protocol/bytestreams'
+      name_xmlns 'query', NS_BYTESTREAMS
 
       ##
       # Initialize such a <query/>
@@ -17,19 +19,8 @@ module Jabber
       # mode:: [Symbol] :tcp or :udp
       def initialize(sid=nil, mode=nil)
         super()
-        add_namespace(IqQueryBytestreams::NS_BYTESTREAMS)
         self.sid = sid
         self.mode = mode
-      end
-
-      def typed_add(xe)
-        if xe.kind_of?(REXML::Element) and xe.name == 'streamhost'
-          super StreamHost.new.import(xe)
-        elsif xe.kind_of?(REXML::Element) and xe.name == 'streamhost-used'
-          super StreamHostUsed.new.import(xe)
-        else
-          super xe
-        end
       end
 
       ##
@@ -87,19 +78,20 @@ module Jabber
       end
     end
 
-    IqQuery.add_namespaceclass(IqQueryBytestreams::NS_BYTESTREAMS, IqQueryBytestreams)
 
     ##
     # <streamhost/> element, normally appear
     # as children of IqQueryBytestreams
-    class StreamHost < REXML::Element
+    class StreamHost < XMPPElement
+      name_xmlns 'streamhost', NS_BYTESTREAMS
+
       ##
       # Initialize a <streamhost/> element
       # jid:: [JID]
       # host:: [String] Hostname or IP address
       # port:: [Fixnum] Port number
       def initialize(jid=nil, host=nil, port=nil)
-        super('streamhost')
+        super()
         self.jid = jid
         self.host = host
         self.port = port
@@ -158,9 +150,11 @@ module Jabber
     ##
     # <streamhost-used/> element, normally appears
     # as child of IqQueryBytestreams
-    class StreamHostUsed < REXML::Element
+    class StreamHostUsed < XMPPElement
+      name_xmlns 'streamhost-used', NS_BYTESTREAMS
+
       def initialize(jid=nil)
-        super('streamhost-used')
+        super()
         self.jid = jid
       end
 

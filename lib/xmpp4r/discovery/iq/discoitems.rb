@@ -17,31 +17,7 @@ module Jabber
     # querying IqQueryDiscoInfo and further sub-items by querying
     # IqQueryDiscoItems.
     class IqQueryDiscoItems < IqQuery
-      ##
-      # Create a new query
-      # with namespace http://jabber.org/protocol/disco#items
-      def initialize
-        super
-        add_namespace('http://jabber.org/protocol/disco#items')
-      end
-
-      ##
-      # Add a children element
-      #
-      # Converts <item/> elements to [Item]
-      def typed_add(element)
-        if element.kind_of?(REXML::Element)
-
-          if element.name == 'item'
-            super(Item::new.import(element))
-          else
-            super(element)
-          end
-
-        else
-          super(element)
-        end
-      end
+      name_xmlns 'query', 'http://jabber.org/protocol/disco#items'
 
       ##
       # Get the queried Service Discovery node or nil
@@ -68,13 +44,14 @@ module Jabber
       end
     end
 
-    IqQuery.add_namespaceclass('http://jabber.org/protocol/disco#items', IqQueryDiscoItems)
 
     ##
     # Service Discovery item to add() to IqQueryDiscoItems
     #
     # Please note that JEP 0030 requires the jid to occur
-    class Item < REXML::Element
+    class Item < XMPPElement
+      name_xmlns 'item', 'http://jabber.org/protocol/disco#items'
+
       ##
       # Initialize a new Service Discovery <item/>
       # to be added to IqQueryDiscoItems
@@ -82,7 +59,7 @@ module Jabber
       # iname:: [String] Item name
       # node:: [String] Service Discovery node (_not_ JID#node)
       def initialize(jid=nil, iname=nil, node=nil)
-        super('item')
+        super()
         set_jid(jid)
         set_iname(iname)
         set_node(node)

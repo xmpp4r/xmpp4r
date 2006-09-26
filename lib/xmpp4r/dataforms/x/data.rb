@@ -10,25 +10,11 @@ module Jabber
     ##
     # Data Forms (JEP-0004) implementation
     class XData < X
-      def initialize(type=nil)
-        super()
-        add_namespace('jabber:x:data')
-        self.type = type
-      end
+      name_xmlns 'x', 'jabber:x:data'
 
-      def typed_add(xe)
-        if xe.kind_of?(REXML::Element)
-          case xe.name
-            when 'instructions' then super XDataInstructions.new.import(xe)
-            when 'title' then super XDataTitle.new.import(xe)
-            when 'field' then super XDataField.new.import(xe)
-            when 'reported' then super XDataReported.new.import(xe)
-            #when 'item' then super XDataItem.new.import(xe)
-            else super xe
-          end
-        else
-          super xe
-        end
+      def initialize(type=nil)
+        super(true)
+        self.type = type
       end
 
       ##
@@ -72,14 +58,13 @@ module Jabber
       end
     end
 
-    X.add_namespaceclass('jabber:x:data', XData)
 
     ##
     # Child of XData, contains the title of this Data Form
-    class XDataTitle < REXML::Element
-      def initialize
-        super('title')
-      end
+    #
+    # TODO: Make this a simple setter
+    class XDataTitle < XMPPElement
+      name_xmlns 'title', 'jabber:x:data'
       def to_s
         text.to_s
       end
@@ -90,10 +75,8 @@ module Jabber
 
     ##
     # Child of XData, contains the instructions of this Data Form
-    class XDataInstructions < REXML::Element
-      def initialize
-        super('instructions')
-      end
+    class XDataInstructions < XMPPElement
+      name_xmlns 'instructions', 'jabber:x:data'
       def to_s
         text.to_s
       end
@@ -104,9 +87,10 @@ module Jabber
 
     ##
     # Child of XData, contains configurable/configured options of this Data Form
-    class XDataField < REXML::Element
+    class XDataField < XMPPElement
+      name_xmlns 'field', 'jabber:x:data'
       def initialize(var=nil, type=nil)
-        super('field')
+        super()
         self.var = var
         self.type = type
       end
@@ -238,10 +222,8 @@ module Jabber
 
     ##
     # The <reported/> element, can contain XDataField elements
-    class XDataReported < REXML::Element
-      def initialize
-        super('reported')
-      end
+    class XDataReported < XMPPElement
+      name_xmlns 'reported', 'jabber:x:data'
     end
   end
 end

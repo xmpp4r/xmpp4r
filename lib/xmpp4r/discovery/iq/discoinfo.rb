@@ -15,34 +15,7 @@ module Jabber
     # elements, describing the type and the supported namespaces of
     # the service.
     class IqQueryDiscoInfo < IqQuery
-      ##
-      # Create a new query
-      # with namespace http://jabber.org/protocol/disco#info
-      def initialize
-        super
-        add_namespace('http://jabber.org/protocol/disco#info')
-      end
-
-      ##
-      # Add a children element
-      #
-      # Converts <identity/> elements to [Identity]
-      # and <feature/> elements to [Feature]
-      def typed_add(element)
-        if element.kind_of?(REXML::Element)
-
-          if element.name == 'identity'
-            super(Identity::new.import(element))
-          elsif element.name == 'feature'
-            super(Feature::new.import(element))
-          else
-            super(element)
-          end
-
-        else
-          super(element)
-        end
-      end
+      name_xmlns 'query', 'http://jabber.org/protocol/disco#info'
 
       ##
       # Get the queried Service Discovery node or nil
@@ -88,20 +61,21 @@ module Jabber
       end
     end
 
-    IqQuery.add_namespaceclass('http://jabber.org/protocol/disco#info', IqQueryDiscoInfo)
 
     ##
     # Service Discovery identity to add() to IqQueryDiscoInfo
     #
     # Please note that JEP 0030 requires both category and type to occur
-    class Identity < REXML::Element
+    class Identity < XMPPElement
+      name_xmlns 'identity', 'http://jabber.org/protocol/disco#info'
+
       ##
       # Initialize a new Identity
       # category:: [String] Initial category or nil
       # iname:: [String] Initial identity name or nil
       # type:: [String] Initial type or nil
       def initialize(category=nil, iname=nil, type=nil)
-        super('identity')
+        super()
         set_category(category)
         set_iname(iname)
         set_type(type)
@@ -187,12 +161,14 @@ module Jabber
     # Service Discovery feature to add() to IqQueryDiscoInfo
     #
     # Please note that JEP 0030 requires var to be set
-    class Feature < REXML::Element
+    class Feature < XMPPElement
+      name_xmlns 'feature', 'http://jabber.org/protocol/disco#info'
+
       ##
       # Create a new <feature/> element
       # var:: [String] New var
       def initialize(var=nil)
-        super('feature')
+        super()
         set_var(var)
       end
 

@@ -8,32 +8,19 @@ require 'xmpp4r/feature_negotiation/iq/feature'
 
 module Jabber
   module Bytestreams
+    PROFILE_FILETRANSFER = 'http://jabber.org/protocol/si/profile/file-transfer'
+
     ##
     # Iq child 'si' for Stream-Initiation
-    class IqSi < REXML::Element
-      PROFILE_FILETRANSFER = 'http://jabber.org/protocol/si/profile/file-transfer'
+    class IqSi < XMPPElement
+      name_xmlns 'si', PROFILE_FILETRANSFER
 
       def initialize(id=nil, profile=nil, mime_type=nil)
-        super('si')
+        super(true)
 
-        add_namespace 'http://jabber.org/protocol/si'
         self.id = id
         self.profile = profile
         self.mime_type = mime_type
-      end
-
-      def IqSi.import(element)
-        IqSi::new.import(element)
-      end
-
-      def typed_add(element)
-        if element.kind_of?(REXML::Element) and element.name == 'file'
-          super IqSiFile.new.import(element)
-        elsif element.kind_of?(REXML::Element) and element.name == 'feature'
-          super FeatureNegotiation::IqFeature.new.import(element)
-        else
-          super element
-        end
       end
 
       ##
@@ -87,25 +74,17 @@ module Jabber
       end
     end
 
-    Iq.add_elementclass('si', IqSi)
 
     ##
     # File-transfer meta-information,
     # may appear as <file/> in IqSi
-    class IqSiFile < REXML::Element
+    class IqSiFile < XMPPElement
+      name_xmlns 'file', PROFILE_FILETRANSFER
+
       def initialize(fname=nil, size=nil)
-        super 'file'
-        add_namespace IqSi::PROFILE_FILETRANSFER
+        super()
         self.fname = fname
         self.size = size
-      end
-
-      def typed_add(element)
-        if element.kind_of?(REXML::Element) and element.name == 'range'
-          super IqSiFileRange.new.import(element)
-        else
-          super element
-        end
       end
 
       ##
@@ -189,9 +168,10 @@ module Jabber
 
     ##
     # Information for ranged transfers
-    class IqSiFileRange < REXML::Element
+    class IqSiFileRange < XMPPElement
+      name_xmlns 'range', PROFILE_FILETRANSFER
       def initialize(offset=nil, length=nil)
-        super('range')
+        super()
 
         self.offset = offset
         self.length = length

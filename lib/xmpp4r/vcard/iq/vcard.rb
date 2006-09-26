@@ -10,26 +10,20 @@ module Jabber
     # vCard container for User Information
     # (can be specified by users themselves, mostly kept on servers)
     # (JEP 0054)
-    class IqVcard < REXML::Element
+    class IqVcard < XMPPElement
+      name_xmlns 'vCard', 'vcard-temp'
+
       ##
       # Initialize a <vCard/> element
       # fields:: [Hash] Initialize with keys as XPath element names and values for element texts
       def initialize(fields=nil)
-        super("vCard")
-        add_namespace('vcard-temp')
+        super(true)
 
         unless fields.nil?
           fields.each { |name,value|
             self[name] = value
           }
         end
-      end
-
-      ##
-      # element:: [REXML::Element] to import
-      # result:: [IqVcard] with all attributes and children copied from element
-      def IqVcard.import(element)
-        IqVcard::new.import(element)
       end
 
       ##
@@ -95,8 +89,6 @@ module Jabber
         }
         res
       end
-
-      Iq.add_elementclass('vCard', IqVcard)
     end
   end
 end

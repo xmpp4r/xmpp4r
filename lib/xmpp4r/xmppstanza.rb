@@ -2,18 +2,19 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
-require 'xmpp4r/jid'
+require 'xmpp4r/xmppelement'
 require 'xmpp4r/error'
+require 'xmpp4r/jid'
 
 module Jabber
   ##
   # root class of all Jabber XML elements
-  class XMLStanza < REXML::Element
+  class XMPPStanza < XMPPElement
     ##
     # Compose a response by doing the following:
-    # * Create a new XMLStanza of the same subclass
+    # * Create a new XMPPStanza of the same subclass
     #   with the same element-name
-    # * Import xmlstanza if import is true
+    # * Import xmppstanza if import is true
     # * Swap 'to' and 'from'
     # * Copy 'id'
     # * Does not take care about the type
@@ -23,31 +24,18 @@ module Jabber
     # another error on the other side, which could be leading to a
     # ping-pong effect quickly!
     #
-    # xmlstanza:: [XMLStanza] source
+    # xmppstanza:: [XMPPStanza] source
     # import:: [true or false] Copy attributes and children of source
-    # result:: [XMLStanza] answer stanza
-    def XMLStanza.answer(xmlstanza, import=true)
-      x = xmlstanza.class::new
+    # result:: [XMPPStanza] answer stanza
+    def XMPPStanza.answer(xmppstanza, import=true)
+      x = xmppstanza.class::new
       if import
-        x.import(xmlstanza)
+        x.import(xmppstanza)
       end
-      x.from = xmlstanza.to
-      x.to = xmlstanza.from
-      x.id = xmlstanza.id
+      x.from = xmppstanza.to
+      x.to = xmppstanza.from
+      x.id = xmppstanza.id
       x
-    end
-
-    ##
-    # Add a sub-element
-    #
-    # Will be converted to [Error] if named "error"
-    # element:: [REXML::Element] to add
-    def typed_add(element)
-      if element.kind_of?(REXML::Element) && (element.name == 'error')
-        super(Error::import(element))
-      else
-        super(element)
-      end
     end
 
     ##
@@ -57,11 +45,11 @@ module Jabber
     end
 
     ##
-    # Compose a response of this XMLStanza
-    # (see XMLStanza.answer)
-    # result:: [XMLStanza] New constructed stanza
+    # Compose a response of this XMPPStanza
+    # (see XMPPStanza.answer)
+    # result:: [XMPPStanza] New constructed stanza
     def answer(import=true)
-      XMLStanza.answer(self, import)
+      XMPPStanza.answer(self, import)
     end
 
     ##

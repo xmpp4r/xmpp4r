@@ -112,6 +112,9 @@ end
 ##
 # Main loop
 ##
+  
+  require 'mprofiler'
+  MemoryProfiler.start(:string_debug=>true)
 
 puts "XMPPING #{cl.jid} -> #{jid}"
 query_methods = ['jabber:iq:version', 'jabber:iq:time', 'http://jabber.org/protocol/disco#info']
@@ -138,7 +141,7 @@ loop {
   if query_method >= query_methods.size
     query_method = 0
   end
-  
+
   sleep(interval)
 }
 

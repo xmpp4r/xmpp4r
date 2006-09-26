@@ -2,9 +2,12 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
-require 'xmpp4r/xmlstanza'
+require 'xmpp4r/xmppstanza'
 require 'xmpp4r/jid'
 require 'digest/sha1'
+
+require 'xmpp4r/query'
+require 'xmpp4r/vcard/iq/vcard'
 
 module Jabber
   ##
@@ -12,7 +15,9 @@ module Jabber
   # (see RFC3920 - 9.2.3
   #
   # A class used to build/parse IQ requests/responses
-  class Iq < XMLStanza
+  class Iq < XMPPStanza
+    name_xmlns 'iq', ''
+
     @@element_classes = {}
 
     ##
@@ -20,13 +25,13 @@ module Jabber
     # type:: [Symbol] or nil, see Iq#type
     # to:: [JID] Recipient
     def initialize(type = nil, to = nil)
-      super("iq")
+      super()
       if not to.nil?
         set_to(to)
-      end 
+      end
       if not type.nil?
         set_type(type)
-      end 
+      end
     end
 
     ##
@@ -112,28 +117,6 @@ module Jabber
     end
 
     ##
-    # Create a new iq from a stanza,
-    # copies all attributes and children from xmlstanza
-    # xmlstanza:: [REXML::Element] Source stanza
-    # return:: [Iq] New stanza
-    def Iq.import(xmlstanza)
-      Iq::new.import(xmlstanza)
-    end
-
-    ##
-    # Add an element to the Iq stanza
-    # element:: [REXML::Element] Element to add.
-    # Will be automatically converted (imported) to
-    # a class registered with add_elementclass
-    def typed_add(element)
-      if element.kind_of?(REXML::Element) && @@element_classes.has_key?(element.name)
-        super(@@element_classes[element.name]::import(element))
-      else
-        super(element)
-      end
-    end
-
-    ##
     # Create a new Iq stanza with an unspecified query child
     # (<query/> has no namespace)
     def Iq.new_query(type = nil, to = nil)
@@ -214,23 +197,5 @@ module Jabber
       iq.add(query)
       iq
     end
-
-    ##
-    # Add a class by name.
-    # Elements with this name will be automatically converted
-    # to the specific class.
-    # Used for <query/>, <vCard>, <pubsub> etc.
-    # name:: [String] Element name
-    # elementclass:: [Class] Target class
-    def Iq.add_elementclass(name, elementclass)
-      @@element_classes[name] = elementclass
-    end
   end
 end
-
-# Actually these should be included at the top,
-# but then they would be unable to call Iq.add_elementclass
-# because it hasn't just been defined.
-
-require 'xmpp4r/query'
-require 'xmpp4r/vcard/iq/vcard'

@@ -4,9 +4,11 @@
 
 module Jabber
   module MUC
-    class XMUCUserInvite < REXML::Element
+    class XMUCUserInvite < XMPPElement
+      name_xmlns 'invite', 'http://jabber.org/protocol/muc#user'
+
       def initialize(to=nil, reason=nil)
-        super('invite')
+        super()
         set_to(to)
         set_reason(reason)
       end

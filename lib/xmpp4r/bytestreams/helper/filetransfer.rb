@@ -260,7 +260,7 @@ module Jabber
 
         iq = Iq::new(:set, jid)
         iq.from = @my_jid
-        si = iq.add(Bytestreams::IqSi.new(session_id, Bytestreams::IqSi::PROFILE_FILETRANSFER, source.mime))
+        si = iq.add(Bytestreams::IqSi.new(session_id, Bytestreams::PROFILE_FILETRANSFER, source.mime))
 
         file = si.add(Bytestreams::IqSiFile.new(source.filename, source.size))
         file.hash = source.md5

@@ -235,7 +235,7 @@ module Jabber
       # If stanza is a Jabber::Message, <tt>stanza.type</tt> will be
       # automatically set to :groupchat if directed to room or :chat
       # if directed to participant.
-      # stanza:: [XMLStanza] to send
+      # stanza:: [XMPPStanza] to send
       # to:: [String] Stanza destination recipient, or room if +nil+
       def send(stanza, to=nil)
         if stanza.kind_of? Message
