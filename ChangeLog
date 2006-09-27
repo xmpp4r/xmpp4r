@@ -3,6 +3,10 @@ XMPP4R 0.4 (xx/xx/xxxx)
 * vCard helper fixes
 * Jabber RPC (JEP0009) support
 * HTTP Binding (JEP0124) support
+* SASL fixes
+* Publish-Subscribe support
+* XMPPElement: a framework for classes representing XML elements
+* Message#x and Presence#x support element selection by namespace
 
 XMPP4R 0.3 (20/07/2006)
 =======================
