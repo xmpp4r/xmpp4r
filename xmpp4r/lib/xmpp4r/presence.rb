@@ -77,12 +77,16 @@ module Jabber
     end
 
     ##
-    # Get the first <x/> element of this stanza
+    # Get the first <x/> element in this stanza, or nil if none found.
+    # namespace:: [String] Optional, find the first <x/> element having this xmlns
     # result:: [REXML::Element] or nil
-    def x
-      xe = nil
-      each_element('x') { |e| xe = e }
-      xe
+    def x(namespace=nil)
+      each_element('x') { |x|
+        if namespace.nil? or namespace == x.namespace
+          return x
+        end
+      }
+      nil
     end
 
     ##
