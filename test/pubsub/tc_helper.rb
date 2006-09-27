@@ -9,6 +9,8 @@ require 'xmpp4r'
 require 'xmpp4r/pubsub/helper/servicehelper'
 include Jabber
 
+Jabber.debug = true
+
 class PubSub::ServiceHelperTest < Test::Unit::TestCase
   include ClientTester
 
@@ -49,13 +51,8 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
   end
 
   def test_publish
-    item1 = REXML::Element.new('item1')
-    item1.attributes['foo'] = 'bar'
+    item1 = Jabber::PubSub::Item.new("3u2iui322nnyjcjjd2")
     item1.text = 'foobar'
-    item2 = REXML::Element.new('item2')
-    item2.attributes['bar'] = 'foo'
-    item2.text = 'barfoo'
-
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 
     state { |iq|
@@ -71,34 +68,13 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       assert_equal(item1.to_s, iq.pubsub.children[0].children[0].children[0].to_s)
       send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
     }
-    h.publish('mynode', {nil=>item1})
-
-    state { |iq|
-      assert_kind_of(Jabber::Iq, iq)
-      assert_equal(:set, iq.type)
-      assert_equal(1, iq.children.size)
-      assert_equal(1, iq.pubsub.children.size)
-      assert_equal('publish', iq.pubsub.children[0].name)
-      assert_equal(2, iq.pubsub.children[0].children.size)
-      assert_equal('item', iq.pubsub.children[0].children[0].name)
-      assert_equal('1', iq.pubsub.children[0].children[0].attributes['id'])
-      assert_equal(1, iq.pubsub.children[0].children[0].children.size)
-      assert_equal(item1.to_s, iq.pubsub.children[0].children[0].children[0].to_s)
-      assert_equal('item', iq.pubsub.children[0].children[1].name)
-      assert_equal('2', iq.pubsub.children[0].children[1].attributes['id'])
-      assert_equal(1, iq.pubsub.children[0].children[1].children.size)
-      assert_equal(item2.to_s, iq.pubsub.children[0].children[1].children[0].to_s)
-      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
-    }
-    h.publish('mynode', {'1'=>item1, '2'=>item2})
+    h.publish('mynode', item1)
   end
 
   def test_items
-    item1 = REXML::Element.new('item1')
-    item1.attributes['foo'] = 'bar'
+    item1 = Jabber::PubSub::Item.new("1")
     item1.text = 'foobar'
-    item2 = REXML::Element.new('item2')
-    item2.attributes['bar'] = 'foo'
+    item2 = Jabber::PubSub::Item.new("2")
     item2.text = 'barfoo'
 
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
@@ -112,8 +88,8 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'>
               <pubsub xmlns='http://jabber.org/protocol/pubsub'>
                 <items node='mynode'>
-                  <item id='1'>#{item1.to_s}</item>
-                  <item id='2'>#{item2.to_s}</item>
+                  #{item1.to_s}
+                  #{item2.to_s}
                 </items>
               </pubsub>
             </iq>")
