@@ -16,6 +16,7 @@ module Jabber
       def initialize(client,pubsubjid)
         @client = client
 	@pubsubjid = pubsubjid
+	
       end
 
       ##
@@ -64,24 +65,19 @@ module Jabber
       ##
       # publish(node,items)
       # node:: [String] 
-      # items:: [Hash] { item_id => [REXML::Element] }
+      # items:: [Jabber::PubSub::Item]
       # publishes a set of items to a pubsub node
+      # NOTE: this method sends only one item per publish request because some services may not
+      # allow batch processing
+      # maybe this is changed in the future 
       
-      def publish(node, items)
-        iq = basic_pubsub_query(:set)
+      def publish(node,item)
+	iq = basic_pubsub_query(:set)
         publish = iq.pubsub.add(REXML::Element.new('publish'))
         publish.attributes['node'] = node
-        items.each { |id,element|
-          item = publish.add(REXML::Element.new('item'))
-          item.attributes['id'] = id
-          item.add(element)
-        }
-
-        @client.send_with_id(iq) { |reply|
-          true
-        }
-      end
-      
+	publish.add(item) if item.kind_of(Jabber::PubSub::Item)
+	@client.send_with_id(iq) { |reply| true }
+      end      
       ##
       # items(node)
       # node:: [String]
@@ -90,11 +86,15 @@ module Jabber
 
       def items(node,count=nil)
         iq = basic_pubsub_query(:get)
-        iq.pubsub.add(REXML::Element.new('items')).attributes['node'] = node
+	items = Jabber::PubSub::Items.new
+	items.set_node = node
+        iq.pubsub.add(items)
 
         res = nil
         @client.send_with_id(iq) { |reply|
-          if reply.kind_of? Iq and reply.pubsub and reply.pubsub.first_element('items')
+	  # i don't know why testing the reply of Iq and Pubsub stanzas
+	  # but stephan probably knows ;)
+          if reply.kind_of?(Iq) and reply.pubsub and reply.pubsub.first_element('items')
             res = {}
             reply.pubsub.first_element('items').each_element('item') do |item|
               res[item.attributes['id']] = item.children.first if item.children.first
@@ -104,6 +104,7 @@ module Jabber
         }
         res
       end
+
       ##
       # affiliations
       # showes the affiliations on a pubsub service
@@ -270,7 +271,9 @@ module Jabber
       end
       
       
-      
+      def to_s
+        @pubsubjid.to_s
+      end
 
       private
       
