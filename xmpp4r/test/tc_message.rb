@@ -54,6 +54,17 @@ class MessageTest < Test::Unit::TestCase
     assert_equal("2", x.body)
   end
 
+  def test_entities
+    m1 = Message::new(nil, '&')
+    assert_equal('<body>&amp;</body>', m1.first_element('body').to_s)
+    m2 = Message::new(nil, '&amp;')
+    assert_equal('<body>&amp;amp;</body>', m2.first_element('body').to_s)
+    m3 = Message::new(nil, '&nbsp')
+    assert_equal('<body>&amp;nbsp</body>', m3.first_element('body').to_s)
+    m4 = Message::new(nil, '&nbsp;')
+    assert_equal('<body>&amp;nbsp;</body>', m4.first_element('body').to_s)
+  end
+
   def test_subject
     x = Message::new
     assert_equal(nil, x.subject)
