@@ -16,7 +16,10 @@ module Jabber
       def initialize(client,pubsubjid)
         @client = client
         @pubsubjid = pubsubjid
-
+	@items_cbs = CallbackList.new
+	@client.add_message_callback(200,self) { |message|)
+	  handle_message(message)
+	}
       end
 
       ##
@@ -24,7 +27,7 @@ module Jabber
       # node:: [String] you node name - otherwise you get a automaticly generated one (in most cases)
       # configure:: [Jabber::XMLStanza] if you want to configure you node (default nil)
       # creates a new node on the pubsub service
-
+      # returns [String]
       def create(node=nil,configure=nil)
         rnode = nil
         iq = basic_pubsub_query(:set)
@@ -52,7 +55,8 @@ module Jabber
       # delete(node)
       # node:: [String]
       # deletes a pubsub node
-
+      # returns true
+      
       def delete(node)
         iq = basic_pubsub_query(:set)
         iq.pubsub.add(REXML::Element.new('delete')).attributes['node'] = node
@@ -70,7 +74,7 @@ module Jabber
       # NOTE: this method sends only one item per publish request because some services may not
       # allow batch processing
       # maybe this is changed in the future
-
+      # returns true 
       def publish(node,item)
         iq = basic_pubsub_query(:set)
         publish = iq.pubsub.add(REXML::Element.new('publish'))
@@ -78,12 +82,13 @@ module Jabber
         publish.add(item) if item.kind_of?(Jabber::PubSub::Item)
         @client.send_with_id(iq) { |reply| true }
       end
+
       ##
       # items(node)
       # node:: [String]
       # count:: [Fixnum]
       # gets all items from a pubsub node
-
+      # returns [Hash] { id => [Jabber::PubSub::Item]}
       def items(node,count=nil)
         iq = basic_pubsub_query(:get)
         items = Jabber::PubSub::Items.new
@@ -186,7 +191,7 @@ module Jabber
       # subscribe(node)
       # node:: [String]
       # subscribe to a node
-
+      # returns [Hash] of { attributename => value }
       def subscribe(node)
 
         iq = basic_pubsub_query(:set)
@@ -221,7 +226,7 @@ module Jabber
       # unsubscribe(node,subid)
       # node:: [String]
       # subid:: [String] or nil
-
+      # return true
       def unsubscribe(node,subid=nil)
         iq = basic_pubsub_query(:set)
         unsub = REXML::Element.new('unsubscribe')
@@ -236,7 +241,7 @@ module Jabber
       # get_options(node,subid=nil)
       # node:: [String]
       # subid:: [String] or nil
-
+      # return [Jabber::XData]
       def get_options(node,subid=nil)
         iq = basic_pubsub_query(:get)
         opt = REXML::Element.new('options')
@@ -258,6 +263,7 @@ module Jabber
       # node:: [String]
       # options:: [Jabber::XData]
       # subid:: [String] or nil
+      # returns true
 
       def set_options(node,options,subid=nil)
         iq = basic_pubsub_query(:set)
@@ -269,10 +275,16 @@ module Jabber
         iq.pubsub.options.add(options)
         @client.send_with_id(iq) { |reply| true }
       end
+      
+      def add
 
-
+      # returns [String]
       def to_s
         @pubsubjid.to_s
+      end
+      
+      def add_item_callback(prio = 200, ref = nil, &block)
+        @items_cbs(prio, ref, block)
       end
 
       private
@@ -283,6 +295,11 @@ module Jabber
         iq.add(IqPubSub.new)
         iq
       end
+      def handle_message(message)
+        # messagehandling
+	 
+      end
+      
     end
   end
 end
