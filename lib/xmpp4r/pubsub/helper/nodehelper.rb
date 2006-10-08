@@ -1,4 +1,6 @@
 require 'xmpp4r/pubsub/helper/servicehelper'
+require 'callbacks'
+require 'thread'
 
 module Jabber
   module PubSub
@@ -13,7 +15,7 @@ module Jabber
       def initialize(client,service,nodename)
          super(client,service)
 	 @nodename = nodename
-	 
+	 @item_cbs = CallbackList.new
       end
       
       ##
