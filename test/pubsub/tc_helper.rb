@@ -50,7 +50,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
   end
 
   def test_publish
-    item1 = Jabber::PubSub::Item.new("3u2iui322nnyjcjjd2")
+    item1 = Jabber::PubSub::Item.new
     item1.text = 'foobar'
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 
@@ -64,7 +64,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       assert_equal('item', iq.pubsub.children[0].children[0].name)
       assert_nil(iq.pubsub.children[0].children[0].attributes['id'])
       assert_equal(1, iq.pubsub.children[0].children[0].children.size)
-      assert_equal(item1.to_s, iq.pubsub.children[0].children[0].children[0].to_s)
+      assert_equal(item1.children.to_s, iq.pubsub.children[0].children[0].children[0].to_s)
       send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
     }
     h.publish('mynode', item1)
@@ -96,10 +96,10 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
 
     items = h.items('mynode')
     assert_equal(2, items.size)
-    assert_kind_of(REXML::Element, items['1'])
-    assert_kind_of(REXML::Element, items['2'])
-    assert_equal(item1.to_s, items['1'].to_s)
-    assert_equal(item2.to_s, items['2'].to_s)
+    assert_kind_of(REXML::Text, items['1'])
+    assert_kind_of(REXML::Text, items['2'])
+    assert_equal(item1.children.to_s, items['1'].to_s)
+    assert_equal(item2.children.to_s, items['2'].to_s)
   end
 
   def test_affiliations

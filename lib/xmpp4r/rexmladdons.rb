@@ -75,7 +75,7 @@ module REXML
     end
 
     def self.import(xmlelement)
-      self.new.import(xmlelement)
+      self.new(xmlelement.name).import(xmlelement)
     end
 
     ##
