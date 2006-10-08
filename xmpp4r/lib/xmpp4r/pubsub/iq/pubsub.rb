@@ -16,18 +16,18 @@ module Jabber
 
 
     ##
-    # Item 
+    # Item
     # One PubSub Item
     class Item < XMPPElement
-      name_xmlns 'item'
-      def initialize(id)
+      name_xmlns 'item', NS_PUBSUB
+      def initialize(id=nil)
         super(true)
-	attributes['id'] = id
+        attributes['id'] = id
       end
-      def get_id
+      def id
         attributes['id']
       end
-      def set_id=(myid)
+      def id=(myid)
         attributes['id'] = myid
       end
     end
@@ -36,26 +36,26 @@ module Jabber
     # Items
     # a collection of Items
     class Items < XMPPElement
-      name_xmlns 'items'
+      name_xmlns 'items', NS_PUBSUB
       def initialize
         super(true)
       end
-      def get_node
+      def node
         attributes['node']
       end
-      def set_node=(mynodename)
+      def node=(mynodename)
         attributes['node'] = mynodename
       end
-      def get_subid
+      def subid
         attributes['subid']
       end
-      def set_subid=(mysubid)
+      def subid=(mysubid)
         attributes['subid'] = mysubid
       end
-      def get_max_items
+      def max_items
         attributes['max_items']
       end
-      def set_max_items=(mymaxitems)
+      def max_items=(mymaxitems)
         attributes['max_items'] = mymaxitems
       end
     end

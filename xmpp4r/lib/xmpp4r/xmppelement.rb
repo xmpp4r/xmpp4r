@@ -39,9 +39,9 @@ module Jabber
     def self.import(element)
       klass = class_for_name_xmlns(element.name, element.namespace)
       if klass != self and klass.ancestors.include?(self)
-        klass.import(element)
+        klass.new.import(element)
       else
-        super
+        self.new.import(element)
       end
     end
 
