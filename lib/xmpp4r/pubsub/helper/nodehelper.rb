@@ -1,3 +1,7 @@
+# =XMPP4R - XMPP Library for Ruby                                                                                     
+# License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.                                         
+# Website::http://home.gna.org/xmpp4r/ 
+
 require 'xmpp4r/pubsub/helper/servicehelper'
 require 'callbacks'
 require 'thread'
@@ -15,7 +19,7 @@ module Jabber
       def initialize(client,service,nodename)
          super(client,service)
 	 @nodename = nodename
-	 @item_cbs = CallbackList.new
+	 #@event_cbs = CallbackList.new
       end
       
       ##
@@ -79,6 +83,17 @@ module Jabber
       def do_unsubscribe(subid=nil)
         unsubscribe(@nodename,subid)
       end
+
+    private
+
+      def handle_message(message)
+        if message.from == @pubsubjid and message.first_element('event') \
+	   and message.pubsub.publish.attributes['node'] == @nodename
+	   
+	  event = message.first_element('event')                                                             
+	  @event_cbs.process(event)                                                                          
+	end
+      end  
     end
   end
 end
