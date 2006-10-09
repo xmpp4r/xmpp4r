@@ -1,3 +1,7 @@
+# =XMPP4R - XMPP Library for Ruby                                                                                     
+# License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.                                         
+# Website::http://home.gna.org/xmpp4r/ 
+
 require 'xmpp4r/pubsub/iq/pubsub'
 require 'xmpp4r/dataforms'
 
@@ -17,7 +21,7 @@ module Jabber
         @client = client
         @pubsubjid = pubsubjid
 	@items_cbs = CallbackList.new
-	@client.add_message_callback(200,self) { |message|)
+	@client.add_message_callback(200,self) { |message|
 	  handle_message(message)
 	}
       end
@@ -276,15 +280,13 @@ module Jabber
         @client.send_with_id(iq) { |reply| true }
       end
       
-      def add
-
       # returns [String]
       def to_s
         @pubsubjid.to_s
       end
       
       def add_item_callback(prio = 200, ref = nil, &block)
-        @items_cbs(prio, ref, block)
+        @items_cbs.add(prio, ref, block)
       end
 
       private
