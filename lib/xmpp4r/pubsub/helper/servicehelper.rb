@@ -20,7 +20,7 @@ module Jabber
       def initialize(client,pubsubjid)
         @client = client
         @pubsubjid = pubsubjid
-	@items_cbs = CallbackList.new
+	@event_cbs = CallbackList.new
 	@client.add_message_callback(200,self) { |message|
 	  handle_message(message)
 	}
@@ -60,7 +60,6 @@ module Jabber
       # node:: [String]
       # deletes a pubsub node
       # returns true
-      
       def delete(node)
         iq = basic_pubsub_query(:set)
         iq.pubsub.add(REXML::Element.new('delete')).attributes['node'] = node
@@ -71,20 +70,39 @@ module Jabber
       end
 
       ##
-      # publish(node,items)
+      # publish(node,item)
       # node:: [String]
-      # items:: [Jabber::PubSub::Item]
-      # publishes a set of items to a pubsub node
+      # item:: [Jabber::PubSub::Item]
       # NOTE: this method sends only one item per publish request because some services may not
       # allow batch processing
-      # maybe this is changed in the future
+      # maybe this will changed in the future
       # returns true 
       def publish(node,item)
         iq = basic_pubsub_query(:set)
         publish = iq.pubsub.add(REXML::Element.new('publish'))
         publish.attributes['node'] = node
-        publish.add(item) if item.kind_of?(Jabber::PubSub::Item)
-        @client.send_with_id(iq) { |reply| true }
+	if item.kind_of?(Jabber::PubSub::Item)
+	  publish.add(item)
+	  p iq.to_s
+          @client.send_with_id(iq) { |reply| true }
+	end
+      end
+
+      ##
+      # publish_with_id(node,xmlitem,id)
+      # node:: [String]
+      # item:: [REXML::Element]
+      # id:: [String]
+      # retrun true
+      def publish_with_id(node,item,id)
+	if item.kind_of?(REXML::Element)
+	  xmlitem = Jabber::PubSub::Item.new
+	  xmlitem.id = id
+	  xmlitem.add(item)
+	  publish(node,xmlitem)
+	else 
+	  raise "given item is not a proper xml document or Jabber::PubSub::Item"
+	end
       end
 
       ##
@@ -118,10 +136,10 @@ module Jabber
       ##
       # affiliations
       # showes the affiliations on a pubsub service
+      # returns a [Hash] of { node => symbol }
       def affiliations
         iq = basic_pubsub_query(:get)
         iq.pubsub.add(REXML::Element.new('affiliations'))
-
         res = nil
         @client.send_with_id(iq) { |reply|
           if reply.pubsub.first_element('affiliations')
@@ -137,8 +155,7 @@ module Jabber
                     end
               res[affiliation.attributes['node']] = aff
             end
-          end
-
+    	  end
           true
         }
         res
@@ -157,7 +174,6 @@ module Jabber
       # node:: [String] or nil
       # showes all subscriptions on the given node
       # returns an [Array] of [REXML::Element]
-
       def subscriptions(node)
         iq = basic_pubsub_query(:get)
         entities = iq.pubsub.add(REXML::Element.new('subscriptions'))
@@ -171,7 +187,6 @@ module Jabber
               res << REXML::Element.new(subscription)
             }
           end
-
           true
         }
         res
@@ -197,33 +212,22 @@ module Jabber
       # subscribe to a node
       # returns [Hash] of { attributename => value }
       def subscribe(node)
-
         iq = basic_pubsub_query(:set)
         sub = REXML::Element.new('subscribe')
         sub.attributes['node'] = node
         sub.attributes['jid'] = @client.jid.strip
         iq.pubsub.add(sub)
-
         repl = {}
-
         @client.send_with_id(iq) do |reply|
-
           pubsubanswer = reply.pubsub
-
           if pubsubanswer.first_element('subscription')
             pubsubanswer.each_element('subscription') { |element|
-
               element.attributes.each { |name,value| repl.store(name,value) }
             }
-
           end
-
           true
-
         end # @client.send_with_id(iq)
-
         repl
-
       end
 
       ##
@@ -268,7 +272,6 @@ module Jabber
       # options:: [Jabber::XData]
       # subid:: [String] or nil
       # returns true
-
       def set_options(node,options,subid=nil)
         iq = basic_pubsub_query(:set)
         opt = REXML::Element.new('options')
@@ -285,8 +288,11 @@ module Jabber
         @pubsubjid.to_s
       end
       
-      def add_item_callback(prio = 200, ref = nil, &block)
-        @items_cbs.add(prio, ref, block)
+      ##
+      # add_event_callback
+      # returns
+      def add_event_callback(prio = 200, ref = nil, &block)
+        @event_cbs.add(prio, ref, block)
       end
 
       private
@@ -297,9 +303,14 @@ module Jabber
         iq.add(IqPubSub.new)
         iq
       end
+      
+      ##
+      # vor handling the incoming events
       def handle_message(message)
-        # messagehandling
-	 
+	if message.from == @pubsubjid and message.first_element('event')
+	  event = message.first_element('event')
+	  @event_cbs.process(event)
+	end
       end
       
     end
