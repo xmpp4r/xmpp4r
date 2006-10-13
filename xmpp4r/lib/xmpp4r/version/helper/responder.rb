@@ -57,6 +57,7 @@ module Jabber
               answer.query.set_iname(name).set_version(version).set_os(os)
 
               @stream.send(answer)
+              true
             }
             @versioncbs.process(iq, replyblock)
           else
