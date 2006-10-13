@@ -13,7 +13,7 @@ module Jabber
       name_xmlns 'x', 'jabber:x:data'
 
       def initialize(type=nil)
-        super(true)
+        super()
         self.type = type
       end
 
