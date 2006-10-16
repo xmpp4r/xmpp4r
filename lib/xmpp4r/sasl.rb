@@ -132,6 +132,8 @@ module Jabber
         end
         res[key] = value unless key == ''
 
+        Jabber::debuglog("SASL DIGEST-MD5 challenge:\n#{text.inspect}\n#{res.inspect}")
+
         res
       end
 
@@ -156,9 +158,13 @@ module Jabber
           end
         }
 
+        response_text = response.collect { |k,v| "#{k}=#{v}" }.join(',')
+        Jabber::debuglog("SASL DIGEST-MD5 response:\n#{response_text}")
+
         r = REXML::Element.new('response')
         r.add_namespace NS_SASL
-        r.text = Base64::encode64(response.collect { |k,v| "#{k}=#{v}" }.join(',')).gsub(/\s/, '')
+        r.text = Base64::encode64(response_text).gsub(/\s/, '')
+
         success_already = false
         error = nil
         @stream.send(r) { |reply|
