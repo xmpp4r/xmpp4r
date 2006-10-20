@@ -59,5 +59,45 @@ module Jabber
         attributes['max_items'] = mymaxitems
       end
     end
+
+    ##
+    # Event
+    # a publishing event
+    class Event < XMPPElement
+      name_xmlns 'event', NS_PUBSUB + '#event'
+      def initialize
+        super(true)
+      end
+      
+      ##
+      # return payload
+      def payload
+        elements
+      end
+
+      ##
+      # add payload
+      def payload=(pl)
+        add_element = pl
+      end
+      
+      ##
+      # return the payload type
+      def event_type?
+        # each child of event
+	# this should interate only one time
+        each_element('./event/*') { |plelement|
+	  case plelement.name
+	    when 'collection' 	   then return :collection
+	    when 'configuration'   then	return :configuration
+	    when 'delete'	   then return :delete
+	    when 'items'	   then return :items
+	    when 'purge'	   then return :purge
+	    when 'subscription'	   then return :subscription
+	    else return nil
+	  end
+	 }
+      end
+    end
   end
 end
