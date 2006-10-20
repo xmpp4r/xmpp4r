@@ -307,7 +307,8 @@ module Jabber
       ##
       # vor handling the incoming events
       def handle_message(message)
-	if message.from == @pubsubjid and message.first_element('event')
+	if message.from == @pubsubjid and message.first_element('event').kind_of?(Jabber::PubSub::Event)
+
 	  event = message.first_element('event')
 	  @event_cbs.process(event)
 	end

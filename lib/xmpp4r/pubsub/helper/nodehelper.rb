@@ -18,8 +18,9 @@ module Jabber
       # nodename:: [String]
       def initialize(client,service,nodename)
          super(client,service)
+	 @pubsubjid = service
 	 @nodename = nodename
-	 #@event_cbs = CallbackList.new
+	 @event_cbs = CallbackList.new
       end
       
       ##
@@ -87,10 +88,11 @@ module Jabber
     private
 
       def handle_message(message)
-        if message.from == @pubsubjid and message.first_element('event') \
-	   and message.pubsub.publish.attributes['node'] == @nodename
-	   
-	  event = message.first_element('event')                                                             
+        if message.from == @pubsubjid and message.first_element('event').kind_of?(Jabber::PubSub::Event) 
+	  # puts message.first_element("message").first_element('event').namespace
+	  event = message.first_element('event')
+
+	  # the @event_cbs comes from our parentclass
 	  @event_cbs.process(event)                                                                          
 	end
       end  
