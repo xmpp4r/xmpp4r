@@ -22,7 +22,7 @@ class BasicClient
       quit = true if line.nil?
       if not quit
         command, args = line.split(' ', 2)
-        args.chomp!
+        args = args.to_s.chomp
         # main case
         case command
         when 'exit'
@@ -52,7 +52,7 @@ class BasicClient
   ##
   # connect <jid> <password>
   def do_connect(args)
-    @jid, @password = args.split(' ', 3)
+    @jid, @password = args.split(' ', 2)
     @jid = JID::new(@jid)
     @cl = Client::new(@jid)
     @cl.connect
