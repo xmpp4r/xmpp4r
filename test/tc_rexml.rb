@@ -13,6 +13,21 @@ class REXMLTest < Test::Unit::TestCase
     assert_nil(e.attributes['x'])
   end
 
+  def test_normalize
+    assert_equal('&amp;', REXML::Text::normalize('&'))
+    assert_equal('&amp;amp;', REXML::Text::normalize('&amp;'))
+    assert_equal('&amp;amp;amp;', REXML::Text::normalize('&amp;amp;'))
+    assert_equal('&amp;nbsp;', REXML::Text::normalize('&nbsp;'))
+  end
+
+  def test_unnormalize
+    assert_equal('&', REXML::Text::unnormalize('&amp;'))
+    assert_equal('&amp;', REXML::Text::unnormalize('&amp;amp;'))
+    assert_equal('&amp;amp;', REXML::Text::unnormalize('&amp;amp;amp;'))
+    assert_equal('&nbsp;', REXML::Text::unnormalize('&amp;nbsp;'))
+    assert_equal('&nbsp;', REXML::Text::unnormalize('&nbsp;'))  # ?
+  end
+
   def test_text_entities
     e = REXML::Element.new('e')
     e.text = '&'
@@ -23,6 +38,12 @@ class REXMLTest < Test::Unit::TestCase
     assert_equal('<e>&amp;nbsp</e>', e.to_s)
     e.text = '&nbsp;'
     assert_equal('<e>&amp;nbsp;</e>', e.to_s)
+    e.text = '&<;'
+    assert_equal('<e>&amp;&lt;;</e>', e.to_s)
+    e.text = '<>"\''
+    assert_equal('<e>&lt;&gt;&quot;&apos;</e>', e.to_s)
+    e.text = '<x>&amp;</x>'
+    assert_equal('<e>&lt;x&gt;&amp;amp;&lt;/x&gt;</e>', e.to_s)
   end
 
   def test_attribute_entites
@@ -35,6 +56,5 @@ class REXMLTest < Test::Unit::TestCase
     assert_equal('&nbsp', e.attributes['x'])
     e.attributes['x'] = '&nbsp;'
     assert_equal('&nbsp;', e.attributes['x'])
-    p e.to_s
   end
 end
