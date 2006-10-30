@@ -23,12 +23,17 @@ module Jabber
       # Will start to listen on the given TCP port and
       # accept new peers
       # port:: [Fixnum] TCP port to listen on
-      def initialize(port)
+      # listen_on:: [String] Optional address for the server socket to listen on (i.e. '0.0.0.0' or '::')
+      def initialize(port, listen_on=nil)
         @port = port
         @addresses = []
         @peers = []
         @peers_lock = Mutex.new
-        socket = TCPServer.new(port)
+        if listen_on
+          socket = TCPServer.new(listen_on, port)
+        else
+          socket = TCPServer.new(port)
+        end
 
         Thread.new {
           loop {

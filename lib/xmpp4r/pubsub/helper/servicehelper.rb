@@ -1,6 +1,6 @@
-# =XMPP4R - XMPP Library for Ruby                                                                                     
-# License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.                                         
-# Website::http://home.gna.org/xmpp4r/ 
+# =XMPP4R - XMPP Library for Ruby
+# License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
+# Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/pubsub/iq/pubsub'
 require 'xmpp4r/dataforms'
@@ -8,31 +8,28 @@ require 'xmpp4r/dataforms'
 module Jabber
   module PubSub
     ##
-    # A Helper for a PubSub Service
-
+    # A Helper representing a PubSub Service
     class ServiceHelper
 
       ##
-      # new(client,pubsubjid)
+      # Creates a new representation of a pubsub service
       # client:: [Jabber::Stream]
       # pubsubjid:: [String] or [Jabber::JID]
-      # creates a new "connection" to a pubsub service
-      def initialize(client,pubsubjid)
+      def initialize(client, pubsubjid)
         @client = client
         @pubsubjid = pubsubjid
-	@event_cbs = CallbackList.new
-	@client.add_message_callback(200,self) { |message|
-	  handle_message(message)
-	}
+        @event_cbs = CallbackList.new
+        @client.add_message_callback(200,self) { |message|
+          handle_message(message)
+        }
       end
 
       ##
-      # create(jid,node,configure)
+      # Create a new node on the pubsub service
       # node:: [String] you node name - otherwise you get a automaticly generated one (in most cases)
       # configure:: [Jabber::XMLStanza] if you want to configure you node (default nil)
-      # creates a new node on the pubsub service
-      # returns [String]
-      def create(node=nil,configure=nil)
+      # return:: [String]
+      def create(node=nil, configure=nil)
         rnode = nil
         iq = basic_pubsub_query(:set)
         iq.pubsub.add(REXML::Element.new('create')).attributes['node'] = node
@@ -45,21 +42,20 @@ module Jabber
           iq.pubsub.add(confele)
         end
 
-        @client.send_with_id(iq) { |reply|
+        @client.send_with_id(iq) do |reply|
           if (create = reply.first_element('pubsub/create'))
             rnode = create.attributes['node']
           end
           true
-        }
+        end
 
         rnode
       end
 
       ##
-      # delete(node)
+      # Delete a pubsub node
       # node:: [String]
-      # deletes a pubsub node
-      # returns true
+      # return:: true
       def delete(node)
         iq = basic_pubsub_query(:set)
         iq.pubsub.add(REXML::Element.new('delete')).attributes['node'] = node
@@ -70,47 +66,44 @@ module Jabber
       end
 
       ##
-      # publish(node,item)
-      # node:: [String]
-      # item:: [Jabber::PubSub::Item]
       # NOTE: this method sends only one item per publish request because some services may not
       # allow batch processing
       # maybe this will changed in the future
-      # returns true 
+      # node:: [String]
+      # item:: [Jabber::PubSub::Item]
+      # return:: true
       def publish(node,item)
         iq = basic_pubsub_query(:set)
         publish = iq.pubsub.add(REXML::Element.new('publish'))
         publish.attributes['node'] = node
-	if item.kind_of?(Jabber::PubSub::Item)
-	  publish.add(item)
-	  p iq.to_s
+        if item.kind_of?(Jabber::PubSub::Item)
+          publish.add(item)
+          p iq.to_s
           @client.send_with_id(iq) { |reply| true }
-	end
+        end
       end
 
       ##
-      # publish_with_id(node,xmlitem,id)
       # node:: [String]
       # item:: [REXML::Element]
       # id:: [String]
-      # retrun true
+      # return:: true
       def publish_with_id(node,item,id)
-	if item.kind_of?(REXML::Element)
-	  xmlitem = Jabber::PubSub::Item.new
-	  xmlitem.id = id
-	  xmlitem.add(item)
-	  publish(node,xmlitem)
-	else 
-	  raise "given item is not a proper xml document or Jabber::PubSub::Item"
-	end
+        if item.kind_of?(REXML::Element)
+          xmlitem = Jabber::PubSub::Item.new
+          xmlitem.id = id
+          xmlitem.add(item)
+          publish(node,xmlitem)
+        else
+          raise "given item is not a proper xml document or Jabber::PubSub::Item"
+        end
       end
 
       ##
-      # items(node)
+      # gets all items from a pubsub node
       # node:: [String]
       # count:: [Fixnum]
-      # gets all items from a pubsub node
-      # returns [Hash] { id => [Jabber::PubSub::Item]}
+      # return:: [Hash] { id => [Jabber::PubSub::Item] }
       def items(node,count=nil)
         iq = basic_pubsub_query(:get)
         items = Jabber::PubSub::Items.new
@@ -119,12 +112,9 @@ module Jabber
 
         res = nil
         @client.send_with_id(iq) { |reply|
-        # i don't know why testing the reply of Iq and Pubsub stanzas
-        # but stephan probably knows ;)
           if reply.kind_of?(Iq) and reply.pubsub and reply.pubsub.first_element('items')
             res = {}
             reply.pubsub.first_element('items').each_element('item') do |item|
-              p item.to_s
               res[item.attributes['id']] = item.children.first if item.children.first
             end
           end
@@ -134,9 +124,8 @@ module Jabber
       end
 
       ##
-      # affiliations
-      # showes the affiliations on a pubsub service
-      # returns a [Hash] of { node => symbol }
+      # shows the affiliations on a pubsub service
+      # return:: [Hash] of { node => symbol }
       def affiliations
         iq = basic_pubsub_query(:get)
         iq.pubsub.add(REXML::Element.new('affiliations'))
@@ -155,26 +144,17 @@ module Jabber
                     end
               res[affiliation.attributes['node']] = aff
             end
-    	  end
+          end
           true
         }
         res
       end
 
       ##
-      # get_all_subscriptions
-      # showes all subscriptions on a pubsub service
-      # returns an [Array] of [REXML::Element]
-      def get_all_subscriptions
-        subscriptions(nil)
-      end
-
-      ##
-      # subscriptions(node)
-      # node:: [String] or nil
-      # showes all subscriptions on the given node
-      # returns an [Array] of [REXML::Element]
-      def subscriptions(node)
+      # shows all subscriptions on the given node
+      # node:: [String], or nil for all
+      # return:: [Array] of [REXML::Element]
+      def subscriptions(node=nil)
         iq = basic_pubsub_query(:get)
         entities = iq.pubsub.add(REXML::Element.new('subscriptions'))
         entities.attributes['node'] = node
@@ -193,11 +173,9 @@ module Jabber
       end
 
       ##
-      # subscribers(node)
+      # shows all jids of subscribers of a node
       # node:: [String]
-      # showes all jids of subscribers of a node
-      # gives back a [Array] of [String]
-
+      # return:: [Array] of [String]
       def subscribers(node)
         res = []
         subscriptions(node).each { |sub|
@@ -207,34 +185,34 @@ module Jabber
       end
 
       ##
-      # subscribe(node)
-      # node:: [String]
       # subscribe to a node
-      # returns [Hash] of { attributename => value }
+      # node:: [String]
+      # return:: [Hash] of { attributename => value }
       def subscribe(node)
         iq = basic_pubsub_query(:set)
         sub = REXML::Element.new('subscribe')
         sub.attributes['node'] = node
         sub.attributes['jid'] = @client.jid.strip
         iq.pubsub.add(sub)
-        repl = {}
+        res = {}
         @client.send_with_id(iq) do |reply|
           pubsubanswer = reply.pubsub
           if pubsubanswer.first_element('subscription')
             pubsubanswer.each_element('subscription') { |element|
-              element.attributes.each { |name,value| repl.store(name,value) }
+              element.attributes.each { |name,value| res[name] = value }
             }
           end
           true
         end # @client.send_with_id(iq)
-        repl
+        res
       end
 
       ##
-      # unsubscribe(node,subid)
+      # Unsubscibe from a node with an optional subscription id
+      #
+      # May raise ErrorException
       # node:: [String]
       # subid:: [String] or nil
-      # return true
       def unsubscribe(node,subid=nil)
         iq = basic_pubsub_query(:set)
         unsub = REXML::Element.new('unsubscribe')
@@ -242,14 +220,13 @@ module Jabber
         unsub.attributes['jid'] = @client.jid.strip
         unsub.attributes['subid'] = subid
         iq.pubsub.add(unsub)
-        @client.send_with_id(iq) { |reply| true	} # @client.send_with_id(iq)
+        @client.send_with_id(iq) { |reply| true        } # @client.send_with_id(iq)
       end
 
       ##
-      # get_options(node,subid=nil)
       # node:: [String]
       # subid:: [String] or nil
-      # return [Jabber::XData]
+      # return:: [Jabber::XData]
       def get_options(node,subid=nil)
         iq = basic_pubsub_query(:get)
         opt = REXML::Element.new('options')
@@ -267,11 +244,9 @@ module Jabber
       end
 
       ##
-      # get_options(node,options,subid=nil)
       # node:: [String]
       # options:: [Jabber::XData]
       # subid:: [String] or nil
-      # returns true
       def set_options(node,options,subid=nil)
         iq = basic_pubsub_query(:set)
         opt = REXML::Element.new('options')
@@ -282,15 +257,17 @@ module Jabber
         iq.pubsub.options.add(options)
         @client.send_with_id(iq) { |reply| true }
       end
-      
-      # returns [String]
+
+      ##
+      # String representation
+      # result:: [String] The PubSub service's JID
       def to_s
         @pubsubjid.to_s
       end
-      
+
       ##
-      # add_event_callback
-      # returns
+      # Register callbacks for incoming events
+      # (i.e. Message stanzas containing) PubSub notifications
       def add_event_callback(prio = 200, ref = nil, &block)
         @event_cbs.add(prio, ref, block)
       end
@@ -303,17 +280,16 @@ module Jabber
         iq.add(IqPubSub.new)
         iq
       end
-      
-      ##
-      # vor handling the incoming events
-      def handle_message(message)
-	if message.from == @pubsubjid and message.first_element('event').kind_of?(Jabber::PubSub::Event)
 
-	  event = message.first_element('event')
-	  @event_cbs.process(event)
-	end
+      ##
+      # for handling incoming events
+      def handle_message(message)
+        if message.from == @pubsubjid and message.first_element('event').kind_of?(Jabber::PubSub::Event)
+          event = message.first_element('event')
+          @event_cbs.process(event)
+        end
       end
-      
+
     end
   end
 end

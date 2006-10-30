@@ -7,6 +7,8 @@ XMPP4R 0.4 (xx/xx/xxxx)
 * Publish-Subscribe support
 * XMPPElement: a framework for classes representing XML elements
 * Message#x and Presence#x support element selection by namespace
+* Proper XML entity escaping
+* Minor fixes to SOCKS5BytestreamsServer and Filetransfer helpers
 
 XMPP4R 0.3 (20/07/2006)
 =======================

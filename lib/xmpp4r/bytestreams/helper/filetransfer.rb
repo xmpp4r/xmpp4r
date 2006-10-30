@@ -246,8 +246,10 @@ module Jabber
       # jid:: [JID] to send the file to
       # source:: File-transfer source, implementing the FileSource interface
       # desc:: [String] or [nil] Optional file description
+      # from:: [String] or [nil] Optional jid for components
       # result:: [Bytestreams::SOCKS5BytestreamsInitiator] or [Bytestreams::IBBInitiator] or [nil]
-      def offer(jid, source, desc=nil)
+      def offer(jid, source, desc=nil, from=nil)
+        from = from || @my_jid || @stream.jid
         session_id = Jabber::IdGenerator.instance.generate_id
 
         offered_methods = {}
@@ -259,7 +261,7 @@ module Jabber
         end
 
         iq = Iq::new(:set, jid)
-        iq.from = @my_jid
+        iq.from = from
         si = iq.add(Bytestreams::IqSi.new(session_id, Bytestreams::PROFILE_FILETRANSFER, source.mime))
 
         file = si.add(Bytestreams::IqSiFile.new(source.filename, source.size))
@@ -303,9 +305,9 @@ module Jabber
         end
 
         if stream_method == Bytestreams::IqQueryBytestreams::NS_BYTESTREAMS and @allow_bytestreams
-          Bytestreams::SOCKS5BytestreamsInitiator.new(@stream, session_id, @my_jid || @stream.jid, jid)
+          Bytestreams::SOCKS5BytestreamsInitiator.new(@stream, session_id, from, jid)
         elsif stream_method == Bytestreams::IBB::NS_IBB and @allow_ibb
-          Bytestreams::IBBInitiator.new(@stream, session_id, @my_jid || @stream.jid, jid)
+          Bytestreams::IBBInitiator.new(@stream, session_id, from, jid)
         else  # Target responded with a stream_method we didn't offer
           eanswer = response.answer
           eanswer.type = :error

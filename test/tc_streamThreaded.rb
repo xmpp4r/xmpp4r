@@ -46,20 +46,26 @@ class StreamThreadedTest < Test::Unit::TestCase
     @server.puts('<stream:stream>')
     @server.flush
 
+    done = Mutex.new
+    done.lock
     n = 0
-    @stream.add_message_callback { n += 1 }
+    @stream.add_message_callback {
+      n += 1
+      done.unlock if n % 100 == 0
+    }
 
     100.times {
       @server.puts('<message/>')
       @server.flush
     }
 
+    done.lock
     assert_equal(100, n)
 
     @server.puts('<message/>' * 100)
     @server.flush
-    sleep 0.1
 
+    done.lock
     assert_equal(200, n)
   end
 
@@ -135,6 +141,28 @@ class StreamThreadedTest < Test::Unit::TestCase
     assert_equal(2, called_outer)
     assert_equal(1, called_inner)
 
+    finished.lock
+  end
+
+  def test_send_in_callback
+    @server.puts('<stream:stream>')
+    @server.flush
+    finished = Mutex.new
+    finished.lock
+
+    @stream.add_message_callback {
+      @stream.send_with_id(Iq.new(:get)) { |reply|
+        assert_equal(:result, reply.type)
+      }
+    }
+
+    Thread.new {
+      @server.gets('>')
+      @server.puts(Iq.new(:result))
+      finished.unlock
+    }
+
+    @server.puts(Message.new)
     finished.lock
   end
 
