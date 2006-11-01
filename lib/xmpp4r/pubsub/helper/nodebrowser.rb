@@ -10,7 +10,7 @@ module Jabber
       ##
       # Initialize a new NodeBrowser
       # new(stream,pubsubservice)
-      # strem:: [Jabber::Stream]
+      # stream:: [Jabber::Stream]
       def initialize(stream)
         @stream = stream
       end

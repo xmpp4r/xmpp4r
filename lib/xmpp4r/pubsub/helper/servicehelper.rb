@@ -3,6 +3,9 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/pubsub/iq/pubsub'
+require 'xmpp4r/pubsub/stanzas/event'
+require 'xmpp4r/pubsub/stanzas/item'
+require 'xmpp4r/pubsub/stanzas/items'
 require 'xmpp4r/dataforms'
 
 module Jabber
@@ -78,7 +81,6 @@ module Jabber
         publish.attributes['node'] = node
         if item.kind_of?(Jabber::PubSub::Item)
           publish.add(item)
-          p iq.to_s
           @client.send_with_id(iq) { |reply| true }
         end
       end
@@ -213,6 +215,7 @@ module Jabber
       # May raise ErrorException
       # node:: [String]
       # subid:: [String] or nil
+      # return:: true
       def unsubscribe(node,subid=nil)
         iq = basic_pubsub_query(:set)
         unsub = REXML::Element.new('unsubscribe')
@@ -247,6 +250,7 @@ module Jabber
       # node:: [String]
       # options:: [Jabber::XData]
       # subid:: [String] or nil
+      # return:: true 
       def set_options(node,options,subid=nil)
         iq = basic_pubsub_query(:set)
         opt = REXML::Element.new('options')
