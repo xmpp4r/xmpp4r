@@ -1,6 +1,9 @@
 # =XMPP4R - XMPP Library for Ruby
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
+#
+# It's recommented to read the XEP-0066 before you use this Helper.
+# 
 
 require 'xmpp4r/pubsub/iq/pubsub'
 require 'xmpp4r/pubsub/stanzas/event'
@@ -227,6 +230,7 @@ module Jabber
       end
 
       ##
+      # get options of a node
       # node:: [String]
       # subid:: [String] or nil
       # return:: [Jabber::XData]
@@ -247,6 +251,7 @@ module Jabber
       end
 
       ##
+      # set options for a node
       # node:: [String]
       # options:: [Jabber::XData]
       # subid:: [String] or nil
@@ -278,7 +283,10 @@ module Jabber
 
       private
 
-
+      ##
+      # creates a basic pubsub iq
+      # basic_pubsub_query(type)
+      # type:: [Symbol]
       def basic_pubsub_query(type)
         iq = Jabber::Iq::new(type,@pubsubjid)
         iq.add(IqPubSub.new)
@@ -286,7 +294,9 @@ module Jabber
       end
 
       ##
-      # for handling incoming events
+      # handling incoming events
+      # handle_message(message)
+      # message:: [Jabber::Message]
       def handle_message(message)
         if message.from == @pubsubjid and message.first_element('event').kind_of?(Jabber::PubSub::Event)
           event = message.first_element('event')
