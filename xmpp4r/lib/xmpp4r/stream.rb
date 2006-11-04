@@ -52,11 +52,12 @@ module Jabber
         threaded = true
       end
       @threaded = threaded
+      @send_lock = Mutex.new
+      @last_send = Time.now
       @stanzaqueue = []
       @stanzaqueue_lock = Mutex::new
       @exception_block = nil
       @threadblocks = []
-#      @pollCounter = 10
       @waiting_thread = nil
       @wakeup_thread = nil
       @streamid = nil
@@ -86,16 +87,7 @@ module Jabber
           end
         end
       end
-#      @pollThread = Thread.new do
-#        begin
-#        poll
-#        rescue
-#          puts "Exception caught in Poll thread, dumping backtrace and" +
-#            " exiting...\n" + $!.exception + "\n"
-#          puts $!.backtrace
-#          exit
-#        end
-#      end
+
       @status = CONNECTED
     end
 
@@ -357,8 +349,11 @@ module Jabber
     end
 
     def send_data(data)
-      @fd << data
-      @fd.flush
+      @send_lock.synchronize do
+        @last_send = Time.now
+        @fd << data
+        @fd.flush
+      end
     end
 
     ##
@@ -374,13 +369,12 @@ module Jabber
     def send(xml, &block)
       Jabber::debuglog("SENDING:\n#{xml}")
       @threadblocks.unshift(ThreadBlock.new(block)) if block
-      Thread.critical = true # we don't want to be interupted before we stop!
       begin
         send_data(xml.to_s)
       rescue Exception => e
         Jabber::debuglog("EXCEPTION:\n#{e.class}\n#{e.message}\n#{e.backtrace.join("\n")}")
 
-        if @exception_block 
+        if @exception_block
           Thread.new { close!; @exception_block.call(e, self, :sending) }
         else
           puts "Exception caught while sending!"
@@ -388,11 +382,13 @@ module Jabber
           raise
         end
       end
-      Thread.critical = false
       # The parser thread might be running this (think of a callback running send())
       # If this is the case, we mustn't stop (or we would cause a deadlock)
-      Thread.stop if block and Thread.current != @parserThread
-      @pollCounter = 10
+      if block and Thread.current != @parserThread
+        Thread.stop
+      elsif block
+        Jabber::debuglog("WARNING:\nCannot stop current thread in Jabber::Stream#send because it is the parser thread!")
+      end
     end
 
     ##
@@ -438,27 +434,6 @@ module Jabber
       end
 
       res
-    end
-
-    ##
-    # Starts a polling thread to send "keep alive" data to prevent
-    # the Jabber connection from closing for inactivity.
-    #
-    # Currently not working!
-    def poll
-      sleep 10
-      while true
-        sleep 2
-#        @pollCounter = @pollCounter - 1
-#        if @pollCounter < 0
-#          begin
-#            send("  \t  ")
-#          rescue
-#            Thread.new {@exception_block.call if @exception_block}
-#            break
-#          end
-#        end
-      end
     end
 
     ##
@@ -559,7 +534,6 @@ module Jabber
 
     def close!
       @parserThread.kill if @parserThread
-#      @pollThread.kill
       @fd.close if @fd and !@fd.closed?
       @status = DISCONNECTED
     end

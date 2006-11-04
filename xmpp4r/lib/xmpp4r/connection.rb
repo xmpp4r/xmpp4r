@@ -13,12 +13,16 @@ module Jabber
   class Connection  < Stream
     attr_reader :host, :port
 
-    # Allow TLS negotiation? Defaults to true
-    attr_accessor :allow_tls
-
     # How many seconds to wait for <stream:features/>
     # before proceeding
     attr_accessor :features_timeout
+
+    # Keep-alive interval in seconds, defaults to 60
+    # (see private method keepalive_loop for implementation details)
+    attr_accessor :keepalive_interval
+
+    # Allow TLS negotiation? Defaults to true
+    attr_accessor :allow_tls
 
     # Optional CA-Path for TLS-handshake
     attr_accessor :ssl_capath
@@ -38,11 +42,14 @@ module Jabber
       @ssl_capath = nil
       @ssl_verifycb = nil
       @features_timeout = 10
+      @keepalive_interval = 60
     end
 
     ##
-    # Connects to the Jabber server through a TCP Socket and
-    # starts the Jabber parser.
+    # Connect to the Jabber server through a TCP Socket,
+    # start the Jabber parser,
+    # invoke to accept_features to wait for TLS,
+    # start the keep-alive thread
     def connect(host, port)
       @host = host
       @port = port
@@ -54,6 +61,18 @@ module Jabber
       start
 
       accept_features
+
+      @keepaliveThread = Thread.new do
+        keepalive_loop
+      end
+    end
+
+    ##
+    # Closing connection:
+    # first kill keepaliveThread, then call Stream#close!
+    def close!
+      @keepaliveThread.kill
+      super
     end
 
     def accept_features
@@ -154,13 +173,33 @@ module Jabber
       stream_start_string += "xmlns='#{xmlns}' " unless xmlns.nil?
       stream_start_string += "to='#{to}' " unless to.nil?
       stream_start_string += "from='#{from}' " unless from.nil?
-      stream_start_string += "id='#{id}' " unless id.nil?      
+      stream_start_string += "id='#{id}' " unless id.nil?
       stream_start_string += "xml:lang='#{xml_lang}' " unless xml_lang.nil?
       stream_start_string += "version='#{version}' " unless version.nil?
       stream_start_string += ">"
       stream_start_string
     end
     private :generate_stream_start
-    
-  end  
+
+    ##
+    # A loop to send "keep alive" data to prevent
+    # the Jabber connection from closing for inactivity.
+    #
+    # This loop sends a single white-space character if
+    # no other data has been sent in the last @keepalive_interval
+    # seconds.
+    def keepalive_loop
+      loop do
+        difference = @last_send + @keepalive_interval - Time.now
+        if difference <= 0
+          send(' ')
+          sleep @keepalive_interval
+        else
+          sleep(difference)
+        end
+      end
+    end
+    private :keepalive_loop
+
+  end
 end
