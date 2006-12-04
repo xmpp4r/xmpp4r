@@ -3,15 +3,14 @@
 # * Handle tons of different JOIN failures
 
 require 'xmpp4r'
-require 'xmpp4r/iq/query/version'
-require 'xmpp4r/iq/query/discoinfo'
-require 'xmpp4r/iq/query/discoitems'
-require 'xmpp4r/x/muc'
-require 'xmpp4r/x/mucuseritem'
-require 'xmpp4r/x/delay'
+require 'xmpp4r/version'
+require 'xmpp4r/discovery'
+require 'xmpp4r/muc'
+require 'xmpp4r/delay'
 require 'yaml'
 
 require 'ircclient'
+require 'avatar'
 
 Jabber::debug = true
 
@@ -22,8 +21,10 @@ class IRCTransport < Jabber::Component
   # Connect the Jabber component and add callbacks
   def initialize(configfile)
     @config = YAML::load File.new(configfile)
-    super jabber_conf['jid'], jabber_conf['server'], jabber_conf['port']
-    connect
+    Avatar.instance.setup(jabber_conf['avatar'])
+
+    super jabber_conf['jid']
+    connect jabber_conf['server'], jabber_conf['port']
     auth jabber_conf['password']
 
     # Leave XMPP4R its own thread
@@ -53,20 +54,20 @@ class IRCTransport < Jabber::Component
   def handle_stanza(stanza)
     unless stanza.to.node # Directed to component
       if stanza.kind_of? Jabber::Iq and stanza.type == :get
-        if stanza.query.kind_of? Jabber::IqQueryDiscoInfo
+        if stanza.query.kind_of? Jabber::Discovery::IqQueryDiscoInfo
           reply = stanza.answer
           reply.type = :result
-          reply.query.add Jabber::DiscoIdentity.new('conference', jabber_conf['identity'], 'irc')
-          reply.query.add Jabber::DiscoFeature.new(Jabber::XMuc.new.namespace)
-          reply.query.add Jabber::DiscoFeature.new(Jabber::XMucUser.new.namespace)
-          reply.query.add Jabber::DiscoFeature.new(Jabber::IqQueryDiscoInfo.new.namespace)
-          reply.query.add Jabber::DiscoFeature.new(Jabber::IqQueryDiscoItems.new.namespace)
+          reply.query.add Jabber::Discovery::Identity.new('conference', jabber_conf['identity'], 'irc')
+          reply.query.add Jabber::Discovery::Feature.new(Jabber::MUC::XMUC.new.namespace)
+          reply.query.add Jabber::Discovery::Feature.new(Jabber::MUC::XMUCUser.new.namespace)
+          reply.query.add Jabber::Discovery::Feature.new(Jabber::Discovery::IqQueryDiscoInfo.new.namespace)
+          reply.query.add Jabber::Discovery::Feature.new(Jabber::Discovery::IqQueryDiscoItems.new.namespace)
           send reply
-        elsif stanza.query.kind_of? Jabber::IqQueryDiscoItems
+        elsif stanza.query.kind_of? Jabber::Discovery::IqQueryDiscoItems
           reply = stanza.answer
           reply.type = :result
           irc_conf['channels'].each { |channel|
-            reply.query.add Jabber::DiscoItem.new(Jabber::JID.new(channel, jid.to_s), channel)
+            reply.query.add Jabber::Discovery::Item.new(Jabber::JID.new(channel, jid.to_s), channel)
           }
           send reply
         end

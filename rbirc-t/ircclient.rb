@@ -1,6 +1,7 @@
 require 'timeout'
 require 'iconv'
 require 'irc'
+require 'avatar'
 
 ##
 # Represents a user known from a channel
@@ -50,11 +51,11 @@ class ChannelUser
   end
 
   ##
-  # Compose a XMucUserItem element with nick and the
+  # Compose a XMUCUserItem element with nick and the
   # appropriate role and affiliation set
   # with_nick:: [Boolean] Whether to include a nick attribute (nick-changes etc.)
   def item(room_jid=nil, with_nick=false)
-    i = Jabber::XMucUserItem.new
+    i = Jabber::MUC::XMUCUserItem.new
     i.jid = "#{@nick}!#{@hostmask}"
     i.nick = @nick if with_nick
     if op?
@@ -75,7 +76,7 @@ class ChannelUser
 
   ##
   # Return a Jabber::Presence stanza
-  # with IRC-chanmodes mapped to Jabber::XMucUserItem
+  # with IRC-chanmodes mapped to Jabber::XMUCUserItem
   # room_jid:: [Jabber::JID] JID of the component to set from-attribute
   # to:: [Jabber::JID] JID of destination to set to-attribute
   # result:: [Jabber::Presence]
@@ -84,7 +85,11 @@ class ChannelUser
     pres.from = jid room_jid
     pres.to = to
 
-    pres.add(Jabber::XMucUser.new).add(item(room_jid))
+    pres.add(Jabber::MUC::XMUCUser.new).add(item(room_jid))
+
+    x_vcard_update = pres.add(Jabber::X.new)
+    x_vcard_update.add_namespace('vcard-temp:x:update')
+    x_vcard_update.add(REXML::Element.new('photo')).text = Avatar.instance.sha1
 
     @modes_sent = @modes.dup
 
@@ -101,7 +106,7 @@ class ChannelUser
     pres = presence(room_jid, to)
     pres.type = :unavailable
 
-    x = pres.first_element 'x'
+    x = pres.x(Jabber::MUC::XMUCUser.new.namespace)
     if code
       x.add(REXML::Element.new('status')).attributes['code'] = code.to_s
     end
@@ -147,7 +152,7 @@ class ChannelUserlist
   def user(nick, add=false)
     @lock.synchronize {
       flags = ''
-      while @prefixes.include? (nick||'')[0..0]
+      while @prefixes.include?((nick||'')[0..0])
         flags += nick[0..0]
         nick = nick[1..-1]
       end
@@ -234,12 +239,15 @@ class WhoisRequest
       end
     }
     
-    Jabber::IqVcard.new({'NICKNAME'=>@nick,
+    Jabber::Vcard::IqVcard.new({'NICKNAME'=>@nick,
                          'FN'=>@realname,
                          'ROLE'=>@idleinfo.collect { |k,v| "#{k}: #{v}" }.join(', '),
                          'EMAIL/USERID'=>@hostmask,
                          'ORG/ORGNAME'=>"#{@server} (#{@serverinfo})",
-                         'ORG/ORGUNIT'=>@channels})
+                         'ORG/ORGUNIT'=>@channels,
+                         'PHOTO/TYPE'=>Avatar.instance.mime_type,
+                         'PHOTO/BINVAL'=>Avatar.instance.base64
+                        })
   end
 end
 
@@ -264,7 +272,7 @@ class VersionRequest
   #
   # Because CTCP returns a String, only IqQueryVersion#iname will be set
   def query
-    Jabber::IqQueryVersion.new(@version)
+    Jabber::Version::IqQueryVersion.new(@version)
   end
 end
 
@@ -383,14 +391,14 @@ class IRCClient < IRC::Client
         }
       else                                                # Possible invitation
         x = nil
-        message.each_element('x') { |e| x = e if e.kind_of? Jabber::XMucUser }
+        message.each_element('x') { |e| x = e if e.kind_of? Jabber::MUC::XMUCUser }
         if x
           invite = x.first_element 'invite'
-          if invite.kind_of? Jabber::XMucUserInvite       # Invitation
+          if invite.kind_of? Jabber::MUC::XMUCUserInvite       # Invitation
             invite.from = message.from
             invitation = Jabber::Message.new(invite.to, "You have been invited to IRC channel #{@room_jid.node} by #{message.from}")
             invitation.from = @room_jid.strip
-            invitation.add(Jabber::XMucUser.new).add(invite)
+            invitation.add(Jabber::MUC::XMUCUser.new).add(invite)
             xconference = invitation.add REXML::Element.new('x')
             xconference.add_namespace 'jabber:x:conference'
             xconference.attributes['jid'] = @room_jid.strip
@@ -418,7 +426,7 @@ class IRCClient < IRC::Client
     unless active?
       if pres.type != :unavailable and pres.type != :error
         pres.each_element('x') { |x|
-          if x.kind_of? Jabber::XMuc
+          if x.kind_of? Jabber::MUC::XMUC
             @password = x.password
           end
         }
@@ -429,7 +437,7 @@ class IRCClient < IRC::Client
             iq = Jabber::Iq.new(:get, @client_jid.strip)
             iq.from = @room_jid.strip
             # Use JEP-0164 (vCard Filtering) and don't request the avatar...
-            filter = iq.add(Jabber::IqVcard.new).add(REXML::Element.new('filter'))
+            filter = iq.add(Jabber::Vcard::IqVcard.new).add(REXML::Element.new('filter'))
             filter.add_namespace 'vcard-temp-filter'
             filter.add(REXML::Element.new('PHOTO'))
 
@@ -460,7 +468,7 @@ class IRCClient < IRC::Client
       end
     else
       if pres.type == :unavailable or pres.type == :error
-        quit(pres.show)
+        quit(pres.status)
       else
         update_away
 
@@ -492,12 +500,12 @@ class IRCClient < IRC::Client
 
     # Translate vCard-requests to WHOIS and jabber:iq:version to CTCP VERSION
     if iq.type == :get and active?
-      if iq.vcard.kind_of? Jabber::IqVcard
+      if iq.vcard.kind_of? Jabber::Vcard::IqVcard
         @whois_requests_lock.synchronize {
           @whois_requests.push WhoisRequest.new(iq.to.resource, iq.id)
         }
         whois iq.to.resource
-      elsif iq.query.kind_of? Jabber::IqQueryVersion
+      elsif iq.query.kind_of? Jabber::Version::IqQueryVersion
         @version_requests_lock.synchronize {
           @version_requests.push VersionRequest.new(iq.to.resource, iq.id)
         }
@@ -617,15 +625,15 @@ class IRCClient < IRC::Client
 
     # Service Discovery
     if iq.type == :get
-      if iq.query.kind_of? Jabber::IqQueryDiscoInfo
+      if iq.query.kind_of? Jabber::Discovery::IqQueryDiscoInfo
         reply = iq.answer
         reply.type = :result
-        reply.query.add Jabber::DiscoIdentity.new('conference', @room_jid.node, 'irc')
-        reply.query.add Jabber::DiscoFeature.new(Jabber::XMuc.new.namespace)
-        reply.query.add Jabber::DiscoFeature.new(Jabber::XMucUser.new.namespace)
-        reply.query.add Jabber::DiscoFeature.new(Jabber::IqQueryDiscoInfo.new.namespace)
+        reply.query.add Jabber::Discovery::Identity.new('conference', @room_jid.node, 'irc')
+        reply.query.add Jabber::Discovery::Feature.new(Jabber::MUC::XMUC.new.namespace)
+        reply.query.add Jabber::Discovery::Feature.new(Jabber::MUC::XMUCUser.new.namespace)
+        reply.query.add Jabber::Discovery::Feature.new(Jabber::Discovery::IqQueryDiscoInfo.new.namespace)
         @transport.send reply
-      elsif iq.query.kind_of? Jabber::IqQueryDiscoItems
+      elsif iq.query.kind_of? Jabber::Discovery::IqQueryDiscoItems
         reply = iq.answer
         reply.type = :result
         # No browseable items
@@ -983,7 +991,7 @@ class IRCClient < IRC::Client
         message.type = :groupchat
         message.from = (@topic_info_nick ? @users[@topic_info_nick].jid(@room_jid) : @room_jid.strip)
         message.subject = irc_to_xmpp text
-        message.add(Jabber::XDelay.new).stamp = @topic_info_time if @topic_info_time
+        message.add(Jabber::Delay::XDelay.new).stamp = @topic_info_time if @topic_info_time
         @transport.send message
 
         @topic_info_nick = nil
