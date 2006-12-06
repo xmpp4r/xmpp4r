@@ -333,18 +333,25 @@ module Jabber
     # Stream#send.
     class ThreadBlock
       def initialize(block)
-        @thread = Thread.current
         @block = block
+        @waiter = Mutex.new
+        @waiter.lock
+        @exception = nil
       end
       def call(*args)
         @block.call(*args)
       end
+      def wait
+        @waiter.lock
+        raise @exception if @exception
+      end
       def wakeup
         # TODO: Handle threadblock removal if !alive?
-        @thread.wakeup if @thread.alive?
+        @waiter.unlock
       end
       def raise(exception)
-        @thread.raise(exception) if @thread.alive?
+        @exception = exception
+        @waiter.unlock
       end
     end
 
@@ -368,7 +375,7 @@ module Jabber
     # &block:: [Block] The optional block
     def send(xml, &block)
       Jabber::debuglog("SENDING:\n#{xml}")
-      @threadblocks.unshift(ThreadBlock.new(block)) if block
+      @threadblocks.unshift(threadblock = ThreadBlock.new(block)) if block
       begin
         send_data(xml.to_s)
       rescue Exception => e
@@ -385,7 +392,7 @@ module Jabber
       # The parser thread might be running this (think of a callback running send())
       # If this is the case, we mustn't stop (or we would cause a deadlock)
       if block and Thread.current != @parserThread
-        Thread.stop
+        threadblock.wait
       elsif block
         Jabber::debuglog("WARNING:\nCannot stop current thread in Jabber::Stream#send because it is the parser thread!")
       end
