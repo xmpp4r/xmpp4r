@@ -83,7 +83,7 @@ module Jabber
     # Throws AuthenticationFailure
     # secret:: [String] the shared secret 
     def auth(secret)
-      hash = Digest::SHA1::new(@streamid.to_s + secret).to_s
+      hash = Digest::SHA1::hexdigest(@streamid.to_s + secret)
       authenticated = false
       send("<handshake>#{hash}</handshake>") { |r|
         if r.prefix == 'stream' and r.name == 'error'

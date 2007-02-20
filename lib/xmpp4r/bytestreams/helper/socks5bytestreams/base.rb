@@ -126,7 +126,7 @@ module Jabber
       # initiator_jid and target_jid.
       # result:: [String] SHA1 hash
       def stream_address
-        Digest::SHA1.new("#{@session_id}#{@initiator_jid}#{@target_jid}").hexdigest
+        Digest::SHA1.hexdigest("#{@session_id}#{@initiator_jid}#{@target_jid}")
       end
 
       ##
