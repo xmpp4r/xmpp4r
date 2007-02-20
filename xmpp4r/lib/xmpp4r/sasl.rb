@@ -45,7 +45,7 @@ module Jabber
       end
 
       def generate_nonce
-        Digest::MD5.new(Time.new.to_f.to_s).hexdigest
+        Digest::MD5.hexdigest(Time.new.to_f.to_s)
       end
     end
 

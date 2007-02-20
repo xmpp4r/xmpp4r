@@ -34,7 +34,7 @@ doc.root.each_element { |e|
   elsif e.name == 'presence'
     pres = Jabber::Presence.new.import(e)
 
-    if (pres.from.strip == jid) || (Digest::MD5.new(pres.from.strip.to_s).to_s == jidhash)
+    if (pres.from.strip == jid) || (Digest::MD5.hexdigest(pres.from.strip.to_s) == jidhash)
       if (jid == '') && !jidhash.nil?
         jid = pres.from.strip
       end
