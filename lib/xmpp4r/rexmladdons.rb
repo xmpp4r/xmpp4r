@@ -131,7 +131,8 @@ module REXML
       @variables = {}
     end
 
-    def namespaces=( namespaces={} )
+    def namespaces=( namespaces= )
+      namespaces ||= {}
       Functions::namespace_context = namespaces
       @namespaces = namespaces
     end
