@@ -54,10 +54,12 @@ class MUCClientTest < Test::Unit::TestCase
     assert_raises(ErrorException) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
+    wait_state
     assert(!m.active?)
     assert_nil(m.room)
 
     assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch'))
+    wait_state
     assert(m.active?)
     assert_equal('darkcave', m.room)
     assert_equal(3, m.roster.size)
@@ -104,15 +106,17 @@ class MUCClientTest < Test::Unit::TestCase
            "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='member' role='participant'/></x>" +
            "</presence>")
     }
-    
+
     m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
     assert_raises(ErrorException) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
+    wait_state
     assert(!m.active?)
 
     assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch', 'cauldron'))
+    wait_state
     assert(m.active?)
   end
 
@@ -221,15 +225,17 @@ class MUCClientTest < Test::Unit::TestCase
     @client.add_stanza_callback { |stanza|
       ignored_stanzas += 1
     }
-    
+
     m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
     assert_equal(0, ignored_stanzas)
     assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch'))
+    wait_state
     assert(m.active?)
 
     assert_equal(0, ignored_stanzas)
     assert_equal(m, m.exit)
+    wait_state
     assert(!m.active?)
     assert_equal(1, ignored_stanzas)
   end
@@ -251,14 +257,16 @@ class MUCClientTest < Test::Unit::TestCase
            "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='member' role='none'/></x>" +
            "</presence>")
     }
-    
+
     m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
     assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch'))
     assert(m.active?)
+    wait_state
 
     assert_equal(m, m.exit('gone where the goblins go'))
     assert(!m.active?)
+    wait_state
   end
 
   def test_joins
@@ -304,6 +312,7 @@ class MUCClientTest < Test::Unit::TestCase
     m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
     assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch'))
+    wait_state
     assert(m.active?)
 
     assert_raises(RuntimeError) { m.join('darkcave@macbeth.shakespeare.lit/thirdwitch') }
@@ -311,11 +320,13 @@ class MUCClientTest < Test::Unit::TestCase
     assert(m.active?)
 
     assert_equal(m, m.exit)
+    wait_state
     assert(!m.active?)
     assert_raises(RuntimeError) { m.exit }
     assert(!m.active?)
 
     assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/fourthwitch'))
+    wait_state
     assert(m.active?)
 
     assert_raises(RuntimeError) { m.join('darkcave@macbeth.shakespeare.lit/thirdwitch') }
@@ -323,6 +334,7 @@ class MUCClientTest < Test::Unit::TestCase
     assert(m.active?)
 
     assert_equal(m, m.exit('Exiting one last time'))
+    wait_state
     assert(!m.active?)
     assert_raises(RuntimeError) { m.exit }
     assert(!m.active?)
@@ -553,16 +565,19 @@ class MUCClientTest < Test::Unit::TestCase
     m.my_jid = 'hag66@shakespeare.lit/pda'
 
     assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch'))
+    wait_state
     assert(m.active?)
     assert_equal('thirdwitch', m.nick)
 
     assert_raises(ErrorException) {
       m.nick = 'secondwitch'
     }
+    wait_state
     assert(m.active?)
     assert_equal('thirdwitch', m.nick)
 
     m.nick = 'oldhag'
+    wait_state
     assert(m.active?)
     assert_equal('oldhag', m.nick)
   end

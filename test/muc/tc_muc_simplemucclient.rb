@@ -49,6 +49,7 @@ class SimpleMUCClientTest < Test::Unit::TestCase
     }
     m.my_jid = 'hag66@shakespeare.lit/pda'
     assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch'))
+    wait_state
     assert(m.active?)
     assert_equal(3, m.roster.size)
 
@@ -64,6 +65,7 @@ class SimpleMUCClientTest < Test::Unit::TestCase
     assert_nil(m.subject)
     wait.lock
     m.subject = 'TestCasing room'
+    wait_state
     wait.lock
     assert_equal([nil, 'thirdwitch', 'TestCasing room'], block_args)
     assert_equal('TestCasing room', m.subject)
