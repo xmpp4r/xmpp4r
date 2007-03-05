@@ -10,7 +10,7 @@ module Jabber
   # The presence class is used to construct presence messages to 
   # send to the Jabber service.
   class Presence < XMPPStanza
-    name_xmlns 'presence', ''
+    name_xmlns 'presence', 'jabber:client'
 
     include Comparable
 

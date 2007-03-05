@@ -11,7 +11,7 @@ module Jabber
   # which is used for all messaging communication.
   class Message < XMPPStanza
 
-    name_xmlns 'message', ''
+    name_xmlns 'message', 'jabber:client'
 
     ##
     # Create a new message
