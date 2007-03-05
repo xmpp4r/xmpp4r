@@ -16,7 +16,7 @@ module Jabber
   #
   # A class used to build/parse IQ requests/responses
   class Iq < XMPPStanza
-    name_xmlns 'iq', ''
+    name_xmlns 'iq', 'jabber:client'
 
     @@element_classes = {}
 
