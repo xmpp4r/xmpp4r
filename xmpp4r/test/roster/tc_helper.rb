@@ -151,6 +151,11 @@ class Roster::HelperTest < Test::Unit::TestCase
     }
     cb_item, cb_op, cb_p = nil, nil, nil
     h.add_presence_callback { |item,oldpres,pres|
+      # HACK:
+      # if two stanzas are expected for one sent stanza,
+      # race conditions may appear here
+      Thread.pass
+
       cb_item, cb_op, cb_p = item, oldpres, pres
       presence_waiter.unlock
     }
@@ -309,6 +314,7 @@ class Roster::HelperTest < Test::Unit::TestCase
       assert_kind_of(Presence, pres)
       assert_equal(:subscribe, pres.type)
       assert_equal(JID.new('contact@example.org'), pres.to)
+      Thread.pass
     }
     h.add('contact@example.org', 'MyContact', true)
     wait_state
@@ -330,17 +336,27 @@ class Roster::HelperTest < Test::Unit::TestCase
     wait_state
     query_waiter.lock
 
+    state { |pres|
+      assert_kind_of(Presence, pres)
+      assert_equal(:subscribed, pres.type)
+    }
+    state { |iq|
+      assert_kind_of(Iq, iq)
+      assert_equal(:set, iq.type)
+      send("<iq type='result' id='#{iq.id}'/>")
+    }
+
     cb_lock = Mutex.new
     cb_lock.lock
     h.add_subscription_request_callback { |item,pres|
       assert_nil(item)
       assert_kind_of(Presence, pres)
       h.accept_subscription(pres.from)
-
       cb_lock.unlock
     }
-
     send("<presence type='subscribe' from='contact@example.org' to='user@example.com'/>")
+    skip_state
+    wait_state
     cb_lock.lock
 
     state { |pres|
@@ -365,6 +381,11 @@ class Roster::HelperTest < Test::Unit::TestCase
     wait_state
     query_waiter.lock
 
+    state { |pres|
+      assert_kind_of(Presence, pres)
+      assert_equal(:unsubscribed, pres.type)
+      assert_equal(JID.new('contact@example.org'), pres.to)
+    }
     cb_lock = Mutex.new
     cb_lock.lock
     h.add_subscription_request_callback { |item,pres|
@@ -376,14 +397,8 @@ class Roster::HelperTest < Test::Unit::TestCase
     }
 
     send("<presence type='subscribe' from='contact@example.org' to='user@example.com'/>")
-    cb_lock.lock
-
-    state { |pres|
-      assert_kind_of(Presence, pres)
-      assert_equal(:unsubscribed, pres.type)
-      assert_equal(JID.new('contact@example.org'), pres.to)
-    }
     wait_state
+    cb_lock.lock
   end
 end
 

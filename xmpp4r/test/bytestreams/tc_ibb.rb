@@ -133,7 +133,7 @@ class IBBTest < Test::Unit::TestCase
 
     assert_equal(3, ignored_stanzas)
   end
-  
+
   def test_ibb_error
     target = Bytestreams::IBBTarget.new(@server, '1', nil, '1@a.com/1')
     initiator = Bytestreams::IBBInitiator.new(@client, '1', nil, '1@a.com/1')

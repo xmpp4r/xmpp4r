@@ -1,11 +1,11 @@
 #!/usr/bin/ruby -w
 
-require 'xmpp4r'
-
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 $:.unshift File.join(File.dirname(__FILE__), '..', 'test')
 $:.unshift File.join(File.dirname(__FILE__), 'lib')
 $:.unshift File.join(File.dirname(__FILE__), 'test')
+
+require 'xmpp4r'
 
 require 'tc_streamThreaded'
 require 'bytestreams/tc_ibb'

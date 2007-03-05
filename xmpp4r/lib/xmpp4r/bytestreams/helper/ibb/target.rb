@@ -32,7 +32,7 @@ module Jabber
             reply = iq.answer(false)
             reply.type = :result
             @stream.send(reply)
-              
+
             connect_lock.unlock
             true
           else
