@@ -9,29 +9,60 @@
 
 
 require 'xmpp4r/pubsub/helper/servicehelper'
+require 'xmpp4r/pubsub/helper/nodebrowser'
 
 module Jabber
   module PubSub
     class NodeHelper < ServiceHelper
 
       attr_reader :nodename
+      attr_reader :name
+      attr_reader :jiod
+      attr_reader :my_subscriptions
       ##
-      # creats a new node  
+      # creates a new node  
       # new(client,service,nodename)
-      # client:: [Jabber::Client]
-      # service:: [String]
+      # stream:: [Jabber::Stream]
+      # jid:: [String] (jid of the pubsub service)
       # nodename:: [String]
-      def initialize(client,service,nodename)
-        super(client,service)
+      def initialize(stream,jid,nodename=nil,create_if_not_exist=true)
+        super(stream,jid)
         @nodename = nodename
+	@jid = jid
+	@stream = client
+	
+	get_subscriptions 
+	
+	if create_if_not_exist and not node_exist?
+	  # if no nodename is given a instant node will created 
+	  # (if the service supports instant nodes)
+	  @nodename = create_node 
+	end
       end
 
       ##
-      # configures the node
+      # creates the node
       # create(configuration=nil)
       # configuration:: [Jabber::XData]
       def create_node(configuration=nil)
         create(@nodename,configuration)
+      end
+      
+      ##
+      # get the configuration of the node
+      # get_configuration(configuration=nil)
+      # configuration:: [Jabber::XData]
+      def get_configuration(subid=nil)
+        get_options(@nodename,subid)
+      end
+      
+      ##
+      # set the configuration of the node
+      # set_configuration(configuration=nil)
+      # configuration:: [Jabber::XData]
+      # subid:: [String] default is nil
+      def set_configuration(configuration,subid=nil)
+        set_options(@nodename,configuration,subid)
       end
 
       ##
@@ -82,7 +113,7 @@ module Jabber
       # get all subscribers subscribed on this node
       # get_subscribers
       def get_subscribers
-        subscribers(@nodename)
+        @subscriptions = subscribers(@nodename)
       end
 
       ##
@@ -90,15 +121,33 @@ module Jabber
       # do_subscribe
       def do_subscribe
         subscribe(@nodename)
+	get_subscriptions
       end
 
       ##
       # unsubscribe from this node
       # do_unsubscribe(subid = nil)
       # subid:: [String]
-      def do_unsubscribe(subid=nil)
+      def do_unsubscribe(subid)
         unsubscribe(@nodename,subid)
       end
-    end
-  end
-end
+      
+      ##
+      # purge all items from this node
+      # purge_items
+      def purge_items
+        purge(@nodename)
+      end
+      
+    private
+    
+      def node_exist?
+        nodebrowser = PubSub::NodeBrowser.new(@stream)
+        nodebrowser.nodes.include?(nodename)
+      end
+      def disco_info
+      end
+
+    end #class
+  end #module
+end #module
