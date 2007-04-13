@@ -159,14 +159,18 @@ module Jabber
         r = REXML::Element.new('response')
         r.add_namespace NS_SASL
         r.text = Base64::encode64(response.collect { |k,v| "#{k}=#{v}" }.join(',')).gsub(/\s/, '')
+        success_already = false
         error = nil
         @stream.send(r) { |reply|
-          if reply.name != 'challenge'
+          if reply.name == 'success'
+            success_already = true
+          elsif reply.name != 'challenge'
             error = reply.first_element(nil).name
           end
           true
         }
         
+        return if success_already
         raise error if error
 
         # TODO: check the challenge from the server
