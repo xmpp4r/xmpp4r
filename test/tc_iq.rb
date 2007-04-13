@@ -22,7 +22,7 @@ class IqTest < Test::Unit::TestCase
 
   def test_iqauth_digest
     x = Iq::new_authset_digest(JID::new('node@domain/resource'), '', 'password')
-    assert_equal("<iq type='set'><query xmlns='jabber:iq:auth'><username>node</username><digest>#{Digest::SHA1.new('password').hexdigest}</digest><resource>resource</resource></query></iq>", x.to_s)
+    assert_equal("<iq type='set'><query xmlns='jabber:iq:auth'><username>node</username><digest>#{Digest::SHA1.hexdigest('password')}</digest><resource>resource</resource></query></iq>", x.to_s)
   end
 
   def test_register
