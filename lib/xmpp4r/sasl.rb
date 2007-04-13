@@ -82,13 +82,7 @@ module Jabber
         error = nil
         @stream.send(generate_auth('DIGEST-MD5')) { |reply|
           if reply.name == 'challenge' and reply.namespace == NS_SASL
-            challenge_text = Base64::decode64(reply.text)
-            challenge_text.split(/,/).each { |s|
-              key, value = s.split(/=/, 2)
-              value.sub!(/^"/, '')
-              value.sub!(/"$/, '')
-              challenge[key] = value
-            }
+            challenge = decode_challenge(reply.text)
           else
             error = reply.first_element(nil).name
           end
@@ -98,6 +92,47 @@ module Jabber
 
         @nonce = challenge['nonce']
         @realm = challenge['realm']
+      end
+
+      def decode_challenge(challenge)
+        text = Base64::decode64(challenge)
+        res = {}
+
+        state = :key
+        key = ''
+        value = ''
+
+        text.scan(/./) do |ch|
+          if state == :key
+            if ch == '='
+              state = :value
+            else
+              key += ch
+            end
+
+          elsif state == :value
+            if ch == ','
+              res[key] = value
+              key = ''
+              value = ''
+              state = :key
+            elsif ch == '"' and value == ''
+              state = :quote
+            else
+              value += ch
+            end
+
+          elsif state == :quote
+            if ch == '"'
+              state = :value
+            else
+              value += ch
+            end
+          end
+        end
+        res[key] = value unless key == ''
+
+        res
       end
 
       ##
