@@ -49,6 +49,9 @@ module Jabber
 
       ##
       # Find the socket a peer is associated to
+      #
+      # This method also performs some housekeeping, ie. removing
+      # peers with closed sockets.
       # addr:: [String] Address like SOCKS5Bytestreams#stream_address
       # result:: [TCPSocker] or [nil]
       def peer_sock(addr)
@@ -62,11 +65,13 @@ module Jabber
               removes << peer
             elsif peer.address == addr and res.nil?
               res = peer.socket
-            else
-              # If we sent multiple addresses of our own, clients may
-              # connect multiple times. Close these connections here.
-              removes << peer
             end
+
+            # If we sent multiple addresses of our own, clients may
+            # connect multiple times. DO NOT close any other connections
+            # here. These may belong to other concurrent bytestreams,
+            # believe that the peer will close any unneeded sockets
+            # which will then be picked up by the next call to peer_sock.
           }
 
           # If we sent multiple addresses of our own, clients may

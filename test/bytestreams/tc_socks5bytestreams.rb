@@ -19,6 +19,52 @@ class SOCKS5BytestreamsTest < Test::Unit::TestCase
     ([nil] * size).collect { rand(256).chr }.join
   end
 
+  def test_server2multi
+    target1 = Bytestreams::SOCKS5BytestreamsTarget.new(@server, '1', '1@a.com/1', '1@a.com/2')
+    target2 = Bytestreams::SOCKS5BytestreamsTarget.new(@server, '2', '2@a.com/1', '2@a.com/2')
+    initiator1 = Bytestreams::SOCKS5BytestreamsInitiator.new(@client, '1', '1@a.com/1', '1@a.com/2')
+    initiator2 = Bytestreams::SOCKS5BytestreamsInitiator.new(@client, '2', '2@a.com/1', '2@a.com/2')
+    initiator1.add_streamhost(@@server)
+    initiator2.add_streamhost(@@server)
+
+    buf1 = create_buffer(8192)
+    buf2 = create_buffer(8192)
+
+    Thread.new do 
+      target1.accept
+      target1.write(buf1)
+      target1.flush
+      target1.close
+    end
+
+    Thread.new do
+      target2.accept
+      target2.write(buf2)
+      target2.flush
+      target2.close
+    end
+
+    initiator1.open
+    initiator2.open
+
+    recv1 = ''
+    recv2 = ''
+
+    while buf = initiator2.read(256)
+      recv2 += buf
+    end
+
+    while buf = initiator1.read(256)
+      recv1 += buf
+    end
+
+    initiator1.close
+    initiator2.close
+
+    assert_equal(buf1, recv1)
+    assert_equal(buf2, recv2)
+  end
+
   def test_pingpong
     target = Bytestreams::SOCKS5BytestreamsTarget.new(@server, '1', '1@a.com/1', '1@a.com/2')
     initiator = Bytestreams::SOCKS5BytestreamsInitiator.new(@client, '1', '1@a.com/1', '1@a.com/2')
