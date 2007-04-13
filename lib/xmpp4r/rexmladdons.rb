@@ -10,8 +10,18 @@ require 'rexml/source'
 oldverbose = $VERBOSE
 $VERBOSE = false
 
-# REXML module. This file only adds a few methods to the REXML module, to
-# ease the coding.
+# REXML module. This file only adds the following methods to the REXML module, to
+# ease the coding:
+# * replace_element_text
+# * first_element
+# * first_element_text
+# * typed_add
+# * import
+# * self.import
+# * delete_elements
+#
+# Further definitions are just copied from REXML out of Ruby-1.8.4 to solve issues
+# with REXML in Ruby-1.8.2.
 module REXML
   # this class adds a few helper methods to REXML::Element
   class Element
