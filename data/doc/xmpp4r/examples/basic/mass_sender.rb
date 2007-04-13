@@ -56,6 +56,7 @@ cl.add_message_callback do |m|
 end
 cl.send(Presence::new)
 m = Message::new(nil, body)
+m.subject = subject
 STDIN.each_line { |l|
   l.chomp!
   m.set_to(JID::new(l).to_s)
