@@ -12,6 +12,10 @@ module Jabber
     # The Roster helper intercepts <tt><iq/></tt> stanzas with Jabber::IqQueryRoster
     # and <tt><presence/></tt> stanzas, but provides cbs which allow the programmer
     # to keep track of updates.
+    #
+    # A thread for any received stanza is spawned, so the user can invoke
+    # accept_subscription et al in the callback blocks, without stopping
+    # the current (= parser) thread when waiting for a reply.
     class Helper
       ##
       # All items in your roster
@@ -41,12 +45,16 @@ module Jabber
 
         # Register cbs
         stream.add_iq_callback(120, self) { |iq|
-          handle_iq(iq)
+          Thread.new do
+            handle_iq(iq)
+          end
         }
         stream.add_presence_callback(120, self) { |pres|
-          handle_presence(pres)
+          Thread.new do
+            handle_presence(pres)
+          end
         }
-        
+
         # Request the roster
         rosterget = Iq.new_rosterget
         stream.send(rosterget)
@@ -175,12 +183,15 @@ module Jabber
       # used internally
       def handle_presence(pres)
         item = self[pres.from]
+
         if [:subscribed, :unsubscribe, :unsubscribed].include?(pres.type)
           @subscription_cbs.process(item, pres)
           true
+
         elsif pres.type == :subscribe
           @subscription_request_cbs.process(item, pres)
           true
+
         else
           unless item.nil?
             update_presence(item, pres)
