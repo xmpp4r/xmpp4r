@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require 'yaml'
 require 'xmpp4r'
 require 'xmpp4r/bytestreams'
