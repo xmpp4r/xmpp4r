@@ -1,3 +1,13 @@
+XMPP4R 0.3.1 (23/04/2007)
+=========================
+* SASL fixes
+* Message#x and Presence#x support element selection by namespace
+* Proper XML entity escaping for REXML text nodes
+* Improvements to FileTransfer::Helper and SOCKS5BytestreamsServer
+* Vcard::Helper fixes
+* Update Digest module usage to reflect recent Ruby versions
+* More documentation
+
 XMPP4R 0.3 (20/07/2006)
 =======================
 * SRV lookup capability in Client#connect
