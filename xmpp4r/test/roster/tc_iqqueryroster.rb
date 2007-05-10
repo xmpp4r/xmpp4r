@@ -5,6 +5,8 @@ $:.unshift File::dirname(__FILE__) + '/../../lib'
 require 'test/unit'
 require 'xmpp4r/rexmladdons'
 require 'xmpp4r/roster/iq/roster'
+require 'xmpp4r/jid'
+require 'xmpp4r/iq'
 include Jabber
 
 class Roster::IqQueryRosterTest < Test::Unit::TestCase

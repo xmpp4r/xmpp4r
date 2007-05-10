@@ -11,6 +11,18 @@ module Jabber
   # root class of all Jabber XML elements
   class XMPPStanza < XMPPElement
     ##
+    # An XMPP stanza is likely being sent without an <tt>xmlns</tt> attribute.
+    # He we strip before and re-add the xmlns after serialization.
+    # REXML::Element (which XMPPStanza derives from) instance method
+    # write (which we overwrite here) is called by REXML::Element#to_s,
+    # thus no XMPPStanza serialization has an <tt>xmlns</tt> attribute.
+    def write(*arg)
+      xmlns = @attributes.delete('xmlns')
+      super
+      add_attribute(xmlns) if xmlns
+    end
+
+    ##
     # Compose a response by doing the following:
     # * Create a new XMPPStanza of the same subclass
     #   with the same element-name

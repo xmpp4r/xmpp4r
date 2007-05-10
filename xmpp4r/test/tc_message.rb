@@ -12,6 +12,7 @@ class MessageTest < Test::Unit::TestCase
   def test_create
     x = Message::new()
     assert_equal("message", x.name)
+    assert_equal("jabber:client", x.namespace)
     assert_equal(nil, x.to)
     assert_equal(nil, x.body)
 

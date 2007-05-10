@@ -61,6 +61,7 @@ module Jabber
       @waiting_thread = nil
       @wakeup_thread = nil
       @streamid = nil
+      @streamns = 'jabber:client'
       @features_lock = Mutex.new
     end
 
@@ -178,12 +179,18 @@ module Jabber
     
     def receive_nonthreaded(element)
       Jabber::debuglog("RECEIVED:\n#{element.to_s}")
+
+      if element.namespace.to_s == '' # REXML namespaces are always strings
+        element.add_namespace(@streamns)
+      end
+
       case element.prefix
       when 'stream'
         case element.name
           when 'stream'
             stanza = element
             @streamid = element.attributes['id']
+            @streamns = element.namespace if element.namespace
             unless element.attributes['version']  # isn't XMPP compliant, so
               Jabber::debuglog("FEATURES: server not XMPP compliant, will not wait for features")
               @features_lock.unlock               # don't wait for <stream:features/>
@@ -205,15 +212,11 @@ module Jabber
             stanza = element
         end
       else
-        case element.name
-          when 'message'
-            stanza = Message::import(element)
-          when 'iq'
-            stanza = Iq::import(element)
-          when 'presence'
-            stanza = Presence::import(element)
-          else
-            stanza = element
+        # Any stanza, classes are registered by XMPPElement::name_xmlns
+        begin
+          stanza = XMPPStanza::import(element)
+        rescue NoNameXmlnsRegistered
+          stanza = element
         end
       end
 
@@ -259,7 +262,7 @@ module Jabber
     # Process |element| until it is consumed. Returns element.consumed?
     # element  The element to process
     def process_one(stanza)
-      Jabber::debuglog("PROCESSING:\n#{stanza.to_s}")
+      Jabber::debuglog("PROCESSING:\n#{stanza.to_s} (#{stanza.class})")
       return true if @xmlcbs.process(stanza)
       return true if @stanzacbs.process(stanza)
       case stanza

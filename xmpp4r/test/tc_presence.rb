@@ -12,6 +12,7 @@ class PresenceTest < Test::Unit::TestCase
   def test_create
     x = Presence::new()
     assert_equal("presence", x.name)
+    assert_equal("jabber:client", x.namespace)
     assert_equal(nil, x.to)
     assert_equal(nil, x.show)
     assert_equal(nil, x.status)

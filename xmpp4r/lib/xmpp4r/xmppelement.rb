@@ -5,6 +5,12 @@
 require 'xmpp4r/rexmladdons'
 
 module Jabber
+  class NoNameXmlnsRegistered < RuntimeError
+    def initialize(klass)
+      super "Class #{klass} has not set name and xmlns"
+    end
+  end
+
   ##
   # This class represents an XML element and provides functionality
   # for automatic casting of XML element classes according to their
@@ -45,7 +51,7 @@ module Jabber
         end
       end
 
-      raise "Class #{klass} has not set name and xmlns"
+      raise NoNameXmlnsRegistered.new(klass)
     end
 
     ##
