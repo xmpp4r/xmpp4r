@@ -25,7 +25,7 @@ module Jabber
     # type:: [Symbol] or nil, see Iq#type
     # to:: [JID] Recipient
     def initialize(type = nil, to = nil)
-      super()
+      super(true)
       if not to.nil?
         set_to(to)
       end

@@ -12,6 +12,7 @@ class IqTest < Test::Unit::TestCase
   def test_create
     x = Iq::new()
     assert_equal("iq", x.name)
+    assert_equal("jabber:client", x.namespace)
     assert_equal("<iq/>", x.to_s)
   end
 
@@ -69,14 +70,14 @@ class IqTest < Test::Unit::TestCase
     assert_equal(nil, x.queryns)
     query = REXML::Element::new('query')
     x.add(query)
-    assert_equal('', x.queryns)
+    assert_equal('jabber:client', x.queryns)
     query.add_namespace('jabber:iq:auth')
     assert_equal(query.to_s, x.query.to_s)
     assert_equal('jabber:iq:auth', x.queryns)
 
     query2 = REXML::Element::new('query')
     x.query = query2
-    assert_equal('', x.queryns)
+    assert_equal('jabber:client', x.queryns)
     query2.add_namespace('jabber:iq:register')
     assert_equal('jabber:iq:register', x.queryns)
   end
@@ -104,6 +105,6 @@ class IqTest < Test::Unit::TestCase
     assert_equal(nil, x.from)
     assert_equal(JID.new('a@b/c'), x.to)
     assert_kind_of(IqQuery, x.query)
-    assert_equal('', x.queryns)
+    assert_equal('jabber:client', x.queryns)
   end
 end

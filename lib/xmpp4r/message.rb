@@ -18,7 +18,7 @@ module Jabber
     # >to:: a JID or a String object to send the message to.
     # >body:: the message's body
     def initialize(to = nil, body = nil)
-      super()
+      super(true)
       if not to.nil?
         set_to(to)
       end

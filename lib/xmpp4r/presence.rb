@@ -20,7 +20,7 @@ module Jabber
     # status:: [String] Initial status message
     # priority:: [Fixnum] Initial priority value
     def initialize(show=nil, status=nil, priority=nil)
-      super()
+      super(true)
       set_show(show) if show
       set_status(status) if status
       set_priority(priority) if priority

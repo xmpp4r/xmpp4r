@@ -45,8 +45,14 @@ module Jabber
 
         # Register cbs
         stream.add_iq_callback(120, self) { |iq|
-          Thread.new do
-            handle_iq(iq)
+          if iq.query.kind_of?(IqQueryRoster)
+            Thread.new do
+              handle_iq_query_roster(iq)
+            end
+
+            true
+          else
+            false
           end
         }
         stream.add_presence_callback(120, self) { |pres|
@@ -141,43 +147,39 @@ module Jabber
       ##
       # Handle received <tt><iq/></tt> stanzas,
       # used internally
-      def handle_iq(iq)
-        if iq.query.kind_of?(IqQueryRoster)
-          # If the <iq/> contains <error/> we just ignore that
-          # and assume an empty roster
-          iq.query.each_element('item') do |item|
-            # Handle deletion of item
-            if item.subscription == :remove
-              @items_lock.synchronize {
-                @items.delete(item.jid)
-              }
+      def handle_iq_query_roster(iq)
+        # If the <iq/> contains <error/> we just ignore that
+        # and assume an empty roster
+        iq.query.each_element('item') do |item|
+          # Handle deletion of item
+          if item.subscription == :remove
+            @items_lock.synchronize {
+              @items.delete(item.jid)
+            }
 
-            else
-              olditem = nil
-              @items_lock.synchronize {
-                if @items.has_key?(item.jid)
-                  olditem = RosterItem.new(@stream).import(@items[item.jid])
+          else
+            olditem = nil
+            @items_lock.synchronize {
+              if @items.has_key?(item.jid)
+                olditem = RosterItem.new(@stream).import(@items[item.jid])
 
-                  # Clear first, because import doesn't
-                  @items[item.jid].iname = nil
-                  @items[item.jid].subscription = nil
-                  @items[item.jid].ask = nil
+                # Clear first, because import doesn't
+                @items[item.jid].iname = nil
+                @items[item.jid].subscription = nil
+                @items[item.jid].ask = nil
 
-                  @items[item.jid].import(item)
-                else
-                  @items[item.jid] = RosterItem.new(@stream).import(item)
-                end
-              }
-              @update_cbs.process(olditem, @items[item.jid])
-            end
+                @items[item.jid].import(item)
+              else
+                @items[item.jid] = RosterItem.new(@stream).import(item)
+              end
+            }
+            @update_cbs.process(olditem, @items[item.jid])
           end
-
-          @query_cbs.process(iq)
-        else
-          false
         end
-      end
 
+        @query_cbs.process(iq)
+      end
+      
       ##
       # Handle received <tt><presence/></tt> stanzas,
       # used internally
@@ -322,7 +324,7 @@ module Jabber
           request = Iq.new_rosterset
           request.query.add(Jabber::Roster::RosterItem.new(jid, iname))
           @stream.send_with_id(request) { true }
-          # Adding to list is handled by handle_iq
+          # Adding to list is handled by handle_iq_query_roster
         end
 
         if subscribe
@@ -396,7 +398,7 @@ module Jabber
           request = Iq.new_rosterset
           request.query.add(Jabber::Roster::RosterItem.new(jid, nil, :remove))
           @stream.send_with_id(request) { true }
-          # Removing from list is handled by Roster#handle_iq
+          # Removing from list is handled by Roster#handle_iq_query_roster
         end
 
         ##
