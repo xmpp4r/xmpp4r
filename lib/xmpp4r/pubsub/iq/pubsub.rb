@@ -9,9 +9,7 @@ module Jabber
     NS_PUBSUB = 'http://jabber.org/protocol/pubsub'
     class IqPubSub < XMPPElement
       name_xmlns 'pubsub', NS_PUBSUB
-      def initialize
-        super(true)
-      end
+      force_xmlns true
     end
   end
 end

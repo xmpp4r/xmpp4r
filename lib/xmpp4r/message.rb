@@ -12,13 +12,14 @@ module Jabber
   class Message < XMPPStanza
 
     name_xmlns 'message', 'jabber:client'
+    force_xmlns true
 
     ##
     # Create a new message
     # >to:: a JID or a String object to send the message to.
     # >body:: the message's body
     def initialize(to = nil, body = nil)
-      super(true)
+      super()
       if not to.nil?
         set_to(to)
       end

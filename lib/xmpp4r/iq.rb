@@ -17,6 +17,7 @@ module Jabber
   # A class used to build/parse IQ requests/responses
   class Iq < XMPPStanza
     name_xmlns 'iq', 'jabber:client'
+    force_xmlns true
 
     @@element_classes = {}
 
@@ -25,7 +26,8 @@ module Jabber
     # type:: [Symbol] or nil, see Iq#type
     # to:: [JID] Recipient
     def initialize(type = nil, to = nil)
-      super(true)
+      super()
+
       if not to.nil?
         set_to(to)
       end

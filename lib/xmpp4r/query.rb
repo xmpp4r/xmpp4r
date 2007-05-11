@@ -10,8 +10,6 @@ module Jabber
   #
   class IqQuery < XMPPElement
     name_xmlns 'query'
-    def initialize
-      super(true)
-    end
+    force_xmlns true
   end
 end

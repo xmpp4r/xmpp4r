@@ -12,12 +12,13 @@ module Jabber
     # (JEP 0054)
     class IqVcard < XMPPElement
       name_xmlns 'vCard', 'vcard-temp'
+      force_xmlns true
 
       ##
       # Initialize a <vCard/> element
       # fields:: [Hash] Initialize with keys as XPath element names and values for element texts
       def initialize(fields=nil)
-        super(true)
+        super()
 
         unless fields.nil?
           fields.each { |name,value|
