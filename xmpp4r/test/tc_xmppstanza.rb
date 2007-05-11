@@ -82,4 +82,18 @@ class XMPPStanzaTest < Test::Unit::TestCase
     assert_equal('<error/>', x.error.to_s)
     assert_equal(Error, x.error.class)
   end
+
+  def test_clone
+    x = MyXMPPStanza::new
+    x.attributes['xyz'] = '123'
+    x.text = 'abc'
+
+    assert_equal(x.attributes['xyz'], '123')
+    assert_equal(x.text, 'abc')
+
+    x2 = x.clone
+    assert_kind_of(MyXMPPStanza, x2)
+    assert_equal('123', x2.attributes['xyz'])
+    assert_equal('abc', x2.text)
+  end
 end
