@@ -127,5 +127,17 @@ module Jabber
 
       super(element)
     end
+
+    def parent=(new_parent)
+      if parent and parent.namespace('') == namespace('') and attributes['xmlns'].nil?
+        add_namespace parent.namespace('')
+      end
+
+      super
+
+      if new_parent and new_parent.namespace('') == namespace('')
+        delete_namespace
+      end
+    end
   end
 end

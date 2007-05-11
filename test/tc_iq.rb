@@ -13,41 +13,41 @@ class IqTest < Test::Unit::TestCase
     x = Iq::new()
     assert_equal("iq", x.name)
     assert_equal("jabber:client", x.namespace)
-    assert_equal("<iq/>", x.to_s)
+    assert_equal("<iq xmlns='jabber:client'/>", x.to_s)
   end
 
   def test_iqauth
     x = Iq::new_authset(JID::new('node@domain/resource'), 'password')
-    assert_equal("<iq type='set'><query xmlns='jabber:iq:auth'><username>node</username><password>password</password><resource>resource</resource></query></iq>", x.to_s)
+    assert_equal("<iq type='set' xmlns='jabber:client'><query xmlns='jabber:iq:auth'><username>node</username><password>password</password><resource>resource</resource></query></iq>", x.to_s)
   end
 
   def test_iqauth_digest
     x = Iq::new_authset_digest(JID::new('node@domain/resource'), '', 'password')
-    assert_equal("<iq type='set'><query xmlns='jabber:iq:auth'><username>node</username><digest>#{Digest::SHA1.hexdigest('password')}</digest><resource>resource</resource></query></iq>", x.to_s)
+    assert_equal("<iq type='set' xmlns='jabber:client'><query xmlns='jabber:iq:auth'><username>node</username><digest>#{Digest::SHA1.hexdigest('password')}</digest><resource>resource</resource></query></iq>", x.to_s)
   end
 
   def test_register
     x1 = Iq::new_register
-    assert_equal("<iq type='set'><query xmlns='jabber:iq:register'/></iq>", x1.to_s)
+    assert_equal("<iq type='set' xmlns='jabber:client'><query xmlns='jabber:iq:register'/></iq>", x1.to_s)
     x2 = Iq::new_register('node')
-    assert_equal("<iq type='set'><query xmlns='jabber:iq:register'><username>node</username></query></iq>", x2.to_s)
+    assert_equal("<iq type='set' xmlns='jabber:client'><query xmlns='jabber:iq:register'><username>node</username></query></iq>", x2.to_s)
     x3 = Iq::new_register('node', 'password')
-    assert_equal("<iq type='set'><query xmlns='jabber:iq:register'><username>node</username><password>password</password></query></iq>", x3.to_s)
+    assert_equal("<iq type='set' xmlns='jabber:client'><query xmlns='jabber:iq:register'><username>node</username><password>password</password></query></iq>", x3.to_s)
   end
 
   def test_rosterget
     x = Iq::new_rosterget
-    assert_equal("<iq type='get'><query xmlns='jabber:iq:roster'/></iq>", x.to_s)
+    assert_equal("<iq type='get' xmlns='jabber:client'><query xmlns='jabber:iq:roster'/></iq>", x.to_s)
   end
 
   def test_rosterset
     x = Iq::new_rosterset
-    assert_equal("<iq type='set'><query xmlns='jabber:iq:roster'/></iq>", x.to_s)
+    assert_equal("<iq type='set' xmlns='jabber:client'><query xmlns='jabber:iq:roster'/></iq>", x.to_s)
   end
 
   def test_browseget
     x = Iq::new_browseget
-    assert_equal("<iq type='get'><query xmlns='jabber:iq:browse'/></iq>", x.to_s)
+    assert_equal("<iq type='get' xmlns='jabber:client'><query xmlns='jabber:iq:browse'/></iq>", x.to_s)
   end
 
   def test_types
