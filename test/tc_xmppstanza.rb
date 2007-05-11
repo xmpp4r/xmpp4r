@@ -15,7 +15,7 @@ class XMPPStanzaTest < Test::Unit::TestCase
   # Hack: XMPPStanza derives from XMPPElement
   # which enforces element classes to be named at declaration time
   class MyXMPPStanza < XMPPStanza
-    name_xmlns 'stanza', ''
+    name_xmlns 'stanza', 'http://home.gna.org/xmpp4r'
   end
 
   def test_from
@@ -83,7 +83,7 @@ class XMPPStanzaTest < Test::Unit::TestCase
     assert_equal(Error, x.error.class)
   end
 
-  def test_clone
+  def test_clone_and_dup
     x = MyXMPPStanza::new
     x.attributes['xyz'] = '123'
     x.text = 'abc'
@@ -94,6 +94,11 @@ class XMPPStanzaTest < Test::Unit::TestCase
     x2 = x.clone
     assert_kind_of(MyXMPPStanza, x2)
     assert_equal('123', x2.attributes['xyz'])
-    assert_equal('abc', x2.text)
+    assert_nil(x2.text)
+
+    x3 = x.dup
+    assert_kind_of(MyXMPPStanza, x3)
+    assert_equal('123', x3.attributes['xyz'])
+    assert_equal('abc', x3.text)
   end
 end
