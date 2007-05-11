@@ -27,6 +27,37 @@ class Roster::IqQueryRosterTest < Test::Unit::TestCase
     assert_equal(Roster::IqQueryRoster, iq2.query.class)
   end
 
+  def test_answer
+    iq = Iq::new_rosterget
+    assert_equal(:get, iq.type)
+    assert_nil(iq.to)
+    assert_equal('jabber:client', iq.namespace)
+    assert_equal('jabber:iq:roster', iq.queryns)
+    assert_equal(0, iq.query.children.size)
+
+    iq2 = iq.answer(true)
+    assert_equal(:get, iq2.type)
+    assert_nil(iq2.from)
+    assert_equal('jabber:client', iq2.namespace)
+    assert_equal('jabber:iq:roster', iq2.queryns)
+    assert_equal(0, iq2.query.children.size)
+  end
+
+  def test_xmlns
+    ri = Roster::RosterItem.new
+    assert_equal('jabber:iq:roster', ri.namespace)
+    assert_equal('jabber:iq:roster', ri.attributes['xmlns'])
+
+    r = Roster::IqQueryRoster.new
+    assert_equal('jabber:iq:roster', r.namespace)
+    assert_equal('jabber:iq:roster', r.attributes['xmlns'])
+
+    r.add(ri)
+
+    assert_equal('jabber:iq:roster', ri.namespace)
+    assert_nil(ri.attributes['xmlns'])
+  end
+
   def test_items
     r = Roster::IqQueryRoster::new
     r.add(Roster::RosterItem.new)

@@ -38,22 +38,22 @@ class StreamSendTest < Test::Unit::TestCase
   # Tries to send a basic message
   def test_sendbasic
     mysend(Message::new)
-    assert_equal("<message/>\n", @server.gets)
+    assert_equal("<message xmlns='jabber:client'/>\n", @server.gets)
   end
 
   def test_sendmessage
     mysend(Message::new('lucas@linux.ensimag.fr', 'coucou'))
-    assert_equal("<message to='lucas@linux.ensimag.fr'><body>coucou</body></message>\n", @server.gets)
+    assert_equal("<message to='lucas@linux.ensimag.fr' xmlns='jabber:client'><body>coucou</body></message>\n", @server.gets)
   end
 
   def test_sendpresence
     mysend(Presence::new)
-    assert_equal("<presence/>\n", @server.gets)
+    assert_equal("<presence xmlns='jabber:client'/>\n", @server.gets)
   end
 
   def test_sendiq
     mysend(Iq::new)
-    assert_equal("<iq/>\n", @server.gets)
+    assert_equal("<iq xmlns='jabber:client'/>\n", @server.gets)
   end
 
 end

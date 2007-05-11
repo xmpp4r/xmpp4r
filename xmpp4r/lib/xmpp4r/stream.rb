@@ -380,7 +380,13 @@ module Jabber
       Jabber::debuglog("SENDING:\n#{xml}")
       @threadblocks.unshift(threadblock = ThreadBlock.new(block)) if block
       begin
-        send_data(xml.to_s)
+        if xml.kind_of? XMPPStanza and xml.namespace('') == @streamns
+          xml.delete_namespace('')
+          send_data(xml.to_s)
+          xml.add_namespace(@streamns)
+        else
+          send_data(xml.to_s)
+        end
       rescue Exception => e
         Jabber::debuglog("EXCEPTION:\n#{e.class}\n#{e.message}\n#{e.backtrace.join("\n")}")
 
