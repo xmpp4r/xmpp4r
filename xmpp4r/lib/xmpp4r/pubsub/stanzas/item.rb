@@ -11,8 +11,9 @@ module Jabber
     # One PubSub Item
     class Item < XMPPElement
       name_xmlns 'item', NS_PUBSUB
+      force_xmlns true
       def initialize(id=nil)
-        super(true)
+        super()
         attributes['id'] = id
       end
       def id

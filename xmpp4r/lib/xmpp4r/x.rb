@@ -12,9 +12,6 @@ module Jabber
   # in [Message] and [Presence] stanzas
   class X < XMPPElement
     name_xmlns 'x'
-
-    def initialize
-      super(true)
-    end
+    force_xmlns true
   end
 end

@@ -22,6 +22,7 @@ module Jabber
   # * The class constructor must be callable with no mandatory parameter
   class XMPPElement < REXML::Element
     @@name_xmlns_classes = {}
+    @@force_xmlns = false
 
     ##
     # Specify XML element name and xmlns for a deriving class,
@@ -32,6 +33,14 @@ module Jabber
     # that namespace was defined
     def self.name_xmlns(name, xmlns=nil)
       @@name_xmlns_classes[[name, xmlns]] = self
+    end
+
+    def self.force_xmlns(force)
+      @@force_xmlns = force
+    end
+
+    def self.force_xmlns?
+      @@force_xmlns
     end
 
     ##
@@ -89,11 +98,15 @@ module Jabber
     # with the name registered with name_xmlns.
     #
     # force_xmlns:: [Boolean] Whether this element is always built with an xmlns attribute
-    def initialize(force_xmlns=false)
-      name, xmlns = self.class::name_xmlns_for_class(self.class)
-      super(name)
-      if force_xmlns
-        add_namespace(xmlns)
+    def initialize(*arg)
+      if arg.empty?
+        name, xmlns = self.class::name_xmlns_for_class(self.class)
+        super(name)
+        if self.class::force_xmlns?
+          add_namespace(xmlns)
+        end
+      else
+        super
       end
     end
 

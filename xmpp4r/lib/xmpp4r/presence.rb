@@ -11,6 +11,7 @@ module Jabber
   # send to the Jabber service.
   class Presence < XMPPStanza
     name_xmlns 'presence', 'jabber:client'
+    force_xmlns true
 
     include Comparable
 
@@ -20,7 +21,7 @@ module Jabber
     # status:: [String] Initial status message
     # priority:: [Fixnum] Initial priority value
     def initialize(show=nil, status=nil, priority=nil)
-      super(true)
+      super()
       set_show(show) if show
       set_status(status) if status
       set_priority(priority) if priority

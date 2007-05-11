@@ -180,7 +180,7 @@ module Jabber
     def receive_nonthreaded(element)
       Jabber::debuglog("RECEIVED:\n#{element.to_s}")
 
-      if element.namespace.to_s == '' # REXML namespaces are always strings
+      if element.namespace('').to_s == '' # REXML namespaces are always strings
         element.add_namespace(@streamns)
       end
 
@@ -190,7 +190,7 @@ module Jabber
           when 'stream'
             stanza = element
             @streamid = element.attributes['id']
-            @streamns = element.namespace if element.namespace
+            @streamns = element.namespace('') if element.namespace('')
             unless element.attributes['version']  # isn't XMPP compliant, so
               Jabber::debuglog("FEATURES: server not XMPP compliant, will not wait for features")
               @features_lock.unlock               # don't wait for <stream:features/>
