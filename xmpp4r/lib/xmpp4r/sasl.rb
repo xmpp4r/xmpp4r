@@ -57,7 +57,7 @@ module Jabber
       def auth(password)
         auth_text = "#{@stream.jid.strip}\x00#{@stream.jid.node}\x00#{password}"
         error = nil
-        @stream.send(generate_auth('PLAIN', Base64::encode64(auth_text).strip)) { |reply|
+        @stream.send(generate_auth('PLAIN', Base64::encode64(auth_text).gsub(/\s/, ''))) { |reply|
           if reply.name != 'success'
             error = reply.first_element(nil).name
           end
