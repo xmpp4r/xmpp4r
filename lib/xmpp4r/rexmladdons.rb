@@ -252,7 +252,7 @@ module REXML
           #puts "IN QNAME"
           prefix = path_stack.shift
           name = path_stack.shift
-          default_ns = @namespaces[prefix]
+          default_ns = @namespaces[prefix] unless @namespaces.nil?
           default_ns = default_ns ? default_ns : ''
           nodeset.delete_if do |node|
             ns = default_ns
