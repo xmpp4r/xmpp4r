@@ -400,5 +400,37 @@ class Roster::HelperTest < Test::Unit::TestCase
     wait_state
     cb_lock.lock
   end
+
+  def test_groupset
+    state { |iq|
+      send("<iq type='result'>
+              <query xmlns='jabber:iq:roster'>
+                <item jid='test@test' subscription='both'>
+                  <group>One</group>
+                  <group>Two</group>
+                </item>
+              </query>
+            </iq>")
+    }
+
+    query_waiter = Mutex.new
+    query_waiter.lock
+    h = Roster::Helper.new(@client)
+    h.add_query_callback { query_waiter.unlock }
+    wait_state
+    query_waiter.lock
+
+    assert_equal(1, h.items.size)
+    assert_equal(%w(One Two).sort, h['test@test'].groups.sort)
+
+    state { |iq|
+      send("<iq type='result' id='#{iq.id}'>#{iq.query}</iq>")
+    }
+    h['test@test'].groups = %w(One Two Three)
+    h['test@test'].send
+    wait_state
+    query_waiter.lock
+    assert_equal(%w(One Two Three).sort, h['test@test'].groups.sort)
+  end
 end
 
