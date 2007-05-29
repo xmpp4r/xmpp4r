@@ -192,7 +192,7 @@ module Jabber
         each_element('group') { |group|
           result.push(group.text)
         }
-        result
+        result.uniq
       end
       
       ##
