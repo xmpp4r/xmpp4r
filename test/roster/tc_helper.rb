@@ -479,5 +479,48 @@ class Roster::HelperTest < Test::Unit::TestCase
     query_waiter.lock
     assert_nil(h['test@test'].iname)
   end
+
+  def test_update_callback
+    update_args = nil
+    update_waiter = Mutex.new
+    update_waiter.lock
+
+    h = Roster::Helper.new(@client)
+    h.add_update_callback { |*a|
+      update_args = a
+      update_waiter.unlock
+    }
+
+    send("<iq type='set'>
+            <query xmlns='jabber:iq:roster'>
+              <item jid='foo@bar' name='Foo'/>
+            </query>
+          </iq>")
+    update_waiter.lock
+    assert_nil(update_args[0])
+    assert_equal(JID.new('foo@bar'), update_args[1].jid)
+    assert_equal('Foo', update_args[1].iname)
+
+    send("<iq type='set'>
+            <query xmlns='jabber:iq:roster'>
+              <item jid='foo@bar'/>
+            </query>
+          </iq>")
+    update_waiter.lock
+    assert_equal(JID.new('foo@bar'), update_args[0].jid)
+    assert_equal('Foo', update_args[0].iname)
+    assert_equal(JID.new('foo@bar'), update_args[1].jid)
+    assert_nil(update_args[1].iname)
+
+    send("<iq type='set'>
+            <query xmlns='jabber:iq:roster'>
+              <item jid='foo@bar' subscription='remove'/>
+            </query>
+          </iq>")
+    update_waiter.lock
+    assert_equal(JID.new('foo@bar'), update_args[0].jid)
+    assert_nil(update_args[0].iname)
+    assert_nil(update_args[1])
+  end
 end
 
