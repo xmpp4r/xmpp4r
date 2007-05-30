@@ -432,5 +432,52 @@ class Roster::HelperTest < Test::Unit::TestCase
     query_waiter.lock
     assert_equal(%w(One Two Three).sort, h['test@test'].groups.sort)
   end
+
+  def test_nameset
+    state { |iq|
+      send("<iq type='result'>
+              <query xmlns='jabber:iq:roster'>
+                <item jid='test@test' subscription='both'/>
+              </query>
+            </iq>")
+    }
+
+    query_waiter = Mutex.new
+    query_waiter.lock
+    h = Roster::Helper.new(@client)
+    h.add_query_callback { query_waiter.unlock }
+    wait_state
+    query_waiter.lock
+
+    assert_equal(1, h.items.size)
+    assert_nil(h['test@test'].iname)
+
+    state { |iq|
+      send("<iq type='result' id='#{iq.id}'>#{iq.query}</iq>")
+    }
+    h['test@test'].iname = 'Unknown'
+    h['test@test'].send
+    wait_state
+    query_waiter.lock
+    assert_equal('Unknown', h['test@test'].iname)
+
+    state { |iq|
+      send("<iq type='result' id='#{iq.id}'>#{iq.query}</iq>")
+    }
+    h['test@test'].iname = 'Known'
+    h['test@test'].send
+    wait_state
+    query_waiter.lock
+    assert_equal('Known', h['test@test'].iname)
+
+    state { |iq|
+      send("<iq type='result' id='#{iq.id}'>#{iq.query}</iq>")
+    }
+    h['test@test'].iname = nil
+    h['test@test'].send
+    wait_state
+    query_waiter.lock
+    assert_nil(h['test@test'].iname)
+  end
 end
 
