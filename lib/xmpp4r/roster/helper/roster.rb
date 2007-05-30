@@ -151,32 +151,21 @@ module Jabber
         # If the <iq/> contains <error/> we just ignore that
         # and assume an empty roster
         iq.query.each_element('item') do |item|
-          # Handle deletion of item
-          if item.subscription == :remove
-            @items_lock.synchronize {
+          olditem, newitem = nil, nil
+
+          @items_lock.synchronize {
+            olditem = @items[item.jid]
+
+            # Handle deletion of item
+            if item.subscription == :remove
               @items.delete(item.jid)
-            }
-
-          else
-            olditem = nil
-            @items_lock.synchronize {
-              if @items.has_key?(item.jid)
-                olditem = RosterItem.new(@stream).import(@items[item.jid])
-
-                # Clear first, because import doesn't
-                @items[item.jid].iname = nil
-                @items[item.jid].subscription = nil
-                @items[item.jid].ask = nil
-
-                @items[item.jid].import(item)
-              else
-                @items[item.jid] = RosterItem.new(@stream).import(item)
-              end
-            }
-            @update_cbs.process(olditem, @items[item.jid])
-          end
+            else
+              newitem = @items[item.jid] = RosterItem.new(@stream).import(item)
+            end
+          }
+          @update_cbs.process(olditem, newitem)
         end
-
+          
         @query_cbs.process(iq)
       end
       
