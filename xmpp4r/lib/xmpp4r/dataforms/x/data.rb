@@ -28,6 +28,18 @@ module Jabber
         nil
       end
 
+      def fields
+        return @fields if @fields
+
+        @fields = []
+        each_element do |xe|
+          if xe.kind_of?(XDataField) and xe.type != :hidden and xe.type != :fixed
+            @fields << xe
+          end
+        end
+        @fields
+      end
+
       ##
       # Type of this Data Form
       # result:: * :cancel
