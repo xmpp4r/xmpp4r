@@ -191,6 +191,13 @@ module Jabber
             stanza = element
             @streamid = element.attributes['id']
             @streamns = element.namespace('') if element.namespace('')
+
+            # Hack: component streams are basically client streams.
+            # Someday we may want to create special stanza classes
+            # for components/s2s deriving from normal stanzas but
+            # posessing these namespaces
+            @streamns = 'jabber:client' if @streamns == 'jabber:component:accept'
+
             unless element.attributes['version']  # isn't XMPP compliant, so
               Jabber::debuglog("FEATURES: server not XMPP compliant, will not wait for features")
               @features_lock.unlock               # don't wait for <stream:features/>
@@ -380,8 +387,10 @@ module Jabber
       Jabber::debuglog("SENDING:\n#{xml}")
       @threadblocks.unshift(threadblock = ThreadBlock.new(block)) if block
       begin
-        if xml.kind_of? XMPPStanza and xml.namespace('') == @streamns
-          xml.delete_namespace('')
+        # Temporarily remove stanza's namespace to
+        # reduce bandwidth consumption
+        if xml.kind_of? XMPPStanza and xml.namespace == 'jabber:client'
+          xml.delete_namespace
           send_data(xml.to_s)
           xml.add_namespace(@streamns)
         else

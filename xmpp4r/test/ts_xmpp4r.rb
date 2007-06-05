@@ -5,6 +5,8 @@ $:.unshift File.join(File.dirname(__FILE__), '..', 'test')
 $:.unshift File.join(File.dirname(__FILE__), 'lib')
 $:.unshift File.join(File.dirname(__FILE__), 'test')
 
+Thread::abort_on_exception = true
+
 require 'xmpp4r'
 
 require 'tc_streamThreaded'
@@ -37,3 +39,4 @@ require 'tc_xmppstanza'
 require 'tc_message'
 require 'tc_class_names'
 require 'tc_rexml'
+require 'tc_streamComponent'

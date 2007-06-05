@@ -74,7 +74,7 @@ class StreamThreadedTest < Test::Unit::TestCase
     @server.flush
 
     Thread.new {
-      assert_equal(Iq.new(:get).to_s, @server.gets('>'))
+      assert_equal(Iq.new(:get).delete_namespace.to_s, @server.gets('>'))
       @stream.receive(Iq.new(:result))
     }
 
@@ -98,14 +98,14 @@ class StreamThreadedTest < Test::Unit::TestCase
     finished.lock
 
     Thread.new {
-      assert_equal(Iq.new(:get).to_s, @server.gets('>'))
-      @server.puts(Iq.new(:result).set_id('1').to_s)
+      assert_equal(Iq.new(:get).delete_namespace.to_s, @server.gets('>'))
+      @server.puts(Iq.new(:result).set_id('1').delete_namespace.to_s)
       @server.flush
-      assert_equal(Iq.new(:set).to_s, @server.gets('>'))
-      @server.puts(Iq.new(:result).set_id('2').to_s)
+      assert_equal(Iq.new(:set).delete_namespace.to_s, @server.gets('>'))
+      @server.puts(Iq.new(:result).set_id('2').delete_namespace.to_s)
       @server.flush
-      assert_equal(Iq.new(:get).to_s, @server.gets('>'))
-      @server.puts(Iq.new(:result).set_id('3').to_s)
+      assert_equal(Iq.new(:get).delete_namespace.to_s, @server.gets('>'))
+      @server.puts(Iq.new(:result).set_id('3').delete_namespace.to_s)
       @server.flush
 
       finished.unlock
@@ -170,18 +170,21 @@ class StreamThreadedTest < Test::Unit::TestCase
     @server.puts('<stream:stream>')
     @server.flush
     finished = Mutex.new
+    finished.lock
     ok = true
+    n = 100
 
     Thread.new {
-      100.times { |i|
-        ok &&= (Iq.new(:get).set_id(i).to_s == @server.gets('>'))
+      n.times { |i|
+        ok &&= (Iq.new(:get).set_id(i).delete_namespace.to_s == @server.gets('>'))
         @server.puts(Iq.new(:result).set_id(i).to_s)
         @server.flush
       }
+
       finished.unlock
     }
 
-    100.times { |i|
+    n.times { |i|
       @stream.send(Iq.new(:get).set_id(i)) { |reply|
         ok &&= reply.kind_of? Iq
         ok &&= (:result == reply.type)
@@ -190,7 +193,7 @@ class StreamThreadedTest < Test::Unit::TestCase
       }
     }
 
+    finished.lock
     assert(ok)
-    2.times { finished.lock }
   end
 end
