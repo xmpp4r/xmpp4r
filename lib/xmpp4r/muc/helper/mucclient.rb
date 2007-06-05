@@ -94,6 +94,11 @@ module Jabber
           # but all join-failures should be type='error'
           elsif r.from == jid and r.kind_of?(Presence) and r.type != :unavailable
             # Our own presence reflected back - success
+            if r.x(XMUCUser) and (i = r.x(XMUCUser).items.first)
+              @affiliation = i.affiliation  # we're interested in if it's :owner
+              @role = i.role                # :moderator ?
+            end
+
             handle_presence(r, false)
             true
           else
@@ -376,6 +381,50 @@ module Jabber
         # Callbacks
         @stream.delete_presence_callback(self)
         @stream.delete_message_callback(self)
+      end
+
+    public
+      def owner?
+        @affiliation == :owner
+      end
+
+      def configure(options={})
+        raise 'You are not the owner' unless owner?
+        
+        iq = Iq.new(:get, jid)
+        iq.to = @jid
+        iq.from = @my_jid
+        iq.add(IqQueryMucOwner.new)
+
+        fields = []
+        
+        answer = @stream.send_with_id(iq)
+        raise "Configuration not possible for this room" unless answer.query && answer.query.x(XData)
+
+        answer.query.x(XData).fields.each { |field|
+          if (var = field.attributes['var'])
+            fields << var
+          end
+        }
+
+        
+        # fill out the reply form
+        iq = Iq.new(:set, jid)
+        iq.to = @jid
+        iq.from = @my_jid
+        query = IqQueryMucOwner.new
+        form = Dataforms::XData.new
+        form.type = :submit
+        options.each do |var, values|
+          field = Dataforms::XDataField.new
+          values = [values] unless values.is_a?(Array)
+          field.var, field.values = var, values
+          form.add(field)
+        end
+        query.add(form)
+        iq.add(query)   
+
+        @stream.send_with_id(iq)
       end
     end
   end
