@@ -155,9 +155,9 @@ module Jabber
       # recipients:: [Hash] of [JID] => [String] Reason
       def invite(recipients)
         msg = Message.new
-        x = msg.add(XMucUser.new)
+        x = msg.add(XMUCUser.new)
         recipients.each { |jid,reason|
-          x.add(XMucUserInvite.new(jid, reason))
+          x.add(XMUCUserInvite.new(jid, reason))
         }
         send(msg)
       end

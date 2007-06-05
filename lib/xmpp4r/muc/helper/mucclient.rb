@@ -394,7 +394,7 @@ module Jabber
         iq = Iq.new(:get, jid)
         iq.to = @jid
         iq.from = @my_jid
-        iq.add(IqQueryMucOwner.new)
+        iq.add(IqQueryMUCOwner.new)
 
         fields = []
         
@@ -412,7 +412,7 @@ module Jabber
         iq = Iq.new(:set, jid)
         iq.to = @jid
         iq.from = @my_jid
-        query = IqQueryMucOwner.new
+        query = IqQueryMUCOwner.new
         form = Dataforms::XData.new
         form.type = :submit
         options.each do |var, values|
