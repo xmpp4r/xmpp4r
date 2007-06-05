@@ -13,10 +13,11 @@ module Jabber
     ##
     # Iq child 'si' for Stream-Initiation
     class IqSi < XMPPElement
-      name_xmlns 'si', PROFILE_FILETRANSFER
+      name_xmlns 'si', 'http://jabber.org/protocol/si'
+      force_xmlns true
 
       def initialize(id=nil, profile=nil, mime_type=nil)
-        super(true)
+        super()
 
         self.id = id
         self.profile = profile

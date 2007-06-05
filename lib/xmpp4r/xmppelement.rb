@@ -35,10 +35,14 @@ module Jabber
       @@name_xmlns_classes[[name, xmlns]] = self
     end
 
+    ##
+    # Set whether this element is always built with an xmlns attribute
     def self.force_xmlns(force)
       @@force_xmlns = force
     end
 
+    ##
+    # Whether this element is always built with an xmlns attribute
     def self.force_xmlns?
       @@force_xmlns
     end
@@ -96,8 +100,6 @@ module Jabber
     ##
     # Initialize this element, which will then be initialized
     # with the name registered with name_xmlns.
-    #
-    # force_xmlns:: [Boolean] Whether this element is always built with an xmlns attribute
     def initialize(*arg)
       if arg.empty?
         name, xmlns = self.class::name_xmlns_for_class(self.class)

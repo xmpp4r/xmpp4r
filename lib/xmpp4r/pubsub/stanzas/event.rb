@@ -12,9 +12,7 @@ module Jabber
     # a publishing event
     class Event < XMPPElement
       name_xmlns 'event', NS_PUBSUB + '#event'
-      def initialize
-        super(true)
-      end
+      force_xmlns true
       
       ##
       # return payload
