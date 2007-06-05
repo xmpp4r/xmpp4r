@@ -163,7 +163,10 @@ Disabled, because non-threaded mode is broken
     @stream.process
 
     Thread.new {
-      assert_equal(Iq.new(:get).to_s, @server.gets('>'))
+      iq_s = @server.gets('>')
+      iq = Iq::import(REXML::Document.new(iq_s).root)
+      assert_kind_of(Iq, iq)
+      assert_equal(:get, iq.type)
       @stream.receive(Iq.new(:result))
     }
 
