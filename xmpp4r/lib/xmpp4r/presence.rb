@@ -14,6 +14,7 @@ module Jabber
     force_xmlns true
 
     include Comparable
+    include XParent
 
     ##
     # Create presence stanza
@@ -75,19 +76,6 @@ module Jabber
     def set_type(val)
       self.type = val
       self
-    end
-
-    ##
-    # Get the first <x/> element in this stanza, or nil if none found.
-    # namespace:: [String] Optional, find the first <x/> element having this xmlns
-    # result:: [REXML::Element] or nil
-    def x(namespace=nil)
-      each_element('x') { |x|
-        if namespace.nil? or namespace == x.namespace
-          return x
-        end
-      }
-      nil
     end
 
     ##

@@ -14,6 +14,8 @@ module Jabber
     name_xmlns 'message', 'jabber:client'
     force_xmlns true
 
+    include XParent
+
     ##
     # Create a new message
     # >to:: a JID or a String object to send the message to.
@@ -69,19 +71,6 @@ module Jabber
     def set_type(v)
       self.type = v
       self
-    end
-
-    ##
-    # Get the first <x/> element in this stanza, or nil if none found.
-    # namespace:: [String] Optional, find the first <x/> element having this xmlns
-    # result:: [REXML::Element] or nil
-    def x(namespace=nil)
-      each_element('x') { |x|
-        if namespace.nil? or namespace == x.namespace
-          return x
-        end
-      }
-      nil
     end
 
     ##

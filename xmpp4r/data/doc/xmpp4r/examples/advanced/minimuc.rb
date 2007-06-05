@@ -68,7 +68,7 @@ class Room
       # Push user-list
       userinfo = Jabber::Presence.import(pres)
       userinfo.to = pres.from
-      userinfo.add(Jabber::XMucUser.new).add(Jabber::XMucUserItem.new(:none, :participant))
+      userinfo.add(Jabber::XMUCUser.new).add(Jabber::XMUCUserItem.new(:none, :participant))
       print "Sending all users for #{pres.to} to #{pres.from}:"
       @users.each { |nick,jid|
         userinfo.from = Jabber::JID::new(@name.node, @name.domain, nick)
@@ -100,9 +100,9 @@ class Room
     
     # Advertise users presence to all
     puts "Advertising user to all"
-    x = Jabber::XMucUserItem.new(:none, :participant, pres.from)
+    x = Jabber::XMUCUserItem.new(:none, :participant, pres.from)
     x.reason = reason
-    pres.add(Jabber::XMucUser.new).add(x)
+    pres.add(Jabber::XMUCUser.new).add(x)
     pres.from = pres.to
     broadcast(pres)
   end
@@ -217,8 +217,8 @@ class MUC
       end
       [Jabber::IqQueryDiscoInfo.new.namespace,
        Jabber::IqQueryDiscoItems.new.namespace,
-       Jabber::XMuc.new.namespace,
-       Jabber::XMucUser.new.namespace].each { |ns|
+       Jabber::XMUC.new.namespace,
+       Jabber::XMUCUser.new.namespace].each { |ns|
           iq.query.add(Jabber::DiscoFeature.new(ns))
       }
     else
