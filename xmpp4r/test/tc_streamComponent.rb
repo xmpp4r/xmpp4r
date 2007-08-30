@@ -8,6 +8,7 @@ require 'socket'
 require 'xmpp4r/component'
 require 'xmpp4r/bytestreams'
 require 'xmpp4r'
+require 'semaphore'
 include Jabber
 
 Thread::abort_on_exception = true
@@ -17,8 +18,7 @@ class StreamComponentTest < Test::Unit::TestCase
 
   def setup
     servlisten = TCPServer.new(@@SOCKET_PORT)
-    serverwait = Mutex.new
-    serverwait.lock
+    serverwait = Semaphore.new
     Thread.new {
       serversock = servlisten.accept
       servlisten.close
@@ -34,13 +34,13 @@ class StreamComponentTest < Test::Unit::TestCase
       }
       @server.start(serversock)
       
-      serverwait.unlock
+      serverwait.run
     }
 
     @stream = Component::new('test')
     @stream.connect('localhost', @@SOCKET_PORT)
 
-    serverwait.lock
+    serverwait.wait
   end
 
   def teardown
@@ -50,48 +50,44 @@ class StreamComponentTest < Test::Unit::TestCase
 
   def test_process
     stanzas = 0
-    message_lock = Mutex.new
-    message_lock.lock
-    iq_lock = Mutex.new
-    iq_lock.lock
-    presence_lock = Mutex.new
-    presence_lock.lock
+    message_lock = Semaphore.new
+    iq_lock = Semaphore.new
+    presence_lock = Semaphore.new
 
     @stream.add_message_callback { |msg|
       assert_kind_of(Message, msg)
       stanzas += 1
-      message_lock.unlock
+      message_lock.run
     }
     @stream.add_iq_callback { |iq|
       assert_kind_of(Iq, iq)
       stanzas += 1
-      iq_lock.unlock
+      iq_lock.run
     } 
     @stream.add_presence_callback { |pres|
       assert_kind_of(Presence, pres)
       stanzas += 1
-      presence_lock.unlock
+      presence_lock.run
     }
 
     @server.send('<message/>')
     @server.send('<iq/>')
     @server.send('<presence/>')
 
-    message_lock.lock
-    iq_lock.lock
-    presence_lock.lock
+    message_lock.wait
+    iq_lock.wait
+    presence_lock.wait
 
     assert_equal(3, stanzas)
   end
 
   def test_file
-    incoming_lock = Mutex.new
-    incoming_lock.lock
+    incoming_lock = Semaphore.new
 
     ft = Jabber::FileTransfer::Helper.new(@stream)
     ft.add_incoming_callback do |iq,file|
       assert_kind_of(Bytestreams::IqSiFile, file)
-      incoming_lock.unlock
+      incoming_lock.run
     end
 
     @server.send("
@@ -112,19 +108,18 @@ class StreamComponentTest < Test::Unit::TestCase
   </si>
 </iq>
 ")
-    incoming_lock.lock
+    incoming_lock.wait
   end
 
   def test_outgoing
-    received_wait = Mutex.new
-    received_wait.lock
+    received_wait = Semaphore.new
 
     @server.add_message_callback { |msg|
       assert_kind_of(Message, msg)
-      received_wait.unlock
+      received_wait.run
     }
 
     @stream.send(Message.new)
-    received_wait.lock
+    received_wait.wait
   end
 end
