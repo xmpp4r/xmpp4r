@@ -7,6 +7,7 @@ require File::dirname(__FILE__) + '/../lib/clienttester'
 
 require 'xmpp4r'
 require 'xmpp4r/roster/helper/roster'
+require 'semaphore'
 include Jabber
 
 class Roster::HelperTest < Test::Unit::TestCase
@@ -29,14 +30,13 @@ class Roster::HelperTest < Test::Unit::TestCase
             </iq>")
     }
 
-    query_waiter = Mutex.new
-    query_waiter.lock
+    query_waiter = Semaphore.new
     h = Roster::Helper::new(@client)
     h.add_query_callback { |iq|
-      query_waiter.unlock
+      query_waiter.run
     }
     wait_state
-    query_waiter.lock
+    query_waiter.wait
 
     assert_equal([nil], h.groups)
     jids = h.find_by_group(nil).collect { |item| item.jid }.sort
@@ -73,12 +73,11 @@ class Roster::HelperTest < Test::Unit::TestCase
             </iq>")
     }
 
-    query_waiter = Mutex.new
-    query_waiter.lock
+    query_waiter = Semaphore.new
     h = Roster::Helper::new(@client)
-    h.add_query_callback { |iq| query_waiter.unlock }
+    h.add_query_callback { |iq| query_waiter.run }
     wait_state
-    query_waiter.lock
+    query_waiter.wait
 
     assert_equal([], h.groups)
     assert_nil(h['a@b.c'])
@@ -88,7 +87,7 @@ class Roster::HelperTest < Test::Unit::TestCase
               <item jid='a@b.c'/>
             </query>
           </iq>")
-    query_waiter.lock
+    query_waiter.wait
 
     assert_kind_of(Roster::Helper::RosterItem, h['a@b.c'])
     assert_equal(JID.new('a@b.c'), h['a@b.c'].jid)
@@ -101,7 +100,7 @@ class Roster::HelperTest < Test::Unit::TestCase
               <item jid='a@b.c' subscription='from' name='ABC' ask='subscribe'/>
             </query>
           </iq>")
-    query_waiter.lock
+    query_waiter.wait
 
     assert_kind_of(Roster::Helper::RosterItem, h['a@b.c'])
     assert_equal(JID.new('a@b.c'), h['a@b.c'].jid)
@@ -114,7 +113,7 @@ class Roster::HelperTest < Test::Unit::TestCase
               <item jid='a@b.c'/>
             </query>
           </iq>")
-    query_waiter.lock
+    query_waiter.wait
 
     assert_kind_of(Roster::Helper::RosterItem, h['a@b.c'])
     assert_equal(JID.new('a@b.c'), h['a@b.c'].jid)
@@ -127,7 +126,7 @@ class Roster::HelperTest < Test::Unit::TestCase
               <item jid='a@b.c' subscription='remove'/>
             </query>
           </iq>")
-    query_waiter.lock
+    query_waiter.wait
 
     assert_nil(h['a@b.c'])
   end
@@ -141,13 +140,11 @@ class Roster::HelperTest < Test::Unit::TestCase
             </iq>")
     }
 
-    query_waiter = Mutex.new
-    query_waiter.lock
-    presence_waiter = Mutex.new
-    presence_waiter.lock
+    query_waiter = Semaphore.new
+    presence_waiter = Semaphore.new
     h = Roster::Helper::new(@client)
     h.add_query_callback { |iq|
-      query_waiter.unlock
+      query_waiter.run
     }
     cb_item, cb_op, cb_p = nil, nil, nil
     h.add_presence_callback { |item,oldpres,pres|
@@ -157,11 +154,11 @@ class Roster::HelperTest < Test::Unit::TestCase
       Thread.pass
 
       cb_item, cb_op, cb_p = item, oldpres, pres
-      presence_waiter.unlock
+      presence_waiter.run
     }
 
     wait_state
-    query_waiter.lock
+    query_waiter.wait
 
     assert_equal(false, h['a@b.c'].online?)
     presences = 0
@@ -169,7 +166,7 @@ class Roster::HelperTest < Test::Unit::TestCase
     assert_equal(0, presences)
 
     send("<presence from='a@b.c/r'/>")
-    presence_waiter.lock
+    presence_waiter.wait
 
     assert_kind_of(Roster::Helper::RosterItem, cb_item)
     assert_nil(cb_op)
@@ -181,7 +178,7 @@ class Roster::HelperTest < Test::Unit::TestCase
     assert_equal(1, presences)
 
     send("<presence from='a@b.c/r2'/>")
-    presence_waiter.lock
+    presence_waiter.wait
 
     assert_kind_of(Roster::Helper::RosterItem, cb_item)
     assert_nil(cb_op)
@@ -193,7 +190,7 @@ class Roster::HelperTest < Test::Unit::TestCase
     assert_equal(2, presences)
 
     send("<presence from='a@b.c/r'/>")
-    presence_waiter.lock
+    presence_waiter.wait
 
     assert_kind_of(Roster::Helper::RosterItem, cb_item)
     assert_kind_of(Presence, cb_op)
@@ -206,7 +203,7 @@ class Roster::HelperTest < Test::Unit::TestCase
     assert_equal(2, presences)
 
     send("<presence from='a@b.c/r' type='error'/>")
-    presence_waiter.lock
+    presence_waiter.wait
 
     assert_kind_of(Roster::Helper::RosterItem, cb_item)
     assert_kind_of(Presence, cb_op)
@@ -219,7 +216,7 @@ class Roster::HelperTest < Test::Unit::TestCase
     assert_equal(2, presences)
 
     send("<presence from='a@b.c/r2' type='unavailable'/>")
-    presence_waiter.lock
+    presence_waiter.wait
 
     assert_kind_of(Roster::Helper::RosterItem, cb_item)
     assert_kind_of(Presence, cb_op)
@@ -232,7 +229,7 @@ class Roster::HelperTest < Test::Unit::TestCase
     assert_equal(2, presences)
 
     send("<presence from='a@b.c/r'/>")
-    presence_waiter.lock
+    presence_waiter.wait
 
     assert_kind_of(Roster::Helper::RosterItem, cb_item)
     assert_kind_of(Presence, cb_op)
@@ -245,7 +242,7 @@ class Roster::HelperTest < Test::Unit::TestCase
     assert_equal(2, presences)
 
     send("<presence from='a@b.c/r2'/>")
-    presence_waiter.lock
+    presence_waiter.wait
 
     assert_kind_of(Roster::Helper::RosterItem, cb_item)
     assert_kind_of(Presence, cb_op)
@@ -259,7 +256,7 @@ class Roster::HelperTest < Test::Unit::TestCase
 
     send("<presence from='a@b.c' type='error'/>")
     2.times {
-      presence_waiter.lock
+      presence_waiter.wait
 
       assert_kind_of(Roster::Helper::RosterItem, cb_item)
       assert_kind_of(Presence, cb_op)
@@ -272,7 +269,7 @@ class Roster::HelperTest < Test::Unit::TestCase
     assert_equal(1, presences)
 
     send("<presence from='a@b.c/r'/>")
-    presence_waiter.lock
+    presence_waiter.wait
 
     assert_kind_of(Roster::Helper::RosterItem, cb_item)
     assert_nil(cb_op)
@@ -291,12 +288,11 @@ class Roster::HelperTest < Test::Unit::TestCase
             </iq>")
     }
 
-    query_waiter = Mutex.new
-    query_waiter.lock
+    query_waiter = Semaphore.new
     h = Roster::Helper::new(@client)
-    h.add_query_callback { |iq| query_waiter.unlock }
+    h.add_query_callback { |iq| query_waiter.run }
     wait_state
-    query_waiter.lock
+    query_waiter.wait
 
     state { |iq|
       assert_kind_of(Iq, iq)
@@ -318,7 +314,7 @@ class Roster::HelperTest < Test::Unit::TestCase
     }
     h.add('contact@example.org', 'MyContact', true)
     wait_state
-    query_waiter.lock
+    query_waiter.wait
     wait_state
   end
 
@@ -329,12 +325,11 @@ class Roster::HelperTest < Test::Unit::TestCase
             </iq>")
     }
 
-    query_waiter = Mutex.new
-    query_waiter.lock
+    query_waiter = Semaphore.new
     h = Roster::Helper::new(@client)
-    h.add_query_callback { |iq| query_waiter.unlock }
+    h.add_query_callback { |iq| query_waiter.run }
     wait_state
-    query_waiter.lock
+    query_waiter.wait
 
     state { |pres|
       assert_kind_of(Presence, pres)
@@ -346,18 +341,17 @@ class Roster::HelperTest < Test::Unit::TestCase
       send("<iq type='result' id='#{iq.id}'/>")
     }
 
-    cb_lock = Mutex.new
-    cb_lock.lock
+    cb_lock = Semaphore.new
     h.add_subscription_request_callback { |item,pres|
       assert_nil(item)
       assert_kind_of(Presence, pres)
       h.accept_subscription(pres.from)
-      cb_lock.unlock
+      cb_lock.run
     }
     send("<presence type='subscribe' from='contact@example.org' to='user@example.com'/>")
     skip_state
     wait_state
-    cb_lock.lock
+    cb_lock.wait
 
     state { |pres|
       assert_kind_of(Presence, pres)
@@ -374,31 +368,29 @@ class Roster::HelperTest < Test::Unit::TestCase
             </iq>")
     }
 
-    query_waiter = Mutex.new
-    query_waiter.lock
+    query_waiter = Semaphore.new
     h = Roster::Helper::new(@client)
-    h.add_query_callback { |iq| query_waiter.unlock }
+    h.add_query_callback { |iq| query_waiter.run }
     wait_state
-    query_waiter.lock
+    query_waiter.wait
 
     state { |pres|
       assert_kind_of(Presence, pres)
       assert_equal(:unsubscribed, pres.type)
       assert_equal(JID.new('contact@example.org'), pres.to)
     }
-    cb_lock = Mutex.new
-    cb_lock.lock
+    cb_lock = Semaphore.new
     h.add_subscription_request_callback { |item,pres|
       assert_nil(item)
       assert_kind_of(Presence, pres)
       h.decline_subscription(pres.from)
 
-      cb_lock.unlock
+      cb_lock.run
     }
 
     send("<presence type='subscribe' from='contact@example.org' to='user@example.com'/>")
     wait_state
-    cb_lock.lock
+    cb_lock.wait
   end
 
   def test_groupset
@@ -413,12 +405,11 @@ class Roster::HelperTest < Test::Unit::TestCase
             </iq>")
     }
 
-    query_waiter = Mutex.new
-    query_waiter.lock
+    query_waiter = Semaphore.new
     h = Roster::Helper.new(@client)
-    h.add_query_callback { query_waiter.unlock }
+    h.add_query_callback { query_waiter.run }
     wait_state
-    query_waiter.lock
+    query_waiter.wait
 
     assert_equal(1, h.items.size)
     assert_equal(%w(One Two).sort, h['test@test'].groups.sort)
@@ -429,7 +420,7 @@ class Roster::HelperTest < Test::Unit::TestCase
     h['test@test'].groups = %w(One Two Three)
     h['test@test'].send
     wait_state
-    query_waiter.lock
+    query_waiter.wait
     assert_equal(%w(One Two Three).sort, h['test@test'].groups.sort)
   end
 
@@ -442,12 +433,11 @@ class Roster::HelperTest < Test::Unit::TestCase
             </iq>")
     }
 
-    query_waiter = Mutex.new
-    query_waiter.lock
+    query_waiter = Semaphore.new
     h = Roster::Helper.new(@client)
-    h.add_query_callback { query_waiter.unlock }
+    h.add_query_callback { query_waiter.run }
     wait_state
-    query_waiter.lock
+    query_waiter.wait
 
     assert_equal(1, h.items.size)
     assert_nil(h['test@test'].iname)
@@ -458,7 +448,7 @@ class Roster::HelperTest < Test::Unit::TestCase
     h['test@test'].iname = 'Unknown'
     h['test@test'].send
     wait_state
-    query_waiter.lock
+    query_waiter.wait
     assert_equal('Unknown', h['test@test'].iname)
 
     state { |iq|
@@ -467,7 +457,7 @@ class Roster::HelperTest < Test::Unit::TestCase
     h['test@test'].iname = 'Known'
     h['test@test'].send
     wait_state
-    query_waiter.lock
+    query_waiter.wait
     assert_equal('Known', h['test@test'].iname)
 
     state { |iq|
@@ -476,19 +466,18 @@ class Roster::HelperTest < Test::Unit::TestCase
     h['test@test'].iname = nil
     h['test@test'].send
     wait_state
-    query_waiter.lock
+    query_waiter.wait
     assert_nil(h['test@test'].iname)
   end
 
   def test_update_callback
     update_args = nil
-    update_waiter = Mutex.new
-    update_waiter.lock
+    update_waiter = Semaphore.new
 
     h = Roster::Helper.new(@client)
     h.add_update_callback { |*a|
       update_args = a
-      update_waiter.unlock
+      update_waiter.run
     }
 
     send("<iq type='set'>
@@ -496,7 +485,7 @@ class Roster::HelperTest < Test::Unit::TestCase
               <item jid='foo@bar' name='Foo'/>
             </query>
           </iq>")
-    update_waiter.lock
+    update_waiter.wait
     assert_nil(update_args[0])
     assert_equal(JID.new('foo@bar'), update_args[1].jid)
     assert_equal('Foo', update_args[1].iname)
@@ -506,7 +495,7 @@ class Roster::HelperTest < Test::Unit::TestCase
               <item jid='foo@bar'/>
             </query>
           </iq>")
-    update_waiter.lock
+    update_waiter.wait
     assert_equal(JID.new('foo@bar'), update_args[0].jid)
     assert_equal('Foo', update_args[0].iname)
     assert_equal(JID.new('foo@bar'), update_args[1].jid)
@@ -517,7 +506,7 @@ class Roster::HelperTest < Test::Unit::TestCase
               <item jid='foo@bar' subscription='remove'/>
             </query>
           </iq>")
-    update_waiter.lock
+    update_waiter.wait
     assert_equal(JID.new('foo@bar'), update_args[0].jid)
     assert_nil(update_args[0].iname)
     assert_nil(update_args[1])
