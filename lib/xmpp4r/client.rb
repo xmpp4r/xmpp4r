@@ -137,8 +137,7 @@ module Jabber
       stop
       start
       # And wait for features - again
-      @features_lock.lock
-      @features_lock.unlock
+      @features_sem.wait
 
       # Resource binding (RFC3920 - 7)
       if @stream_features.has_key? 'bind'

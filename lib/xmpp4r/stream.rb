@@ -5,6 +5,7 @@
 require 'callbacks'
 require 'socket'
 require 'thread'
+require 'semaphore'
 Thread::abort_on_exception = true
 require 'xmpp4r/streamparser'
 require 'xmpp4r/presence'
@@ -62,7 +63,7 @@ module Jabber
       @wakeup_thread = nil
       @streamid = nil
       @streamns = 'jabber:client'
-      @features_lock = Mutex.new
+      @features_sem = Semaphore.new
     end
 
     ##
@@ -200,7 +201,7 @@ module Jabber
 
             unless element.attributes['version']  # isn't XMPP compliant, so
               Jabber::debuglog("FEATURES: server not XMPP compliant, will not wait for features")
-              @features_lock.unlock               # don't wait for <stream:features/>
+              @features_sem.run                   # don't wait for <stream:features/> 
             end
           when 'features'
             stanza = element
@@ -214,7 +215,7 @@ module Jabber
               end
             }
             Jabber::debuglog("FEATURES: received")
-            @features_lock.unlock
+            @features_sem.run
           else
             stanza = element
         end
@@ -344,24 +345,23 @@ module Jabber
     class ThreadBlock
       def initialize(block)
         @block = block
-        @waiter = Mutex.new
-        @waiter.lock
+        @waiter = Semaphore.new
         @exception = nil
       end
       def call(*args)
         @block.call(*args)
       end
       def wait
-        @waiter.lock
+        @waiter.wait
         raise @exception if @exception
       end
       def wakeup
         # TODO: Handle threadblock removal if !alive?
-        @waiter.unlock
+        @waiter.run
       end
       def raise(exception)
         @exception = exception
-        @waiter.unlock
+        @waiter.run
       end
     end
 
