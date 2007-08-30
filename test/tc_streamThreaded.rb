@@ -6,6 +6,7 @@ require 'tempfile'
 require 'test/unit'
 require 'socket'
 require 'xmpp4r/stream'
+require 'semaphore'
 include Jabber
 
 class StreamThreadedTest < Test::Unit::TestCase
@@ -46,12 +47,11 @@ class StreamThreadedTest < Test::Unit::TestCase
     @server.puts('<stream:stream>')
     @server.flush
 
-    done = Mutex.new
-    done.lock
+    done = Semaphore.new
     n = 0
     @stream.add_message_callback {
       n += 1
-      done.unlock if n % 100 == 0
+      done.run if n % 100 == 0
     }
 
     100.times {
@@ -59,13 +59,13 @@ class StreamThreadedTest < Test::Unit::TestCase
       @server.flush
     }
 
-    done.lock
+    done.wait
     assert_equal(100, n)
 
     @server.puts('<message/>' * 100)
     @server.flush
 
-    done.lock
+    done.wait
     assert_equal(200, n)
   end
 
@@ -94,8 +94,7 @@ class StreamThreadedTest < Test::Unit::TestCase
   def test_send_nested
     @server.puts('<stream:stream>')
     @server.flush
-    finished = Mutex.new
-    finished.lock
+    finished = Semaphore.new
 
     Thread.new {
       assert_equal(Iq.new(:get).delete_namespace.to_s, @server.gets('>'))
@@ -108,7 +107,7 @@ class StreamThreadedTest < Test::Unit::TestCase
       @server.puts(Iq.new(:result).set_id('3').delete_namespace.to_s)
       @server.flush
 
-      finished.unlock
+      finished.run
     }
 
     called_outer = 0
@@ -141,14 +140,13 @@ class StreamThreadedTest < Test::Unit::TestCase
     assert_equal(2, called_outer)
     assert_equal(1, called_inner)
 
-    finished.lock
+    finished.wait
   end
 
   def test_send_in_callback
     @server.puts('<stream:stream>')
     @server.flush
-    finished = Mutex.new
-    finished.lock
+    finished = Semaphore.new
 
     @stream.add_message_callback {
       @stream.send_with_id(Iq.new(:get)) { |reply|
@@ -159,18 +157,17 @@ class StreamThreadedTest < Test::Unit::TestCase
     Thread.new {
       @server.gets('>')
       @server.puts(Iq.new(:result))
-      finished.unlock
+      finished.run
     }
 
     @server.puts(Message.new)
-    finished.lock
+    finished.wait
   end
 
   def test_bidi
     @server.puts('<stream:stream>')
     @server.flush
-    finished = Mutex.new
-    finished.lock
+    finished = Semaphore.new
     ok = true
     n = 100
 
@@ -181,7 +178,7 @@ class StreamThreadedTest < Test::Unit::TestCase
         @server.flush
       }
 
-      finished.unlock
+      finished.run
     }
 
     n.times { |i|
@@ -193,7 +190,7 @@ class StreamThreadedTest < Test::Unit::TestCase
       }
     }
 
-    finished.lock
+    finished.wait
     assert(ok)
   end
 end
