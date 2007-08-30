@@ -119,6 +119,13 @@ module Jabber
     end
 
     ##
+    # Returns the iq's <command/> child, or nil
+    # resulte:: [IqCommand]
+    def command
+      first_element("command")
+    end
+
+    ##
     # Create a new Iq stanza with an unspecified query child
     # (<query/> has no namespace)
     def Iq.new_query(type = nil, to = nil)
