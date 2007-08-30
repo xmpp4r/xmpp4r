@@ -6,6 +6,7 @@ $:.unshift File::dirname(__FILE__) + '/../../lib'
 require 'test/unit'
 require File::dirname(__FILE__) + '/../lib/clienttester'
 require 'xmpp4r/muc'
+require 'semaphore'
 include Jabber
 
 class MUCClientTest < Test::Unit::TestCase
@@ -349,13 +350,12 @@ class MUCClientTest < Test::Unit::TestCase
            "</presence>")
     }
 
-    message_lock = Mutex.new
-    message_lock.lock
+    message_lock = Semaphore.new
 
     messages_client = 0
     @client.add_message_callback { |msg|
       messages_client += 1
-      message_lock.unlock
+      message_lock.run
     }
     
     m = MUC::MUCClient.new(@client)
@@ -363,12 +363,12 @@ class MUCClientTest < Test::Unit::TestCase
     messages_muc = 0
     m.add_message_callback { |msg|
       messages_muc += 1
-      message_lock.unlock
+      message_lock.run
     }
     messages_muc_private = 0
     m.add_private_message_callback { |msg|
       messages_muc_private += 1
-      message_lock.unlock
+      message_lock.run
     }
 
     assert_equal(m, m.join('darkcave@macbeth.shakespeare.lit/thirdwitch', 'cauldron'))
@@ -379,21 +379,21 @@ class MUCClientTest < Test::Unit::TestCase
     assert_equal(0, messages_muc_private)
 
     send("<message from='darkcave@macbeth.shakespeare.lit/firstwitch' to='hag66@shakespeare.lit/pda'><body>Hello</body></message>")
-    message_lock.lock
+    message_lock.wait
 
     assert_equal(0, messages_client)
     assert_equal(1, messages_muc)
     assert_equal(0, messages_muc_private)
 
     send("<message from='user@domain/resource' to='hag66@shakespeare.lit/pda'><body>Hello</body></message>")
-    message_lock.lock
+    message_lock.wait
 
     assert_equal(1, messages_client)
     assert_equal(1, messages_muc)
     assert_equal(0, messages_muc_private)
 
     send("<message type='chat' from='darkcave@macbeth.shakespeare.lit/firstwitch' to='hag66@shakespeare.lit/pda'><body>Hello</body></message>")
-    message_lock.lock
+    message_lock.wait
 
     assert_equal(1, messages_client)
     assert_equal(1, messages_muc)
@@ -409,30 +409,29 @@ class MUCClientTest < Test::Unit::TestCase
            "</presence>")
     }
 
-    presence_lock = Mutex.new
-    presence_lock.lock
+    presence_lock = Semaphore.new
 
     presences_client = 0
     @client.add_presence_callback { |pres|
       presences_client += 1
-      presence_lock.unlock
+      presence_lock.run
     }   
     m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
     presences_join = 0
     m.add_join_callback { |pres|
       presences_join += 1
-      presence_lock.unlock
+      presence_lock.run
     }
     presences_leave = 0
     m.add_leave_callback { |pres|
       presences_leave += 1
-      presence_lock.unlock
+      presence_lock.run
     }
     presences_muc = 0
     m.add_presence_callback { |pres|
       presences_muc += 1
-      presence_lock.unlock
+      presence_lock.run
     }
 
     assert_equal(0, presences_client)
@@ -451,7 +450,7 @@ class MUCClientTest < Test::Unit::TestCase
     send("<presence from='darkcave@macbeth.shakespeare.lit/firstwitch' to='hag66@shakespeare.lit/pda'>" +
          "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='member' role='participant'/></x>" +
          "</presence>")
-    presence_lock.lock
+    presence_lock.wait
     assert_equal(0, presences_client)
     assert_equal(1, presences_join)
     assert_equal(0, presences_leave)
@@ -460,7 +459,7 @@ class MUCClientTest < Test::Unit::TestCase
     send("<presence from='user@domain/resource' to='hag66@shakespeare.lit/pda'>" +
          "<show>chat</show>" +
          "</presence>")
-    presence_lock.lock
+    presence_lock.wait
     assert_equal(1, presences_client)
     assert_equal(1, presences_join)
     assert_equal(0, presences_leave)
@@ -469,14 +468,14 @@ class MUCClientTest < Test::Unit::TestCase
     send("<presence from='darkcave@macbeth.shakespeare.lit/firstwitch' to='hag66@shakespeare.lit/pda'>" +
          "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='member' role='participant'/></x>" +
          "<show>away</show></presence>")
-    presence_lock.lock
+    presence_lock.wait
     assert_equal(1, presences_client)
     assert_equal(1, presences_join)
     assert_equal(0, presences_leave)
     assert_equal(1, presences_muc)
 
     send("<presence from='darkcave@macbeth.shakespeare.lit/firstwitch' to='hag66@shakespeare.lit/pda' type='unavailable'/>")
-    presence_lock.lock
+    presence_lock.wait
     assert_equal(1, presences_client)
     assert_equal(1, presences_join)
     assert_equal(1, presences_leave)
