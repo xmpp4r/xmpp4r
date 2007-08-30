@@ -7,6 +7,7 @@ require File::dirname(__FILE__) + '/../lib/clienttester'
 
 require 'xmpp4r'
 require 'xmpp4r/bytestreams'
+require 'semaphore'
 include Jabber
 
 class IBBTest < Test::Unit::TestCase
@@ -71,10 +72,9 @@ class IBBTest < Test::Unit::TestCase
   
   def test_ibb_pingpong
     ignored_stanzas = 0
-    wait = Mutex.new
-    wait.lock
-    @server.add_message_callback { ignored_stanzas += 1; wait.unlock }
-    @server.add_iq_callback { ignored_stanzas += 1; wait.unlock }
+    wait = Semaphore.new
+    @server.add_message_callback { ignored_stanzas += 1; wait.run }
+    @server.add_iq_callback { ignored_stanzas += 1; wait.run }
 
 
     target = Bytestreams::IBBTarget.new(@server, '1', nil, '1@a.com/1')
@@ -96,7 +96,7 @@ class IBBTest < Test::Unit::TestCase
     @client.send("<iq from='1@a.com/1' type='set'>
                     <close xmlns='http://jabber.org/protocol/ibb' sid='another session id'/>
                   </iq>")
-    wait.lock
+    wait.wait
     assert_equal(1, ignored_stanzas)
 
 
@@ -107,12 +107,12 @@ class IBBTest < Test::Unit::TestCase
     @client.send("<message from='1@a.com/1' type='error'>
                     <data xmlns='http://jabber.org/protocol/ibb' sid='another session id' seq='0'/>
                   </message>")
-    wait.lock
+    wait.wait
     assert_equal(2, ignored_stanzas)
     @client.send("<iq from='1@a.com/1' type='set'>
                     <close xmlns='http://jabber.org/protocol/ibb' sid='another session id'/>
                   </iq>")
-    wait.lock
+    wait.wait
     assert_equal(3, ignored_stanzas)
 
 
