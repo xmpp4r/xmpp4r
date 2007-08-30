@@ -104,7 +104,7 @@ module Jabber
 
         receive_elements_with_rid(@http_rid, res_body.children)
 
-        @features_lock.unlock
+        @features_sem.run
       end
 
       ##

@@ -19,8 +19,7 @@ module Jabber
       # Wait for the initiator side to start
       # the stream.
       def accept
-        connect_lock = Mutex.new
-        connect_lock.lock
+        connect_sem = Semaphore.new
 
         @stream.add_iq_callback(200, self) { |iq|
           open = iq.first_element('open')
@@ -33,15 +32,14 @@ module Jabber
             reply.type = :result
             @stream.send(reply)
 
-            connect_lock.unlock
+            connect_sem.run
             true
           else
             false
           end
         }
 
-        connect_lock.lock
-        connect_lock.unlock
+        connect_sem.wait
         true
       end
     end

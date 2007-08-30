@@ -13,8 +13,7 @@ module Jabber
       # May raise various exceptions
       def accept
         error = nil
-        connect_lock = Mutex.new
-        connect_lock.lock
+        connect_sem = Semaphore.new
 
         @stream.add_iq_callback(200, self) { |iq|
           if iq.type == :set and iq.from == @initiator_jid and iq.to == @target_jid and iq.query.kind_of?(IqQueryBytestreams)
@@ -47,15 +46,14 @@ module Jabber
               error = e
             end
               
-            connect_lock.unlock
+            connect_sem.run
             true
           else
             false
           end
         }
 
-        connect_lock.lock
-        connect_lock.unlock
+        connect_sem.wait
         raise error if error
         (@socks != nil)
       end

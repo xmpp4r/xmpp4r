@@ -38,8 +38,7 @@ module Jabber
         @seq_recv = 0
         @queue = []
         @queue_lock = Mutex.new
-        @pending = Mutex.new
-        @pending.lock
+        @pending = Semaphore.new
         @sendbuf = ''
         @sendbuf_lock = Mutex.new
 
@@ -105,7 +104,7 @@ module Jabber
             }
 
             # No data? Wait for next to arrive...
-            @pending.lock unless res
+            @pending.wait unless res
           end
 
           if res.type == :data
@@ -188,12 +187,12 @@ module Jabber
               if msg.type == nil
                 @queue_lock.synchronize {
                   @queue.push IBBQueueItem.new(:data, data.attributes['seq'], data.text.to_s)
-                  @pending.unlock
+                  @pending.run
                 }
               elsif msg.type == :error
                 @queue_lock.synchronize {
                   @queue << IBBQueueItem.new(:close)
-                  @pending.unlock
+                  @pending.run
                 }
               end
               true
@@ -211,7 +210,7 @@ module Jabber
 
               @queue_lock.synchronize {
                 @queue << IBBQueueItem.new(:close)
-                @pending.unlock
+                @pending.run
               }
               true
             else

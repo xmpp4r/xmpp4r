@@ -79,8 +79,7 @@ module Jabber
       begin
         Timeout::timeout(@features_timeout) {
           Jabber::debuglog("FEATURES: waiting...")
-          @features_lock.lock
-          @features_lock.unlock
+          @features_sem.wait
           Jabber::debuglog("FEATURES: waiting finished")
         }
       rescue Timeout::Error
@@ -99,8 +98,6 @@ module Jabber
     ##
     # Start the parser on the previously connected socket
     def start
-      @features_lock.lock
-
       super(@socket)
     end
 
