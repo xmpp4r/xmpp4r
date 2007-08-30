@@ -44,7 +44,6 @@ module Jabber
         elsif iq.type == :set && iq.command
           @commandexeccbs.process(iq)
         end
-        puts "iq.type: #{iq.type} [#{iq.command}]"
       end
 
     end
