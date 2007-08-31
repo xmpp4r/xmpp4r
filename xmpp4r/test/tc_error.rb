@@ -3,6 +3,7 @@
 $:.unshift '../lib'
 
 require 'test/unit'
+require 'xmpp4r'
 require 'xmpp4r/rexmladdons'
 require 'xmpp4r/error'
 require 'xmpp4r/message'
