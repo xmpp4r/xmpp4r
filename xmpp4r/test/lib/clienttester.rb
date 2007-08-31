@@ -2,6 +2,7 @@ $:.unshift '../lib'
 require 'xmpp4r'
 require 'test/unit'
 require 'socket'
+require 'xmpp4r/semaphore'
 
 # Turn $VERBOSE off to suppress warnings about redefinition
 oldverbose = $VERBOSE
@@ -25,8 +26,7 @@ module Jabber
       Thread::abort_on_exception = true
 
       servlisten = TCPServer.new(@@SOCKET_PORT)
-      serverwait = Mutex.new
-      serverwait.lock
+      serverwait = Semaphore.new
       Thread.new {
         serversock = servlisten.accept
         servlisten.close
@@ -42,7 +42,7 @@ module Jabber
         }
         @server.start(serversock)
 
-        serverwait.unlock
+        serverwait.run
       }
 
       clientsock = TCPSocket.new('localhost', @@SOCKET_PORT)
@@ -56,22 +56,20 @@ module Jabber
 
       @state = 0
       @states = []
-      @state_wait = Mutex.new
-      @state_wait.lock
-      @state_wait2 = Mutex.new
-      @state_wait2.lock
+      @state_wait = Semaphore.new
+      @state_wait2 = Semaphore.new
       @server.add_stanza_callback { |stanza|
         if @state < @states.size
           @states[@state].call(stanza)
           @state += 1
-          @state_wait2.lock
-          @state_wait.unlock
+          @state_wait2.wait
+          @state_wait.run
         end
 
         false
       }
 
-      serverwait.lock
+      serverwait.wait
     end
 
     def teardown
@@ -104,12 +102,12 @@ module Jabber
     end
 
     def wait_state
-      @state_wait2.unlock
-      @state_wait.lock
+      @state_wait2.run
+      @state_wait.wait
     end
 
     def skip_state
-      @state_wait2.unlock
+      @state_wait2.run
     end
   end
 end
