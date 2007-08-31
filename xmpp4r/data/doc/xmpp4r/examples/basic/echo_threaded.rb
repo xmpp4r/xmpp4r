@@ -21,9 +21,13 @@ puts "Connected ! send messages to #{myJID.strip.to_s}."
 mainthread = Thread.current
 cl.add_message_callback do |m|
   if m.type != :error
-    cl.send(Message::new(m.from, "You sent: #{m.body}"))
+    m2 = Message::new(m.from, "You sent: #{m.body}")
+    m2.type = m.type
+    cl.send(m2)
     if m.body == 'exit'
-      cl.send(Message::new(m.from, "Exiting ..."))
+      m2 = Message::new(m.from, "Exiting ...")
+      m2.type = m.type
+      cl.send(m2)
       mainthread.wakeup
     end
   end

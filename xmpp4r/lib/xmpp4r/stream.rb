@@ -41,6 +41,9 @@ module Jabber
     # Create a new stream
     # (just initializes)
     def initialize(threaded = true)
+      unless threaded
+        raise "Non-threaded mode was removed from XMPP4R."
+      end
       @fd = nil
       @status = DISCONNECTED
       @xmlcbs = CallbackList::new
@@ -48,18 +51,10 @@ module Jabber
       @messagecbs = CallbackList::new
       @iqcbs = CallbackList::new
       @presencecbs = CallbackList::new
-      unless threaded
-        $stderr.puts "Non-threaded mode is currently broken, re-enabling threaded"
-        threaded = true
-      end
-      @threaded = threaded
       @send_lock = Mutex.new
       @last_send = Time.now
-      @stanzaqueue = []
-      @stanzaqueue_lock = Mutex::new
       @exception_block = nil
       @threadblocks = []
-      @waiting_thread = nil
       @wakeup_thread = nil
       @streamid = nil
       @streamns = 'jabber:client'
@@ -83,7 +78,7 @@ module Jabber
           if @exception_block
             Thread.new { close; @exception_block.call(e, self, :start) }
           else
-            puts "Exception caught in Parser thread!"
+            puts "Exception caught in Parser thread! (#{e.class})"
             close
             raise
           end
@@ -165,20 +160,8 @@ module Jabber
     # Processes a received REXML::Element and executes 
     # registered thread blocks and filters against it.
     #
-    # If in threaded mode, a new thread will be spawned
-    # for the call to receive_nonthreaded.
     # element:: [REXML::Element] The received element
     def receive(element)
-      if @threaded
-        # Don't spawn a new thread here. An implicit feature
-        # of XMPP is constant order of stanzas.
-        receive_nonthreaded(element)
-      else
-        receive_nonthreaded(element)
-      end
-    end
-    
-    def receive_nonthreaded(element)
       Jabber::debuglog("RECEIVED:\n#{element.to_s}")
 
       if element.namespace('').to_s == '' # REXML namespaces are always strings
@@ -254,22 +237,6 @@ module Jabber
         end
       }
 
-      if @threaded
-        process_one(stanza)
-      else
-        # stanzaqueue will be read when the user call process
-        @stanzaqueue_lock.lock
-        @stanzaqueue.push(stanza)
-        @stanzaqueue_lock.unlock
-        @waiting_thread.wakeup if @waiting_thread
-      end
-    end
-    private :receive_nonthreaded
-
-    ##
-    # Process |element| until it is consumed. Returns element.consumed?
-    # element  The element to process
-    def process_one(stanza)
       Jabber::debuglog("PROCESSING:\n#{stanza.to_s} (#{stanza.class})")
       return true if @xmlcbs.process(stanza)
       return true if @stanzacbs.process(stanza)
@@ -281,61 +248,6 @@ module Jabber
       when Presence
         return true if @presencecbs.process(stanza)
       end
-    end
-    private :process_one
-
-    ##
-    # Process |max| XML stanzas and call listeners for all of them. 
-    #
-    # max:: [Integer] the number of stanzas to process (nil means process
-    # all available)
-    def process(max = nil)
-      n = 0
-      @stanzaqueue_lock.lock
-      while @stanzaqueue.size > 0 and (max == nil or n < max)
-        e = @stanzaqueue.shift
-        @stanzaqueue_lock.unlock
-        process_one(e)
-        n += 1
-        @stanzaqueue_lock.lock
-      end
-      @stanzaqueue_lock.unlock
-      n
-    end
-
-    ##
-    # Process an XML stanza and call the listeners for it. If no stanza is
-    # currently available, wait for max |time| seconds before returning.
-    # 
-    # time:: [Integer] time to wait in seconds. If nil, wait infinitely.
-    # all available)
-    def wait_and_process(time = nil)
-      if time == 0 
-        return process(1)
-      end
-      @stanzaqueue_lock.lock
-      if @stanzaqueue.size > 0
-        e = @stanzaqueue.shift
-        @stanzaqueue_lock.unlock
-        process_one(e)
-        return 1
-      end
-
-      @waiting_thread = Thread.current
-      @wakeup_thread = Thread.new { sleep time ; @waiting_thread.wakeup if @waiting_thread }
-      @waiting_thread.stop
-      @wakeup_thread.kill if @wakeup_thread
-      @wakeup_thread = nil
-      @waiting_thread = nil
-
-      @stanzaqueue_lock.lock
-      if @stanzaqueue.size > 0
-        e = @stanzaqueue.shift
-        @stanzaqueue_lock.unlock
-        process_one(e)
-        return 1
-      end
-      return 0
     end
 
     ##

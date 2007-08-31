@@ -23,9 +23,7 @@ module Jabber
     attr_reader :jid
 
     ##
-    # Create a new Client. If threaded mode is activated, callbacks are called
-    # as soon as messages are received; If it isn't, you have to call
-    # Stream#process from time to time.
+    # Create a new Client.
     #
     # Remember to *always* put a resource in your JID unless the server can do SASL.
     def initialize(jid, threaded = true)
