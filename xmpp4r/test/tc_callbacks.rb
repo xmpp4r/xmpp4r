@@ -4,6 +4,7 @@ $:.unshift '../lib'
 
 require 'test/unit'
 require 'xmpp4r/callbacks'
+include Jabber
 
 class CallbacksTest < Test::Unit::TestCase
   def test_test1
