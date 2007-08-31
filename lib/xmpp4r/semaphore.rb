@@ -28,7 +28,7 @@ module Jabber
 
     ##
     # Unlocks guarded section, increments number of free tickets
-    def release
+    def run
       @lock.synchronize {
         @tickets += 1
         @cond.signal
