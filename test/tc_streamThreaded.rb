@@ -9,7 +9,7 @@ require 'xmpp4r/stream'
 require 'xmpp4r/semaphore'
 include Jabber
 
-class StreamThreadedTest < Test::Unit::TestCase
+class StreamTest < Test::Unit::TestCase
   def setup
     @tmpfile = Tempfile::new("StreamSendTest")
     @tmpfilepath = @tmpfile.path()
@@ -192,5 +192,36 @@ class StreamThreadedTest < Test::Unit::TestCase
 
     finished.wait
     assert(ok)
+  end
+
+  def test_similar_children
+    delay = 0.1
+    n = 0
+    @stream.add_message_callback { n += 1 }
+    assert_equal(0, n)
+    @server.puts('<stream:stream><message/>')
+    @server.flush
+    sleep delay
+    assert_equal(1, n)
+    @server.puts('<message>')
+    @server.flush
+    sleep delay
+    assert_equal(1, n)
+    @server.puts('<message/>')
+    @server.flush
+    sleep delay
+    assert_equal(1, n)
+    @server.puts('</message>')
+    @server.flush
+    sleep delay
+    assert_equal(2, n)
+    @server.puts('<message><stream:stream><message/></stream:stream>')
+    @server.flush
+    sleep delay
+    assert_equal(2, n)
+    @server.puts('</message>')
+    @server.flush
+    sleep delay
+    assert_equal(3, n)
   end
 end

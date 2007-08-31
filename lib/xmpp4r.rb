@@ -59,12 +59,6 @@
 # But instead check for the query's class:
 # <tt>iq.query.kind_of?(Jabber::IqQueryDiscoInfo)</tt>
 #
-# ==Threaded and non-threaded modes
-#
-# From the user's point of view, the library can be used either in threaded mode,
-# or in non-threaded mode, using a call to <tt>Jabber::Stream#process</tt> to
-# receive pending messages.
-#
 # ==Where to begin?
 #
 # Because it is built in an extensible way, it might be hard for newcomers to
