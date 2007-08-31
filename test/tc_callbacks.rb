@@ -3,7 +3,7 @@
 $:.unshift '../lib'
 
 require 'test/unit'
-require 'callbacks'
+require 'xmpp4r/callbacks'
 
 class CallbacksTest < Test::Unit::TestCase
   def test_test1

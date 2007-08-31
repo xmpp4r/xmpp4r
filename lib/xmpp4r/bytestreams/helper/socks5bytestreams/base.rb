@@ -7,7 +7,7 @@ require 'thread'
 require 'timeout'
 require 'digest/sha1'
 
-require 'callbacks'
+require 'xmpp4r/callbacks'
 
 module Jabber
   module Bytestreams

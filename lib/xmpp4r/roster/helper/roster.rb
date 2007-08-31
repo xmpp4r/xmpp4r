@@ -2,7 +2,7 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
-require 'callbacks'
+require 'xmpp4r/callbacks'
 require 'thread'
 require 'xmpp4r/roster/iq/roster'
 
