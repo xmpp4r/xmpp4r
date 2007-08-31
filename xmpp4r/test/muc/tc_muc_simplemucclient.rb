@@ -6,6 +6,7 @@ $:.unshift File::dirname(__FILE__) + '/../../lib'
 require 'test/unit'
 require File::dirname(__FILE__) + '/../lib/clienttester'
 require 'xmpp4r/muc'
+require 'xmpp4r/semaphore'
 include Jabber
 
 class SimpleMUCClientTest < Test::Unit::TestCase
@@ -23,8 +24,8 @@ class SimpleMUCClientTest < Test::Unit::TestCase
     m = MUC::SimpleMUCClient.new(@client)
 
     block_args = []
-    wait = Mutex.new
-    block = lambda { |*a| block_args = a; wait.unlock }
+    wait = Semaphore.new
+    block = lambda { |*a| block_args = a; wait.run }
     m.on_room_message(&block)
     m.on_message(&block)
     m.on_private_message(&block)
@@ -63,10 +64,10 @@ class SimpleMUCClientTest < Test::Unit::TestCase
       send(msg.set_from('darkcave@macbeth.shakespeare.lit/thirdwitch').set_to('hag66@shakespeare.lit/pda'))
     }
     assert_nil(m.subject)
-    wait.lock
+    wait.wait
     m.subject = 'TestCasing room'
     wait_state
-    wait.lock
+    wait.wait
     assert_equal([nil, 'thirdwitch', 'TestCasing room'], block_args)
     assert_equal('TestCasing room', m.subject)
   end
