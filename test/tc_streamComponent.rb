@@ -7,8 +7,8 @@ require 'test/unit'
 require 'socket'
 require 'xmpp4r/component'
 require 'xmpp4r/bytestreams'
+require 'xmpp4r/semaphore'
 require 'xmpp4r'
-require 'semaphore'
 include Jabber
 
 Thread::abort_on_exception = true

@@ -7,7 +7,7 @@ require File::dirname(__FILE__) + '/../lib/clienttester'
 
 require 'xmpp4r'
 require 'xmpp4r/roster/helper/roster'
-require 'semaphore'
+require 'xmpp4r/semaphore'
 include Jabber
 
 class Roster::HelperTest < Test::Unit::TestCase

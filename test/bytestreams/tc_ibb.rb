@@ -7,7 +7,7 @@ require File::dirname(__FILE__) + '/../lib/clienttester'
 
 require 'xmpp4r'
 require 'xmpp4r/bytestreams'
-require 'semaphore'
+require 'xmpp4r/semaphore'
 include Jabber
 
 class IBBTest < Test::Unit::TestCase
