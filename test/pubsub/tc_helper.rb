@@ -179,7 +179,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
 	     </iq>")
     }
 
-    s = h.get_all_subscriptions
+    s = h.subscriptions
     assert_kind_of(Array,s)
     assert_equal(4,s.size)
     assert_kind_of(REXML::Element,s[0])

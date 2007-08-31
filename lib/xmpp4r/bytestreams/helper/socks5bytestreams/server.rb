@@ -35,21 +35,23 @@ module Jabber
           socket = TCPServer.new(port)
         end
 
-        Thread.new {
-          loop {
+        Thread.new do
+          Thread.current.abort_on_exception = true
+          loop do
             peer = SOCKS5BytestreamsPeer.new(socket.accept)
-            Thread.new {
+            Thread.new do
+              Thread.current.abort_on_exception = true
               begin
                 peer.start
               rescue
                 Jabber::debuglog("SOCKS5 BytestreamsServer: Error accepting peer: #{$!}")
               end
-            }
-            @peers_lock.synchronize {
+            end
+            @peers_lock.synchronize do
               @peers << peer
-            }
-          }
-        }
+            end
+          end
+        end
       end
 
       ##

@@ -11,31 +11,30 @@ require 'xmpp4r/semaphore'
 require 'xmpp4r'
 include Jabber
 
-Thread::abort_on_exception = true
-
 class StreamComponentTest < Test::Unit::TestCase
   @@SOCKET_PORT = 65224
 
   def setup
     servlisten = TCPServer.new(@@SOCKET_PORT)
     serverwait = Semaphore.new
-    Thread.new {
+    Thread.new do
+      Thread.current.abort_on_exception = true
       serversock = servlisten.accept
       servlisten.close
       serversock.sync = true
       @server = Stream.new(true)
-      @server.add_xml_callback { |xml|
+      @server.add_xml_callback do |xml|
         if xml.prefix == 'stream' and xml.name == 'stream'
           @server.send('<stream:stream xmlns="jabber:component:accept">')
           true
         else
           false
         end
-      }
+      end
       @server.start(serversock)
       
       serverwait.run
-    }
+    end
 
     @stream = Component::new('test')
     @stream.connect('localhost', @@SOCKET_PORT)

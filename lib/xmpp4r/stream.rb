@@ -6,7 +6,6 @@ require 'xmpp4r/callbacks'
 require 'socket'
 require 'thread'
 require 'xmpp4r/semaphore'
-Thread::abort_on_exception = true
 require 'xmpp4r/streamparser'
 require 'xmpp4r/presence'
 require 'xmpp4r/message'
@@ -70,13 +69,18 @@ module Jabber
       @fd = fd
       @parser = StreamParser.new(@fd, self)
       @parserThread = Thread.new do
+        Thread.current.abort_on_exception = true
         begin
           @parser.parse
         rescue Exception => e
           Jabber::debuglog("EXCEPTION:\n#{e.class}\n#{e.message}\n#{e.backtrace.join("\n")}")
 
           if @exception_block
-            Thread.new { close; @exception_block.call(e, self, :start) }
+            Thread.new do
+              Thread.current.abort_on_exception = true
+              close
+              @exception_block.call(e, self, :start)
+            end
           else
             puts "Exception caught in Parser thread! (#{e.class})"
             close
@@ -115,10 +119,11 @@ module Jabber
       # to commit suicide(???)
       if @exception_block
         # New thread, because close will kill the current thread
-        Thread.new {
+        Thread.new do
+          Thread.current.abort_on_exception = true
           close
           @exception_block.call(e, self, :parser)
-        }
+        end
       else
         puts "Stream#parse_failure was called by XML parser. Dumping " +
         "backtrace...\n" + e.exception + "\n"
@@ -132,10 +137,11 @@ module Jabber
     # This method is called by the parser upon receiving <tt></stream:stream></tt>
     def parser_end
       if @exception_block
-        Thread.new {
+        Thread.new do
+          Thread.current.abort_on_exception = true
           close
           @exception_block.call(nil, self, :close)
-        }
+        end
       else
         close
       end
@@ -312,7 +318,11 @@ module Jabber
         Jabber::debuglog("EXCEPTION:\n#{e.class}\n#{e.message}\n#{e.backtrace.join("\n")}")
 
         if @exception_block
-          Thread.new { close!; @exception_block.call(e, self, :sending) }
+          Thread.new do
+            Thread.current.abort_on_exception = true
+            close!
+            @exception_block.call(e, self, :sending)
+          end
         else
           puts "Exception caught while sending!"
           close!

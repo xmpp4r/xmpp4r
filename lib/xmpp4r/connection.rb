@@ -63,6 +63,7 @@ module Jabber
       accept_features
 
       @keepaliveThread = Thread.new do
+        Thread.current.abort_on_exception = true
         keepalive_loop
       end
     end
