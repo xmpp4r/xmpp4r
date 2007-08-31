@@ -5,6 +5,7 @@ $:.unshift File.join(File.dirname(__FILE__), '..', 'test')
 $:.unshift File.join(File.dirname(__FILE__), 'lib')
 $:.unshift File.join(File.dirname(__FILE__), 'test')
 
+# This is allowed here, to make sure it's enabled in all tests.
 Thread::abort_on_exception = true
 
 require 'xmpp4r'

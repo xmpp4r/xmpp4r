@@ -47,6 +47,7 @@ module Jabber
         stream.add_iq_callback(120, self) { |iq|
           if iq.query.kind_of?(IqQueryRoster)
             Thread.new do
+              Thread.current.abort_on_exception = true
               handle_iq_query_roster(iq)
             end
 
@@ -57,6 +58,7 @@ module Jabber
         }
         stream.add_presence_callback(120, self) { |pres|
           Thread.new do
+            Thread.current.abort_on_exception = true
             handle_presence(pres)
           end
         }

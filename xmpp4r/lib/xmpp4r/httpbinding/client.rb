@@ -226,7 +226,10 @@ module Jabber
 
         rescue REXML::ParseException
           if @exception_block
-            Thread.new { close; @exception_block.call(e, self, :parser) }
+            Thread.new do
+              Thread.current.abort_on_exception = true
+              close; @exception_block.call(e, self, :parser)
+            end
           else
             puts "Exception caught when parsing HTTP response!"
             close
@@ -259,18 +262,20 @@ module Jabber
             data = @send_buffer
             @send_buffer = ''
 
-            Thread.new {
+            Thread.new do
+              Thread.current.abort_on_exception = true
               post_data(data)
-            }
+            end
 
           elsif !limited_by_requests
-            Thread.new {
+            Thread.new do
+              Thread.current.abort_on_exception = true
               # Defer until @http_polling has expired
               wait = @last_send + @http_polling - Time.now
               sleep(wait) if wait > 0
               # Ignore locking, it's already threaded ;-)
               send_data('')
-            }
+            end
           end
 
         end
