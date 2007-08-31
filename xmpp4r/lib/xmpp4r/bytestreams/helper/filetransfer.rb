@@ -2,8 +2,7 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
-require 'callbacks'
-
+require 'xmpp4r/callbacks'
 require 'xmpp4r/bytestreams/iq/si'
 require 'xmpp4r/dataforms/x/data'
 require 'xmpp4r/bytestreams/helper/ibb/base'
