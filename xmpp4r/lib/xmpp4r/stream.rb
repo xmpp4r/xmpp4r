@@ -5,7 +5,7 @@
 require 'callbacks'
 require 'socket'
 require 'thread'
-require 'semaphore'
+require 'xmpp4r/semaphore'
 Thread::abort_on_exception = true
 require 'xmpp4r/streamparser'
 require 'xmpp4r/presence'

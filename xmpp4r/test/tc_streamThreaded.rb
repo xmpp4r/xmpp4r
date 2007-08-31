@@ -6,7 +6,7 @@ require 'tempfile'
 require 'test/unit'
 require 'socket'
 require 'xmpp4r/stream'
-require 'semaphore'
+require 'xmpp4r/semaphore'
 include Jabber
 
 class StreamThreadedTest < Test::Unit::TestCase

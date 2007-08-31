@@ -6,7 +6,7 @@ $:.unshift File::dirname(__FILE__) + '/../../lib'
 require 'test/unit'
 require File::dirname(__FILE__) + '/../lib/clienttester'
 require 'xmpp4r/muc'
-require 'semaphore'
+require 'xmpp4r/semaphore'
 include Jabber
 
 class MUCClientTest < Test::Unit::TestCase
