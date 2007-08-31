@@ -9,7 +9,6 @@ Thread::abort_on_exception = true
 
 require 'xmpp4r'
 
-require 'tc_streamThreaded'
 require 'bytestreams/tc_ibb'
 require 'bytestreams/tc_socks5bytestreams'
 require 'delay/tc_xdelay'
@@ -20,7 +19,7 @@ require 'tc_error'
 require 'tc_stream'
 require 'tc_idgenerator'
 require 'tc_iqquery'
-#require 'tc_streamError'
+require 'tc_streamError'
 require 'tc_presence'
 require 'vcard/tc_iqvcard'
 require 'vcard/tc_helper'
