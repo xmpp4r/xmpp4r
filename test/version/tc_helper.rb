@@ -7,6 +7,7 @@ require File::dirname(__FILE__) + '/../lib/clienttester'
 
 require 'xmpp4r'
 require 'xmpp4r/version/helper/responder'
+require 'xmpp4r/version/helper/simpleresponder'
 include Jabber
 
 class Version::HelperTest < Test::Unit::TestCase
@@ -42,5 +43,18 @@ class Version::HelperTest < Test::Unit::TestCase
       true
     }
     assert_equal(1, calls)
+  end
+
+  def test_simple
+    h = Version::SimpleResponder.new(@client, 'Test program', '1.0', 'Ruby Test::Unit')
+
+    # Send a query
+    @server.send("<iq type='get'><query xmlns='jabber:iq:version'/></iq>") { |reply|
+      assert_equal('Test program', reply.query.iname)
+      assert_equal('1.0', reply.query.version)
+      assert_equal('Ruby Test::Unit', reply.query.os)
+      true
+    }
+
   end
 end
