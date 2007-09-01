@@ -29,15 +29,13 @@ module Jabber
       end
 
       def fields
-        return @fields if @fields
-
-        @fields = []
+        fields = []
         each_element do |xe|
           if xe.kind_of?(XDataField) and xe.type != :hidden and xe.type != :fixed
-            @fields << xe
+            fields << xe
           end
         end
-        @fields
+        fields
       end
 
       ##
@@ -73,10 +71,14 @@ module Jabber
 
     ##
     # Child of XData, contains the title of this Data Form
-    #
-    # TODO: Make this a simple setter
     class XDataTitle < XMPPElement
       name_xmlns 'title', 'jabber:x:data'
+
+      def initialize(title=nil)
+        super()
+        add_text(title)
+      end
+
       def to_s
         text.to_s
       end
@@ -89,9 +91,16 @@ module Jabber
     # Child of XData, contains the instructions of this Data Form
     class XDataInstructions < XMPPElement
       name_xmlns 'instructions', 'jabber:x:data'
+
+      def initialize(instructions=nil)
+        super()
+        add_text(instructions)
+      end
+
       def to_s
         text.to_s
       end
+
       def instructions
         text
       end
