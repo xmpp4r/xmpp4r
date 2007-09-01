@@ -18,6 +18,9 @@ class XMPPStanzaTest < Test::Unit::TestCase
     name_xmlns 'stanza', 'http://home.gna.org/xmpp4r'
   end
 
+  class MyStanza < XMPPStanza
+  end
+
   def test_from
     x = MyXMPPStanza::new
     assert_equal(nil, x.from)
@@ -100,5 +103,11 @@ class XMPPStanzaTest < Test::Unit::TestCase
     assert_kind_of(MyXMPPStanza, x3)
     assert_equal('123', x3.attributes['xyz'])
     assert_equal('abc', x3.text)
+  end
+
+  def test_raise
+    assert_raises(NoNameXmlnsRegistered) {
+      XMPPStanza.name_xmlns_for_class(MyStanza)
+    }
   end
 end
