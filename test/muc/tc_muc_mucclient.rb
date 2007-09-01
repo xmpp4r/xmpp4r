@@ -135,6 +135,8 @@ class MUCClientTest < Test::Unit::TestCase
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
     assert(!m.active?)
+
+    wait_state
   end
 
   def test_banned_users
@@ -151,6 +153,8 @@ class MUCClientTest < Test::Unit::TestCase
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
     assert(!m.active?)
+
+    wait_state
   end
 
   def test_nickname_conflict
@@ -167,6 +171,8 @@ class MUCClientTest < Test::Unit::TestCase
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
     assert(!m.active?)
+
+    wait_state
   end
 
   def test_max_users
@@ -183,11 +189,12 @@ class MUCClientTest < Test::Unit::TestCase
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
     assert(!m.active?)
+
+    wait_state
   end
 
   def test_locked_room
     state { |pres|
-      assert_kind_of(Presence, pres)
       send("<presence from='darkcave@macbeth.shakespeare.lit' to='hag66@shakespeare.lit/pda' type='error'>" + 
            "<error code='404' type='cancel'><item-not-found xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/></error>" +
            "</presence>")
@@ -199,6 +206,7 @@ class MUCClientTest < Test::Unit::TestCase
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
     assert(!m.active?)
+    wait_state
   end
 
   def test_exit_room
@@ -398,7 +406,9 @@ class MUCClientTest < Test::Unit::TestCase
     assert_equal(1, messages_client)
     assert_equal(1, messages_muc)
     assert_equal(1, messages_muc_private)
-  end
+
+    wait_state
+   end
 
   def test_presence_callbacks
     state { |pres|
@@ -480,6 +490,7 @@ class MUCClientTest < Test::Unit::TestCase
     assert_equal(1, presences_join)
     assert_equal(1, presences_leave)
     assert_equal(1, presences_muc)
+    wait_state
   end
 
   def test_send
