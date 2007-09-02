@@ -113,29 +113,29 @@ class StreamTest < Test::Unit::TestCase
     called_outer = 0
     called_inner = 0
 
-    @stream.send(Iq.new(:get)) { |reply|
+    @stream.send(Iq.new(:get)) do |reply|
       called_outer += 1
       assert_kind_of(Iq, reply)
       assert_equal(:result, reply.type)
       
       if reply.id == '1'
-        @stream.send(Iq.new(:set)) { |reply|
+        @stream.send(Iq.new(:set)) do |reply2|
           called_inner += 1
-          assert_kind_of(Iq, reply)
-          assert_equal(:result, reply.type)
-          assert_equal('2', reply.id)
+          assert_kind_of(Iq, reply2)
+          assert_equal(:result, reply2.type)
+          assert_equal('2', reply2.id)
 
           @stream.send(Iq.new(:get))
 
           true
-        }
+        end
         false
       elsif reply.id == '3'
         true
       else
         false
       end
-    }
+    end
 
     assert_equal(2, called_outer)
     assert_equal(1, called_inner)
