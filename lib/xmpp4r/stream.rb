@@ -58,6 +58,7 @@ module Jabber
       @streamid = nil
       @streamns = 'jabber:client'
       @features_sem = Semaphore.new
+      @parser_thread = nil
     end
 
     ##
@@ -68,7 +69,7 @@ module Jabber
 
       @fd = fd
       @parser = StreamParser.new(@fd, self)
-      @parserThread = Thread.new do
+      @parser_thread = Thread.new do
         Thread.current.abort_on_exception = true
         begin
           @parser.parse
@@ -83,6 +84,7 @@ module Jabber
             end
           else
             puts "Exception caught in Parser thread! (#{e.class})"
+            puts e.backtrace
             close
             raise
           end
@@ -93,7 +95,7 @@ module Jabber
     end
 
     def stop
-      @parserThread.kill
+      @parser_thread.kill
       @parser = nil
     end
 
@@ -331,7 +333,7 @@ module Jabber
       end
       # The parser thread might be running this (think of a callback running send())
       # If this is the case, we mustn't stop (or we would cause a deadlock)
-      if block and Thread.current != @parserThread
+      if block and Thread.current != @parser_thread
         threadblock.wait
       elsif block
         Jabber::debuglog("WARNING:\nCannot stop current thread in Jabber::Stream#send because it is the parser thread!")
@@ -480,7 +482,7 @@ module Jabber
     end
 
     def close!
-      @parserThread.kill if @parserThread
+      @parser_thread.kill if @parser_thread
       @fd.close if @fd and !@fd.closed?
       @status = DISCONNECTED
     end
