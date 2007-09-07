@@ -16,7 +16,7 @@ end
 # Globals
 
 PKG_NAME = 'xmpp4r'
-PKG_VERSION = '0.3'
+PKG_VERSION = '0.3.1'
 
 PKG_FILES = ['ChangeLog', 'README', 'COPYING', 'LICENSE', 'setup.rb', 'Rakefile', 'UPDATING']
 Find.find('lib/', 'data/', 'test/', 'tools/') do |f|
