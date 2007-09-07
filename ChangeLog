@@ -3,12 +3,18 @@ XMPP4R 0.4 (xx/xx/xxxx)
 * vCard helper fixes
 * Jabber RPC (JEP0009) support
 * HTTP Binding (JEP0124) support
-* SASL fixes
 * Publish-Subscribe support
 * XMPPElement: a framework for classes representing XML elements
+
+XMPP4R 0.3.1 (23/04/2007)
+=========================
+* SASL fixes
 * Message#x and Presence#x support element selection by namespace
-* Proper XML entity escaping
-* Minor fixes to SOCKS5BytestreamsServer and Filetransfer helpers
+* Proper XML entity escaping for REXML text nodes
+* Improvements to FileTransfer::Helper and SOCKS5BytestreamsServer
+* Vcard::Helper fixes
+* Update Digest module usage to reflect recent Ruby versions
+* More documentation
 
 XMPP4R 0.3 (20/07/2006)
 =======================
