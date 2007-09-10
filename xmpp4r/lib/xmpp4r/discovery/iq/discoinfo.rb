@@ -50,6 +50,17 @@ module Jabber
       end
 
       ##
+      # Get list of identities
+      # result:: [Array] of [Identity]
+      def identities
+        res = []
+        each_element('identity') { |id|
+          res.push(id)
+        }
+        res        
+      end
+
+      ##
       # Get list of features
       # result:: [Array] of [String]
       def features
