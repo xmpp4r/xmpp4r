@@ -32,6 +32,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
             </iq>")
     }
     assert_equal('mynode', h.create('mynode'))
+    wait_state
   end
 
   def test_delete
@@ -47,6 +48,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
     }
     h.delete('mynode')
+    wait_state
   end
 
   def test_publish
@@ -68,6 +70,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
     }
     h.publish('mynode', item1)
+    wait_state
   end
 
   def test_items
@@ -100,6 +103,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     assert_kind_of(REXML::Text, items['2'])
     assert_equal(item1.children.to_s, items['1'].to_s)
     assert_equal(item2.children.to_s, items['2'].to_s)
+    wait_state
   end
 
   def test_affiliations
@@ -129,6 +133,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     assert_equal(:publisher, a['node2'])
     assert_equal(:outcast, a['node5'])
     assert_equal(:owner, a['node6'])
+    wait_state
   end
 
   def test_subscriptions
@@ -158,7 +163,9 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     assert_kind_of(REXML::Element,s[1])
     assert_kind_of(REXML::Element,s[2])
     assert_kind_of(REXML::Element,s[3])
+    wait_state
   end
+
   def test_get_all_subscriptions
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 
@@ -186,8 +193,9 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     assert_kind_of(REXML::Element,s[1])
     assert_kind_of(REXML::Element,s[2])
     assert_kind_of(REXML::Element,s[3])
-
+    wait_state
   end
+
   def test_subscribers
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 
@@ -214,5 +222,6 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     assert_kind_of(String,s[1])
     assert_kind_of(String,s[2])
     assert_kind_of(String,s[3])
+    wait_state
   end
 end
