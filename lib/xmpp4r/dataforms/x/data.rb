@@ -66,6 +66,40 @@ module Jabber
           else attributes['type'] = nil
         end
       end
+
+      ##
+      # Get the Data Form title
+      # return:: [XDataTitle] or nil
+      def title
+        first_element('title')
+      end
+
+      ##
+      # Set the Data Form title
+      # title:: [String]
+      def title=(title)
+        delete_elements('title')
+        add_element(XDataTitle.new(title))
+      end
+
+      ##
+      # Get the Data Form instructions
+      # return:: [Array] of [XDataInstructions] or nil
+      def instructions
+        fields = []
+        each_element('instructions') do |xe|
+          fields << xe
+        end
+        fields        
+      end
+  
+      ##
+      # Add Data Form instructions
+      # i:: [String]
+      def instructions=(i)
+        add(XDataInstructions.new(i))
+      end
+
     end
 
 
