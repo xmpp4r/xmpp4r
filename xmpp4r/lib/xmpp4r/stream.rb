@@ -83,9 +83,11 @@ module Jabber
               @exception_block.call(e, self, :start)
             end
           else
-            puts "Exception caught in Parser thread! (#{e.class})"
-            puts e.backtrace
-            close
+            if Jabber::debug
+              puts "Exception caught in Parser thread! (#{e.class})"
+              puts e.backtrace
+            end
+            close!
             raise
           end
         end
@@ -326,7 +328,10 @@ module Jabber
             @exception_block.call(e, self, :sending)
           end
         else
-          puts "Exception caught while sending!"
+          if Jabber::debug
+            puts "Exception caught while sending! (#{e.class})"
+            puts e.backtrace
+          end
           close!
           raise
         end

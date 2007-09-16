@@ -45,6 +45,7 @@ class ConnectionErrorTest < Test::Unit::TestCase
     end
     assert(!error)
     begin
+      # wrong port on purpose
       conn = TCPSocket::new('localhost', 1)
     rescue
     end
@@ -104,19 +105,13 @@ class ConnectionErrorTest < Test::Unit::TestCase
     @stream.start(@conn)
     @server.puts('<stream:stream>')
     @server.flush
-    @stream.send('</test>')
-    sleep 0.1
-    @stream.send('</test>')
-    sleep 0.1
-    @stream.send('</test>')
-    sleep 0.1
-    @stream.send('</test>')
-    sleep 0.1
-    @stream.send('</test>')
-    sleep 0.1
-    # FIXME! an exception should be raised somewhere in that case
-    assert(false)
-    @server.close
-    @stream.close
+    assert_raise(Errno::EPIPE) do
+      @server.close
+     sleep 0.1
+      @stream.send('</test>')
+      sleep 0.1
+      @stream.send('</test>')
+      sleep 0.1
+    end
   end
 end
