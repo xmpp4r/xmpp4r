@@ -80,36 +80,6 @@ class StreamComponentTest < Test::Unit::TestCase
     assert_equal(3, stanzas)
   end
 
-  def test_file
-    incoming_lock = Semaphore.new
-
-    ft = Jabber::FileTransfer::Helper.new(@stream)
-    ft.add_incoming_callback do |iq,file|
-      assert_kind_of(Bytestreams::IqSiFile, file)
-      incoming_lock.run
-    end
-
-    @server.send("
-<iq from='test@local' type='set' to='disk' id='1'>
-  <si mime-type='application/octet-stream' profile='http://jabber.org/protocol/si/profile/file-transfer' id='11' xmlns='http://jabber.org/protocol/si'>
-    <file name='test' size='105' xmlns='http://jabber.org/protocol/si/profile/file-transfer'>
-      <desc/>
-    </file>
-    <feature xmlns='http://jabber.org/protocol/feature-neg'>
-      <x type='form' xmlns='jabber:x:data'>
-        <field type='list-single' var='stream-method'>
-	  <option><value>http://jabber.org/protocol/bytestreams</value></option>
-	  <option><value>http://jabber.org/protocol/iqibb</value></option>
-	  <option><value>http://jabber.org/protocol/ibb</value></option>
-	</field>
-      </x>
-    </feature>
-  </si>
-</iq>
-")
-    incoming_lock.wait
-  end
-
   def test_outgoing
     received_wait = Semaphore.new
 
