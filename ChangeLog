@@ -5,6 +5,8 @@ XMPP4R 0.4 (xx/xx/xxxx)
 * HTTP Binding (JEP0124) support
 * Publish-Subscribe support
 * XMPPElement: a framework for classes representing XML elements
+* Ad-hoc commands support
+* Improvements to Dataforms: XData, XDataTitle and XDataInstructions
 
 XMPP4R 0.3.1 (23/04/2007)
 =========================
