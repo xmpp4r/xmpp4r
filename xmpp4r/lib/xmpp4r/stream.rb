@@ -73,6 +73,13 @@ module Jabber
         Thread.current.abort_on_exception = true
         begin
           @parser.parse
+          Jabber::debuglog("DISCONNECTED\n")
+
+          if @exception_block
+            Thread.new { close!; @exception_block.call(nil, self, :disconnected) }
+          else
+            close!
+          end
         rescue Exception => e
           Jabber::debuglog("EXCEPTION:\n#{e.class}\n#{e.message}\n#{e.backtrace.join("\n")}")
 
