@@ -51,7 +51,7 @@ class REXMLTest < Test::Unit::TestCase
     e.attributes['x'] = '&'
     assert_equal('&', e.attributes['x'])
     e.attributes['x'] = '&amp;'
-    assert_equal('&amp;', e.attributes['x'])
+    assert_equal('&', e.attributes['x']) # this one should not be escaped
     e.attributes['x'] = '&nbsp'
     assert_equal('&nbsp', e.attributes['x'])
     e.attributes['x'] = '&nbsp;'
