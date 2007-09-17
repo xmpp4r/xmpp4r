@@ -118,56 +118,6 @@ module REXML
   end
 end
 
-############################################################################
- 
-module REXML
-  class Text
-    # Escapes all possible entities
-    def Text::normalize( input, doctype=nil, entity_filter=nil )
-      copy = input
-      # Doing it like this rather than in a loop improves the speed
-      if doctype
-        # Replace all ampersands that aren't part of an entity
-        copy = copy.gsub( EREFERENCE, '&amp;' )
-        doctype.entities.each_value do |entity|
-          copy = copy.gsub( entity.value, 
-            "&#{entity.name};" ) if entity.value and 
-              not( entity_filter and entity_filter.include?(entity) )
-        end
-      else
-        # Replace all ampersands
-        copy = copy.gsub( '&', '&amp;' )
-        DocType::DEFAULT_ENTITIES.each_value do |entity|
-          copy = copy.gsub(entity.value, "&#{entity.name};" )
-        end
-      end
-      copy
-    end
-  end
-
-	class Attribute
-		def initialize( first, second=nil, parent=nil )
-			@normalized = @unnormalized = @element = nil
-			if first.kind_of? Attribute
-				self.name = first.expanded_name
-				@value = first.value
-				if second.kind_of? Element
-					@element = second
-				else
-					@element = first.element
-				end
-			elsif first.kind_of? String
-				@element = parent if parent.kind_of? Element
-				self.name = first
-				@value = Text::normalize(second.to_s)
-			else
-				raise "illegal argument #{first.class.name} to Attribute constructor"
-			end
-		end
-  end
-
-end
-
 # Restore the old $VERBOSE setting
 $VERBOSE = oldverbose
 
