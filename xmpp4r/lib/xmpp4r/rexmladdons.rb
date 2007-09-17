@@ -102,18 +102,6 @@ module REXML
 
   end
 
-  # very dirty fix for the :progress problem in REXML from Ruby 1.8.3
-  # http://www.germane-software.com/projects/rexml/ticket/34
-  class IOSource
-    def position
-      0
-    end
-
-    def current_line
-      [0, 0, ""]
-    end
-  end
-
 ############################################################################
   # The XPath parser has bugs. Here is a patch.
 ############################################################################
