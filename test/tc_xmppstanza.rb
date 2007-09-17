@@ -7,6 +7,8 @@ require 'socket'
 require 'xmpp4r/rexmladdons'
 require 'xmpp4r/xmppstanza'
 require 'xmpp4r/iq'
+require 'xmpp4r/feature_negotiation'
+require 'xmpp4r/dataforms'
 include Jabber
 
 class XMPPStanzaTest < Test::Unit::TestCase
@@ -76,6 +78,17 @@ class XMPPStanzaTest < Test::Unit::TestCase
     assert_equal(q.to_s, iq.query.to_s)
     assert_equal(x.to_s, iq.to_s)
     assert_equal(q.namespace, iq.queryns)
+  end
+
+  def test_import2
+    feature = FeatureNegotiation::IqFeature.new
+    xdata = feature.add(Dataforms::XData.new(:form))
+    field = xdata.add(Dataforms::XDataField.new('stream-method', :list_single))
+
+    feature2 = FeatureNegotiation::IqFeature.new.import(feature)
+#    puts feature2
+    assert_equal(field.var, feature2.x.fields.first.var)
+    assert_equal(field.type, feature2.x.fields.first.type)
   end
 
   def test_error
