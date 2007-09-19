@@ -141,5 +141,12 @@ module Jabber
         delete_namespace
       end
     end
+
+    def clone
+      cloned = self.class.new
+      cloned.add_attributes self.attributes.clone
+      cloned.context = @context
+      cloned
+    end
   end
 end

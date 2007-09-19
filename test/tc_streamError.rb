@@ -79,24 +79,32 @@ class ConnectionErrorTest < Test::Unit::TestCase
 
   def test_connectionError_send_withexcblock
     @stream = Stream::new
-    error = false
+    error = 0
     @stream.start(@conn)
     @stream.on_exception do |exc, o, w|
-      assert_equal(Errno::EPIPE, exc.class)
-      assert_equal(Jabber::Stream, o.class)
-      assert_equal(:sending, w)
-      error = true
+      case w
+      when :sending
+        assert_equal(IOError, exc.class)
+        assert_equal(Jabber::Stream, o.class)
+      when :disconnected
+        assert_equal(nil, exc)
+        assert_equal(Jabber::Stream, o.class)
+      else
+        assert(false)
+      end
+      error += 1
     end
     @server.puts('<stream:stream>')
     @server.flush
-    assert(!error)
+    assert_equal(0, error)
     @server.close
     sleep 0.1
+    assert_equal(1, error)
     @stream.send('</test>')
     sleep 0.1
     @stream.send('</test>')
     sleep 0.1
-    assert(error)
+    assert_equal(3, error)
     @stream.close
   end
 
