@@ -86,8 +86,6 @@ class XMPPStanzaTest < Test::Unit::TestCase
     field = xdata.add(Dataforms::XDataField.new('stream-method', :list_single))
 
     feature2 = FeatureNegotiation::IqFeature.new.import(feature)
-    puts feature
-    puts feature2
     assert_equal(field.var, feature2.x.fields.first.var)
     assert_equal(field.type, feature2.x.fields.first.type)
   end
