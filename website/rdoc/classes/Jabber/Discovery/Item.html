@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Jabber::Discovery::Item</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Jabber::Discovery::Item</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../../files/lib/xmpp4r/discovery/iq/discoitems_rb.html">
+                lib/xmpp4r/discovery/iq/discoitems.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                <a href="../../REXML/Element.html">
+                REXML::Element
+               </a>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+Service <a href="../Discovery.html">Discovery</a> item to add() to <a
+href="IqQueryDiscoItems.html">IqQueryDiscoItems</a>
+</p>
+<p>
+Please note that JEP 0030 requires the <a href="Item.html#M000369">jid</a>
+to occur
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000372">iname</a>&nbsp;&nbsp;
+      <a href="#M000373">iname=</a>&nbsp;&nbsp;
+      <a href="#M000369">jid</a>&nbsp;&nbsp;
+      <a href="#M000370">jid=</a>&nbsp;&nbsp;
+      <a href="#M000368">new</a>&nbsp;&nbsp;
+      <a href="#M000375">node</a>&nbsp;&nbsp;
+      <a href="#M000376">node=</a>&nbsp;&nbsp;
+      <a href="#M000374">set_iname</a>&nbsp;&nbsp;
+      <a href="#M000371">set_jid</a>&nbsp;&nbsp;
+      <a href="#M000377">set_node</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000368" class="method-detail">
+        <a name="M000368"></a>
+
+        <div class="method-heading">
+          <a href="#M000368" class="method-signature">
+          <span class="method-name">new</span><span class="method-args">(jid=nil, iname=nil, node=nil)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Initialize a <a href="Item.html#M000368">new</a> Service <a
+href="../Discovery.html">Discovery</a> &lt;item/&gt; to be added to <a
+href="IqQueryDiscoItems.html">IqQueryDiscoItems</a>
+</p>
+<table>
+<tr><td valign="top"><a href="Item.html#M000369">jid</a>:</td><td>[<a href="../JID.html">JID</a>]
+
+</td></tr>
+<tr><td valign="top"><a href="Item.html#M000372">iname</a>:</td><td>[String] <a href="Item.html">Item</a> name
+
+</td></tr>
+<tr><td valign="top"><a href="Item.html#M000375">node</a>:</td><td>[String] Service <a href="../Discovery.html">Discovery</a> <a
+href="Item.html#M000375">node</a> (<em>not</em> <a
+href="../JID.html#M000502">JID#node</a>)
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000368-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000368-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/discovery/iq/discoitems.rb, line 84</span>
+84:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">jid</span>=<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">iname</span>=<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">node</span>=<span class="ruby-keyword kw">nil</span>)
+85:         <span class="ruby-keyword kw">super</span>(<span class="ruby-value str">'item'</span>)
+86:         <span class="ruby-identifier">set_jid</span>(<span class="ruby-identifier">jid</span>)
+87:         <span class="ruby-identifier">set_iname</span>(<span class="ruby-identifier">iname</span>)
+88:         <span class="ruby-identifier">set_node</span>(<span class="ruby-identifier">node</span>)
+89:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000372" class="method-detail">
+        <a name="M000372"></a>
+
+        <div class="method-heading">
+          <a href="#M000372" class="method-signature">
+          <span class="method-name">iname</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Get the item&#8216;s name or nil
+</p>
+<p>
+This has been renamed from &lt;name/&gt; to &quot;<a
+href="Item.html#M000372">iname</a>&quot; here to keep REXML::Element#name
+accessible
+</p>
+<table>
+<tr><td valign="top">result:</td><td>[String]
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000372-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000372-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/discovery/iq/discoitems.rb, line 119</span>
+119:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">iname</span>
+120:         <span class="ruby-identifier">attributes</span>[<span class="ruby-value str">'name'</span>]
+121:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000373" class="method-detail">
+        <a name="M000373"></a>
+
+        <div class="method-heading">
+          <a href="#M000373" class="method-signature">
+          <span class="method-name">iname=</span><span class="method-args">(val)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set the item&#8216;s name
+</p>
+<table>
+<tr><td valign="top">val:</td><td>[String]
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000373-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000373-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/discovery/iq/discoitems.rb, line 126</span>
+126:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">iname=</span>(<span class="ruby-identifier">val</span>)
+127:         <span class="ruby-identifier">attributes</span>[<span class="ruby-value str">'name'</span>] = <span class="ruby-identifier">val</span>
+128:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000369" class="method-detail">
+        <a name="M000369"></a>
+
+        <div class="method-heading">
+          <a href="#M000369" class="method-signature">
+          <span class="method-name">jid</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Get the item&#8216;s <a href="Item.html#M000369">jid</a> or nil
+</p>
+<table>
+<tr><td valign="top">result:</td><td>[String]
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000369-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000369-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/discovery/iq/discoitems.rb, line 94</span>
+94:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">jid</span>
+95:         <span class="ruby-constant">JID</span><span class="ruby-operator">::</span><span class="ruby-identifier">new</span>(<span class="ruby-identifier">attributes</span>[<span class="ruby-value str">'jid'</span>])
+96:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000370" class="method-detail">
+        <a name="M000370"></a>
+
+        <div class="method-heading">
+          <a href="#M000370" class="method-signature">
+          <span class="method-name">jid=</span><span class="method-args">(val)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set the item&#8216;s <a href="Item.html#M000369">jid</a>
+</p>
+<table>
+<tr><td valign="top">val:</td><td>[<a href="../JID.html">JID</a>]
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000370-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000370-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/discovery/iq/discoitems.rb, line 101</span>
+101:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">jid=</span>(<span class="ruby-identifier">val</span>)
+102:         <span class="ruby-identifier">attributes</span>[<span class="ruby-value str">'jid'</span>] = <span class="ruby-identifier">val</span>.<span class="ruby-identifier">to_s</span>
+103:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000375" class="method-detail">
+        <a name="M000375"></a>
+
+        <div class="method-heading">
+          <a href="#M000375" class="method-signature">
+          <span class="method-name">node</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Get the item&#8216;s Service <a href="../Discovery.html">Discovery</a> <a
+href="Item.html#M000375">node</a> or nil
+</p>
+<table>
+<tr><td valign="top">result:</td><td>[String]
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000375-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000375-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/discovery/iq/discoitems.rb, line 141</span>
+141:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">node</span>
+142:         <span class="ruby-identifier">attributes</span>[<span class="ruby-value str">'node'</span>]
+143:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000376" class="method-detail">
+        <a name="M000376"></a>
+
+        <div class="method-heading">
+          <a href="#M000376" class="method-signature">
+          <span class="method-name">node=</span><span class="method-args">(val)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set the item&#8216;s Service <a href="../Discovery.html">Discovery</a> <a
+href="Item.html#M000375">node</a>
+</p>
+<table>
+<tr><td valign="top">val:</td><td>[String]
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000376-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000376-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/discovery/iq/discoitems.rb, line 148</span>
+148:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">node=</span>(<span class="ruby-identifier">val</span>)
+149:         <span class="ruby-identifier">attributes</span>[<span class="ruby-value str">'node'</span>] = <span class="ruby-identifier">val</span>
+150:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000374" class="method-detail">
+        <a name="M000374"></a>
+
+        <div class="method-heading">
+          <a href="#M000374" class="method-signature">
+          <span class="method-name">set_iname</span><span class="method-args">(val)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set the item&#8216;s name (chaining-friendly)
+</p>
+<table>
+<tr><td valign="top">val:</td><td>[String]
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000374-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000374-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/discovery/iq/discoitems.rb, line 133</span>
+133:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">set_iname</span>(<span class="ruby-identifier">val</span>)
+134:         <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">iname</span> = <span class="ruby-identifier">val</span>
+135:         <span class="ruby-keyword kw">self</span>
+136:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000371" class="method-detail">
+        <a name="M000371"></a>
+
+        <div class="method-heading">
+          <a href="#M000371" class="method-signature">
+          <span class="method-name">set_jid</span><span class="method-args">(val)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set the item&#8216;s <a href="Item.html#M000369">jid</a>
+(chaining-friendly)
+</p>
+<table>
+<tr><td valign="top">val:</td><td>[<a href="../JID.html">JID</a>]
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000371-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000371-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/discovery/iq/discoitems.rb, line 108</span>
+108:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">set_jid</span>(<span class="ruby-identifier">val</span>)
+109:         <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">jid</span> = <span class="ruby-identifier">val</span>
+110:         <span class="ruby-keyword kw">self</span>
+111:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000377" class="method-detail">
+        <a name="M000377"></a>
+
+        <div class="method-heading">
+          <a href="#M000377" class="method-signature">
+          <span class="method-name">set_node</span><span class="method-args">(val)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set the item&#8216;s Service <a href="../Discovery.html">Discovery</a> <a
+href="Item.html#M000375">node</a> (chaining-friendly)
+</p>
+<table>
+<tr><td valign="top">val:</td><td>[String]
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000377-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000377-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/discovery/iq/discoitems.rb, line 155</span>
+155:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">set_node</span>(<span class="ruby-identifier">val</span>)
+156:         <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">node</span> = <span class="ruby-identifier">val</span>
+157:         <span class="ruby-keyword kw">self</span>
+158:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: REXML::Element</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">REXML::Element</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/xmpp4r/rexmladdons_rb.html">
+                lib/xmpp4r/rexmladdons.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+this class adds a few helper methods to <a
+href="Element.html">REXML::Element</a>
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000039">delete_elements</a>&nbsp;&nbsp;
+      <a href="#M000034">first_element</a>&nbsp;&nbsp;
+      <a href="#M000035">first_element_text</a>&nbsp;&nbsp;
+      <a href="#M000038">import</a>&nbsp;&nbsp;
+      <a href="#M000037">import</a>&nbsp;&nbsp;
+      <a href="#M000033">replace_element_text</a>&nbsp;&nbsp;
+      <a href="#M000036">typed_add</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000038" class="method-detail">
+        <a name="M000038"></a>
+
+        <div class="method-heading">
+          <a href="#M000038" class="method-signature">
+          <span class="method-name">import</span><span class="method-args">(xmlelement)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000038-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000038-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/rexmladdons.rb, line 92</span>
+92:     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">import</span>(<span class="ruby-identifier">xmlelement</span>)
+93:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">import</span>(<span class="ruby-identifier">xmlelement</span>)
+94:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000039" class="method-detail">
+        <a name="M000039"></a>
+
+        <div class="method-heading">
+          <a href="#M000039" class="method-signature">
+          <span class="method-name">delete_elements</span><span class="method-args">(element)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Deletes one or more children elements, not just one like
+REXML::Element#delete_element
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000039-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000039-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/rexmladdons.rb, line 99</span>
+ 99:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">delete_elements</span>(<span class="ruby-identifier">element</span>)
+100:       <span class="ruby-keyword kw">while</span>(<span class="ruby-identifier">delete_element</span>(<span class="ruby-identifier">element</span>)) <span class="ruby-keyword kw">do</span> <span class="ruby-keyword kw">end</span>
+101:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000034" class="method-detail">
+        <a name="M000034"></a>
+
+        <div class="method-heading">
+          <a href="#M000034" class="method-signature">
+          <span class="method-name">first_element</span><span class="method-args">(e)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns first element of name <tt>e</tt>
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000034-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000034-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/rexmladdons.rb, line 49</span>
+49:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">first_element</span>(<span class="ruby-identifier">e</span>)
+50:       <span class="ruby-identifier">each_element</span>(<span class="ruby-identifier">e</span>) { <span class="ruby-operator">|</span><span class="ruby-identifier">el</span><span class="ruby-operator">|</span> <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">el</span> }
+51:       <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span>
+52:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000035" class="method-detail">
+        <a name="M000035"></a>
+
+        <div class="method-heading">
+          <a href="#M000035" class="method-signature">
+          <span class="method-name">first_element_text</span><span class="method-args">(e)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns text of first element of name <tt>e</tt>
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000035-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000035-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/rexmladdons.rb, line 56</span>
+56:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">first_element_text</span>(<span class="ruby-identifier">e</span>)
+57:       <span class="ruby-identifier">el</span> = <span class="ruby-identifier">first_element</span>(<span class="ruby-identifier">e</span>)
+58:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">el</span>
+59:         <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">el</span>.<span class="ruby-identifier">text</span>
+60:       <span class="ruby-keyword kw">else</span>
+61:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span>
+62:       <span class="ruby-keyword kw">end</span>
+63:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000037" class="method-detail">
+        <a name="M000037"></a>
+
+        <div class="method-heading">
+          <a href="#M000037" class="method-signature">
+          <span class="method-name">import</span><span class="method-args">(xmlelement)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+<a href="Element.html#M000037">import</a> this element&#8216;s children and
+attributes
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000037-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000037-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/rexmladdons.rb, line 76</span>
+76:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">import</span>(<span class="ruby-identifier">xmlelement</span>)
+77:       <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@name</span> <span class="ruby-keyword kw">and</span> <span class="ruby-ivar">@name</span> <span class="ruby-operator">!=</span> <span class="ruby-identifier">xmlelement</span>.<span class="ruby-identifier">name</span>
+78:         <span class="ruby-identifier">raise</span> <span class="ruby-node">&quot;Trying to import an #{xmlelement.name} to a #{@name} !&quot;</span>
+79:       <span class="ruby-keyword kw">end</span>
+80:       <span class="ruby-identifier">add_attributes</span>(<span class="ruby-identifier">xmlelement</span>.<span class="ruby-identifier">attributes</span>.<span class="ruby-identifier">clone</span>)
+81:       <span class="ruby-ivar">@context</span> = <span class="ruby-identifier">xmlelement</span>.<span class="ruby-identifier">context</span>
+82:       <span class="ruby-identifier">xmlelement</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span>
+83:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">kind_of?</span> <span class="ruby-constant">REXML</span><span class="ruby-operator">::</span><span class="ruby-constant">Element</span>
+84:           <span class="ruby-identifier">typed_add</span>(<span class="ruby-identifier">e</span>.<span class="ruby-identifier">deep_clone</span>)
+85:         <span class="ruby-keyword kw">else</span> <span class="ruby-comment cmt"># text element, probably.</span>
+86:           <span class="ruby-identifier">add</span>(<span class="ruby-identifier">e</span>.<span class="ruby-identifier">clone</span>)
+87:         <span class="ruby-keyword kw">end</span>
+88:       <span class="ruby-keyword kw">end</span>
+89:       <span class="ruby-keyword kw">self</span>
+90:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000033" class="method-detail">
+        <a name="M000033"></a>
+
+        <div class="method-heading">
+          <a href="#M000033" class="method-signature">
+          <span class="method-name">replace_element_text</span><span class="method-args">(e, t)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Replaces or add a child element of name <tt>e</tt> with text <tt>t</tt>.
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000033-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000033-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/rexmladdons.rb, line 35</span>
+35:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">replace_element_text</span>(<span class="ruby-identifier">e</span>, <span class="ruby-identifier">t</span>)
+36:       <span class="ruby-identifier">el</span> = <span class="ruby-identifier">first_element</span>(<span class="ruby-identifier">e</span>)
+37:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">el</span>.<span class="ruby-identifier">nil?</span>
+38:         <span class="ruby-identifier">el</span> = <span class="ruby-constant">REXML</span><span class="ruby-operator">::</span><span class="ruby-constant">Element</span><span class="ruby-operator">::</span><span class="ruby-identifier">new</span>(<span class="ruby-identifier">e</span>)
+39:         <span class="ruby-identifier">add_element</span>(<span class="ruby-identifier">el</span>)
+40:       <span class="ruby-keyword kw">end</span>
+41:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">t</span>
+42:         <span class="ruby-identifier">el</span>.<span class="ruby-identifier">text</span> = <span class="ruby-identifier">t</span>
+43:       <span class="ruby-keyword kw">end</span>
+44:       <span class="ruby-keyword kw">self</span>
+45:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000036" class="method-detail">
+        <a name="M000036"></a>
+
+        <div class="method-heading">
+          <a href="#M000036" class="method-signature">
+          <span class="method-name">typed_add</span><span class="method-args">(e)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+This method does exactly the same thing as add(), but it can be overriden
+by subclasses to provide on-the-fly object creations. For example, if you
+<a href="Element.html#M000037">import</a> a <a
+href="Element.html">REXML::Element</a> of name &#8216;plop&#8217;, and you
+have a Plop class that subclasses <a
+href="Element.html">REXML::Element</a>, with <a
+href="Element.html#M000036">typed_add</a> you can get your <a
+href="Element.html">REXML::Element</a> to be &quot;magically&quot;
+converted to Plop.
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000036-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000036-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/rexmladdons.rb, line 70</span>
+70:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">typed_add</span>(<span class="ruby-identifier">e</span>)
+71:       <span class="ruby-identifier">add</span>(<span class="ruby-identifier">e</span>)
+72:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

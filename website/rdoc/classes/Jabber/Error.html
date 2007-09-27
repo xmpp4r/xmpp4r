@@ -1,0 +1,735 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Jabber::Error</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Jabber::Error</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/xmpp4r/error_rb.html">
+                lib/xmpp4r/error.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                <a href="../REXML/Element.html">
+                REXML::Element
+               </a>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+A class used to build/parse &lt;<a href="Error.html#M000525">error</a>/&gt;
+elements. Look at JEP 0086 for explanation.
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000522">code</a>&nbsp;&nbsp;
+      <a href="#M000523">code=</a>&nbsp;&nbsp;
+      <a href="#M000525">error</a>&nbsp;&nbsp;
+      <a href="#M000526">error=</a>&nbsp;&nbsp;
+      <a href="#M000521">import</a>&nbsp;&nbsp;
+      <a href="#M000520">new</a>&nbsp;&nbsp;
+      <a href="#M000524">set_code</a>&nbsp;&nbsp;
+      <a href="#M000527">set_error</a>&nbsp;&nbsp;
+      <a href="#M000530">set_text</a>&nbsp;&nbsp;
+      <a href="#M000533">set_type</a>&nbsp;&nbsp;
+      <a href="#M000528">text</a>&nbsp;&nbsp;
+      <a href="#M000529">text=</a>&nbsp;&nbsp;
+      <a href="#M000531">type</a>&nbsp;&nbsp;
+      <a href="#M000532">type=</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000521" class="method-detail">
+        <a name="M000521"></a>
+
+        <div class="method-heading">
+          <a href="#M000521" class="method-signature">
+          <span class="method-name">import</span><span class="method-args">(element)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Create a <a href="Error.html#M000520">new</a> &lt;<a
+href="Error.html#M000525">error</a>/&gt; element and <a
+href="Error.html#M000521">import</a> from existing
+</p>
+<table>
+<tr><td valign="top">element:</td><td>[<a href="../REXML/Element.html">REXML::Element</a>] to <a
+href="Error.html#M000521">import</a>
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000521-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000521-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/error.rb, line 68</span>
+68:     <span class="ruby-keyword kw">def</span> <span class="ruby-constant">Error</span>.<span class="ruby-identifier">import</span>(<span class="ruby-identifier">element</span>)
+69:       <span class="ruby-constant">Error</span><span class="ruby-operator">::</span><span class="ruby-identifier">new</span>.<span class="ruby-identifier">import</span>(<span class="ruby-identifier">element</span>)
+70:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000520" class="method-detail">
+        <a name="M000520"></a>
+
+        <div class="method-heading">
+          <a href="#M000520" class="method-signature">
+          <span class="method-name">new</span><span class="method-args">(errorcondition=nil, text=nil)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <table>
+<tr><td valign="top">errorcondition:</td><td>[nil] or [String] of the following:
+
+</td></tr>
+</table>
+<ul>
+<li>&quot;bad-request&quot;
+
+</li>
+<li>&quot;conflict&quot;
+
+</li>
+<li>&quot;feature-not-implemented&quot;
+
+</li>
+<li>&quot;forbidden&quot;
+
+</li>
+<li>&quot;gone&quot;
+
+</li>
+<li>&quot;internal-server-<a href="Error.html#M000525">error</a>&quot;
+
+</li>
+<li>&quot;item-not-found&quot;
+
+</li>
+<li>&quot;jid-malformed&quot;
+
+</li>
+<li>&quot;not-acceptable&quot;
+
+</li>
+<li>&quot;not-allowed&quot;
+
+</li>
+<li>&quot;not-authorized&quot;
+
+</li>
+<li>&quot;payment-required&quot;
+
+</li>
+<li>&quot;recipient-unavailable&quot;
+
+</li>
+<li>&quot;redirect&quot;
+
+</li>
+<li>&quot;registration-required&quot;
+
+</li>
+<li>&quot;remote-server-not-found&quot;
+
+</li>
+<li>&quot;remote-server-timeout&quot;
+
+</li>
+<li>&quot;resource-constraint&quot;
+
+</li>
+<li>&quot;service-unavailable&quot;
+
+</li>
+<li>&quot;subscription-required&quot;
+
+</li>
+<li>&quot;undefined-condition&quot;
+
+</li>
+<li>&quot;unexpected-request&quot;
+
+</li>
+</ul>
+<p>
+Will raise an [Exception] if not [nil] and none of the above
+</p>
+<p>
+Does also set <a href="Error.html#M000531">type</a> and <a
+href="Error.html#M000522">code</a> to appropriate values according to
+errorcondition
+</p>
+<p>
+<a href="Error.html#M000528">text</a>: [nil] or [String] <a
+href="Error.html">Error</a> <a href="Error.html#M000528">text</a>
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000520-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000520-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/error.rb, line 39</span>
+39:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">errorcondition</span>=<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">text</span>=<span class="ruby-keyword kw">nil</span>)
+40:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">errorcondition</span>.<span class="ruby-identifier">nil?</span>
+41:         <span class="ruby-keyword kw">super</span>(<span class="ruby-value str">'error'</span>)
+42:         <span class="ruby-identifier">set_text</span>(<span class="ruby-identifier">text</span>) <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">text</span>.<span class="ruby-identifier">nil?</span>
+43:       <span class="ruby-keyword kw">else</span>
+44:         <span class="ruby-identifier">errortype</span> = <span class="ruby-keyword kw">nil</span>
+45:         <span class="ruby-identifier">errorcode</span> = <span class="ruby-keyword kw">nil</span>
+46:         <span class="ruby-ivar">@@Errors</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">cond</span>,<span class="ruby-identifier">type</span>,<span class="ruby-identifier">code</span><span class="ruby-operator">|</span>
+47:           <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">errorcondition</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">cond</span>
+48:             <span class="ruby-identifier">errortype</span> = <span class="ruby-identifier">type</span>
+49:             <span class="ruby-identifier">errorcode</span> = <span class="ruby-identifier">code</span>
+50:           <span class="ruby-keyword kw">end</span>
+51:         }
+52: 
+53:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">errortype</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">errorcode</span>.<span class="ruby-identifier">nil?</span>
+54:           <span class="ruby-identifier">raise</span>(<span class="ruby-value str">&quot;Unknown error condition when initializing Error&quot;</span>)
+55:         <span class="ruby-keyword kw">end</span>
+56:         
+57:         <span class="ruby-keyword kw">super</span>(<span class="ruby-value str">&quot;error&quot;</span>)
+58:         <span class="ruby-identifier">set_error</span>(<span class="ruby-identifier">errorcondition</span>)
+59:         <span class="ruby-identifier">set_type</span>(<span class="ruby-identifier">errortype</span>)
+60:         <span class="ruby-identifier">set_code</span>(<span class="ruby-identifier">errorcode</span>)
+61:         <span class="ruby-identifier">set_text</span>(<span class="ruby-identifier">text</span>) <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">text</span>.<span class="ruby-identifier">nil?</span>
+62:       <span class="ruby-keyword kw">end</span>
+63:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000522" class="method-detail">
+        <a name="M000522"></a>
+
+        <div class="method-heading">
+          <a href="#M000522" class="method-signature">
+          <span class="method-name">code</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Get the &#8216;Legacy <a href="Error.html#M000525">error</a> <a
+href="Error.html#M000522">code</a>&#8217; or nil
+</p>
+<table>
+<tr><td valign="top">result:</td><td>[Integer] <a href="Error.html">Error</a> <a
+href="Error.html#M000522">code</a>
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000522-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000522-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/error.rb, line 75</span>
+75:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">code</span>
+76:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">attributes</span>[<span class="ruby-value str">'code'</span>]
+77:         <span class="ruby-identifier">attributes</span>[<span class="ruby-value str">'code'</span>].<span class="ruby-identifier">to_i</span>
+78:       <span class="ruby-keyword kw">else</span>
+79:         <span class="ruby-keyword kw">nil</span>
+80:       <span class="ruby-keyword kw">end</span>
+81:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000523" class="method-detail">
+        <a name="M000523"></a>
+
+        <div class="method-heading">
+          <a href="#M000523" class="method-signature">
+          <span class="method-name">code=</span><span class="method-args">(i)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set the &#8216;Legacy <a href="Error.html#M000525">error</a> <a
+href="Error.html#M000522">code</a>&#8217; or nil
+</p>
+<table>
+<tr><td valign="top">i:</td><td>[Integer] <a href="Error.html">Error</a> <a
+href="Error.html#M000522">code</a>
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000523-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000523-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/error.rb, line 86</span>
+86:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">code=</span>(<span class="ruby-identifier">i</span>)
+87:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">nil?</span>
+88:         <span class="ruby-identifier">attributes</span>[<span class="ruby-value str">'code'</span>] = <span class="ruby-keyword kw">nil</span>
+89:       <span class="ruby-keyword kw">else</span>
+90:         <span class="ruby-identifier">attributes</span>[<span class="ruby-value str">'code'</span>] = <span class="ruby-identifier">i</span>.<span class="ruby-identifier">to_s</span>
+91:       <span class="ruby-keyword kw">end</span>
+92:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000525" class="method-detail">
+        <a name="M000525"></a>
+
+        <div class="method-heading">
+          <a href="#M000525" class="method-signature">
+          <span class="method-name">error</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Get the &#8216;XMPP <a href="Error.html#M000525">error</a> condition&#8216;
+</p>
+<p>
+This can be anything that possess the specific namespace, checks
+don&#8216;t apply here
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000525-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000525-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/error.rb, line 106</span>
+106:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">error</span>
+107:       <span class="ruby-identifier">name</span> = <span class="ruby-keyword kw">nil</span>
+108:       <span class="ruby-identifier">each_element</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">name</span> = <span class="ruby-identifier">e</span>.<span class="ruby-identifier">name</span> <span class="ruby-keyword kw">if</span> (<span class="ruby-identifier">e</span>.<span class="ruby-identifier">namespace</span> <span class="ruby-operator">==</span> <span class="ruby-value str">'urn:ietf:params:xml:ns:xmpp-stanzas'</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">e</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">!=</span> <span class="ruby-value str">'text'</span>) }
+109:       <span class="ruby-identifier">name</span>
+110:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000526" class="method-detail">
+        <a name="M000526"></a>
+
+        <div class="method-heading">
+          <a href="#M000526" class="method-signature">
+          <span class="method-name">error=</span><span class="method-args">(s)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set the &#8216;XMPP <a href="Error.html#M000525">error</a> condition&#8216;
+</p>
+<p>
+One previous element with that namespace will be deleted before
+</p>
+<table>
+<tr><td valign="top">s:</td><td>[String] Name of the element to be added,
+
+</td></tr>
+</table>
+<p>
+namespace will be added automatically, checks don&#8216;t apply here
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000526-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000526-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/error.rb, line 119</span>
+119:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">error=</span>(<span class="ruby-identifier">s</span>)
+120:       <span class="ruby-identifier">xe</span> = <span class="ruby-keyword kw">nil</span>
+121:       <span class="ruby-identifier">each_element</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">xe</span> = <span class="ruby-identifier">e</span> <span class="ruby-keyword kw">if</span> (<span class="ruby-identifier">e</span>.<span class="ruby-identifier">namespace</span> <span class="ruby-operator">==</span> <span class="ruby-value str">'urn:ietf:params:xml:ns:xmpp-stanzas'</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">e</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">!=</span> <span class="ruby-value str">'text'</span>) }
+122:       <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">xe</span>.<span class="ruby-identifier">nil?</span>
+123:         <span class="ruby-identifier">delete_element</span>(<span class="ruby-identifier">xe</span>)
+124:       <span class="ruby-keyword kw">end</span>
+125: 
+126:       <span class="ruby-identifier">add_element</span>(<span class="ruby-identifier">s</span>).<span class="ruby-identifier">add_namespace</span>(<span class="ruby-value str">'urn:ietf:params:xml:ns:xmpp-stanzas'</span>)
+127:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000524" class="method-detail">
+        <a name="M000524"></a>
+
+        <div class="method-heading">
+          <a href="#M000524" class="method-signature">
+          <span class="method-name">set_code</span><span class="method-args">(i)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set the &#8216;Legacy <a href="Error.html#M000525">error</a> <a
+href="Error.html#M000522">code</a>&#8217; (chaining-friendly)
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000524-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000524-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/error.rb, line 96</span>
+96:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">set_code</span>(<span class="ruby-identifier">i</span>)
+97:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">code</span> = <span class="ruby-identifier">i</span>
+98:       <span class="ruby-keyword kw">self</span>
+99:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000527" class="method-detail">
+        <a name="M000527"></a>
+
+        <div class="method-heading">
+          <a href="#M000527" class="method-signature">
+          <span class="method-name">set_error</span><span class="method-args">(s)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set the &#8216;XMPP <a href="Error.html#M000525">error</a> condition&#8217;
+(chaining-friendly)
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000527-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000527-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/error.rb, line 131</span>
+131:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">set_error</span>(<span class="ruby-identifier">s</span>)
+132:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">error</span> = <span class="ruby-identifier">s</span>
+133:       <span class="ruby-keyword kw">self</span>
+134:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000530" class="method-detail">
+        <a name="M000530"></a>
+
+        <div class="method-heading">
+          <a href="#M000530" class="method-signature">
+          <span class="method-name">set_text</span><span class="method-args">(s)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set the errors &lt;<a href="Error.html#M000528">text</a>/&gt; element <a
+href="Error.html#M000528">text</a> (chaining-friendly)
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000530-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000530-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/error.rb, line 159</span>
+159:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">set_text</span>(<span class="ruby-identifier">s</span>)
+160:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">text</span> = <span class="ruby-identifier">s</span>
+161:       <span class="ruby-keyword kw">self</span>
+162:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000533" class="method-detail">
+        <a name="M000533"></a>
+
+        <div class="method-heading">
+          <a href="#M000533" class="method-signature">
+          <span class="method-name">set_type</span><span class="method-args">(t)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set the <a href="Error.html#M000531">type</a> of <a
+href="Error.html#M000525">error</a> (chaining-friendly)
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000533-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000533-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/error.rb, line 199</span>
+199:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">set_type</span>(<span class="ruby-identifier">t</span>)
+200:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">type</span> = <span class="ruby-identifier">t</span>
+201:       <span class="ruby-keyword kw">self</span>
+202:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000528" class="method-detail">
+        <a name="M000528"></a>
+
+        <div class="method-heading">
+          <a href="#M000528" class="method-signature">
+          <span class="method-name">text</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Get the errors &lt;<a href="Error.html#M000528">text</a>/&gt; element <a
+href="Error.html#M000528">text</a>
+</p>
+<table>
+<tr><td valign="top">result:</td><td>[String] or nil
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000528-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000528-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/error.rb, line 139</span>
+139:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">text</span>
+140:       <span class="ruby-identifier">first_element_text</span>(<span class="ruby-value str">'text'</span>) <span class="ruby-operator">||</span> <span class="ruby-keyword kw">super</span>
+141:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000529" class="method-detail">
+        <a name="M000529"></a>
+
+        <div class="method-heading">
+          <a href="#M000529" class="method-signature">
+          <span class="method-name">text=</span><span class="method-args">(s)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set the errors &lt;<a href="Error.html#M000528">text</a>/&gt; element <a
+href="Error.html#M000528">text</a> (Previous &lt;<a
+href="Error.html#M000528">text</a>/&gt; elements will be deleted first)
+</p>
+<table>
+<tr><td valign="top">s:</td><td>[String] &lt;<a href="Error.html#M000528">text</a>/&gt; content or [nil] if
+no &lt;<a href="Error.html#M000528">text</a>/&gt; element
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000529-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000529-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/error.rb, line 147</span>
+147:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">text=</span>(<span class="ruby-identifier">s</span>)
+148:       <span class="ruby-identifier">delete_elements</span>(<span class="ruby-value str">'text'</span>)
+149: 
+150:       <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">nil?</span>
+151:         <span class="ruby-identifier">e</span> = <span class="ruby-identifier">add_element</span>(<span class="ruby-value str">'text'</span>)
+152:         <span class="ruby-identifier">e</span>.<span class="ruby-identifier">add_namespace</span>(<span class="ruby-value str">'urn:ietf:params:xml:ns:xmpp-stanzas'</span>)
+153:         <span class="ruby-identifier">e</span>.<span class="ruby-identifier">text</span> = <span class="ruby-identifier">s</span>
+154:       <span class="ruby-keyword kw">end</span>
+155:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000531" class="method-detail">
+        <a name="M000531"></a>
+
+        <div class="method-heading">
+          <a href="#M000531" class="method-signature">
+          <span class="method-name">type</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Get the <a href="Error.html#M000531">type</a> of <a
+href="Error.html#M000525">error</a> (meaning how to proceed)
+</p>
+<table>
+<tr><td valign="top">result:</td><td>[Symbol] or [nil] as following:
+
+</td></tr>
+</table>
+<ul>
+<li>:auth
+
+</li>
+<li>:cancel
+
+</li>
+<li>:continue
+
+</li>
+<li>:modify
+
+</li>
+<li>:wait
+
+</li>
+</ul>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000531-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000531-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/error.rb, line 173</span>
+173:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">type</span>
+174:       <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">attributes</span>[<span class="ruby-value str">'type'</span>]
+175:         <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'auth'</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">:auth</span>
+176:         <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'cancel'</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">:cancel</span>
+177:         <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'continue'</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">:continue</span>
+178:         <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'modify'</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">:modify</span>
+179:         <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'wait'</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">:wait</span>
+180:         <span class="ruby-keyword kw">else</span> <span class="ruby-keyword kw">nil</span>
+181:       <span class="ruby-keyword kw">end</span>
+182:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000532" class="method-detail">
+        <a name="M000532"></a>
+
+        <div class="method-heading">
+          <a href="#M000532" class="method-signature">
+          <span class="method-name">type=</span><span class="method-args">(t)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set the <a href="Error.html#M000531">type</a> of <a
+href="Error.html#M000525">error</a> (see <a
+href="Error.html#M000531">Error#type</a>)
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000532-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000532-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/error.rb, line 186</span>
+186:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">type=</span>(<span class="ruby-identifier">t</span>)
+187:       <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">t</span>
+188:         <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:auth</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">attributes</span>[<span class="ruby-value str">'type'</span>] = <span class="ruby-value str">'auth'</span>
+189:         <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:cancel</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">attributes</span>[<span class="ruby-value str">'type'</span>] = <span class="ruby-value str">'cancel'</span>
+190:         <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:continue</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">attributes</span>[<span class="ruby-value str">'type'</span>] = <span class="ruby-value str">'continue'</span>
+191:         <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:modify</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">attributes</span>[<span class="ruby-value str">'type'</span>] = <span class="ruby-value str">'modify'</span>
+192:         <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:wait</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">attributes</span>[<span class="ruby-value str">'type'</span>] = <span class="ruby-value str">'wait'</span>
+193:         <span class="ruby-keyword kw">else</span> <span class="ruby-identifier">attributes</span>[<span class="ruby-value str">'type'</span>] = <span class="ruby-keyword kw">nil</span>
+194:       <span class="ruby-keyword kw">end</span>
+195:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

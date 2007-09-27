@@ -1,0 +1,885 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Jabber::Presence</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Jabber::Presence</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/xmpp4r/presence_rb.html">
+                lib/xmpp4r/presence.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                <a href="XMLStanza.html">
+                XMLStanza
+               </a>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+The presence class is used to construct presence messages to send to the <a
+href="../Jabber.html">Jabber</a> service.
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000490">&lt;=&gt;</a>&nbsp;&nbsp;
+      <a href="#M000491">cmp_interest</a>&nbsp;&nbsp;
+      <a href="#M000476">import</a>&nbsp;&nbsp;
+      <a href="#M000474">new</a>&nbsp;&nbsp;
+      <a href="#M000487">priority</a>&nbsp;&nbsp;
+      <a href="#M000488">priority=</a>&nbsp;&nbsp;
+      <a href="#M000489">set_priority</a>&nbsp;&nbsp;
+      <a href="#M000483">set_show</a>&nbsp;&nbsp;
+      <a href="#M000486">set_status</a>&nbsp;&nbsp;
+      <a href="#M000479">set_type</a>&nbsp;&nbsp;
+      <a href="#M000481">show</a>&nbsp;&nbsp;
+      <a href="#M000482">show=</a>&nbsp;&nbsp;
+      <a href="#M000484">status</a>&nbsp;&nbsp;
+      <a href="#M000485">status=</a>&nbsp;&nbsp;
+      <a href="#M000477">type</a>&nbsp;&nbsp;
+      <a href="#M000478">type=</a>&nbsp;&nbsp;
+      <a href="#M000475">typed_add</a>&nbsp;&nbsp;
+      <a href="#M000480">x</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+    <div id="includes">
+      <h3 class="section-bar">Included Modules</h3>
+
+      <div id="includes-list">
+        <span class="include-name">Comparable</span>
+      </div>
+    </div>
+
+    <div id="section">
+
+
+    <div id="constants-list">
+      <h3 class="section-bar">Constants</h3>
+
+      <div class="name-list">
+        <table summary="Constants">
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">PRESENCE_STATUS</td>
+          <td>=</td>
+          <td class="context-item-value">{ :chat =&gt; 4,                         nil =&gt; 3,                         :dnd =&gt; 2,                         :away =&gt; 1,                         :xa =&gt; 0,                         :unavailable =&gt; -1,                         :error =&gt; -2 }</td>
+          <td width="3em">&nbsp;</td>
+          <td class="context-item-desc">
+Compare two presences. The most suitable to talk with is the biggest.
+
+</td>
+        </tr>
+        </table>
+      </div>
+    </div>
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000476" class="method-detail">
+        <a name="M000476"></a>
+
+        <div class="method-heading">
+          <a href="#M000476" class="method-signature">
+          <span class="method-name">import</span><span class="method-args">(xmlstanza)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Create a <a href="Presence.html#M000474">new</a> presence from a stanza
+</p>
+<table>
+<tr><td valign="top">result:</td><td>[<a href="Presence.html">Presence</a>] Imported <a
+href="XMLStanza.html">XMLStanza</a>
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000476-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000476-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/presence.rb, line 42</span>
+42:     <span class="ruby-keyword kw">def</span> <span class="ruby-constant">Presence</span>.<span class="ruby-identifier">import</span>(<span class="ruby-identifier">xmlstanza</span>)
+43:       <span class="ruby-constant">Presence</span><span class="ruby-operator">::</span><span class="ruby-identifier">new</span>.<span class="ruby-identifier">import</span>(<span class="ruby-identifier">xmlstanza</span>)
+44:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000474" class="method-detail">
+        <a name="M000474"></a>
+
+        <div class="method-heading">
+          <a href="#M000474" class="method-signature">
+          <span class="method-name">new</span><span class="method-args">(show=nil, status=nil, priority=nil)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Create presence stanza
+</p>
+<table>
+<tr><td valign="top"><a href="Presence.html#M000481">show</a>:</td><td>[String] Initial Availability Status
+
+</td></tr>
+<tr><td valign="top"><a href="Presence.html#M000484">status</a>:</td><td>[String] Initial <a href="Presence.html#M000484">status</a> message
+
+</td></tr>
+<tr><td valign="top"><a href="Presence.html#M000487">priority</a>:</td><td>[Fixnum] Initial <a href="Presence.html#M000487">priority</a> value
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000474-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000474-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/presence.rb, line 20</span>
+20:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">show</span>=<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">status</span>=<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">priority</span>=<span class="ruby-keyword kw">nil</span>)
+21:       <span class="ruby-keyword kw">super</span>(<span class="ruby-value str">&quot;presence&quot;</span>)
+22:       <span class="ruby-identifier">set_show</span>(<span class="ruby-identifier">show</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">show</span>
+23:       <span class="ruby-identifier">set_status</span>(<span class="ruby-identifier">status</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">status</span>
+24:       <span class="ruby-identifier">set_priority</span>(<span class="ruby-identifier">priority</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">priority</span>
+25:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000490" class="method-detail">
+        <a name="M000490"></a>
+
+        <div class="method-heading">
+          <a href="#M000490" class="method-signature">
+          <span class="method-name">&lt;=&gt;</span><span class="method-args">(o)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Compare two presences using <a href="Presence.html#M000487">priority</a>
+(with <a href="Presence.html#M000491">cmp_interest</a> as fall-back).
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000490-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000490-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/presence.rb, line 224</span>
+224:     <span class="ruby-keyword kw">def</span> <span class="ruby-operator">&lt;=&gt;</span>(<span class="ruby-identifier">o</span>)
+225:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">priority</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">priority</span>.<span class="ruby-identifier">to_i</span>
+226:         <span class="ruby-identifier">cmp_interest</span>(<span class="ruby-identifier">o</span>)
+227:       <span class="ruby-keyword kw">else</span>
+228:         <span class="ruby-identifier">priority</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">&lt;=&gt;</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">priority</span>.<span class="ruby-identifier">to_i</span>
+229:       <span class="ruby-keyword kw">end</span>
+230:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000491" class="method-detail">
+        <a name="M000491"></a>
+
+        <div class="method-heading">
+          <a href="#M000491" class="method-signature">
+          <span class="method-name">cmp_interest</span><span class="method-args">(o)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000491-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000491-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/presence.rb, line 242</span>
+242:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">cmp_interest</span>(<span class="ruby-identifier">o</span>)
+243:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">type</span>.<span class="ruby-identifier">nil?</span>
+244:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">type</span>.<span class="ruby-identifier">nil?</span>
+245:           <span class="ruby-comment cmt"># both available.</span>
+246:           <span class="ruby-constant">PRESENCE_STATUS</span>[<span class="ruby-identifier">show</span>] <span class="ruby-operator">&lt;=&gt;</span> <span class="ruby-constant">PRESENCE_STATUS</span>[<span class="ruby-identifier">o</span>.<span class="ruby-identifier">show</span>]
+247:         <span class="ruby-keyword kw">else</span>
+248:           <span class="ruby-keyword kw">return</span> <span class="ruby-value">-1</span>
+249:         <span class="ruby-keyword kw">end</span>
+250:       <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">type</span>.<span class="ruby-identifier">nil?</span>
+251:         <span class="ruby-keyword kw">return</span> <span class="ruby-value">1</span>
+252:       <span class="ruby-keyword kw">else</span>
+253:         <span class="ruby-comment cmt"># both are non-nil. We consider this is equal.</span>
+254:         <span class="ruby-keyword kw">return</span> <span class="ruby-value">0</span>
+255:       <span class="ruby-keyword kw">end</span>
+256:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000487" class="method-detail">
+        <a name="M000487"></a>
+
+        <div class="method-heading">
+          <a href="#M000487" class="method-signature">
+          <span class="method-name">priority</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Get presence <a href="Presence.html#M000487">priority</a>, or nil if absent
+</p>
+<table>
+<tr><td valign="top">result:</td><td>[Integer]
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000487-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000487-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/presence.rb, line 190</span>
+190:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">priority</span>
+191:        <span class="ruby-identifier">e</span> = <span class="ruby-identifier">first_element_text</span>(<span class="ruby-value str">'priority'</span>)
+192:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">e</span>
+193:         <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">to_i</span>
+194:       <span class="ruby-keyword kw">else</span>
+195:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span>
+196:       <span class="ruby-keyword kw">end</span>
+197:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000488" class="method-detail">
+        <a name="M000488"></a>
+
+        <div class="method-heading">
+          <a href="#M000488" class="method-signature">
+          <span class="method-name">priority=</span><span class="method-args">(val)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set presence <a href="Presence.html#M000487">priority</a>
+</p>
+<table>
+<tr><td valign="top">val:</td><td>[Integer] Priority value between -128 and +127
+
+</td></tr>
+</table>
+<p>
+*Warning:* negative values make you receive no subscription requests etc.
+(RFC3921 - 2.2.2.3.)
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000488-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000488-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/presence.rb, line 205</span>
+205:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">priority=</span>(<span class="ruby-identifier">val</span>)
+206:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">val</span>.<span class="ruby-identifier">nil?</span>
+207:         <span class="ruby-identifier">delete_element</span>(<span class="ruby-value str">'priority'</span>)
+208:       <span class="ruby-keyword kw">else</span>
+209:         <span class="ruby-identifier">replace_element_text</span>(<span class="ruby-value str">'priority'</span>, <span class="ruby-identifier">val</span>)
+210:       <span class="ruby-keyword kw">end</span>
+211:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000489" class="method-detail">
+        <a name="M000489"></a>
+
+        <div class="method-heading">
+          <a href="#M000489" class="method-signature">
+          <span class="method-name">set_priority</span><span class="method-args">(val)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set presence <a href="Presence.html#M000487">priority</a>
+(chaining-friendly)
+</p>
+<table>
+<tr><td valign="top">val:</td><td>[Integer] Priority value between -128 and +127
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000489-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000489-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/presence.rb, line 216</span>
+216:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">set_priority</span>(<span class="ruby-identifier">val</span>)
+217:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">priority</span> = <span class="ruby-identifier">val</span>
+218:       <span class="ruby-keyword kw">self</span>
+219:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000483" class="method-detail">
+        <a name="M000483"></a>
+
+        <div class="method-heading">
+          <a href="#M000483" class="method-signature">
+          <span class="method-name">set_show</span><span class="method-args">(val)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set Availability Status (chaining-friendly)
+</p>
+<table>
+<tr><td valign="top">val:</td><td>[Symbol] or [Nil] See <a href="Presence.html#M000481">show</a> for
+explanation
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000483-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000483-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/presence.rb, line 156</span>
+156:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">set_show</span>(<span class="ruby-identifier">val</span>)
+157:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">show</span> = <span class="ruby-identifier">val</span>
+158:       <span class="ruby-keyword kw">self</span>
+159:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000486" class="method-detail">
+        <a name="M000486"></a>
+
+        <div class="method-heading">
+          <a href="#M000486" class="method-signature">
+          <span class="method-name">set_status</span><span class="method-args">(val)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set <a href="Presence.html#M000484">status</a> message (chaining-friendly)
+</p>
+<table>
+<tr><td valign="top">val:</td><td>[String] or nil
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000486-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000486-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/presence.rb, line 182</span>
+182:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">set_status</span>(<span class="ruby-identifier">val</span>)
+183:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">status</span> = <span class="ruby-identifier">val</span>
+184:       <span class="ruby-keyword kw">self</span>
+185:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000479" class="method-detail">
+        <a name="M000479"></a>
+
+        <div class="method-heading">
+          <a href="#M000479" class="method-signature">
+          <span class="method-name">set_type</span><span class="method-args">(val)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set <a href="Presence.html#M000477">type</a> of presence
+(chaining-friendly)
+</p>
+<table>
+<tr><td valign="top">val:</td><td>[Symbol] See <a href="Presence.html#M000477">type</a> for possible
+subscription types
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000479-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000479-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/presence.rb, line 91</span>
+91:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">set_type</span>(<span class="ruby-identifier">val</span>)
+92:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">type</span> = <span class="ruby-identifier">val</span>
+93:       <span class="ruby-keyword kw">self</span>
+94:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000481" class="method-detail">
+        <a name="M000481"></a>
+
+        <div class="method-heading">
+          <a href="#M000481" class="method-signature">
+          <span class="method-name">show</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Get Availability Status (RFC3921 - 5.2)
+</p>
+<table>
+<tr><td valign="top">result:</td><td>[Symbol] or [Nil] Valid values according to RFC3921:
+
+</td></tr>
+</table>
+<ul>
+<li>nil (Available, no &lt;<a href="Presence.html#M000481">show</a>/&gt;
+element)
+
+</li>
+<li>:away
+
+</li>
+<li>:chat (Free for chat)
+
+</li>
+<li>:dnd (Do not disturb)
+
+</li>
+<li>:xa (Extended away)
+
+</li>
+</ul>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000481-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000481-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/presence.rb, line 117</span>
+117:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">show</span>
+118:       <span class="ruby-identifier">e</span> = <span class="ruby-identifier">first_element</span>(<span class="ruby-value str">'show'</span>)
+119:       <span class="ruby-identifier">text</span> = <span class="ruby-identifier">e</span> <span class="ruby-value">? </span><span class="ruby-identifier">e</span>.<span class="ruby-identifier">text</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">nil</span>
+120:       <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">text</span>
+121:         <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'away'</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">:away</span>
+122:         <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'chat'</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">:chat</span>
+123:         <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'dnd'</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">:dnd</span>
+124:         <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'xa'</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">:xa</span>
+125:         <span class="ruby-keyword kw">else</span> <span class="ruby-keyword kw">nil</span>
+126:       <span class="ruby-keyword kw">end</span>
+127:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000482" class="method-detail">
+        <a name="M000482"></a>
+
+        <div class="method-heading">
+          <a href="#M000482" class="method-signature">
+          <span class="method-name">show=</span><span class="method-args">(val)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set Availability Status
+</p>
+<table>
+<tr><td valign="top">val:</td><td>[Symbol] or [Nil] See <a href="Presence.html#M000481">show</a> for
+explanation
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000482-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000482-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/presence.rb, line 132</span>
+132:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">show=</span>(<span class="ruby-identifier">val</span>)
+133:       <span class="ruby-identifier">xe</span> = <span class="ruby-identifier">first_element</span>(<span class="ruby-value str">'show'</span>)
+134:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">xe</span>.<span class="ruby-identifier">nil?</span>
+135:         <span class="ruby-identifier">xe</span> = <span class="ruby-identifier">add_element</span>(<span class="ruby-value str">'show'</span>)
+136:       <span class="ruby-keyword kw">end</span>
+137:       <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">val</span>
+138:         <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:away</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">text</span> = <span class="ruby-value str">'away'</span>
+139:         <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:chat</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">text</span> = <span class="ruby-value str">'chat'</span>
+140:         <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:dnd</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">text</span> = <span class="ruby-value str">'dnd'</span>
+141:         <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:xa</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">text</span> = <span class="ruby-value str">'xa'</span>
+142:         <span class="ruby-keyword kw">when</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">text</span> = <span class="ruby-keyword kw">nil</span>
+143:         <span class="ruby-keyword kw">else</span> <span class="ruby-identifier">raise</span> <span class="ruby-value str">&quot;Invalid value for show.&quot;</span>
+144:       <span class="ruby-keyword kw">end</span>
+145: 
+146:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">text</span>.<span class="ruby-identifier">nil?</span>
+147:         <span class="ruby-identifier">delete_element</span>(<span class="ruby-identifier">xe</span>)
+148:       <span class="ruby-keyword kw">else</span>
+149:         <span class="ruby-identifier">xe</span>.<span class="ruby-identifier">text</span> = <span class="ruby-identifier">text</span>
+150:       <span class="ruby-keyword kw">end</span>
+151:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000484" class="method-detail">
+        <a name="M000484"></a>
+
+        <div class="method-heading">
+          <a href="#M000484" class="method-signature">
+          <span class="method-name">status</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Get <a href="Presence.html#M000484">status</a> message
+</p>
+<table>
+<tr><td valign="top">result:</td><td>[String] or nil
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000484-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000484-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/presence.rb, line 164</span>
+164:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">status</span>
+165:       <span class="ruby-identifier">first_element_text</span>(<span class="ruby-value str">'status'</span>)
+166:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000485" class="method-detail">
+        <a name="M000485"></a>
+
+        <div class="method-heading">
+          <a href="#M000485" class="method-signature">
+          <span class="method-name">status=</span><span class="method-args">(val)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set <a href="Presence.html#M000484">status</a> message
+</p>
+<table>
+<tr><td valign="top">val:</td><td>[String] or nil
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000485-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000485-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/presence.rb, line 171</span>
+171:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">status=</span>(<span class="ruby-identifier">val</span>)
+172:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">val</span>.<span class="ruby-identifier">nil?</span>
+173:         <span class="ruby-identifier">delete_element</span>(<span class="ruby-value str">'status'</span>)
+174:       <span class="ruby-keyword kw">else</span>
+175:         <span class="ruby-identifier">replace_element_text</span>(<span class="ruby-value str">'status'</span>, <span class="ruby-identifier">val</span>)
+176:       <span class="ruby-keyword kw">end</span>
+177:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000477" class="method-detail">
+        <a name="M000477"></a>
+
+        <div class="method-heading">
+          <a href="#M000477" class="method-signature">
+          <span class="method-name">type</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Get <a href="Presence.html#M000477">type</a> of presence
+</p>
+<table>
+<tr><td valign="top">result:</td><td>[Symbol] or [Nil] Possible values are:
+
+</td></tr>
+</table>
+<ul>
+<li>:error
+
+</li>
+<li>:probe (Servers send this to request presence information)
+
+</li>
+<li>:subscribe (Subscription request)
+
+</li>
+<li>:subscribed (Subscription approval)
+
+</li>
+<li>:unavailable (User has gone offline)
+
+</li>
+<li>:unsubscribe (Unsubscription request)
+
+</li>
+<li>:unsubscribed (Unsubscription approval)
+
+</li>
+<li>[nil] (available)
+
+</li>
+</ul>
+<p>
+See RFC3921 - 2.2.1. for explanation.
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000477-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000477-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/presence.rb, line 59</span>
+59:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">type</span>
+60:       <span class="ruby-keyword kw">case</span> <span class="ruby-keyword kw">super</span>
+61:         <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'error'</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">:error</span>
+62:         <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'probe'</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">:probe</span>
+63:         <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'subscribe'</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">:subscribe</span>
+64:         <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'subscribed'</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">:subscribed</span>
+65:         <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'unavailable'</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">:unavailable</span>
+66:         <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'unsubscribe'</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">:unsubscribe</span>
+67:         <span class="ruby-keyword kw">when</span> <span class="ruby-value str">'unsubscribed'</span> <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">:unsubscribed</span>
+68:         <span class="ruby-keyword kw">else</span> <span class="ruby-keyword kw">nil</span>
+69:       <span class="ruby-keyword kw">end</span>
+70:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000478" class="method-detail">
+        <a name="M000478"></a>
+
+        <div class="method-heading">
+          <a href="#M000478" class="method-signature">
+          <span class="method-name">type=</span><span class="method-args">(val)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Set <a href="Presence.html#M000477">type</a> of presence
+</p>
+<table>
+<tr><td valign="top">val:</td><td>[Symbol] See <a href="Presence.html#M000477">type</a> for possible
+subscription types
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000478-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000478-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/presence.rb, line 75</span>
+75:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">type=</span>(<span class="ruby-identifier">val</span>)
+76:       <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">val</span>
+77:         <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:error</span> <span class="ruby-keyword kw">then</span> <span class="ruby-keyword kw">super</span>(<span class="ruby-value str">'error'</span>)
+78:         <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:probe</span> <span class="ruby-keyword kw">then</span> <span class="ruby-keyword kw">super</span>(<span class="ruby-value str">'probe'</span>)
+79:         <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:subscribe</span> <span class="ruby-keyword kw">then</span> <span class="ruby-keyword kw">super</span>(<span class="ruby-value str">'subscribe'</span>)
+80:         <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:subscribed</span> <span class="ruby-keyword kw">then</span> <span class="ruby-keyword kw">super</span>(<span class="ruby-value str">'subscribed'</span>)
+81:         <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:unavailable</span> <span class="ruby-keyword kw">then</span> <span class="ruby-keyword kw">super</span>(<span class="ruby-value str">'unavailable'</span>)
+82:         <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:unsubscribe</span> <span class="ruby-keyword kw">then</span> <span class="ruby-keyword kw">super</span>(<span class="ruby-value str">'unsubscribe'</span>)
+83:         <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:unsubscribed</span> <span class="ruby-keyword kw">then</span> <span class="ruby-keyword kw">super</span>(<span class="ruby-value str">'unsubscribed'</span>)
+84:         <span class="ruby-keyword kw">else</span> <span class="ruby-keyword kw">super</span>(<span class="ruby-keyword kw">nil</span>)
+85:       <span class="ruby-keyword kw">end</span>
+86:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000475" class="method-detail">
+        <a name="M000475"></a>
+
+        <div class="method-heading">
+          <a href="#M000475" class="method-signature">
+          <span class="method-name">typed_add</span><span class="method-args">(element)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Add an element to the presence stanza
+</p>
+<ul>
+<li>&lt;<a href="Presence.html#M000480">x</a>/&gt; elements are converted to
+[<a href="X.html">X</a>]
+
+</li>
+</ul>
+<table>
+<tr><td valign="top">element:</td><td>[<a href="../REXML/Element.html">REXML::Element</a>] to add
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000475-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000475-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/presence.rb, line 31</span>
+31:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">typed_add</span>(<span class="ruby-identifier">element</span>)
+32:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">element</span>.<span class="ruby-identifier">kind_of?</span>(<span class="ruby-constant">REXML</span><span class="ruby-operator">::</span><span class="ruby-constant">Element</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">element</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-value str">'x'</span>)
+33:         <span class="ruby-keyword kw">super</span>(<span class="ruby-constant">X</span><span class="ruby-operator">::</span><span class="ruby-identifier">import</span>(<span class="ruby-identifier">element</span>))
+34:       <span class="ruby-keyword kw">else</span>
+35:         <span class="ruby-keyword kw">super</span>(<span class="ruby-identifier">element</span>)
+36:       <span class="ruby-keyword kw">end</span>
+37:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000480" class="method-detail">
+        <a name="M000480"></a>
+
+        <div class="method-heading">
+          <a href="#M000480" class="method-signature">
+          <span class="method-name">x</span><span class="method-args">(namespace=nil)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Get the first &lt;<a href="Presence.html#M000480">x</a>/&gt; element in
+this stanza, or nil if none found.
+</p>
+<table>
+<tr><td valign="top">namespace:</td><td>[String] Optional, find the first &lt;<a
+href="Presence.html#M000480">x</a>/&gt; element having this xmlns
+
+</td></tr>
+<tr><td valign="top">result:</td><td>[<a href="../REXML/Element.html">REXML::Element</a>] or nil
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000480-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000480-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/presence.rb, line 100</span>
+100:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">x</span>(<span class="ruby-identifier">namespace</span>=<span class="ruby-keyword kw">nil</span>)
+101:       <span class="ruby-identifier">each_element</span>(<span class="ruby-value str">'x'</span>) { <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span>
+102:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">namespace</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">namespace</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">namespace</span>
+103:           <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">x</span>
+104:         <span class="ruby-keyword kw">end</span>
+105:       }
+106:       <span class="ruby-keyword kw">nil</span>
+107:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

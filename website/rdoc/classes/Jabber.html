@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Module: Jabber</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href=".././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Module</strong></td>
+          <td class="class-name-in-header">Jabber</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../files/lib/xmpp4r/iq_rb.html">
+                lib/xmpp4r/iq.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/errorexception_rb.html">
+                lib/xmpp4r/errorexception.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/x_rb.html">
+                lib/xmpp4r/x.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/jid_rb.html">
+                lib/xmpp4r/jid.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/debuglog_rb.html">
+                lib/xmpp4r/debuglog.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/authenticationfailure_rb.html">
+                lib/xmpp4r/authenticationfailure.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/message_rb.html">
+                lib/xmpp4r/message.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/client_rb.html">
+                lib/xmpp4r/client.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/streamparser_rb.html">
+                lib/xmpp4r/streamparser.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/query_rb.html">
+                lib/xmpp4r/query.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/presence_rb.html">
+                lib/xmpp4r/presence.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/idgenerator_rb.html">
+                lib/xmpp4r/idgenerator.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/component_rb.html">
+                lib/xmpp4r/component.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/sasl_rb.html">
+                lib/xmpp4r/sasl.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/connection_rb.html">
+                lib/xmpp4r/connection.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/stream_rb.html">
+                lib/xmpp4r/stream.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/xmpp4r_rb.html">
+                lib/xmpp4r/xmpp4r.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/error_rb.html">
+                lib/xmpp4r/error.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/xmlstanza_rb.html">
+                lib/xmpp4r/xmlstanza.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/bytestreams/iq/si_rb.html">
+                lib/xmpp4r/bytestreams/iq/si.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/bytestreams/iq/bytestreams_rb.html">
+                lib/xmpp4r/bytestreams/iq/bytestreams.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/bytestreams/helper/filetransfer_rb.html">
+                lib/xmpp4r/bytestreams/helper/filetransfer.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/bytestreams/helper/ibb/base_rb.html">
+                lib/xmpp4r/bytestreams/helper/ibb/base.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/bytestreams/helper/ibb/target_rb.html">
+                lib/xmpp4r/bytestreams/helper/ibb/target.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/bytestreams/helper/ibb/initiator_rb.html">
+                lib/xmpp4r/bytestreams/helper/ibb/initiator.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/bytestreams/helper/socks5bytestreams/base_rb.html">
+                lib/xmpp4r/bytestreams/helper/socks5bytestreams/base.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/bytestreams/helper/socks5bytestreams/socks5_rb.html">
+                lib/xmpp4r/bytestreams/helper/socks5bytestreams/socks5.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/bytestreams/helper/socks5bytestreams/target_rb.html">
+                lib/xmpp4r/bytestreams/helper/socks5bytestreams/target.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/bytestreams/helper/socks5bytestreams/server_rb.html">
+                lib/xmpp4r/bytestreams/helper/socks5bytestreams/server.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/bytestreams/helper/socks5bytestreams/initiator_rb.html">
+                lib/xmpp4r/bytestreams/helper/socks5bytestreams/initiator.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/vcard/iq/vcard_rb.html">
+                lib/xmpp4r/vcard/iq/vcard.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/vcard/helper/vcard_rb.html">
+                lib/xmpp4r/vcard/helper/vcard.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/feature_negotiation/iq/feature_rb.html">
+                lib/xmpp4r/feature_negotiation/iq/feature.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/version/iq/version_rb.html">
+                lib/xmpp4r/version/iq/version.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/version/helper/simpleresponder_rb.html">
+                lib/xmpp4r/version/helper/simpleresponder.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/version/helper/responder_rb.html">
+                lib/xmpp4r/version/helper/responder.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/muc/x/muc_rb.html">
+                lib/xmpp4r/muc/x/muc.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/muc/x/mucuseritem_rb.html">
+                lib/xmpp4r/muc/x/mucuseritem.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/muc/x/mucuserinvite_rb.html">
+                lib/xmpp4r/muc/x/mucuserinvite.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/muc/helper/mucbrowser_rb.html">
+                lib/xmpp4r/muc/helper/mucbrowser.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/muc/helper/mucclient_rb.html">
+                lib/xmpp4r/muc/helper/mucclient.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/muc/helper/simplemucclient_rb.html">
+                lib/xmpp4r/muc/helper/simplemucclient.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/roster/iq/roster_rb.html">
+                lib/xmpp4r/roster/iq/roster.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/roster/x/roster_rb.html">
+                lib/xmpp4r/roster/x/roster.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/roster/helper/roster_rb.html">
+                lib/xmpp4r/roster/helper/roster.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/discovery/iq/discoitems_rb.html">
+                lib/xmpp4r/discovery/iq/discoitems.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/discovery/iq/discoinfo_rb.html">
+                lib/xmpp4r/discovery/iq/discoinfo.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/delay/x/delay_rb.html">
+                lib/xmpp4r/delay/x/delay.rb
+                </a>
+        <br />
+                <a href="../files/lib/xmpp4r/dataforms/x/data_rb.html">
+                lib/xmpp4r/dataforms/x/data.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <h1>XMPP4R - XMPP Library for Ruby</h1>
+<table>
+<tr><td valign="top">License:</td><td>Ruby&#8216;s license (see the LICENSE file) or GNU GPL, at your option.
+
+</td></tr>
+</table>
+<p>
+Website::http://home.gna.org/xmpp4r/
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000041">debug</a>&nbsp;&nbsp;
+      <a href="#M000040">debug=</a>&nbsp;&nbsp;
+      <a href="#M000042">debuglog</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+    <div id="class-list">
+      <h3 class="section-bar">Classes and Modules</h3>
+
+      Module <a href="Jabber/Bytestreams.html" class="link">Jabber::Bytestreams</a><br />
+Module <a href="Jabber/Dataforms.html" class="link">Jabber::Dataforms</a><br />
+Module <a href="Jabber/Delay.html" class="link">Jabber::Delay</a><br />
+Module <a href="Jabber/Discovery.html" class="link">Jabber::Discovery</a><br />
+Module <a href="Jabber/FeatureNegotiation.html" class="link">Jabber::FeatureNegotiation</a><br />
+Module <a href="Jabber/FileTransfer.html" class="link">Jabber::FileTransfer</a><br />
+Module <a href="Jabber/MUC.html" class="link">Jabber::MUC</a><br />
+Module <a href="Jabber/Roster.html" class="link">Jabber::Roster</a><br />
+Module <a href="Jabber/SASL.html" class="link">Jabber::SASL</a><br />
+Module <a href="Jabber/Vcard.html" class="link">Jabber::Vcard</a><br />
+Module <a href="Jabber/Version.html" class="link">Jabber::Version</a><br />
+Class <a href="Jabber/AuthenticationFailure.html" class="link">Jabber::AuthenticationFailure</a><br />
+Class <a href="Jabber/Client.html" class="link">Jabber::Client</a><br />
+Class <a href="Jabber/Component.html" class="link">Jabber::Component</a><br />
+Class <a href="Jabber/Connection.html" class="link">Jabber::Connection</a><br />
+Class <a href="Jabber/Error.html" class="link">Jabber::Error</a><br />
+Class <a href="Jabber/ErrorException.html" class="link">Jabber::ErrorException</a><br />
+Class <a href="Jabber/IdGenerator.html" class="link">Jabber::IdGenerator</a><br />
+Class <a href="Jabber/Iq.html" class="link">Jabber::Iq</a><br />
+Class <a href="Jabber/IqQuery.html" class="link">Jabber::IqQuery</a><br />
+Class <a href="Jabber/JID.html" class="link">Jabber::JID</a><br />
+Class <a href="Jabber/Message.html" class="link">Jabber::Message</a><br />
+Class <a href="Jabber/Presence.html" class="link">Jabber::Presence</a><br />
+Class <a href="Jabber/Stream.html" class="link">Jabber::Stream</a><br />
+Class <a href="Jabber/StreamParser.html" class="link">Jabber::StreamParser</a><br />
+Class <a href="Jabber/X.html" class="link">Jabber::X</a><br />
+Class <a href="Jabber/XMLStanza.html" class="link">Jabber::XMLStanza</a><br />
+
+    </div>
+
+    <div id="constants-list">
+      <h3 class="section-bar">Constants</h3>
+
+      <div class="name-list">
+        <table summary="Constants">
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">XMPP4R_VERSION</td>
+          <td>=</td>
+          <td class="context-item-value">'0.3.1'</td>
+          <td width="3em">&nbsp;</td>
+          <td class="context-item-desc">
+XMPP4R <a href="Jabber/Version.html">Version</a> number
+
+</td>
+        </tr>
+        </table>
+      </div>
+    </div>
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000041" class="method-detail">
+        <a name="M000041"></a>
+
+        <div class="method-heading">
+          <a href="#M000041" class="method-signature">
+          <span class="method-name">debug</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+returns true if debugging mode is enabled. If you just want to log
+something if debugging is enabled, use Jabber::debuglog instead.
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000041-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000041-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/debuglog.rb, line 21</span>
+21:   <span class="ruby-keyword kw">def</span> <span class="ruby-constant">Jabber</span><span class="ruby-operator">::</span><span class="ruby-identifier">debug</span>
+22:     <span class="ruby-ivar">@@debug</span>
+23:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000040" class="method-detail">
+        <a name="M000040"></a>
+
+        <div class="method-heading">
+          <a href="#M000040" class="method-signature">
+          <span class="method-name">debug=</span><span class="method-args">(debug)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Enable/disable debugging mode. When <a href="Jabber.html#M000041">debug</a>
+mode is enabled, information can be logged using Jabber::debuglog. When <a
+href="Jabber.html#M000041">debug</a> mode is disabled, calls to
+Jabber::debuglog are just ignored.
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000040-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000040-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/debuglog.rb, line 12</span>
+12:   <span class="ruby-keyword kw">def</span> <span class="ruby-constant">Jabber</span><span class="ruby-operator">::</span><span class="ruby-identifier">debug=</span>(<span class="ruby-identifier">debug</span>)
+13:     <span class="ruby-ivar">@@debug</span> = <span class="ruby-identifier">debug</span>
+14:     <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@@debug</span>
+15:       <span class="ruby-identifier">debuglog</span>(<span class="ruby-value str">'Debugging mode enabled.'</span>)
+16:     <span class="ruby-keyword kw">end</span>
+17:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000042" class="method-detail">
+        <a name="M000042"></a>
+
+        <div class="method-heading">
+          <a href="#M000042" class="method-signature">
+          <span class="method-name">debuglog</span><span class="method-args">(string)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Outputs a string only if debugging mode is enabled. If the string includes
+several lines, 4 spaces are added at the begginning of each line but the
+first one. Time is prepended to the string.
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000042-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000042-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/debuglog.rb, line 28</span>
+28:   <span class="ruby-keyword kw">def</span> <span class="ruby-constant">Jabber</span><span class="ruby-operator">::</span><span class="ruby-identifier">debuglog</span>(<span class="ruby-identifier">string</span>)
+29:     <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">not</span> <span class="ruby-ivar">@@debug</span>
+30:     <span class="ruby-identifier">s</span> = <span class="ruby-identifier">string</span>.<span class="ruby-identifier">chomp</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-value str">&quot;\n&quot;</span>, <span class="ruby-value str">&quot;\n    &quot;</span>)
+31:     <span class="ruby-identifier">t</span> = <span class="ruby-constant">Time</span><span class="ruby-operator">::</span><span class="ruby-identifier">new</span>.<span class="ruby-identifier">strftime</span>(<span class="ruby-value str">'%H:%M:%S'</span>)
+32:     <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;#{t} #{s}&quot;</span>
+33:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

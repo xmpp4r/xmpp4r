@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Jabber::SASL::DigestMD5</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Jabber::SASL::DigestMD5</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../../files/lib/xmpp4r/sasl_rb.html">
+                lib/xmpp4r/sasl.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                <a href="Base.html">
+                Base
+               </a>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+<a href="../SASL.html">SASL</a> DIGEST-MD5 authentication helper (RFC2831)
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000312">auth</a>&nbsp;&nbsp;
+      <a href="#M000311">decode_challenge</a>&nbsp;&nbsp;
+      <a href="#M000313">h</a>&nbsp;&nbsp;
+      <a href="#M000314">hh</a>&nbsp;&nbsp;
+      <a href="#M000310">new</a>&nbsp;&nbsp;
+      <a href="#M000315">response_value</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000310" class="method-detail">
+        <a name="M000310"></a>
+
+        <div class="method-heading">
+          <a href="#M000310" class="method-signature">
+          <span class="method-name">new</span><span class="method-args">(stream)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Sends the wished <a href="DigestMD5.html#M000312">auth</a> mechanism and
+wait for a challenge
+</p>
+<p>
+(proceed with <a href="DigestMD5.html#M000312">DigestMD5#auth</a>)
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000310-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000310-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/sasl.rb, line 78</span>
+78:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">stream</span>)
+79:         <span class="ruby-keyword kw">super</span>
+80: 
+81:         <span class="ruby-identifier">challenge</span> = {}
+82:         <span class="ruby-identifier">error</span> = <span class="ruby-keyword kw">nil</span>
+83:         <span class="ruby-ivar">@stream</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">generate_auth</span>(<span class="ruby-value str">'DIGEST-MD5'</span>)) { <span class="ruby-operator">|</span><span class="ruby-identifier">reply</span><span class="ruby-operator">|</span>
+84:           <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">reply</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-value str">'challenge'</span> <span class="ruby-keyword kw">and</span> <span class="ruby-identifier">reply</span>.<span class="ruby-identifier">namespace</span> <span class="ruby-operator">==</span> <span class="ruby-constant">NS_SASL</span>
+85:             <span class="ruby-identifier">challenge</span> = <span class="ruby-identifier">decode_challenge</span>(<span class="ruby-identifier">reply</span>.<span class="ruby-identifier">text</span>)
+86:           <span class="ruby-keyword kw">else</span>
+87:             <span class="ruby-identifier">error</span> = <span class="ruby-identifier">reply</span>.<span class="ruby-identifier">first_element</span>(<span class="ruby-keyword kw">nil</span>).<span class="ruby-identifier">name</span>
+88:           <span class="ruby-keyword kw">end</span>
+89:           <span class="ruby-keyword kw">true</span>
+90:         }
+91:         <span class="ruby-identifier">raise</span> <span class="ruby-identifier">error</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">error</span>
+92: 
+93:         <span class="ruby-ivar">@nonce</span> = <span class="ruby-identifier">challenge</span>[<span class="ruby-value str">'nonce'</span>]
+94:         <span class="ruby-ivar">@realm</span> = <span class="ruby-identifier">challenge</span>[<span class="ruby-value str">'realm'</span>]
+95:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000312" class="method-detail">
+        <a name="M000312"></a>
+
+        <div class="method-heading">
+          <a href="#M000312" class="method-signature">
+          <span class="method-name">auth</span><span class="method-args">(password)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <ul>
+<li>Send a response
+
+</li>
+<li>Wait for the server&#8216;s challenge (which aren&#8216;t checked)
+
+</li>
+<li>Send a blind response to the server&#8216;s challenge
+
+</li>
+</ul>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000312-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000312-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/sasl.rb, line 144</span>
+144:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">auth</span>(<span class="ruby-identifier">password</span>)
+145:         <span class="ruby-identifier">response</span> = {}
+146:         <span class="ruby-identifier">response</span>[<span class="ruby-value str">'nonce'</span>] = <span class="ruby-ivar">@nonce</span>
+147:         <span class="ruby-identifier">response</span>[<span class="ruby-value str">'charset'</span>] = <span class="ruby-value str">'utf-8'</span>
+148:         <span class="ruby-identifier">response</span>[<span class="ruby-value str">'username'</span>] = <span class="ruby-ivar">@stream</span>.<span class="ruby-identifier">jid</span>.<span class="ruby-identifier">node</span>
+149:         <span class="ruby-identifier">response</span>[<span class="ruby-value str">'realm'</span>] = <span class="ruby-ivar">@realm</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@stream</span>.<span class="ruby-identifier">jid</span>.<span class="ruby-identifier">domain</span>
+150:         <span class="ruby-identifier">response</span>[<span class="ruby-value str">'cnonce'</span>] = <span class="ruby-identifier">generate_nonce</span>
+151:         <span class="ruby-identifier">response</span>[<span class="ruby-value str">'nc'</span>] = <span class="ruby-value str">'00000001'</span>
+152:         <span class="ruby-identifier">response</span>[<span class="ruby-value str">'qop'</span>] = <span class="ruby-value str">'auth'</span>
+153:         <span class="ruby-identifier">response</span>[<span class="ruby-value str">'digest-uri'</span>] = <span class="ruby-node">&quot;xmpp/#{@stream.jid.domain}&quot;</span>
+154:         <span class="ruby-identifier">response</span>[<span class="ruby-value str">'response'</span>] = <span class="ruby-identifier">response_value</span>(<span class="ruby-ivar">@stream</span>.<span class="ruby-identifier">jid</span>.<span class="ruby-identifier">node</span>, <span class="ruby-ivar">@stream</span>.<span class="ruby-identifier">jid</span>.<span class="ruby-identifier">domain</span>, <span class="ruby-identifier">response</span>[<span class="ruby-value str">'digest-uri'</span>], <span class="ruby-identifier">password</span>, <span class="ruby-ivar">@nonce</span>, <span class="ruby-identifier">response</span>[<span class="ruby-value str">'cnonce'</span>], <span class="ruby-identifier">response</span>[<span class="ruby-value str">'qop'</span>])
+155:         <span class="ruby-identifier">response</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">key</span>,<span class="ruby-identifier">value</span><span class="ruby-operator">|</span>
+156:           <span class="ruby-keyword kw">unless</span> <span class="ruby-node">%w(nc qop response charset)</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">key</span>
+157:             <span class="ruby-identifier">response</span>[<span class="ruby-identifier">key</span>] = <span class="ruby-node">&quot;\&quot;#{value}\&quot;&quot;</span>
+158:           <span class="ruby-keyword kw">end</span>
+159:         }
+160: 
+161:         <span class="ruby-identifier">response_text</span> = <span class="ruby-identifier">response</span>.<span class="ruby-identifier">collect</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;#{k}=#{v}&quot;</span> }.<span class="ruby-identifier">join</span>(<span class="ruby-value str">','</span>)
+162:         <span class="ruby-constant">Jabber</span><span class="ruby-operator">::</span><span class="ruby-identifier">debuglog</span>(<span class="ruby-node">&quot;SASL DIGEST-MD5 response:\n#{response_text}&quot;</span>)
+163: 
+164:         <span class="ruby-identifier">r</span> = <span class="ruby-constant">REXML</span><span class="ruby-operator">::</span><span class="ruby-constant">Element</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">'response'</span>)
+165:         <span class="ruby-identifier">r</span>.<span class="ruby-identifier">add_namespace</span> <span class="ruby-constant">NS_SASL</span>
+166:         <span class="ruby-identifier">r</span>.<span class="ruby-identifier">text</span> = <span class="ruby-constant">Base64</span><span class="ruby-operator">::</span><span class="ruby-identifier">encode64</span>(<span class="ruby-identifier">response_text</span>).<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/\s/</span>, <span class="ruby-value str">''</span>)
+167: 
+168:         <span class="ruby-identifier">success_already</span> = <span class="ruby-keyword kw">false</span>
+169:         <span class="ruby-identifier">error</span> = <span class="ruby-keyword kw">nil</span>
+170:         <span class="ruby-ivar">@stream</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">r</span>) { <span class="ruby-operator">|</span><span class="ruby-identifier">reply</span><span class="ruby-operator">|</span>
+171:           <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">reply</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-value str">'success'</span>
+172:             <span class="ruby-identifier">success_already</span> = <span class="ruby-keyword kw">true</span>
+173:           <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">reply</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">!=</span> <span class="ruby-value str">'challenge'</span>
+174:             <span class="ruby-identifier">error</span> = <span class="ruby-identifier">reply</span>.<span class="ruby-identifier">first_element</span>(<span class="ruby-keyword kw">nil</span>).<span class="ruby-identifier">name</span>
+175:           <span class="ruby-keyword kw">end</span>
+176:           <span class="ruby-keyword kw">true</span>
+177:         }
+178:         
+179:         <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">success_already</span>
+180:         <span class="ruby-identifier">raise</span> <span class="ruby-identifier">error</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">error</span>
+181: 
+182:         <span class="ruby-comment cmt"># TODO: check the challenge from the server</span>
+183: 
+184:         <span class="ruby-identifier">r</span>.<span class="ruby-identifier">text</span> = <span class="ruby-keyword kw">nil</span>
+185:         <span class="ruby-ivar">@stream</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">r</span>) { <span class="ruby-operator">|</span><span class="ruby-identifier">reply</span><span class="ruby-operator">|</span>
+186:           <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">reply</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">!=</span> <span class="ruby-value str">'success'</span>
+187:             <span class="ruby-identifier">error</span> = <span class="ruby-identifier">reply</span>.<span class="ruby-identifier">first_element</span>(<span class="ruby-keyword kw">nil</span>).<span class="ruby-identifier">name</span>
+188:           <span class="ruby-keyword kw">end</span>
+189:           <span class="ruby-keyword kw">true</span>
+190:         }
+191:         
+192:         <span class="ruby-identifier">raise</span> <span class="ruby-identifier">error</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">error</span>
+193:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000311" class="method-detail">
+        <a name="M000311"></a>
+
+        <div class="method-heading">
+          <a href="#M000311" class="method-signature">
+          <span class="method-name">decode_challenge</span><span class="method-args">(challenge)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000311-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000311-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/sasl.rb, line 97</span>
+ 97:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">decode_challenge</span>(<span class="ruby-identifier">challenge</span>)
+ 98:         <span class="ruby-identifier">text</span> = <span class="ruby-constant">Base64</span><span class="ruby-operator">::</span><span class="ruby-identifier">decode64</span>(<span class="ruby-identifier">challenge</span>)
+ 99:         <span class="ruby-identifier">res</span> = {}
+100: 
+101:         <span class="ruby-identifier">state</span> = <span class="ruby-identifier">:key</span>
+102:         <span class="ruby-identifier">key</span> = <span class="ruby-value str">''</span>
+103:         <span class="ruby-identifier">value</span> = <span class="ruby-value str">''</span>
+104: 
+105:         <span class="ruby-identifier">text</span>.<span class="ruby-identifier">scan</span>(<span class="ruby-regexp re">/./</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ch</span><span class="ruby-operator">|</span>
+106:           <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">state</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">:key</span>
+107:             <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">ch</span> <span class="ruby-operator">==</span> <span class="ruby-value str">'='</span>
+108:               <span class="ruby-identifier">state</span> = <span class="ruby-identifier">:value</span>
+109:             <span class="ruby-keyword kw">else</span>
+110:               <span class="ruby-identifier">key</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">ch</span>
+111:             <span class="ruby-keyword kw">end</span>
+112: 
+113:           <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">state</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">:value</span>
+114:             <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">ch</span> <span class="ruby-operator">==</span> <span class="ruby-value str">','</span>
+115:               <span class="ruby-identifier">res</span>[<span class="ruby-identifier">key</span>] = <span class="ruby-identifier">value</span>
+116:               <span class="ruby-identifier">key</span> = <span class="ruby-value str">''</span>
+117:               <span class="ruby-identifier">value</span> = <span class="ruby-value str">''</span>
+118:               <span class="ruby-identifier">state</span> = <span class="ruby-identifier">:key</span>
+119:             <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">ch</span> <span class="ruby-operator">==</span> <span class="ruby-value str">'&quot;'</span> <span class="ruby-keyword kw">and</span> <span class="ruby-identifier">value</span> <span class="ruby-operator">==</span> <span class="ruby-value str">''</span>
+120:               <span class="ruby-identifier">state</span> = <span class="ruby-identifier">:quote</span>
+121:             <span class="ruby-keyword kw">else</span>
+122:               <span class="ruby-identifier">value</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">ch</span>
+123:             <span class="ruby-keyword kw">end</span>
+124: 
+125:           <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">state</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">:quote</span>
+126:             <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">ch</span> <span class="ruby-operator">==</span> <span class="ruby-value str">'&quot;'</span>
+127:               <span class="ruby-identifier">state</span> = <span class="ruby-identifier">:value</span>
+128:             <span class="ruby-keyword kw">else</span>
+129:               <span class="ruby-identifier">value</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">ch</span>
+130:             <span class="ruby-keyword kw">end</span>
+131:           <span class="ruby-keyword kw">end</span>
+132:         <span class="ruby-keyword kw">end</span>
+133:         <span class="ruby-identifier">res</span>[<span class="ruby-identifier">key</span>] = <span class="ruby-identifier">value</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">key</span> <span class="ruby-operator">==</span> <span class="ruby-value str">''</span>
+134: 
+135:         <span class="ruby-constant">Jabber</span><span class="ruby-operator">::</span><span class="ruby-identifier">debuglog</span>(<span class="ruby-node">&quot;SASL DIGEST-MD5 challenge:\n#{text.inspect}\n#{res.inspect}&quot;</span>)
+136: 
+137:         <span class="ruby-identifier">res</span>
+138:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Private Instance methods</h3>
+
+      <div id="method-M000313" class="method-detail">
+        <a name="M000313"></a>
+
+        <div class="method-heading">
+          <a href="#M000313" class="method-signature">
+          <span class="method-name">h</span><span class="method-args">(s)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Function from RFC2831
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000313-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000313-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/sasl.rb, line 199</span>
+199:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">h</span>(<span class="ruby-identifier">s</span>); <span class="ruby-constant">Digest</span><span class="ruby-operator">::</span><span class="ruby-constant">MD5</span>.<span class="ruby-identifier">digest</span>(<span class="ruby-identifier">s</span>); <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000314" class="method-detail">
+        <a name="M000314"></a>
+
+        <div class="method-heading">
+          <a href="#M000314" class="method-signature">
+          <span class="method-name">hh</span><span class="method-args">(s)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Function from RFC2831
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000314-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000314-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/sasl.rb, line 202</span>
+202:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">hh</span>(<span class="ruby-identifier">s</span>); <span class="ruby-constant">Digest</span><span class="ruby-operator">::</span><span class="ruby-constant">MD5</span>.<span class="ruby-identifier">hexdigest</span>(<span class="ruby-identifier">s</span>); <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000315" class="method-detail">
+        <a name="M000315"></a>
+
+        <div class="method-heading">
+          <a href="#M000315" class="method-signature">
+          <span class="method-name">response_value</span><span class="method-args">(username, realm, digest_uri, passwd, nonce, cnonce, qop)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Calculate the value for the response field
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000315-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000315-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/xmpp4r/sasl.rb, line 206</span>
+206:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">response_value</span>(<span class="ruby-identifier">username</span>, <span class="ruby-identifier">realm</span>, <span class="ruby-identifier">digest_uri</span>, <span class="ruby-identifier">passwd</span>, <span class="ruby-identifier">nonce</span>, <span class="ruby-identifier">cnonce</span>, <span class="ruby-identifier">qop</span>)
+207:         <span class="ruby-identifier">a1_h</span> = <span class="ruby-identifier">h</span>(<span class="ruby-node">&quot;#{username}:#{realm}:#{passwd}&quot;</span>)
+208:         <span class="ruby-identifier">a1</span> = <span class="ruby-node">&quot;#{a1_h}:#{nonce}:#{cnonce}&quot;</span>
+209:         <span class="ruby-comment cmt">#a2 = &quot;AUTHENTICATE:#{digest_uri}#{(qop == 'auth') ? '' : ':00000000000000000000000000000000'}&quot;</span>
+210:         <span class="ruby-identifier">a2</span> = <span class="ruby-node">&quot;AUTHENTICATE:#{digest_uri}&quot;</span>
+211: 
+212:         <span class="ruby-identifier">hh</span>(<span class="ruby-node">&quot;#{hh(a1)}:#{nonce}:00000001:#{cnonce}:#{qop}:#{hh(a2)}&quot;</span>)
+213:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

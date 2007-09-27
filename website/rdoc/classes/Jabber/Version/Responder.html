@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Jabber::Version::Responder</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Jabber::Version::Responder</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../../files/lib/xmpp4r/version/helper/responder_rb.html">
+                lib/xmpp4r/version/helper/responder.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+A class to answer version requests using <a
+href="IqQueryVersion.html">IqQueryVersion</a>
+</p>
+<p>
+If you don&#8216;t need the flexibility of dynamic responses with the
+callback you can register with <a
+href="Responder.html#M000131">add_version_callback</a>, take a look at <a
+href="SimpleResponder.html">SimpleResponder</a>
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000131">add_version_callback</a>&nbsp;&nbsp;
+      <a href="#M000132">iq_callback</a>&nbsp;&nbsp;
+      <a href="#M000130">new</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000130" class="method-detail">
+        <a name="M000130"></a>
+
+        <div class="method-heading">
+          <a href="#M000130" class="method-signature">
+          <span class="method-name">new</span><span class="method-args">(stream)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Initialize a <a href="Responder.html#M000130">new</a> version responder
+</p>
+<p>
+Registers it&#8216;s callback (prio = 180, ref = self)
+</p>
+<table>
+<tr><td valign="top">stream:</td><td>[<a href="../Stream.html">Stream</a>] Where to register callback handlers
+
+</td></tr>
+</table>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000130-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000130-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/version/helper/responder.rb, line 22</span>
+22:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">stream</span>)
+23:         <span class="ruby-ivar">@stream</span> = <span class="ruby-identifier">stream</span>
+24:         <span class="ruby-ivar">@versioncbs</span> = <span class="ruby-constant">CallbackList</span>.<span class="ruby-identifier">new</span>
+25: 
+26:         <span class="ruby-identifier">stream</span>.<span class="ruby-identifier">add_iq_callback</span>(<span class="ruby-value">180</span>, <span class="ruby-keyword kw">self</span>) { <span class="ruby-operator">|</span><span class="ruby-identifier">iq</span><span class="ruby-operator">|</span>
+27:           <span class="ruby-identifier">iq_callback</span>(<span class="ruby-identifier">iq</span>)
+28:         }
+29:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000131" class="method-detail">
+        <a name="M000131"></a>
+
+        <div class="method-heading">
+          <a href="#M000131" class="method-signature">
+          <span class="method-name">add_version_callback</span><span class="method-args">(priority = 0, ref = nil, &amp;block)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Add a callback for <a href="../Iq.html">Iq</a> stanzas with <a
+href="IqQueryVersion.html">IqQueryVersion</a>
+</p>
+<p>
+First argument passed to block is the <a href="../Iq.html">Iq</a> stanza,
+second argument is a block, which can be called with software name, version
+and os
+</p>
+<p>
+Example:
+</p>
+<pre>
+  my_version_helper.add_version_callback { |iq,block|
+    block.call('Cool client', '6.0', 'Cool OS')
+  }
+</pre>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000131-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000131-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/version/helper/responder.rb, line 42</span>
+42:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">add_version_callback</span>(<span class="ruby-identifier">priority</span> = <span class="ruby-value">0</span>, <span class="ruby-identifier">ref</span> = <span class="ruby-keyword kw">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+43:         <span class="ruby-ivar">@versioncbs</span>.<span class="ruby-identifier">add</span>(<span class="ruby-identifier">priority</span>, <span class="ruby-identifier">ref</span>, <span class="ruby-identifier">block</span>)
+44:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000132" class="method-detail">
+        <a name="M000132"></a>
+
+        <div class="method-heading">
+          <a href="#M000132" class="method-signature">
+          <span class="method-name">iq_callback</span><span class="method-args">(iq)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+&lt;iq/&gt; callback handler to answer Software <a
+href="../Version.html">Version</a> queries (registered by constructor and
+used internally only)
+</p>
+<p>
+Used internally
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000132-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000132-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/xmpp4r/version/helper/responder.rb, line 51</span>
+51:       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">iq_callback</span>(<span class="ruby-identifier">iq</span>)
+52:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">iq</span>.<span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">:get</span>
+53:           <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">iq</span>.<span class="ruby-identifier">query</span>.<span class="ruby-identifier">kind_of?</span>(<span class="ruby-constant">IqQueryVersion</span>)
+54:             <span class="ruby-identifier">replyblock</span> = <span class="ruby-identifier">lambda</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">name</span>,<span class="ruby-identifier">version</span>,<span class="ruby-identifier">os</span><span class="ruby-operator">|</span>
+55:               <span class="ruby-identifier">answer</span> = <span class="ruby-identifier">iq</span>.<span class="ruby-identifier">answer</span>
+56:               <span class="ruby-identifier">answer</span>.<span class="ruby-identifier">type</span> = <span class="ruby-identifier">:result</span>
+57:               <span class="ruby-identifier">answer</span>.<span class="ruby-identifier">query</span>.<span class="ruby-identifier">set_iname</span>(<span class="ruby-identifier">name</span>).<span class="ruby-identifier">set_version</span>(<span class="ruby-identifier">version</span>).<span class="ruby-identifier">set_os</span>(<span class="ruby-identifier">os</span>)
+58: 
+59:               <span class="ruby-ivar">@stream</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">answer</span>)
+60:             }
+61:             <span class="ruby-ivar">@versioncbs</span>.<span class="ruby-identifier">process</span>(<span class="ruby-identifier">iq</span>, <span class="ruby-identifier">replyblock</span>)
+62:           <span class="ruby-keyword kw">else</span>
+63:             <span class="ruby-keyword kw">false</span>
+64:           <span class="ruby-keyword kw">end</span>
+65:         <span class="ruby-keyword kw">else</span>
+66:           <span class="ruby-keyword kw">false</span>
+67:         <span class="ruby-keyword kw">end</span>
+68:       <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>
