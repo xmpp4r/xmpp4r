@@ -9,6 +9,7 @@ require 'xmpp4r/pubsub/iq/pubsub'
 require 'xmpp4r/pubsub/stanzas/event'
 require 'xmpp4r/pubsub/stanzas/item'
 require 'xmpp4r/pubsub/stanzas/items'
+require 'xmpp4r/pubsub/stanzas/subscription'
 require 'xmpp4r/dataforms'
 
 module Jabber
@@ -63,9 +64,8 @@ module Jabber
       # node:: [String]
       # return:: true
       def delete(node)
-        iq = basic_pubsub_query(:set)
+        iq = basic_pubsub_query(:set,true)
         iq.pubsub.add(REXML::Element.new('delete')).attributes['node'] = node
-
         @client.send_with_id(iq) { |reply|
           true
         }
@@ -114,7 +114,6 @@ module Jabber
         items = Jabber::PubSub::Items.new
         items.node = node
         iq.pubsub.add(items)
-
         res = nil
         @client.send_with_id(iq) { |reply|
           if reply.kind_of?(Iq) and reply.pubsub and reply.pubsub.first_element('items')
@@ -163,7 +162,6 @@ module Jabber
         iq = basic_pubsub_query(:get)
         entities = iq.pubsub.add(REXML::Element.new('subscriptions'))
         entities.attributes['node'] = node
-
         res = nil
         @client.send_with_id(iq) { |reply|
           if reply.pubsub.first_element('subscriptions')
@@ -244,10 +242,13 @@ module Jabber
         ret = nil
         @client.send_with_id(iq) { |reply|
           reply.pubsub.options.first_element('x') { |xdata|
+    
             ret = xdata if xdata.kind_of?(Jabber::XData)
+    
           }
         true
         }
+        return ret
       end
 
       ##
@@ -265,6 +266,18 @@ module Jabber
         iq.pubsub.add(opt)
         iq.pubsub.options.add(options)
         @client.send_with_id(iq) { |reply| true }
+      end
+      
+      ##
+      # purges all items on a persist node
+      # node:: [String]
+      # return:: true
+      def purge(node)
+        iq = basic_pubsub_query(:set)
+	purge = REXML::Element.new('purge')
+	purge.attributes['node'] = node
+	iq.pubsub.add(purge)
+	@client.send_with_id(iq) { |reply| true }
       end
 
       ##
@@ -287,9 +300,13 @@ module Jabber
       # creates a basic pubsub iq
       # basic_pubsub_query(type)
       # type:: [Symbol]
-      def basic_pubsub_query(type)
+      def basic_pubsub_query(type,ownerusecase)
         iq = Jabber::Iq::new(type,@pubsubjid)
-        iq.add(IqPubSub.new)
+	if ownerusecase 
+	  iq.add(IqPubSubOwner.new)
+	else
+          iq.add(IqPubSub.new)
+	end
         iq
       end
 
