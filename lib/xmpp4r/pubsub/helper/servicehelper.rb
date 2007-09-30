@@ -300,7 +300,7 @@ module Jabber
       # creates a basic pubsub iq
       # basic_pubsub_query(type)
       # type:: [Symbol]
-      def basic_pubsub_query(type,ownerusecase)
+      def basic_pubsub_query(type,ownerusecase = false)
         iq = Jabber::Iq::new(type,@pubsubjid)
 	if ownerusecase 
 	  iq.add(IqPubSubOwner.new)
