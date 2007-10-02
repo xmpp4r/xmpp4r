@@ -198,8 +198,8 @@ module Jabber
         si.feature.x.type = :submit
         stream_method = si.feature.x.field('stream-method')
 
-        if stream_method.options.keys.include?(Bytestreams::IqQueryBytestreams::NS_BYTESTREAMS) and @allow_bytestreams
-          stream_method.values = [Bytestreams::IqQueryBytestreams::NS_BYTESTREAMS]
+        if stream_method.options.keys.include?(Bytestreams::NS_BYTESTREAMS) and @allow_bytestreams
+          stream_method.values = [Bytestreams::NS_BYTESTREAMS]
           stream_method.options = []
           @stream.send(answer)
 
@@ -253,7 +253,7 @@ module Jabber
 
         offered_methods = {}
         if @allow_bytestreams
-          offered_methods[Bytestreams::IqQueryBytestreams::NS_BYTESTREAMS] = nil
+          offered_methods[Bytestreams::NS_BYTESTREAMS] = nil
         end
         if @allow_ibb
           offered_methods[Bytestreams::IBB::NS_IBB] = nil
@@ -303,7 +303,7 @@ module Jabber
           end
         end
 
-        if stream_method == Bytestreams::IqQueryBytestreams::NS_BYTESTREAMS and @allow_bytestreams
+        if stream_method == Bytestreams::NS_BYTESTREAMS and @allow_bytestreams
           Bytestreams::SOCKS5BytestreamsInitiator.new(@stream, session_id, from, jid)
         elsif stream_method == Bytestreams::IBB::NS_IBB and @allow_ibb
           Bytestreams::IBBInitiator.new(@stream, session_id, from, jid)
