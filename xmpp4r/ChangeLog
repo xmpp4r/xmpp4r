@@ -1,3 +1,7 @@
+XMPP4R 0.3.3 (XX/XX/XXXX)
+=========================
+* TODO
+
 XMPP4R 0.3.2 (15/10/2007)
 =========================
 * Serious bug involving Ruby threading fixed (caused exceptions with
