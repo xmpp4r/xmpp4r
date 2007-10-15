@@ -8,7 +8,7 @@
 # a simple debug logging support.
 module Jabber
   # XMPP4R Version number
-  XMPP4R_VERSION = '0.3.1'
+  XMPP4R_VERSION = '0.3.2'
 end
 
 require 'xmpp4r/client'

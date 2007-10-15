@@ -1,6 +1,6 @@
-XMPP4R 0.4 (xx/xx/xxxx)
-=======================
-* Serious bug involved Ruby threading fixed (caused exceptions with
+XMPP4R 0.3.2 (15/10/2007)
+=========================
+* Serious bug involving Ruby threading fixed (caused exceptions with
   ruby 1.8.6)
 * vCard helper fixes
 * Jabber RPC (JEP0009) support
