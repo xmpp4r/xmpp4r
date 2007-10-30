@@ -32,6 +32,14 @@ module Jabber
         @parser = nil
         @create = XMLRPC::Create.new
       end
+      
+      ##
+      # automaticly trys to find a method 
+      # thanx to eric cestari  :)
+      def method_missing(methodname, *args)
+        send("call", methodname,*args)
+      end
+
 
       def call(method, *args)
         ok, param = call2(method, *args)
@@ -91,7 +99,12 @@ module Jabber
 
       def gen_multicall(methods=[])
         ok, params = call2("system.multicall",
-          methods.collect { |m| {'methodName' => m[0], 'params' => m[1..-1]} }
+          methods.collect { |m| 
+	    { 
+	      'methodName' => m[0], 
+	      'params' => m[1..-1]
+	    } 
+	  }
         )
 
         if ok
