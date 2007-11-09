@@ -47,10 +47,19 @@ module Jabber
       # port:: [Fixnum] Port number
       def connect_domain(domain, port)
         write("\x05\x01\x00\x03#{domain.size.chr}#{domain}#{[port].pack("n")}")
-        buf = read(7 + domain.size)
+        buf = read(4)
         if buf.nil? or buf[0..1] != "\005\000"
           close
           raise SOCKS5Error.new("Invalid SOCKS5 connect: #{buf.inspect}")
+        end
+
+        case buf[3]
+          when 1 then read(6)  # IPv4 addr
+          when 3 then read(3 + domain.size) # Domain
+          when 4 then read(18) # IPv6 addr
+          else
+            close
+            raise SOCKS5Error.new("Invalid SOCKS5 address type #{buf[3].to_s}")
         end
 
         self
