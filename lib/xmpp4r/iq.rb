@@ -176,6 +176,17 @@ module Jabber
     end
 
     ##
+    # Create a new jabber:iq:register get stanza for retrieval
+    # of accepted registration information
+    def Iq.new_registerget
+      iq = Iq::new(:get)
+      query = IqQuery::new
+      query.add_namespace('jabber:iq:register')
+      iq.add(query)
+      iq
+    end
+
+    ##
     # Create a new jabber:iq:roster get Stanza.
     #
     # IqQueryRoster is unused here because possibly not require'd

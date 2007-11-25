@@ -190,14 +190,48 @@ module Jabber
     end
 
     ##
+    # Get instructions and available fields for registration
+    # return:: [instructions, fields] Where instructions is a String and fields is an Array of Strings
+    def register_info
+      instructions = nil
+      fields = []
+
+      reg = Iq.new_registerget
+      reg.to = jid.domain
+      send_with_id(reg) do |answer|
+        if answer.query
+          answer.query.each_element { |e|
+            if e.namespace == 'jabber:iq:register'
+              if e.name == 'instructions'
+                instructions = e.text.strip
+              else
+                fields << e.name
+              end
+            end
+          }
+        end
+
+        true
+      end
+
+      [instructions, fields]
+    end
+
+    ##
     # Register a new user account
     # (may be used instead of Client#auth)
     #
     # This method may raise ErrorException if the registration was
     # not successful.
-    def register(password)
+    # password:: String
+    # fields:: {String=>String} additional registration information
+    def register(password, fields={})
       reg = Iq.new_register(jid.node, password)
       reg.to = jid.domain
+      fields.each { |name,value|
+        reg.query.add(REXML::Element.new(name)).text = value
+      }
+
       send_with_id(reg) { |answer|
         true
       }
