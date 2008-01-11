@@ -174,7 +174,7 @@ class IBBTest < Test::Unit::TestCase
     assert_equal(:close, i1.type)
     assert_nil(i1.seq)
 
-    i2 = Bytestreams::IBBQueueItem.new(:data, 1, Base64::encode64('blah'))
+    i2 = Bytestreams::IBBQueueItem.new(:data, 1, ['blah'].pack('m'))
     assert_equal(:data, i2.type)
     assert_equal(1, i2.seq)
     assert_equal('blah', i2.data)
