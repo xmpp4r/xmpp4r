@@ -10,6 +10,8 @@ require 'xmpp4r/semaphore'
 include Jabber
 
 class StreamTest < Test::Unit::TestCase
+  STREAM = '<stream:stream xmlns:stream="http://etherx.jabber.org/streams">'
+
   def setup
     @tmpfile = Tempfile::new("StreamSendTest")
     @tmpfilepath = @tmpfile.path()
@@ -38,13 +40,13 @@ class StreamTest < Test::Unit::TestCase
     called = false
     @stream.add_xml_callback { called = true }
     assert(!called)
-    @server.puts('<stream:stream>')
+    @server.puts(STREAM)
     @server.flush
     assert(called)
   end
 
   def test_process100
-    @server.puts('<stream:stream>')
+    @server.puts(STREAM)
     @server.flush
 
     done = Semaphore.new
@@ -70,7 +72,7 @@ class StreamTest < Test::Unit::TestCase
   end
 
   def test_send
-    @server.puts('<stream:stream>')
+    @server.puts(STREAM)
     @server.flush
 
     Thread.new {
@@ -92,7 +94,7 @@ class StreamTest < Test::Unit::TestCase
   end
 
   def test_send_nested
-    @server.puts('<stream:stream>')
+    @server.puts(STREAM)
     @server.flush
     finished = Semaphore.new
 
@@ -144,7 +146,7 @@ class StreamTest < Test::Unit::TestCase
   end
 
   def test_send_in_callback
-    @server.puts('<stream:stream>')
+    @server.puts(STREAM)
     @server.flush
     finished = Semaphore.new
 
@@ -165,7 +167,7 @@ class StreamTest < Test::Unit::TestCase
   end
 
   def test_bidi
-    @server.puts('<stream:stream>')
+    @server.puts(STREAM)
     @server.flush
     finished = Semaphore.new
     ok = true
@@ -199,7 +201,7 @@ class StreamTest < Test::Unit::TestCase
     n = 0
     @stream.add_message_callback { n += 1 }
     assert_equal(0, n)
-    @server.puts('<stream:stream><message/>')
+    @server.puts("#{STREAM}<message/>")
     @server.flush
     sleep delay
     assert_equal(1, n)
@@ -215,7 +217,7 @@ class StreamTest < Test::Unit::TestCase
     @server.flush
     sleep delay
     assert_equal(2, n)
-    @server.puts('<message><stream:stream><message/></stream:stream>')
+    @server.puts("<message>#{STREAM}<message/></stream:stream>")
     @server.flush
     sleep delay
     assert_equal(2, n)
