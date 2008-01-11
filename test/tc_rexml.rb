@@ -51,7 +51,10 @@ class REXMLTest < Test::Unit::TestCase
     e.attributes['x'] = '&'
     assert_equal('&', e.attributes['x'])
     e.attributes['x'] = '&amp;'
-    assert_equal('&', e.attributes['x']) # this one should not be escaped
+    # bug in REXML 3.1.6 unescaped the ampersand
+    # assert_equal('&', e.attributes['x'])
+    # substituting a test that works with 3.1.5, 3.1.6, and 3.1.7
+    assert_equal('&amp;amp;', e.attribute('x').to_s)
     e.attributes['x'] = '&nbsp'
     assert_equal('&nbsp', e.attributes['x'])
     e.attributes['x'] = '&nbsp;'

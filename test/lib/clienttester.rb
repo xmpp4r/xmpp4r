@@ -25,6 +25,8 @@ module Jabber
     def setup
       servlisten = TCPServer.new(@@SOCKET_PORT)
       serverwait = Semaphore.new
+      stream = '<stream:stream xmlns:stream="http://etherx.jabber.org/streams">'
+
       Thread.new do
         Thread.current.abort_on_exception = true
         serversock = servlisten.accept
@@ -33,7 +35,7 @@ module Jabber
         @server = Stream.new(true)
         @server.add_xml_callback do |xml|
           if xml.prefix == 'stream' and xml.name == 'stream'
-            send('<stream:stream>')
+            send(stream)
             true
           else
             false
@@ -49,7 +51,7 @@ module Jabber
       @client = Stream.new(true)
       @client.start(clientsock)
 
-      @client.send('<stream:stream>') { |reply| true }
+      @client.send(stream) { |reply| true }
 
       @state = 0
       @states = []

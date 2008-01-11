@@ -13,6 +13,7 @@ include Jabber
 
 class StreamComponentTest < Test::Unit::TestCase
   @@SOCKET_PORT = 65224
+  STREAM = 'stream:stream xmlns:stream="http://etherx.jabber.org/streams"'
 
   def setup
     servlisten = TCPServer.new(@@SOCKET_PORT)
@@ -25,7 +26,7 @@ class StreamComponentTest < Test::Unit::TestCase
       @server = Stream.new(true)
       @server.add_xml_callback do |xml|
         if xml.prefix == 'stream' and xml.name == 'stream'
-          @server.send('<stream:stream xmlns="jabber:component:accept">')
+          @server.send("<#{STREAM} xmlns='jabber:component:accept'>")
           true
         else
           false
