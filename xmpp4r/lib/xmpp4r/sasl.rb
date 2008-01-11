@@ -2,7 +2,6 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
-require 'base64'
 require 'digest/md5'
 
 module Jabber
@@ -57,7 +56,7 @@ module Jabber
       def auth(password)
         auth_text = "#{@stream.jid.strip}\x00#{@stream.jid.node}\x00#{password}"
         error = nil
-        @stream.send(generate_auth('PLAIN', Base64::encode64(auth_text).gsub(/\s/, ''))) { |reply|
+        @stream.send(generate_auth('PLAIN', [auth_text].pack('m').gsub(/\s/, ''))) { |reply|
           if reply.name != 'success'
             error = reply.first_element(nil).name
           end
@@ -95,7 +94,7 @@ module Jabber
       end
 
       def decode_challenge(challenge)
-        text = Base64::decode64(challenge)
+        text = challenge.unpack('m').first
         res = {}
 
         state = :key
