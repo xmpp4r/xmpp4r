@@ -101,8 +101,8 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     assert_equal(2, items.size)
     assert_kind_of(REXML::Text, items['1'])
     assert_kind_of(REXML::Text, items['2'])
-    assert_equal(item1.children.to_s, items['1'].to_s)
-    assert_equal(item2.children.to_s, items['2'].to_s)
+    assert_equal(item1.children.join, items['1'].to_s)
+    assert_equal(item2.children.join, items['2'].to_s)
     wait_state
   end
 
