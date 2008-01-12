@@ -151,14 +151,18 @@ module Jabber
       ##
       # Start handshake process
       def start
-        auth_ver = @socket.getc
+        if !@socket.respond_to? :getbyte
+          class << @socket; alias getbyte getc; end
+        end
+
+        auth_ver = @socket.getbyte
         if auth_ver != 5
           # Unsupported version
           @socket.close
           return
         end
 
-        auth_nmethods = @socket.getc
+        auth_nmethods = @socket.getbyte
         auth_methods = @socket.read(auth_nmethods)
         unless auth_methods.index("\x00")
           # Client won't accept no authentication
@@ -175,7 +179,7 @@ module Jabber
           @socket.close
           return
         end
-        req_addrlen = @socket.getc
+        req_addrlen = @socket.getbyte
         req_addr = @socket.read(req_addrlen)
         req_port = @socket.read(2)
         if req_port != "\x00\x00"
