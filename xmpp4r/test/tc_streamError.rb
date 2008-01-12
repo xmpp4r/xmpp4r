@@ -62,10 +62,15 @@ class ConnectionErrorTest < Test::Unit::TestCase
     error = false
     @stream.start(@conn)
     @stream.on_exception do |e, o, w|
-      assert_equal(REXML::ParseException, e.class)
-      assert_equal(Jabber::Stream, o.class)
-      assert_equal(:parser, w)
-      error = true
+      if w == :disconnected 
+        assert_equal(nil, e)
+        assert_equal(Jabber::Stream, o.class)
+      else
+        assert_equal(REXML::ParseException, e.class)
+        assert_equal(Jabber::Stream, o.class)
+        assert_equal(:parser, w)
+        error = true
+      end
     end
     @server.puts(STREAM)
     @server.flush

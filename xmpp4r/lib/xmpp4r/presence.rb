@@ -107,6 +107,7 @@ module Jabber
         xe = add_element('show')
       end
       case val
+        when String then raise "Invalid value for show."
         when :away then text = 'away'
         when :chat then text = 'chat'
         when :dnd then text = 'dnd'
