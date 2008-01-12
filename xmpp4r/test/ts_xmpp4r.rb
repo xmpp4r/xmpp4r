@@ -39,7 +39,7 @@ tc_subdirs.each do |dir|
         # on threaded code.  While they may pass with the green thread
         # implementation in Ruby 1.8, they often fail with real threads.
         next if f =~ /tc_helper.rb/
-        next unless f =~ /tc_stream.rb/
+        next if f =~ /tc_stream.rb/
       end
 
       tc_files << f
