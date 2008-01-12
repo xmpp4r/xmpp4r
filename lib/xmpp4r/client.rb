@@ -168,6 +168,39 @@ module Jabber
     end
 
     ##
+    # See Client#auth_anonymous_sasl
+    def auth_anonymous
+      auth_anonymous_sasl
+    end
+
+
+    ##
+    # Shortcut for anonymous connection to server
+    #
+    # Throws AnonymousUnsupported, AuthenticationFailure
+    def auth_anonymous_sasl
+      if self.supports_anonymous?
+        begin
+          auth_sasl SASL.new(self, 'ANONYMOUS'), ""
+        rescue
+          Jabber::debuglog("#{$!.class}: #{$!}\n#{$!.backtrace.join("\n")}")
+          raise AuthenticationFailure.new, $!.to_s
+        end
+      else
+        raise "AnonymousUnsupported"
+      end
+    end
+    
+    ##
+    # Reports whether or not anonymous authentication is reported
+    # by the client.
+    #
+    # Returns true or false
+    def supports_anonymous?
+      @stream_mechanisms.include? 'ANONYMOUS'
+    end
+
+    ##
     # Send auth with given password and wait for result
     # (non-SASL)
     #
