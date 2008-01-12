@@ -53,7 +53,7 @@ module Jabber
           raise SOCKS5Error.new("Invalid SOCKS5 connect: #{buf.inspect}")
         end
 
-        case buf[3]
+        case buf.respond_to?(:bytes) ? buf.bytes.to_a[3] : buf[3]
           when 1 then read(6)  # IPv4 addr
           when 3 then read(3 + domain.size) # Domain
           when 4 then read(18) # IPv6 addr
