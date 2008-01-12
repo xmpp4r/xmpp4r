@@ -39,7 +39,7 @@ class ConnectionErrorTest < Test::Unit::TestCase
     error = false
     @stream.on_exception do |e, o, w|
       # strange exception, it's caused by REXML, actually
-      # assert_equal(NameError, e.class)
+      assert_kind_of(StandardError, e)
       assert_equal(Jabber::Stream, o.class)
       assert_equal(:start, w)
       error = true
