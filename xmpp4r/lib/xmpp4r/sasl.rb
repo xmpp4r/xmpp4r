@@ -21,6 +21,8 @@ module Jabber
           DigestMD5.new(stream)
         when 'PLAIN'
           Plain.new(stream)
+        when 'ANONYMOUS'
+          Anonymous.new(stream)
         else
           raise "Unknown SASL mechanism: #{mechanism}"
       end
@@ -57,6 +59,25 @@ module Jabber
         auth_text = "#{@stream.jid.strip}\x00#{@stream.jid.node}\x00#{password}"
         error = nil
         @stream.send(generate_auth('PLAIN', [auth_text].pack('m').gsub(/\s/, ''))) { |reply|
+          if reply.name != 'success'
+            error = reply.first_element(nil).name
+          end
+          true
+        }
+        
+        raise error if error
+      end
+    end
+    
+    ##
+    # SASL Anonymous authentication helper 
+    class Anonymous < Base
+      ##
+      # Authenticate by sending nothing with the ANONYMOUS token
+      def auth(password)
+        auth_text = "#{@stream.jid.node}"
+        error = nil
+        @stream.send(generate_auth('ANONYMOUS', Base64::encode64(auth_text).gsub(/\s/, ''))) { |reply|
           if reply.name != 'success'
             error = reply.first_element(nil).name
           end
