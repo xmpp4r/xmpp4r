@@ -1,6 +1,6 @@
 XMPP4R 0.3.3 (XX/XX/XXXX)
 =========================
-* TODO
+* Initial support for Ruby 1.9 (see README.ruby19)
 
 XMPP4R 0.3.2 (15/10/2007)
 =========================

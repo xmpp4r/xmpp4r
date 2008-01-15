@@ -183,7 +183,7 @@ module Jabber
 
         r = REXML::Element.new('response')
         r.add_namespace NS_SASL
-        r.text = Base64::encode64(response_text).gsub(/\s/, '')
+        r.text = [response_text].pack('m').gsub(/\s/, '')
 
         success_already = false
         error = nil
