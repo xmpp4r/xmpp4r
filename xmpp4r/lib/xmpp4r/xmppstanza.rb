@@ -122,7 +122,7 @@ module Jabber
     #
     # v:: [String] the value id set
     def id= (v)
-      add_attribute('id', v)
+      add_attribute('id', v.to_s)
     end
 
     ##
@@ -130,7 +130,7 @@ module Jabber
     #
     # v:: [String] the value id set
     def set_id(v)
-      add_attribute('id', v)
+      add_attribute('id', v.to_s)
       self
     end
 
