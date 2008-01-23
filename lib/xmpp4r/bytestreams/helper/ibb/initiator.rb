@@ -20,7 +20,7 @@ module Jabber
         open = iq.add REXML::Element.new('open')
         open.add_namespace IBB::NS_IBB
         open.attributes['sid'] = @session_id
-        open.attributes['block-size'] = @block_size
+        open.attributes['block-size'] = @block_size.to_s
 
         @stream.send_with_id(iq) { |answer|
           answer.type == :result

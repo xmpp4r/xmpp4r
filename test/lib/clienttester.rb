@@ -80,22 +80,6 @@ module Jabber
       @server.send(xml)
     end
 
-    def receive
-      @receive_lock.lock
-
-      loop {
-        @stanzas_lock.synchronize {
-          if @stanzas.size > 0
-            @receive_lock.unlock
-            return @stanzas.shift
-          end
-        }
-
-        @receive_lock.lock
-        @receive_lock.unlock
-      }
-    end
-
     def state(&block)
       @states << block
     end
