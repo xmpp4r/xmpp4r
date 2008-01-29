@@ -110,8 +110,6 @@ module Jabber
       # return:: [Hash] with possible keys type:: [String] ,category:: [String],features:: [Array] of feature, nodeinformation:: [Jabber::XData]
       # check http://www.xmpp.org/extensions/xep-0060.html#entity for more infos
       
-      # this is only for a xep <-> nodebrowser.rb understanding
-      alias get_metadata get_info
       
       def get_info(jid,node)
         iq = Iq.new(:get,jid)
@@ -129,18 +127,6 @@ module Jabber
 	    
 	    info['features'] = answer.query.features
 	    
-# i think its not needed - if you think so then delete it	    
-#	    answer.query.each_element('identity') { |identity|
-#	      info['type'] = identity.type
-#	      info['category'] = identity.category
-#	    }
-#	    
-#	    features = []
-#	    answer.query.each_element('feature') { |feature|
-#	     features.push(feature)
-#	    }
-#	    info['features'] = features
-#	    
 	    answer.query.each_element('x') { |x|
 	      info['nodeinformation'] = x 
 	    }
@@ -148,6 +134,8 @@ module Jabber
 	}
 	return info
       end
+      # this is only for a xep <-> nodebrowser.rb understanding
+      alias get_metadata get_info
       
       ##
       # get type of node
