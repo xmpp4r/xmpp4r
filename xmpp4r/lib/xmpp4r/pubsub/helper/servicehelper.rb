@@ -20,13 +20,13 @@ module Jabber
 
       ##
       # Creates a new representation of a pubsub service
-      # client:: [Jabber::Stream]
+      # stream:: [Jabber::Stream]
       # pubsubjid:: [String] or [Jabber::JID]
-      def initialize(client, pubsubjid)
-        @client = client
+      def initialize(stream, pubsubjid)
+        @stream = stream
         @pubsubjid = pubsubjid
         @event_cbs = CallbackList.new
-        @client.add_message_callback(200,self) { |message|
+        @stream.add_message_callback(200,self) { |message|
           handle_message(message)
         }
       end
@@ -49,7 +49,7 @@ module Jabber
           iq.pubsub.add(confele)
         end
 
-        @client.send_with_id(iq) do |reply|
+        @stream.send_with_id(iq) do |reply|
           if (create = reply.first_element('pubsub/create'))
             rnode = create.attributes['node']
           end
@@ -66,7 +66,7 @@ module Jabber
       def delete(node)
         iq = basic_pubsub_query(:set,true)
         iq.pubsub.add(REXML::Element.new('delete')).attributes['node'] = node
-        @client.send_with_id(iq) { |reply|
+        @stream.send_with_id(iq) { |reply|
           true
         }
       end
@@ -84,7 +84,7 @@ module Jabber
         publish.attributes['node'] = node
         if item.kind_of?(Jabber::PubSub::Item)
           publish.add(item)
-          @client.send_with_id(iq) { |reply| true }
+          @stream.send_with_id(iq) { |reply| true }
         end
       end
 
@@ -115,7 +115,7 @@ module Jabber
         items.node = node
         iq.pubsub.add(items)
         res = nil
-        @client.send_with_id(iq) { |reply|
+        @stream.send_with_id(iq) { |reply|
           if reply.kind_of?(Iq) and reply.pubsub and reply.pubsub.first_element('items')
             res = {}
             reply.pubsub.first_element('items').each_element('item') do |item|
@@ -134,7 +134,7 @@ module Jabber
         iq = basic_pubsub_query(:get)
         iq.pubsub.add(REXML::Element.new('affiliations'))
         res = nil
-        @client.send_with_id(iq) { |reply|
+        @stream.send_with_id(iq) { |reply|
           if reply.pubsub.first_element('affiliations')
             res = {}
             reply.pubsub.first_element('affiliations').each_element('affiliation') do |affiliation|
@@ -163,7 +163,7 @@ module Jabber
         entities = iq.pubsub.add(REXML::Element.new('subscriptions'))
         entities.attributes['node'] = node
         res = nil
-        @client.send_with_id(iq) { |reply|
+        @stream.send_with_id(iq) { |reply|
           if reply.pubsub.first_element('subscriptions')
             res = []
             reply.pubsub.first_element('subscriptions').each_element('subscription') { |subscription|
@@ -195,10 +195,10 @@ module Jabber
         iq = basic_pubsub_query(:set)
         sub = REXML::Element.new('subscribe')
         sub.attributes['node'] = node
-        sub.attributes['jid'] = @client.jid.strip
+        sub.attributes['jid'] = @stream.jid.strip
         iq.pubsub.add(sub)
         res = {}
-        @client.send_with_id(iq) do |reply|
+        @stream.send_with_id(iq) do |reply|
           pubsubanswer = reply.pubsub
           if pubsubanswer.first_element('subscription')
             pubsubanswer.each_element('subscription') { |element|
@@ -206,7 +206,7 @@ module Jabber
             }
           end
           true
-        end # @client.send_with_id(iq)
+        end # @stream.send_with_id(iq)
         res
       end
 
@@ -221,10 +221,10 @@ module Jabber
         iq = basic_pubsub_query(:set)
         unsub = REXML::Element.new('unsubscribe')
         unsub.attributes['node'] = node
-        unsub.attributes['jid'] = @client.jid.strip
+        unsub.attributes['jid'] = @stream.jid.strip
         unsub.attributes['subid'] = subid
         iq.pubsub.add(unsub)
-        @client.send_with_id(iq) { |reply| true        } # @client.send_with_id(iq)
+        @stream.send_with_id(iq) { |reply| true        } # @stream.send_with_id(iq)
       end
 
       ##
@@ -236,11 +236,11 @@ module Jabber
         iq = basic_pubsub_query(:get)
         opt = REXML::Element.new('options')
         opt.attributes['node'] = node
-        opt.attributes['jid'] = @client.jid.strip
+        opt.attributes['jid'] = @stream.jid.strip
         opt.attributes['subid'] = subid
         iq.pubsub.add(opt)
         ret = nil
-        @client.send_with_id(iq) { |reply|
+        @stream.send_with_id(iq) { |reply|
           reply.pubsub.options.first_element('x') { |xdata|
     
             ret = xdata if xdata.kind_of?(Jabber::XData)
@@ -261,11 +261,11 @@ module Jabber
         iq = basic_pubsub_query(:set)
         opt = REXML::Element.new('options')
         opt.attributes['node'] = node
-        opt.attributes['jid'] = @client.jid.strip
+        opt.attributes['jid'] = @stream.jid.strip
         opt.attributes['subid'] = subid
         iq.pubsub.add(opt)
         iq.pubsub.options.add(options)
-        @client.send_with_id(iq) { |reply| true }
+        @stream.send_with_id(iq) { |reply| true }
       end
       
       ##
@@ -277,7 +277,7 @@ module Jabber
 	purge = REXML::Element.new('purge')
 	purge.attributes['node'] = node
 	iq.pubsub.add(purge)
-	@client.send_with_id(iq) { |reply| true }
+	@stream.send_with_id(iq) { |reply| true }
       end
 
       ##
