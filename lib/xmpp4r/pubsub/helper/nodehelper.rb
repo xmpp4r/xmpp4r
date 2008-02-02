@@ -25,34 +25,38 @@ module Jabber
       # stream:: [Jabber::Stream]
       # jid:: [String] (jid of the pubsub service)
       # nodename:: [String]
-      def initialize(stream,jid,nodename=nil,create_if_not_exist=true)
+      def initialize(stream,jid,nodename = nil,create_if_not_exist = true)
         super(stream,jid)
         @nodename = nodename
 	@jid = jid
 	@stream = stream
-	
-	get_subscriptions 
-	
+
 	if create_if_not_exist and not node_exist?
 	  # if no nodename is given a instant node will created 
 	  # (if the service supports instant nodes)
 	  @nodename = create_node 
+	else
+	 get_subscriptions 
 	end
       end
-
+      
       ##
       # creates the node
       # create(configuration=nil)
       # configuration:: [Jabber::XData]
-      def create_node(configuration=nil)
-        create(@nodename,configuration)
+      def create_node(configuration = nil)
+        if ! node_exist?
+            create(@nodename,configuration)
+	else
+	    false
+	end
       end
       
       ##
       # get the configuration of the node
       # get_configuration(configuration=nil)
       # configuration:: [Jabber::XData]
-      def get_configuration(subid=nil)
+      def get_configuration(subid = nil)
         get_options(@nodename,subid)
       end
       
@@ -61,7 +65,7 @@ module Jabber
       # set_configuration(configuration=nil)
       # configuration:: [Jabber::XData]
       # subid:: [String] default is nil
-      def set_configuration(configuration,subid=nil)
+      def set_configuration(configuration,subid = nil)
         set_options(@nodename,configuration,subid)
       end
 
