@@ -29,7 +29,7 @@ module Jabber
         super(stream,jid)
         @nodename = nodename
 	@jid = jid
-	@stream = client
+	@stream = stream
 	
 	get_subscriptions 
 	
@@ -143,7 +143,7 @@ module Jabber
     
       def node_exist?
         nodebrowser = PubSub::NodeBrowser.new(@stream)
-        nodebrowser.nodes.include?(nodename)
+        nodebrowser.nodes(@jid).include?(@nodename)
       end
       def disco_info
       end
