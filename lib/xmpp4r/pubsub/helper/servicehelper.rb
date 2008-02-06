@@ -2,9 +2,37 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 #
-# It's recommented to read the XEP-0066 before you use this Helper.
+# It's recommented to read the XEP-0066 before you use this Helper. (Maybe its 
+# better not use the helper ) ;)
+# The whole code is buggy - you have been warned!
 # 
-
+# Maybe the following structure is good 
+# ( taken form the xep-0060 )
+#
+# subscriber usecases 
+#   subscribe
+#   unsubscribe
+#   configure subscription options
+#   retrive items from a node
+# publisher usecases
+#   publish a item to a node
+#   delete a item from a node
+# owner usecases
+#   create a node
+#   configure a node
+#   request default configuration options
+#   delete a node
+#   purge all node items
+#   manage subscription requests
+#   process pending subscriptions
+#   manage subscriptions 
+#   manage affiliations
+#  
+# collection nodes
+#    
+#  If someone want to implement something i think its better to do this in  
+#  this order because everyone who reads the xep-0060 do know where to search in the file
+# 
 require 'xmpp4r/pubsub/iq/pubsub'
 require 'xmpp4r/pubsub/stanzas/event'
 require 'xmpp4r/pubsub/stanzas/item'
@@ -36,7 +64,7 @@ module Jabber
       # node:: [String] you node name - otherwise you get a automaticly generated one (in most cases)
       # configure:: [Jabber::XMLStanza] if you want to configure you node (default nil)
       # return:: [String]
-      def create(node=nil, configure=nil)
+      def create_node(node=nil, configure=nil)
         rnode = nil
         iq = basic_pubsub_query(:set)
         iq.pubsub.add(REXML::Element.new('create')).attributes['node'] = node
@@ -63,7 +91,7 @@ module Jabber
       # Delete a pubsub node
       # node:: [String]
       # return:: true
-      def delete(node)
+      def delete_node(node)
         iq = basic_pubsub_query(:set,true)
         iq.pubsub.add(REXML::Element.new('delete')).attributes['node'] = node
         @stream.send_with_id(iq) { |reply|
@@ -78,7 +106,7 @@ module Jabber
       # node:: [String]
       # item:: [Jabber::PubSub::Item]
       # return:: true
-      def publish(node,item)
+      def publish_item_to(node,item)
         iq = basic_pubsub_query(:set)
         publish = iq.pubsub.add(REXML::Element.new('publish'))
         publish.attributes['node'] = node
@@ -93,7 +121,7 @@ module Jabber
       # item:: [REXML::Element]
       # id:: [String]
       # return:: true
-      def publish_with_id(node,item,id)
+      def publish_item_with_id(node,item,id)
         if item.kind_of?(REXML::Element)
           xmlitem = Jabber::PubSub::Item.new
           xmlitem.id = id
@@ -109,7 +137,7 @@ module Jabber
       # node:: [String]
       # count:: [Fixnum]
       # return:: [Hash] { id => [Jabber::PubSub::Item] }
-      def items(node,count=nil)
+      def get_items_from(node,count=nil)
         iq = basic_pubsub_query(:get)
         items = Jabber::PubSub::Items.new
         items.node = node
@@ -129,10 +157,12 @@ module Jabber
 
       ##
       # shows the affiliations on a pubsub service
+      # node:: [String]
       # return:: [Hash] of { node => symbol }
-      def affiliations
+      def get_affiliations(node = nil)
         iq = basic_pubsub_query(:get)
-        iq.pubsub.add(REXML::Element.new('affiliations'))
+        affiliations = iq.pubsub.add(REXML::Element.new('affiliations'))
+	affiliations.attributes['node'] = node
         res = nil
         @stream.send_with_id(iq) { |reply|
           if reply.pubsub.first_element('affiliations')
@@ -156,9 +186,9 @@ module Jabber
 
       ##
       # shows all subscriptions on the given node
-      # node:: [String], or nil for all
+      # node:: [String]
       # return:: [Array] of [REXML::Element]
-      def subscriptions(node=nil)
+      def get_subscriptions_from(node)
         iq = basic_pubsub_query(:get)
         entities = iq.pubsub.add(REXML::Element.new('subscriptions'))
         entities.attributes['node'] = node
@@ -179,7 +209,7 @@ module Jabber
       # shows all jids of subscribers of a node
       # node:: [String]
       # return:: [Array] of [String]
-      def subscribers(node)
+      def get_subscribers_from(node)
         res = []
         subscriptions(node).each { |sub|
           res << sub.attributes['jid']
@@ -191,7 +221,7 @@ module Jabber
       # subscribe to a node
       # node:: [String]
       # return:: [Hash] of { attributename => value }
-      def subscribe(node)
+      def subscribe_to(node)
         iq = basic_pubsub_query(:set)
         sub = REXML::Element.new('subscribe')
         sub.attributes['node'] = node
@@ -217,7 +247,7 @@ module Jabber
       # node:: [String]
       # subid:: [String] or nil
       # return:: true
-      def unsubscribe(node,subid=nil)
+      def unsubscribe_from(node,subid=nil)
         iq = basic_pubsub_query(:set)
         unsub = REXML::Element.new('unsubscribe')
         unsub.attributes['node'] = node
@@ -228,11 +258,11 @@ module Jabber
       end
 
       ##
-      # get options of a node
+      # get options from a node
       # node:: [String]
       # subid:: [String] or nil
       # return:: [Jabber::XData]
-      def get_options(node,subid=nil)
+      def get_options_from(node,subid=nil)
         iq = basic_pubsub_query(:get)
         opt = REXML::Element.new('options')
         opt.attributes['node'] = node
@@ -257,7 +287,7 @@ module Jabber
       # options:: [Jabber::XData]
       # subid:: [String] or nil
       # return:: true 
-      def set_options(node,options,subid=nil)
+      def set_options_for(node,options,subid=nil)
         iq = basic_pubsub_query(:set)
         opt = REXML::Element.new('options')
         opt.attributes['node'] = node
@@ -272,7 +302,7 @@ module Jabber
       # purges all items on a persist node
       # node:: [String]
       # return:: true
-      def purge(node)
+      def purge_items_from(node)
         iq = basic_pubsub_query(:set)
 	purge = REXML::Element.new('purge')
 	purge.attributes['node'] = node
