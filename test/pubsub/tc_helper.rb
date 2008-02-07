@@ -15,16 +15,9 @@ Jabber.debug = false
 
 class PubSub::ServiceHelperTest < Test::Unit::TestCase
   include ClientTester
-  private
-    def create_helper
-      @pubsubjid = 'pubsub.example.org'  
-      PubSub::ServiceHelper.new(@client,@pubsubjid)
-    end  
-
-  public
 
   def test_subscribe
-    h = create_helper
+    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
     assert_kind_of(PubSub::ServiceHelper,h)
     state { |iq|
       asset_kind_of(Jabber::Iq,iq)
@@ -42,7 +35,11 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
 	 	   </pubsub>
 	  </iq>")
     }
-    asset_equal('princely_musings',h.subscribe_to('princely_musings'))
+    subscription = h.subscribe_to('princely_musings')
+    assert_equal(Jabber::PubSub::Subscription,subscription)
+    assert_equal('princely_musings',subscription.node)
+    assert_equal('ba49252aaa4f5d320c24d3766f0bdcade78c78d3',subscription.subid)
+    assert_equal(:subscribed,subscription.subscription)
     wait_state
   end
 
@@ -171,7 +168,6 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
 
   def test_subscriptions
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
-
     state { |iq|
       assert_kind_of(Jabber::Iq, iq)
       assert_equal(:get, iq.type)
@@ -179,7 +175,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       assert_equal('subscriptions', iq.pubsub.children.first.name)
       send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'>
               <pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>
-                <subscriptions node='princely_musings'>
+                <subscriptions node='node1'>
                   <subscription jid='hamlet@denmark.lit' subscription='subscribed'/>
                   <subscription jid='polonius@denmark.lit' subscription='unconfigured'/>
                   <subscription jid='bernardo@denmark.lit' subscription='subscribed' subid='123-abc'/>
@@ -189,13 +185,17 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
             </iq>")
     }
 
-    s = h.get_subscriptions_from('mynode')
+    s = h.get_subscriptions_from('node1')
     assert_kind_of(Array,s)
     assert_equal(4,s.size)
-    assert_kind_of(REXML::Element,s[0])
-    assert_kind_of(REXML::Element,s[1])
-    assert_kind_of(REXML::Element,s[2])
-    assert_kind_of(REXML::Element,s[3])
+    assert_kind_of(Jabber::PubSub::Subscription,s[0])
+    assert_kind_of(Jabber::PubSub::Subscription,s[1])
+    assert_kind_of(Jabber::PubSub::Subscription,s[2])
+    assert_kind_of(Jabber::PubSub::Subscription,s[3])
+    assert_equal(:subscribed,s[0].state)
+    assert_equal(:unconfigured,s[1].state)
+    assert_equal("hamlet@denmark.lit",s[0].jid)
+    assert_equal("123-abc",s[2].subid)
     wait_state
   end
 
@@ -222,10 +222,16 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     s = h.get_subscriptions_from_all_nodes
     assert_kind_of(Array,s)
     assert_equal(4,s.size)
-    assert_kind_of(REXML::Element,s[0])
-    assert_kind_of(REXML::Element,s[1])
-    assert_kind_of(REXML::Element,s[2])
-    assert_kind_of(REXML::Element,s[3])
+    assert_kind_of(Jabber::PubSub::Subscription,s[0])
+    assert_kind_of(Jabber::PubSub::Subscription,s[1])
+    assert_kind_of(Jabber::PubSub::Subscription,s[2])
+    assert_kind_of(Jabber::PubSub::Subscription,s[3])
+    assert_equal(:subscribed,s[0].state)
+    assert_equal(:unconfigured,s[2].state)
+    assert_equal(:pending,s[3].state)
+    assert_equal("francisco@denmark.lit",s[0].jid)
+    assert_equal("node1",s[0].node)
+
     wait_state
   end
 
