@@ -16,6 +16,8 @@ Jabber.debug = false
 class PubSub::ServiceHelperTest < Test::Unit::TestCase
   include ClientTester
 
+  ##
+  # subscribe_to
   def test_subscribe
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
     assert_kind_of(PubSub::ServiceHelper,h)
@@ -42,6 +44,69 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     assert_equal(:subscribed,subscription.subscription)
     wait_state
   end
+
+  def test_subscribe_configuration_required
+    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
+    assert_kind_of(PubSub::ServiceHelper,h)
+    state { |iq|
+      asset_kind_of(Jabber::Iq,iq)
+      asset_equal(:set,iq.type)
+      assert_equal(1, iq.children.size)
+      assert_equal('http://jabber.org/protocol/pubsub', iq.pubsub.namespace)
+      assert_equal(1, iq.pubsub.children.size)
+      assert_equal('subscribe',iq.pubsub.children.first.name)
+      assert_equal('princely_musings',iq.pubsub.children.first.attributes['node'])
+      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'>
+		    <pubsub xmlns='http://jabber.org/protocol/pubsub'>
+		        <subscription node='#{iq.pubsub.children.first.attributes['node']}' jid='#{iq.from}'
+				        subid='ba49252aaa4f5d320c24d3766f0bdcade78c78d3'
+		        subscription='unconfigured'/>
+			<subscribe-options>
+			  <required/>
+			</subscribe-options>
+	 	   </pubsub>
+	  </iq>")
+    }
+    subscription = h.subscribe_to('princely_musings')
+    assert_equal(Jabber::PubSub::Subscription,subscription)
+    assert_equal('princely_musings',subscription.node)
+    assert_equal('ba49252aaa4f5d320c24d3766f0bdcade78c78d3',subscription.subid)
+    assert_equal(:unconfigured,subscription.subscription)
+    assert_equal(true,subscription.need_configuration?)
+    wait_state
+  end
+
+  def test_subscribe_approval_required
+    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
+    assert_kind_of(PubSub::ServiceHelper,h)
+    state { |iq|
+      asset_kind_of(Jabber::Iq,iq)
+      asset_equal(:set,iq.type)
+      assert_equal(1, iq.children.size)
+      assert_equal('http://jabber.org/protocol/pubsub', iq.pubsub.namespace)
+      assert_equal(1, iq.pubsub.children.size)
+      assert_equal('subscribe',iq.pubsub.children.first.name)
+      assert_equal('princely_musings',iq.pubsub.children.first.attributes['node'])
+      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'>
+		    <pubsub xmlns='http://jabber.org/protocol/pubsub'>
+		        <subscription node='#{iq.pubsub.children.first.attributes['node']}' jid='#{iq.from}'
+				        subid='ba49252aaa4f5d320c24d3766f0bdcade78c78d3'
+		        subscription='pending'/>
+			
+	 	   </pubsub>
+	  </iq>")
+    }
+    subscription = h.subscribe_to('princely_musings')
+    assert_equal(Jabber::PubSub::Subscription,subscription)
+    assert_equal('princely_musings',subscription.node)
+    assert_equal('ba49252aaa4f5d320c24d3766f0bdcade78c78d3',subscription.subid)
+    assert_equal(:pending,subscription.subscription)
+    assert_equal(:true,subscription.need_approval?)
+    wait_state
+  end
+
+
+
 
   def test_create
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
@@ -165,7 +230,9 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     assert_equal(:owner, a['node6'])
     wait_state
   end
-
+   
+  ##
+  # get_subscriptions_from
   def test_subscriptions
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
     state { |iq|
@@ -199,6 +266,38 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     wait_state
   end
 
+  
+  def test_subscribers
+    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
+
+    state { |iq|
+      assert_kind_of(Jabber::Iq, iq)
+      assert_equal(:get, iq.type)
+      assert_equal(1, iq.pubsub.children.size)
+      assert_equal('subscriptions', iq.pubsub.children.first.name)
+      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'>
+            <pubsub xmlns='http://jabber.org/protocol/pubsub'>
+	        <subscriptions node='princely_musings'>
+		  <subscription jid='peter@denmark.lit' subscription='subscribed'/>
+		  <subscription jid='frank@denmark.lit' subscription='subscribed'/>
+		  <subscription jid='albrecht@denmark.lit' subscription='unconfigured'/>
+		  <subscription jid='hugo@denmark.lit' subscription='pending'/>
+		</subscriptions>
+	     </pubsub>
+	     </iq>")
+    }
+
+    s = h.get_subscribers_from('princely_musings')
+    assert_equal(4,s.size)
+    assert_kind_of(String,s[0])
+    assert_kind_of(String,s[1])
+    assert_kind_of(String,s[2])
+    assert_kind_of(String,s[3])
+    wait_state
+  end
+    
+  ##
+  # get_all_subscriptions
   def test_get_all_subscriptions
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 
@@ -235,7 +334,8 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     wait_state
   end
 
-  def test_subscribers
+  
+  def test_get_all_subscriptions_with_no_subscriptions
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 
     state { |iq|
@@ -245,22 +345,18 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       assert_equal('subscriptions', iq.pubsub.children.first.name)
       send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'>
             <pubsub xmlns='http://jabber.org/protocol/pubsub'>
-	        <subscriptions node='princely_musings'>
-		  <subscription jid='peter@denmark.lit' subscription='subscribed'/>
-		  <subscription jid='frank@denmark.lit' subscription='subscribed'/>
-		  <subscription jid='albrecht@denmark.lit' subscription='unconfigured'/>
-		  <subscription jid='hugo@denmark.lit' subscription='pending'/>
-		</subscriptions>
+	        <subscriptions />
 	     </pubsub>
 	     </iq>")
     }
 
-    s = h.get_subscribers_from('princely_musings')
-    assert_equal(4,s.size)
-    assert_kind_of(String,s[0])
-    assert_kind_of(String,s[1])
-    assert_kind_of(String,s[2])
-    assert_kind_of(String,s[3])
+    s = h.get_subscriptions_from_all_nodes
+    assert_kind_of(Array,s)
+    assert_equal(0,s.size)
     wait_state
   end
+  
+
+
+  
 end
