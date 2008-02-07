@@ -9,6 +9,10 @@
 # Maybe the following structure is good 
 # ( taken form the xep-0060 )
 #
+# entity usecases
+#  retrieve all suscriptions
+#  retrieve all affiliations
+# NOTE: the disco stuff will done by the nodebrowserhelper
 # subscriber usecases 
 #   subscribe
 #   unsubscribe
@@ -58,6 +62,132 @@ module Jabber
           handle_message(message)
         }
       end
+      
+      ##
+      # get all subscriptions on a pubsub component
+      # return:: [Hash] of [PubSub::Subscription]
+      def get_subscriptions_from_all_nodes
+        iq = basic_pubsub_query(:get)
+        entities = iq.pubsub.add(REXML::Element.new('subscriptions'))
+        res = nil
+        @stream.send_with_id(iq) { |reply|
+          if reply.pubsub.first_element('subscriptions')
+            res = []
+            reply.pubsub.first_element('subscriptions').each_element('subscription') { |subscription|
+    	        res << PubSub::Subscription.import(subscription)
+             } 
+          end
+          true
+        }
+        res
+
+      end
+      ##
+      # subscribe to a node
+      # node:: [String]
+      # return:: [Hash] of { attributename => value }
+      def subscribe_to(node)
+        iq = basic_pubsub_query(:set)
+        sub = REXML::Element.new('subscribe')
+        sub.attributes['node'] = node
+        sub.attributes['jid'] = @stream.jid.strip.to_s
+        iq.pubsub.add(sub)
+        res = nil
+        @stream.send_with_id(iq) do |reply|
+          pubsubanswer = reply.pubsub
+          if pubsubanswer.first_element('subscription')
+	    res = PubSub::Subscription.import(pubsubanswer.first_element('subscription'))
+          end
+          true
+        end # @stream.send_with_id(iq)
+        res
+      end
+
+      ##
+      # Unsubscibe from a node with an optional subscription id
+      #
+      # May raise ErrorException
+      # node:: [String]
+      # subid:: [String] or nil
+      # return:: true
+      def unsubscribe_from(node,subid=nil)
+        iq = basic_pubsub_query(:set)
+        unsub = REXML::Element.new('unsubscribe')
+        unsub.attributes['node'] = node
+        unsub.attributes['jid'] = @stream.jid.strip
+        unsub.attributes['subid'] = subid
+        iq.pubsub.add(unsub)
+        @stream.send_with_id(iq) { |reply| true        } # @stream.send_with_id(iq)
+      end
+      
+      
+      ##
+      # gets all items from a pubsub node
+      # node:: [String]
+      # count:: [Fixnum]
+      # return:: [Hash] { id => [Jabber::PubSub::Item] }
+      def get_items_from(node,count=nil)
+        iq = basic_pubsub_query(:get)
+        items = Jabber::PubSub::Items.new
+        items.node = node
+        iq.pubsub.add(items)
+        res = nil
+        @stream.send_with_id(iq) { |reply|
+          if reply.kind_of?(Iq) and reply.pubsub and reply.pubsub.first_element('items')
+            res = {}
+            reply.pubsub.first_element('items').each_element('item') do |item|
+              res[item.attributes['id']] = item.children.first if item.children.first
+            end
+          end
+          true
+        }
+        res
+      end
+
+      ##
+      # NOTE: this method sends only one item per publish request because some services may not
+      # allow batch processing
+      # maybe this will changed in the future
+      # node:: [String]
+      # item:: [Jabber::PubSub::Item]
+      # return:: true
+      def publish_item_to(node,item)
+        iq = basic_pubsub_query(:set)
+        publish = iq.pubsub.add(REXML::Element.new('publish'))
+        publish.attributes['node'] = node
+        if item.kind_of?(Jabber::PubSub::Item)
+          publish.add(item)
+          @stream.send_with_id(iq) { |reply| true }
+        end
+      end
+
+      ##
+      # node:: [String]
+      # item:: [REXML::Element]
+      # id:: [String]
+      # return:: true
+      def publish_item_with_id(node,item,id)
+        if item.kind_of?(REXML::Element)
+          xmlitem = Jabber::PubSub::Item.new
+          xmlitem.id = id
+          xmlitem.add(item)
+          publish(node,xmlitem)
+        else
+          raise "given item is not a proper xml document or Jabber::PubSub::Item"
+        end
+      end
+
+      ##
+      # purges all items on a persist node
+      # node:: [String]
+      # return:: true
+      def purge_items_from(node)
+        iq = basic_pubsub_query(:set)
+	purge = REXML::Element.new('purge')
+	purge.attributes['node'] = node
+	iq.pubsub.add(purge)
+	@stream.send_with_id(iq) { |reply| true }
+      end
 
       ##
       # Create a new node on the pubsub service
@@ -99,61 +229,6 @@ module Jabber
         }
       end
 
-      ##
-      # NOTE: this method sends only one item per publish request because some services may not
-      # allow batch processing
-      # maybe this will changed in the future
-      # node:: [String]
-      # item:: [Jabber::PubSub::Item]
-      # return:: true
-      def publish_item_to(node,item)
-        iq = basic_pubsub_query(:set)
-        publish = iq.pubsub.add(REXML::Element.new('publish'))
-        publish.attributes['node'] = node
-        if item.kind_of?(Jabber::PubSub::Item)
-          publish.add(item)
-          @stream.send_with_id(iq) { |reply| true }
-        end
-      end
-
-      ##
-      # node:: [String]
-      # item:: [REXML::Element]
-      # id:: [String]
-      # return:: true
-      def publish_item_with_id(node,item,id)
-        if item.kind_of?(REXML::Element)
-          xmlitem = Jabber::PubSub::Item.new
-          xmlitem.id = id
-          xmlitem.add(item)
-          publish(node,xmlitem)
-        else
-          raise "given item is not a proper xml document or Jabber::PubSub::Item"
-        end
-      end
-
-      ##
-      # gets all items from a pubsub node
-      # node:: [String]
-      # count:: [Fixnum]
-      # return:: [Hash] { id => [Jabber::PubSub::Item] }
-      def get_items_from(node,count=nil)
-        iq = basic_pubsub_query(:get)
-        items = Jabber::PubSub::Items.new
-        items.node = node
-        iq.pubsub.add(items)
-        res = nil
-        @stream.send_with_id(iq) { |reply|
-          if reply.kind_of?(Iq) and reply.pubsub and reply.pubsub.first_element('items')
-            res = {}
-            reply.pubsub.first_element('items').each_element('item') do |item|
-              res[item.attributes['id']] = item.children.first if item.children.first
-            end
-          end
-          true
-        }
-        res
-      end
 
       ##
       # shows the affiliations on a pubsub service
@@ -187,7 +262,7 @@ module Jabber
       ##
       # shows all subscriptions on the given node
       # node:: [String]
-      # return:: [Array] of [REXML::Element]
+      # return:: [Array] of [Jabber::Pubsub::Subscription]
       def get_subscriptions_from(node)
         iq = basic_pubsub_query(:get)
         entities = iq.pubsub.add(REXML::Element.new('subscriptions'))
@@ -196,9 +271,11 @@ module Jabber
         @stream.send_with_id(iq) { |reply|
           if reply.pubsub.first_element('subscriptions')
             res = []
-            reply.pubsub.first_element('subscriptions').each_element('subscription') { |subscription|
-              res << REXML::Element.new(subscription)
-            }
+	    if reply.pubsub.first_element('subscriptions').attributes['node'] == node
+              reply.pubsub.first_element('subscriptions').each_element('subscription') { |subscription|
+    	        res << PubSub::Subscription.import(subscription)
+              } 
+	    end
           end
           true
         }
@@ -211,51 +288,13 @@ module Jabber
       # return:: [Array] of [String]
       def get_subscribers_from(node)
         res = []
-        subscriptions(node).each { |sub|
-          res << sub.attributes['jid']
+        get_subscriptions_from(node).each { |sub|
+	 
+          res << sub.jid
         }
         res
       end
 
-      ##
-      # subscribe to a node
-      # node:: [String]
-      # return:: [Hash] of { attributename => value }
-      def subscribe_to(node)
-        iq = basic_pubsub_query(:set)
-        sub = REXML::Element.new('subscribe')
-        sub.attributes['node'] = node
-        sub.attributes['jid'] = @stream.jid.strip
-        iq.pubsub.add(sub)
-        res = {}
-        @stream.send_with_id(iq) do |reply|
-          pubsubanswer = reply.pubsub
-          if pubsubanswer.first_element('subscription')
-            pubsubanswer.each_element('subscription') { |element|
-              element.attributes.each { |name,value| res[name] = value }
-            }
-          end
-          true
-        end # @stream.send_with_id(iq)
-        res
-      end
-
-      ##
-      # Unsubscibe from a node with an optional subscription id
-      #
-      # May raise ErrorException
-      # node:: [String]
-      # subid:: [String] or nil
-      # return:: true
-      def unsubscribe_from(node,subid=nil)
-        iq = basic_pubsub_query(:set)
-        unsub = REXML::Element.new('unsubscribe')
-        unsub.attributes['node'] = node
-        unsub.attributes['jid'] = @stream.jid.strip
-        unsub.attributes['subid'] = subid
-        iq.pubsub.add(unsub)
-        @stream.send_with_id(iq) { |reply| true        } # @stream.send_with_id(iq)
-      end
 
       ##
       # get options from a node
@@ -298,17 +337,6 @@ module Jabber
         @stream.send_with_id(iq) { |reply| true }
       end
       
-      ##
-      # purges all items on a persist node
-      # node:: [String]
-      # return:: true
-      def purge_items_from(node)
-        iq = basic_pubsub_query(:set)
-	purge = REXML::Element.new('purge')
-	purge.attributes['node'] = node
-	iq.pubsub.add(purge)
-	@stream.send_with_id(iq) { |reply| true }
-      end
 
       ##
       # String representation
