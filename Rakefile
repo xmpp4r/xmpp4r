@@ -53,7 +53,6 @@ Rake::RDocTask.new do |rd|
   f.unshift('lib/xmpp4r.rb')
   rd.rdoc_files.include(f)
   rd.options << '--all'
-  rd.options << '--diagram'
   rd.options << '--fileboxes'
   rd.options << '--inline-source'
   rd.options << '--line-numbers'
@@ -91,6 +90,7 @@ begin
 		s.autorequire = 'xmpp4r'
 		s.files = PKG_FILES
 		s.description = "Ruby library for Jabber Instant-Messaging"
+		s.has_rdoc = true
 	end
 
 	Rake::GemPackageTask.new(spec) do |pkg|
