@@ -85,7 +85,7 @@ module Jabber
         feature_repr = lambda { |f| f.var }
         s = (@identities.map(&identity_repr).sort! + @features.map(&feature_repr).sort!).join('<') + '<'
 
-        Base64.encode64(Digest::SHA1.new(s).digest).chomp!
+        Base64.encode64(Digest::SHA1.new.digest(s)).chomp!
       end
     end
   end
