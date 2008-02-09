@@ -2,7 +2,8 @@ XMPP4R 0.3.3 (XX/XX/XXXX)
 =========================
 * Initial support for Ruby 1.9 (see README.ruby19)
 * Complete PubSub API Change - more logical and better for 
-  childclasses 
+  childclasses
+* a Helper to assist with XEP-0115 Entity Capabilities 
 
 XMPP4R 0.3.2 (15/10/2007)
 =========================
