@@ -591,4 +591,235 @@ class MUCClientTest < Test::Unit::TestCase
     assert(m.active?)
     assert_equal('oldhag', m.nick)
   end
+
+  # JEP-0045: 10.2 Room Configuration
+  def test_configuration
+      state { |pres|
+        send(
+            "<presence from='darkcave@macbeth.shakespeare.lit/thirdwitch' to='hag66@shakespeare.lit/pda'>" +
+            "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='owner' role='moderator'/></x>" +
+            "</presence>")
+      }
+
+      room = 'darkcave@macbeth.shakespeare.lit/thirdwitch'
+      
+      m = MUC::MUCClient.new(@client)
+      m.my_jid = 'hag66@shakespeare.lit/pda'
+
+      m.join(room)
+      wait_state
+
+      assert_equal(true, m.owner?)
+
+      state { |iq|
+        assert_kind_of(Jabber::Iq,iq)
+        assert_equal(m.my_jid.to_s, iq.from.to_s)
+        assert_equal(room.strip.to_s, iq.to.to_s)
+        assert_equal(iq.type, :get)
+        
+        assert_kind_of(Jabber::MUC::IqQueryMUCOwner, iq.first_element('query'))
+        
+        send(muc_config_form.sub("id='config1'","id='#{iq.id}'"))
+      }
+      
+      assert_nothing_raised do
+        m.configure('muc#roomconfig_roomname' => 'Dunsinane')
+        wait_state
+      end
+    end
+
+    # example 150
+    def muc_config_form
+      "<iq from='darkcave@macbeth.shakespeare.lit'
+          id='config1'
+          to='crone1@shakespeare.lit/desktop'
+          type='result'>
+        <query xmlns='http://jabber.org/protocol/muc#owner'>
+          <x xmlns='jabber:x:data' type='form'>
+            <title>Configuration for \"darkcave\" Room</title>
+            <instructions>
+              Complete this form to make changes to
+              the configuration of your room.
+            </instructions>
+            <field
+                type='hidden'
+                var='FORM_TYPE'>
+              <value>http://jabber.org/protocol/muc#roomconfig</value>
+            </field>
+            <field
+                label='Natural-Language Room Name'
+                type='text-single'
+                var='muc#roomconfig_roomname'>
+              <value>A Dark Cave</value>
+            </field>
+            <field
+                label='Short Description of Room'
+                type='text-single'
+                var='muc#roomconfig_roomdesc'>
+              <value>The place for all good witches!</value>
+            </field>
+            <field
+                label='Enable Public Logging?'
+                type='boolean'
+                var='muc#roomconfig_enablelogging'>
+              <value>0</value>
+            </field>
+            <field
+                label='Allow Occupants to Change Subject?'
+                type='boolean'
+                var='muc#roomconfig_changesubject'>
+              <value>0</value>
+            </field>
+            <field
+                label='Allow Occupants to Invite Others?'
+                type='boolean'
+                var='muc#roomconfig_allowinvites'>
+              <value>0</value>
+            </field>
+            <field
+                label='Maximum Number of Occupants'
+                type='list-single'
+                var='muc#roomconfig_maxusers'>
+              <value>10</value>
+              <option label='10'><value>10</value></option>
+              <option label='20'><value>20</value></option>
+              <option label='30'><value>30</value></option>
+              <option label='50'><value>50</value></option>
+              <option label='100'><value>100</value></option>
+              <option label='None'><value>none</value></option>
+            </field>
+            <field
+                label='Roles for which Presence is Broadcast'
+                type='list-multi'
+                var='muc#roomconfig_presencebroadcast'>
+              <value>moderator</value>
+              <value>participant</value>
+              <value>visitor</value>
+              <option label='Moderator'><value>moderator</value></option>
+              <option label='Participant'><value>participant</value></option>
+              <option label='Visitor'><value>visitor</value></option>
+            </field>
+            <field
+                label='Roles and Affiliations that May Retrieve Member List'
+                type='list-multi'
+                var='muc#roomconfig_getmemberlist'>
+              <value>moderator</value>
+              <value>participant</value>
+              <value>visitor</value>
+              <option label='Moderator'><value>moderator</value></option>
+              <option label='Participant'><value>participant</value></option>
+              <option label='Visitor'><value>visitor</value></option>
+            </field>
+            <field
+                label='Make Room Publicly Searchable?'
+                type='boolean'
+                var='muc#roomconfig_publicroom'>
+              <value>0</value>
+            </field>
+            <field
+                label='Make Room Persistent?'
+                type='boolean'
+                var='muc#roomconfig_persistentroom'>
+              <value>0</value>
+            </field>
+            <field
+                label='Make Room Moderated?'
+                type='boolean'
+                var='muc#roomconfig_moderatedroom'>
+              <value>0</value>
+            </field>
+            <field
+                label='Make Room Members Only?'
+                type='boolean'
+                var='muc#roomconfig_membersonly'>
+              <value>0</value>
+            </field>
+            <field
+                label='Password Required for Entry?'
+                type='boolean'
+                var='muc#roomconfig_passwordprotectedroom'>
+              <value>1</value>
+            </field>
+            <field type='fixed'>
+              <value>
+                If a password is required to enter this room,
+                you must specify the password below.
+              </value>
+            </field>
+            <field
+                label='Password'
+                type='text-private'
+                var='muc#roomconfig_roomsecret'>
+              <value>cauldronburn</value>
+            </field>
+            <field
+                label='Who May Discover Real JIDs?'
+                type='list-single'
+                var='muc#roomconfig_whois'>
+              <value>moderators</value>
+              <option label='Moderators Only'>
+                <value>moderators</value>
+              </option>
+              <option label='Anyone'>
+                <value>anyone</value>
+              </option>
+            </field>
+            <field type='fixed'>
+              <value>
+                You may specify additional people who have
+                administrative privileges in the room. Please
+                provide one Jabber ID per line.
+              </value>
+            </field>
+            <field
+                label='Room Admins'
+                type='jid-multi'
+                var='muc#roomconfig_roomadmins'>
+              <value>wiccarocks@shakespeare.lit</value>
+              <value>hecate@shakespeare.lit</value>
+            </field>
+            <field type='fixed'>
+              <value>
+                You may specify additional owners for this
+                room. Please provide one Jabber ID per line.
+              </value>
+            </field>
+            <field
+                label='Room Owners'
+                type='jid-multi'
+                var='muc#roomconfig_roomowners'/>
+          </x>
+        </query>
+      </iq>"
+    end
 end
+
+__END__
+assert_equal(3, m.roster.size)
+m.roster.each { |resource,pres|
+  assert_equal(resource, pres.from.resource)
+  assert_equal('darkcave', pres.from.node)
+  assert_equal('macbeth.shakespeare.lit', pres.from.domain)
+  assert_kind_of(String, resource)
+  assert_kind_of(Presence, pres)
+  assert(%w(firstwitch secondwitch thirdwitch).include?(resource))
+  assert_kind_of(MUC::XMUCUser, pres.x)
+  assert_kind_of(Array, pres.x.items)
+  assert_equal(1, pres.x.items.size)
+}
+assert_equal(:owner, m.roster['firstwitch'].x.items[0].affiliation)
+assert_equal(:moderator, m.roster['firstwitch'].x.items[0].role)
+assert_equal(:admin, m.roster['secondwitch'].x.items[0].affiliation)
+assert_equal(:moderator, m.roster['secondwitch'].x.items[0].role)
+assert_equal(:member, m.roster['thirdwitch'].x.items[0].affiliation)
+assert_equal(:participant, m.roster['thirdwitch'].x.items[0].role)
+assert_nil(m.roster['thirdwitch'].x.items[0].jid)
+
+send("<presence from='darkcave@macbeth.shakespeare.lit/thirdwitch' to='crone1@shakespeare.lit/desktop'>" +
+     "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='none' jid='hag66@shakespeare.lit/pda' role='participant'/></x>" +
+     "</presence>")
+sleep 0.1
+assert_equal(3, m.roster.size)
+assert_equal(:none, m.roster['thirdwitch'].x.items[0].affiliation)
+assert_equal(:participant, m.roster['thirdwitch'].x.items[0].role)
+assert_equal(JID.new('hag66@shakespeare.lit/pda'), m.roster['thirdwitch'].x.items[0].jid)
