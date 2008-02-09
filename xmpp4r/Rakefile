@@ -54,6 +54,7 @@ Rake::RDocTask.new do |rd|
   rd.rdoc_files.include(f)
   rd.options << '--all'
   rd.options << '--fileboxes'
+  rd.options << '--diagram'
   rd.options << '--inline-source'
   rd.options << '--line-numbers'
   rd.rdoc_dir = 'rdoc'
