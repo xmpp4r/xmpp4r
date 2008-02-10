@@ -134,4 +134,10 @@ class JIDTest < Test::Unit::TestCase
     assert_kind_of(Class, Jabber::RPC::Server)
     assert_kind_of(Class, Jabber::RPC::Client)
   end
+  
+  def test_pubsub
+    require 'xmpp4r/pubsub'
+    assert_kind_of(Module, Jabber::PubSub)
+    assert_kind_of(Class, Jabber::PubSub::ServiceHelper)
+  end
 end
