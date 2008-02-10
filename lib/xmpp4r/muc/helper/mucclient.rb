@@ -3,6 +3,8 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/muc/x/muc'
+require 'xmpp4r/muc/iq/mucowner'
+require 'xmpp4r/dataforms'
 
 module Jabber
   module MUC
@@ -388,30 +390,44 @@ module Jabber
         @affiliation == :owner
       end
 
+      ##
+      # Use this method to configure a MUC room of which you are the owner.
+      #
+      # options:: [Hash] where keys are the features of the room you wish
+      # to configure. See http://www.xmpp.org/extensions/xep-0045.html#registrar-formtype-owner
       def configure(options={})
+        get_room_configuration
+        submit_room_configuration(options)
+      end
+      
+      # :nodoc: 
+      def get_room_configuration
         raise 'You are not the owner' unless owner?
         
-        iq = Iq.new(:get, jid)
-        iq.to = @jid
-        iq.from = @my_jid
+        iq = Iq.new(:get, jid.strip)
+        iq.from = my_jid
         iq.add(IqQueryMUCOwner.new)
 
         fields = []
         
-        answer = @stream.send_with_id(iq)
-        raise "Configuration not possible for this room" unless answer.query && answer.query.x(XData)
+        @stream.send_with_id(iq) do |answer|
+          raise "Configuration not possible for this room" unless answer.query && answer.query.x(Dataforms::XData)
 
-        answer.query.x(XData).fields.each { |field|
-          if (var = field.attributes['var'])
-            fields << var
+          answer.query.x(Dataforms::XData).fields.each do |field|
+            if (var = field.attributes['var'])
+              fields << var
+            end
           end
-        }
-
+        end
         
+        fields
+      end
+      
+      # :nodoc: 
+      def submit_room_configuration(options) 
         # fill out the reply form
-        iq = Iq.new(:set, jid)
-        iq.to = @jid
-        iq.from = @my_jid
+        iq = Iq.new(:set, jid.strip)
+        iq.from = my_jid
         query = IqQueryMUCOwner.new
         form = Dataforms::XData.new
         form.type = :submit

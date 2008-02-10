@@ -594,42 +594,65 @@ class MUCClientTest < Test::Unit::TestCase
 
   # JEP-0045: 10.2 Room Configuration
   def test_configuration
-      state { |pres|
-        send(
-            "<presence from='darkcave@macbeth.shakespeare.lit/thirdwitch' to='hag66@shakespeare.lit/pda'>" +
-            "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='owner' role='moderator'/></x>" +
-            "</presence>")
-      }
+    room = JID.new('darkcave@macbeth.shakespeare.lit/thirdwitch')
+    jid = JID.new('hag66@shakespeare.lit/pda')
 
-      room = 'darkcave@macbeth.shakespeare.lit/thirdwitch'
+    state { |pres|
+      send(
+          "<presence from='darkcave@macbeth.shakespeare.lit/thirdwitch' to='hag66@shakespeare.lit/pda'>" +
+          "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='owner' role='moderator'/></x>" +
+          "</presence>"
+      )
+    }
+
+    state { |iq|
+      assert_kind_of(Jabber::Iq,iq)
+      assert_equal(jid, iq.from)
+      assert_equal(room.strip, iq.to)
+      assert_equal(:get, iq.type)
       
-      m = MUC::MUCClient.new(@client)
-      m.my_jid = 'hag66@shakespeare.lit/pda'
-
-      m.join(room)
-      wait_state
-
-      assert_equal(true, m.owner?)
-
-      state { |iq|
-        assert_kind_of(Jabber::Iq,iq)
-        assert_equal(m.my_jid.to_s, iq.from.to_s)
-        assert_equal(room.strip.to_s, iq.to.to_s)
-        assert_equal(iq.type, :get)
-        
-        assert_kind_of(Jabber::MUC::IqQueryMUCOwner, iq.first_element('query'))
-        
-        send(muc_config_form.sub("id='config1'","id='#{iq.id}'"))
-      }
+      assert_kind_of(Jabber::MUC::IqQueryMUCOwner, iq.first_element('query'))
       
-      assert_nothing_raised do
-        m.configure('muc#roomconfig_roomname' => 'Dunsinane')
-        wait_state
-      end
-    end
+      send(muc_config_form.sub("id='config1'","id='#{iq.id}'"))
+    }
 
-    # example 150
-    def muc_config_form
+    state { |room_config|
+      assert_kind_of(Jabber::Iq, room_config)
+      assert_equal(room.strip, room_config.to)
+      assert_equal(:set, room_config.type)
+      
+      assert_kind_of(Jabber::MUC::IqQueryMUCOwner, room_config.first_element('query'))
+      
+      form = room_config.first_element('query/x')
+      assert_kind_of(Dataforms::XData, form)
+      assert_equal(:submit, form.type)
+      assert_equal(1, form.elements.size)
+      assert_equal('muc#roomconfig_roomname', form.first_element('field').var)
+      assert_equal(['Dunsinane'], form.first_element('field').values)
+      
+      send(muc_config_acknowledgement.sub("id='config1'","id='#{room_config.id}'"))
+    }
+
+    m = MUC::MUCClient.new(@client)
+    m.my_jid = jid
+    m.join(room)
+    wait_state
+    assert_equal(true, m.owner?)
+
+    assert_equal(%w{muc#roomconfig_roomname muc#roomconfig_roomdesc 
+      muc#roomconfig_enablelogging muc#roomconfig_changesubject muc#roomconfig_allowinvites 
+      muc#roomconfig_maxusers muc#roomconfig_presencebroadcast muc#roomconfig_getmemberlist
+      muc#roomconfig_publicroom muc#roomconfig_persistentroom muc#roomconfig_moderatedroom 
+      muc#roomconfig_membersonly muc#roomconfig_passwordprotectedroom muc#roomconfig_roomsecret
+      muc#roomconfig_whois muc#roomconfig_roomadmins muc#roomconfig_roomowners}, m.get_room_configuration)
+    wait_state
+
+    m.submit_room_configuration( 'muc#roomconfig_roomname' => 'Dunsinane' )
+    wait_state
+  end
+
+  # example 150 from XEP-0045
+  def muc_config_form
       "<iq from='darkcave@macbeth.shakespeare.lit'
           id='config1'
           to='crone1@shakespeare.lit/desktop'
@@ -791,35 +814,17 @@ class MUCClientTest < Test::Unit::TestCase
           </x>
         </query>
       </iq>"
-    end
+  end
+    
+  def muc_config_acknowledgement
+      "<iq from='darkcave@macbeth.shakespeare.lit'
+          id='config1'
+          to='crone1@shakespeare.lit/desktop'>
+        <query xmlns='http://jabber.org/protocol/muc#owner'>
+          <x xmlns='jabber:x:data' type='result'>
+            <field var='muc#roomconfig_roomname'><value>Dunsinane</value></field>
+          </x>
+        </query>
+      </iq>"
+  end
 end
-
-__END__
-assert_equal(3, m.roster.size)
-m.roster.each { |resource,pres|
-  assert_equal(resource, pres.from.resource)
-  assert_equal('darkcave', pres.from.node)
-  assert_equal('macbeth.shakespeare.lit', pres.from.domain)
-  assert_kind_of(String, resource)
-  assert_kind_of(Presence, pres)
-  assert(%w(firstwitch secondwitch thirdwitch).include?(resource))
-  assert_kind_of(MUC::XMUCUser, pres.x)
-  assert_kind_of(Array, pres.x.items)
-  assert_equal(1, pres.x.items.size)
-}
-assert_equal(:owner, m.roster['firstwitch'].x.items[0].affiliation)
-assert_equal(:moderator, m.roster['firstwitch'].x.items[0].role)
-assert_equal(:admin, m.roster['secondwitch'].x.items[0].affiliation)
-assert_equal(:moderator, m.roster['secondwitch'].x.items[0].role)
-assert_equal(:member, m.roster['thirdwitch'].x.items[0].affiliation)
-assert_equal(:participant, m.roster['thirdwitch'].x.items[0].role)
-assert_nil(m.roster['thirdwitch'].x.items[0].jid)
-
-send("<presence from='darkcave@macbeth.shakespeare.lit/thirdwitch' to='crone1@shakespeare.lit/desktop'>" +
-     "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='none' jid='hag66@shakespeare.lit/pda' role='participant'/></x>" +
-     "</presence>")
-sleep 0.1
-assert_equal(3, m.roster.size)
-assert_equal(:none, m.roster['thirdwitch'].x.items[0].affiliation)
-assert_equal(:participant, m.roster['thirdwitch'].x.items[0].role)
-assert_equal(JID.new('hag66@shakespeare.lit/pda'), m.roster['thirdwitch'].x.items[0].jid)
