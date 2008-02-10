@@ -1,1 +1,7 @@
+require 'xmpp4r/pubsub/iq/pubsub'
+require 'xmpp4r/pubsub/stanzas/event'
+require 'xmpp4r/pubsub/stanzas/item'
+require 'xmpp4r/pubsub/stanzas/items'
+require 'xmpp4r/pubsub/stanzas/subscription'
+require 'xmpp4r/pubsub/stanzas/unsubscribe'
 require 'xmpp4r/pubsub/helper/servicehelper'
