@@ -163,6 +163,29 @@ module Jabber
       end
 
       ##
+      # Administratively remove one or more users from the room.
+      #
+      # Will wait for response, possibly raising ErrorException
+      #
+      # Sample usage:
+      #   my_muc.kick 'pistol', 'Avaunt, you cullion!'
+      #   my_muc.kick(['Bill', 'Linus'], 'Stop flaming')
+      #
+      # recipients:: [Array] of, or single [String]: Nicks
+      # reason:: [String] Kick reason
+      def kick(recipients, reason)
+        recipients = [recipients] unless recipients.kind_of? Array
+        items = recipients.collect { |recipient|
+          item = IqQueryMUCAdminItem.new
+          item.nick = recipient
+          item.role = :none
+          item.reason = reason
+          item
+        }
+        send_affiliations(items)
+      end
+
+      ##
       # Block to be invoked when a message *from* the room arrives
       #
       # Example:
