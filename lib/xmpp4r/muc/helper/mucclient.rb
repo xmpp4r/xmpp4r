@@ -4,6 +4,7 @@
 
 require 'xmpp4r/muc/x/muc'
 require 'xmpp4r/muc/iq/mucowner'
+require 'xmpp4r/muc/iq/mucadmin'
 require 'xmpp4r/dataforms'
 
 module Jabber
@@ -439,6 +440,22 @@ module Jabber
         end
         query.add(form)
         iq.add(query)   
+
+        @stream.send_with_id(iq)
+      end
+
+      ##
+      # Push a list of new affiliations to the room
+      # items:: [Array] of, or single [IqQueryMUCAdminItem]
+      def send_affiliations(items)
+        iq = Iq.new(:set, jid.strip)
+        iq.from = my_jid
+        iq.add(IqQueryMUCAdmin.new)
+
+        items = [item] unless items.kind_of? Array
+        items.each { |item|
+          iq.query.add(item)
+        }
 
         @stream.send_with_id(iq)
       end

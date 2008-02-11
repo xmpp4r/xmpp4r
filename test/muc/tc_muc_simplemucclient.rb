@@ -72,4 +72,28 @@ class SimpleMUCClientTest < Test::Unit::TestCase
     assert_equal('TestCasing room', m.subject)
   end
 
+  def test_kick
+    m = MUC::SimpleMUCClient.new(@client)
+
+    state { |presence|
+      send("<presence from='test@test/test'/>")
+    }
+    m.join('test@test/test')
+    wait_state
+
+    state { |iq|
+      assert_kind_of(Iq, iq)
+      assert_equal('http://jabber.org/protocol/muc#admin', iq.queryns)
+      assert_kind_of(MUC::IqQueryMUCAdmin, iq.query)
+      assert_equal(1, iq.query.items.size)
+      assert_equal('pistol', iq.query.items[0].nick)
+      assert_equal(:none, iq.query.items[0].role)
+      assert_equal('Avaunt, you cullion!', iq.query.items[0].reason)
+      a = iq.answer(false)
+      a.type = :result
+      send(a)
+    }
+    m.kick('pistol', 'Avaunt, you cullion!')
+    wait_state
+  end
 end
