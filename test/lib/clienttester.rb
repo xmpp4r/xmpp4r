@@ -11,10 +11,9 @@ $VERBOSE = false
 module Jabber
   ##
   # The ClientTester is a mix-in which provides a setup and teardown
-  # method to prepare a Stream object (@client) and two methods
+  # method to prepare a Stream object (@client) and the method
   # interfacing as the "server side":
   # * send(xml):: Send a stanza to @client
-  # * receive:: (Wait and) retrieve a stanza sent by the client (in order)
   #
   # The server side is a stream, too: add your callbacks to @server
   #
@@ -49,10 +48,21 @@ module Jabber
       clientsock = TCPSocket.new('localhost', @@SOCKET_PORT)
       clientsock.sync = true
       @client = Stream.new(true)
+#=begin 
+      class << @client
+        def jid
+          begin
+            #raise
+          rescue
+            puts $!.backtrace.join("\n")
+          end
+          JID.new('test@test.com/test')
+        end
+      end
+#=end
       @client.start(clientsock)
-
       @client.send(stream) { |reply| true }
-
+      
       @state = 0
       @states = []
       @state_wait = Semaphore.new
