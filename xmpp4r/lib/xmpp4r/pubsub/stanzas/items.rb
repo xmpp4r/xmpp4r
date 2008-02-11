@@ -10,8 +10,7 @@ module Jabber
     # Items
     # a collection of Items
     class Items < XMPPElement
-      name_xmlns 'items', NS_PUBSUB
-      force_xmlns true
+      name_xmlns 'items'
       def node
         attributes['node']
       end

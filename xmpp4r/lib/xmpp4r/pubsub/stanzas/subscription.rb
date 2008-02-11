@@ -9,20 +9,20 @@ module Jabber
     ##
     # Subscription
     class Subscription < XMPPElement
-      name_xmlns 'subscription', NS_PUBSUB
+      name_xmlns 'subscription' 
       def initialize(myjid=nil,mynode=nil,mysubid=nil,mysubscription=nil)
-        super(true)
-        jid = myjid
-	node =  mynode
-	subid =  mysubid
-	state = mysubscription
+        super()
+        jid = myjid if myjid
+	node =  mynode if mynode
+	subid =  mysubid  if mysubid
+	state = mysubscription if mysubscription
       end
       
       ##
       # shows the jid
       # return:: [String]
       def jid
-        attributes['jid']
+        JID::new(attributes['jid'])
       end
       
       ##
@@ -83,13 +83,6 @@ module Jabber
       end
       
       alias subscription state
-      
-      ##
-      # the subscription need a configuration?
-      # return:: true or false
-      def need_configuration?
-        self.first_element('subscribe-options').first_element('required') ? true : false
-      end
       
       ##
       # is a approval from the nodeadmin needed?

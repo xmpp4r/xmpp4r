@@ -3,7 +3,7 @@
 # Website::http://home.gna.org/xmpp4r/
 #
 # It's recommented to read the XEP-0066 before you use this Helper. (Maybe its 
-# better not use the helper ) ;)
+# better not use the helper for now ) ;)
 # The whole code is buggy - you have been warned!
 # 
 # Maybe the following structure is good 
@@ -42,6 +42,7 @@ require 'xmpp4r/pubsub/stanzas/event'
 require 'xmpp4r/pubsub/stanzas/item'
 require 'xmpp4r/pubsub/stanzas/items'
 require 'xmpp4r/pubsub/stanzas/subscription'
+require 'xmpp4r/pubsub/stanzas/unsubscribe'
 require 'xmpp4r/dataforms'
 
 module Jabber
@@ -74,13 +75,13 @@ module Jabber
           if reply.pubsub.first_element('subscriptions')
             res = []
             reply.pubsub.first_element('subscriptions').each_element('subscription') { |subscription|
-    	        res << PubSub::Subscription.import(subscription)
+    	        res << Jabber::PubSub::Subscription.import(subscription)
              } 
           end
           true
         }
-        res
 
+        res
       end
       ##
       # subscribe to a node
@@ -96,7 +97,7 @@ module Jabber
         @stream.send_with_id(iq) do |reply|
           pubsubanswer = reply.pubsub
           if pubsubanswer.first_element('subscription')
-	    res = PubSub::Subscription.import(pubsubanswer.first_element('subscription'))
+            res = PubSub::Subscription.import(pubsubanswer.first_element('subscription'))
           end
           true
         end # @stream.send_with_id(iq)
@@ -112,13 +113,24 @@ module Jabber
       # return:: true
       def unsubscribe_from(node,subid=nil)
         iq = basic_pubsub_query(:set)
-        unsub = REXML::Element.new('unsubscribe')
-        unsub.attributes['node'] = node
-        unsub.attributes['jid'] = @stream.jid.strip
-        unsub.attributes['subid'] = subid
+	unsub = PubSub::Unsubscribe.new
+	unsub.node = node
+	unsub.jid = @stream.jid.strip
         iq.pubsub.add(unsub)
-        @stream.send_with_id(iq) { |reply| true        } # @stream.send_with_id(iq)
+        ret = false
+        @stream.send_with_id(iq) { |reply| 
+        
+          unsubscribe = PubSub::Unsubscribe.import(reply.pubsub.first_element('unsubscribe'))
+          if unsubscribe.jid == @stream.jid.strip && unsubscribe.node == node 
+            ret = true
+          end
+          true 
+        } # @stream.send_with_id(iq)
+        ret
       end
+      
+      
+      
       
       
       ##
@@ -365,7 +377,8 @@ module Jabber
 	else
           iq.add(IqPubSub.new)
 	end
-        iq
+        iq.from = @stream.jid.strip
+	iq
       end
 
       ##
