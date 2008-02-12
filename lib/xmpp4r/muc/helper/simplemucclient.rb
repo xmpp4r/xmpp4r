@@ -4,6 +4,7 @@
 
 require 'xmpp4r/delay/x/delay'
 require 'xmpp4r/muc/helper/mucclient'
+require 'xmpp4r/muc/iq/mucadminitem'
 
 module Jabber
   module MUC
