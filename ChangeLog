@@ -7,6 +7,7 @@ XMPP4R 0.3.3 (XX/XX/XXXX)
 * SASL anonymous support
 * File transfer fixes
 * MUC room configuration fixes
+* initial support for XEP-0118 User Tune
 
 XMPP4R 0.3.2 (15/10/2007)
 =========================
