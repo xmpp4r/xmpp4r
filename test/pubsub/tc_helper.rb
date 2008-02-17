@@ -9,7 +9,7 @@ require 'xmpp4r'
 require 'xmpp4r/pubsub/helper/servicehelper'
 include Jabber
 
-Jabber.debug = false
+Jabber.debug = true
 
 
 
@@ -184,6 +184,26 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     item1 = Jabber::PubSub::Item.new
     item1.text = 'foobar'
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
+    state { |iq|
+      assert_kind_of(Jabber::Iq, iq)
+      assert_equal(:set, iq.type)
+      assert_equal(1, iq.children.size)
+      assert_equal(1, iq.pubsub.children.size)
+      assert_equal('publish', iq.pubsub.children[0].name)
+      assert_equal(1, iq.pubsub.children[0].children.size)
+      assert_equal('item', iq.pubsub.children[0].children[0].name)
+      assert_equal(1, iq.pubsub.children[0].children[0].children.size)
+      assert_equal(item1.children.to_s, iq.pubsub.children[0].children[0].children[0].to_s)
+      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
+    }
+    h.publish_item_to('mynode', item1)
+    wait_state
+  end
+  
+  def test_publish_pubsub_item_with_id
+    item1 = Jabber::PubSub::Item.new
+    item1.text = 'foobar'
+    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 
     state { |iq|
       assert_kind_of(Jabber::Iq, iq)
@@ -193,14 +213,38 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       assert_equal('publish', iq.pubsub.children[0].name)
       assert_equal(1, iq.pubsub.children[0].children.size)
       assert_equal('item', iq.pubsub.children[0].children[0].name)
-      assert_nil(iq.pubsub.children[0].children[0].attributes['id'])
+      assert_equal('blubb', iq.pubsub.children[0].children[0].attributes['id'] )
       assert_equal(1, iq.pubsub.children[0].children[0].children.size)
       assert_equal(item1.children.to_s, iq.pubsub.children[0].children[0].children[0].to_s)
       send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
     }
-    h.publish_item_to('mynode', item1)
+    h.publish_item_with_id_to('mynode', item1,"blubb")
     wait_state
   end
+
+=begin
+# i dont know how to catch the runtime error - if you know please fix :)
+  def test_publish_pubsub_item_with_id_and_produce_an_error
+    item1 = "foobar"
+    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
+
+    state { |iq|
+      assert_kind_of(Jabber::Iq, iq)
+      assert_equal(:set, iq.type)
+      assert_equal(1, iq.children.size)
+      assert_equal(1, iq.pubsub.children.size)
+      assert_equal('publish', iq.pubsub.children[0].name)
+      assert_equal(1, iq.pubsub.children[0].children.size)
+      assert_equal('item', iq.pubsub.children[0].children[0].name)
+      assert_equal('blubb', iq.pubsub.children[0].children[0].attributes['id'] )
+      assert_equal(1, iq.pubsub.children[0].children[0].children.size)
+      assert_equal(item1.children.to_s, iq.pubsub.children[0].children[0].children[0].to_s)
+      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
+    }
+    h.publish_item_with_id_to('mynode', item1,"blubb")
+    wait_state
+  end
+=end
 
   def test_items
     item1 = Jabber::PubSub::Item.new("1")
@@ -389,8 +433,10 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     assert_equal(0,s.size)
     wait_state
   end
-  
 
-
+  def test_to_s
+    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
+    assert_equal('pubsub.example.org',h.to_s)
+  end
   
 end

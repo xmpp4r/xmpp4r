@@ -163,11 +163,14 @@ module Jabber
       # node:: [String]
       # item:: [Jabber::PubSub::Item]
       # return:: true
+      # it automaticly generates a id for the item 
       def publish_item_to(node,item)
         iq = basic_pubsub_query(:set)
-        publish = iq.pubsub.add(REXML::Element.new('publish'))
+	publish = iq.pubsub.add(REXML::Element.new('publish'))
         publish.attributes['node'] = node
+        
         if item.kind_of?(Jabber::PubSub::Item)
+    	  item.id = Jabber::IdGenerator.generate_id
           publish.add(item)
           @stream.send_with_id(iq) { |reply| true }
         end
@@ -178,15 +181,20 @@ module Jabber
       # item:: [REXML::Element]
       # id:: [String]
       # return:: true
-      def publish_item_with_id(node,item,id)
+      def publish_item_with_id_to(node,item,id)
+        iq = basic_pubsub_query(:set)
+        publish = iq.pubsub.add(REXML::Element.new('publish'))
+        publish.attributes['node'] = node
+          
         if item.kind_of?(REXML::Element)
           xmlitem = Jabber::PubSub::Item.new
           xmlitem.id = id
-          xmlitem.add(item)
-          publish(node,xmlitem)
+          xmlitem.import(item)
+          publish.add(xmlitem)
         else
           raise "given item is not a proper xml document or Jabber::PubSub::Item"
         end
+        @stream.send_with_id(iq) { |reply| true }
       end
 
       ##
