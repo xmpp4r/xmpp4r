@@ -10,39 +10,27 @@ module Jabber
     # Item
     # One PubSub Item
     class Item < XMPPElement
-      name_xmlns 'item'
-      def initialize(id = nil,node = nil)
+      name_xmlns 'item', NS_PUBSUB
+      force_xmlns true
+      def initialize(id=nil)
         super()
-        attributes['node'] = node
         attributes['id'] = id
       end
-
-      ##
-      # returns itemid
       def id
         attributes['id']
       end
-
-      ##
-      # set item id
-      # id:: [String]
       def id=(myid)
         attributes['id'] = myid
       end
-      
-      ##
-      # returns node
-      def node
-        attributes['node']
-      end
-      
-      ##
-      # sets node
-      # node:: [String]
-      def node=(mynode)
-        attributes['node'] = mynode
-      end
-      
+    end
+
+    ##
+    # An Item wrapped in a Pubsub Event.
+    #
+    # See example 2 in http://www.xmpp.org/extensions/xep-0060.html#intro-howitworks
+    # and http://www.xmpp.org/extensions/xep-0060.html#schemas-event
+    class EventItem < Item
+      name_xmlns 'item', NS_PUBSUB + "#event"
     end
   end
 end

@@ -10,7 +10,8 @@ module Jabber
     # Items
     # a collection of Items
     class Items < XMPPElement
-      name_xmlns 'items'
+      name_xmlns 'items', NS_PUBSUB
+      force_xmlns true
       def node
         attributes['node']
       end
@@ -29,6 +30,15 @@ module Jabber
       def max_items=(mymaxitems)
         attributes['max_items'] = mymaxitems
       end
+    end
+
+    ##
+    # Items wrapped in a Pubsub Event.
+    #
+    # See example 2 in http://www.xmpp.org/extensions/xep-0060.html#intro-howitworks
+    # and http://www.xmpp.org/extensions/xep-0060.html#schemas-event
+    class EventItems < Items
+      name_xmlns 'items', NS_PUBSUB + "#event"
     end
   end
 end
