@@ -14,8 +14,6 @@ module Jabber
     # http://www.xmpp.org/extensions/xep-0060.html#intro-howitworks
     class Publish < XMPPElement
       name_xmlns 'publish', NS_PUBSUB 
-      force_xmlns true
-      
       ##
       # return the node for this publication
       def node
