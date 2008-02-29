@@ -22,7 +22,10 @@ module Jabber
       def initialize(node = nil, ver = nil)
         super()
         add_attribute('node', node) if node
-        add_attribute('ver', ver) if ver
+        if ver
+          add_attribute('ver', ver)
+          add_attribute('hash', 'sha-1')
+        end
       end
 
       ##
@@ -37,6 +40,13 @@ module Jabber
       # a 'unique identifier for the software underlying the entity'
       def node
         attributes['node']
+      end
+
+      ##
+      # Get the value of this element's 'hash' attribute,
+      # the algorithm used in generating the 'ver' attribute
+      def hash
+        attributes['hash']
       end
     end
   end
