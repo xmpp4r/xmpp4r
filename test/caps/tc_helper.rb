@@ -25,6 +25,9 @@ class Caps::HelperTest < Test::Unit::TestCase
       # see http://www.xmpp.org/extensions/xep-0115.html#ver
       assert_equal('8RovUdtOmiAjzj+xI7SK5BCw3A8=', c.ver)
 
+      # version 1.5 of xep 0115 indicates that the <c /> stanzq MUST feature a 'hash' attribute
+      assert_equal('sha-1', c.hash)
+
       assert_equal("http://home.gna.org/xmpp4r/##{Jabber::XMPP4R_VERSION}", c.node)
       
       send(iq_discovering_capabilities)
