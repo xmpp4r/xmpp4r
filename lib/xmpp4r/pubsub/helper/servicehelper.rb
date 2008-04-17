@@ -212,7 +212,7 @@ module Jabber
       ##
       # Create a new node on the pubsub service
       # node:: [String] you node name - otherwise you get a automaticly generated one (in most cases)
-      # configure:: [Jabber::XMLStanza] if you want to configure you node (default nil)
+      # configure:: [Jabber::XMPPElement] if you want to configure you node (default nil)
       # return:: [String]
       def create_node(node=nil, configure=nil)
         rnode = nil
@@ -221,8 +221,8 @@ module Jabber
         if configure
           confele =  REXML::Element.new('configure')
 
-          if configure.type_of?(XMLStanza)
-            confele << configure
+          if configure.kind_of?(XMPPElement)
+            confele.add(configure)
           end
           iq.pubsub.add(confele)
         end
