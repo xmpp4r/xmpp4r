@@ -164,6 +164,36 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     wait_state
   end
 
+  def test_create_configure
+    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
+
+    state { |iq|
+      assert_kind_of(Jabber::Iq, iq)
+      assert_equal(:set, iq.type)
+      assert_equal(1, iq.children.size)
+      assert_equal('http://jabber.org/protocol/pubsub', iq.pubsub.namespace)
+      assert_equal(2, iq.pubsub.children.size)
+      assert_equal('create', iq.pubsub.children.first.name)
+      assert_equal('mynode', iq.pubsub.children.first.attributes['node'])
+      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'>
+              <pubsub xmlns='http://jabber.org/protocol/pubsub'>
+                <create node='#{iq.pubsub.children.first.attributes['node']}'/>
+              </pubsub>
+            </iq>")
+    }
+
+    form = Jabber::Dataforms::XData.new :submit
+    pubsub_config = Jabber::Dataforms::XDataField.new('FORM_TYPE', :hidden)
+    pubsub_config.values = 'http://jabber.org/protocol/pubsub#node_config'
+    form.add pubsub_config
+    f = Jabber::Dataforms::XDataField.new('pubsub#access_model')
+    f.values = 'open'
+    form.add f
+     
+    assert_nothing_raised { h.create_node('mynode', form) }
+    wait_state
+  end
+
   def test_delete
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 
