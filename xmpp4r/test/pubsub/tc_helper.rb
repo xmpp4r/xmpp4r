@@ -9,7 +9,7 @@ require 'xmpp4r'
 require 'xmpp4r/pubsub/helper/servicehelper'
 include Jabber
 
-Jabber.debug = true
+# Jabber.debug = true
 
 
 
