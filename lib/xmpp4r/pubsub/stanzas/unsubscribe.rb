@@ -20,14 +20,14 @@ module Jabber
       # shows the jid
       # return:: [String]
       def jid
-        JID::new(attributes['jid'])
+        (a = attribute('jid')).nil? ? a : JID::new(a.value)
       end
       
       ##
       # sets the jid
       # =:: [Jabber::JID] or [String]
       def jid=(myjid)
-        attributes['jid'] = myjid
+        add_attribute('jid', myjid ? myjid.to_s : nil)
       end
       
       ##

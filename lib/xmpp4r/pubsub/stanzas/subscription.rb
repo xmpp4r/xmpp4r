@@ -11,17 +11,17 @@ module Jabber
     class Subscription < XMPPElement
       name_xmlns 'subscription', NS_PUBSUB
       def initialize(myjid=nil,mynode=nil,mysubid=nil,mysubscription=nil)
-        super(true)
+        super()
         jid = myjid
 	node =  mynode
 	subid =  mysubid
 	state = mysubscription
       end
       def jid
-        attributes['jid']
+        (a = attribute('jid')).nil? ? a : JID::new(a.value)
       end
       def jid=(myjid)
-        attributes['jid'] = myjid
+        add_attribute('jid', myjid ? myjid.to_s : nil)
       end
       
       def node
@@ -45,7 +45,7 @@ module Jabber
               when 'none'      		then return :none
               when 'pending'   		then return :pending
               when 'subscribed'         then return :subscribed
-              when 'unconfigured'       then return :items
+              when 'unconfigured'       then return :unconfigured
               else return nil
           end
       end
@@ -53,6 +53,10 @@ module Jabber
         attributes['subscription'] = mystate
       end
       alias subscription state
+
+      def need_approval?
+        state == :pending
+      end
     end
   end
 end
