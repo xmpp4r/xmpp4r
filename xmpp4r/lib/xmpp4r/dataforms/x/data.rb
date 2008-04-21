@@ -28,10 +28,11 @@ module Jabber
         nil
       end
 
-      def fields
+      def fields(including_hidden=false)
         fields = []
         each_element do |xe|
-          if xe.kind_of?(XDataField) and xe.type != :hidden and xe.type != :fixed
+          if xe.kind_of?(XDataField) and (including_hidden or
+                                          (xe.type != :hidden and xe.type != :fixed))
             fields << xe
           end
         end
@@ -249,6 +250,18 @@ module Jabber
         ary.each { |v|
           add(REXML::Element.new('value')).text = v
         }
+      end
+
+      ##
+      # Get the first value
+      def value
+        values.first
+      end
+
+      ##
+      # Remove all and set one value
+      def value=(val)
+        self.values = [val]
       end
 
       ##

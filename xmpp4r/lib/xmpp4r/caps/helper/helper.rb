@@ -5,6 +5,7 @@
 require 'xmpp4r'
 require 'xmpp4r/discovery'
 require 'xmpp4r/caps/c'
+require 'xmpp4r/caps/helper/generator'
 require 'digest/sha1'
 require 'base64'
 
@@ -13,7 +14,7 @@ module Jabber
     ##
     # A Helper to manage advertising and discovery of entity capabilities.
     #
-    # Following EP-0115 (ver 1.4 http://www.xmpp.org/extensions/xep-0115.html).
+    # Following XEP-0115 (ver 1.4 http://www.xmpp.org/extensions/xep-0115.html).
     # you can use this Helper to, for example, advertise that your client
     # wishes to receive XEP-0118 User Tune notifications, eg:
     #
@@ -81,11 +82,7 @@ module Jabber
       #
       # See http://www.xmpp.org/extensions/xep-0115.html#ver
       def ver
-        identity_repr = lambda { |i| "#{i.category}/#{i.type}" }
-        feature_repr = lambda { |f| f.var }
-        s = (@identities.map(&identity_repr).sort! + @features.map(&feature_repr).sort!).join('<') + '<'
-
-        Base64.encode64(Digest::SHA1::digest(s)).chomp!
+        Caps::generate_ver(@identities, @features)
       end
     end
   end

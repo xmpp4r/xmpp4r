@@ -1,8 +1,15 @@
+# =XMPP4R - XMPP Library for Ruby
+# License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
+# Website::http://home.gna.org/xmpp4r/
+
 $:.unshift '../lib'
 require 'xmpp4r'
 require 'test/unit'
 require 'socket'
 require 'xmpp4r/semaphore'
+
+# This is sane for tests:
+Thread::abort_on_exception = true
 
 # Turn $VERBOSE off to suppress warnings about redefinition
 oldverbose = $VERBOSE
@@ -62,22 +69,26 @@ module Jabber
 #=end
       @client.start(clientsock)
       @client.send(stream) { |reply| true }
-      
+     
       @state = 0
       @states = []
       @state_wait = Semaphore.new
       @state_wait2 = Semaphore.new
       @server.add_stanza_callback { |stanza|
         if @state < @states.size
-          @states[@state].call(stanza)
+          begin
+            @states[@state].call(stanza)
+          rescue
+            puts "Exception in state: #{$!.class}: #{$!}\n#{$!.join("\n")}"
+          end
           @state += 1
           @state_wait2.wait
           @state_wait.run
         end
-
+        
         false
       }
-
+      
       serverwait.wait
     end
 

@@ -31,12 +31,17 @@ module Jabber
       # (Remember to send initial presence afterwards!)
       #
       # The initialization will not wait for the roster being received,
-      # use add_query_callback to get notifyed when Roster::Helper#items
-      # has been filled.
+      # use wait_for_roster.
+      #
+      # <b>Attention:</b> If you send presence and receive presences
+      # before the roster has arrived, the Roster helper will let them
+      # pass through and does *not* keep them!
       def initialize(stream)
         @stream = stream
         @items = {}
         @items_lock = Mutex.new
+        @roster_wait = Mutex.new
+        @roster_wait.lock
         @query_cbs = CallbackList.new
         @update_cbs = CallbackList.new
         @presence_cbs = CallbackList.new
@@ -66,6 +71,13 @@ module Jabber
         # Request the roster
         rosterget = Iq.new_rosterget
         stream.send(rosterget)
+      end
+
+      ##
+      # Wait for first roster query result to arrive
+      def wait_for_roster
+        @roster_wait.lock
+        @roster_wait.unlock
       end
 
       ##
@@ -167,7 +179,8 @@ module Jabber
           }
           @update_cbs.process(olditem, newitem)
         end
-          
+
+        @roster_wait.unlock
         @query_cbs.process(iq)
       end
       
