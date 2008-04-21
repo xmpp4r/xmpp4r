@@ -148,5 +148,26 @@ module Jabber
       cloned.context = @context
       cloned
     end
+
+    ##
+    # Generic XML attribute 'xml:lang'
+    # (REXML provides no shortcut)
+    def xml_lang
+      attributes['xml:lang']
+    end
+
+    ##
+    # Set XML language attribute
+    def xml_lang=(l)
+      attributes['xml:lang'] = l
+    end
+
+    ##
+    # Set XML language attribute (chainable)
+    def set_xml_lang(l)
+      self.xml_lang = l
+      self
+    end
+
   end
 end
