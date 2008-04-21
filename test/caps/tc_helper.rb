@@ -114,11 +114,44 @@ class Caps::HelperTest < Test::Unit::TestCase
                               Discovery::Feature.new('http://jabber.org/protocol/disco#items'),
                               Discovery::Feature.new('http://jabber.org/protocol/caps ')], # caps not in XEP
                              [form])
-    assert_equal('8lu+88MRxmKM7yO3MEzY7YmTsWs=', ver)
+    assert_equal('8lu+88MRxmKM7yO3MEzY7YmTsWs= (copied from XEP-0115)', ver + ' (known to fail)')
   end
 
   ##
   # http://www.xmpp.org/extensions/xep-0115.html#ver-gen-complex
   def test_caps_complex_imported
+    query = IqQuery::import(REXML::Document.new(<<END).root)
+<query xmlns='http://jabber.org/protocol/disco#info'
+         node='http://psi-im.org#8lu+88MRxmKM7yO3MEzY7YmTsWs='>
+    <identity xml:lang='en' category='client' name='Psi 0.9.1' type='pc'/>
+    <identity xml:lang='el' category='client' name='Ψ 0.9.1' type='pc'/>
+    <feature var='http://jabber.org/protocol/disco#info'/>
+    <feature var='http://jabber.org/protocol/disco#items'/>
+    <feature var='http://jabber.org/protocol/muc'/>
+    <x xmlns='jabber:x:data' type='result'>
+      <field var='FORM_TYPE' type='hidden'>
+        <value>urn:xmpp:dataforms:softwareinfo</value>
+      </field>
+      <field var='ip_version'>
+        <value>ipv4</value>
+        <value>ipv6</value>
+      </field>
+      <field var='os'>
+        <value>Mac</value>
+      </field>
+      <field var='os_version'>
+        <value>10.5.1</value>
+      </field>
+      <field var='software'>
+        <value>Psi</value>
+      </field>
+      <field var='software_version'>
+        <value>0.11</value>
+      </field>
+    </x>
+  </query>
+END
+    assert_equal('8lu+88MRxmKM7yO3MEzY7YmTsWs= (copied from XEP-0115)',
+                 Caps::generate_ver_from_discoinfo(query) + ' (known to fail)')
   end
 end
