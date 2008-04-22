@@ -25,30 +25,49 @@ module Jabber
 
       ##
       # Identities returned on Discovery Info query
+      #
+      # Array of [Discovery::Identity]
       attr_accessor :identities
       ##
-      # Features returned on Discovery Info query
+      # Features returned on Discovery Info query,
+      #
+      # Array of [Discovery::Feature]
       attr_accessor :features
       ##
       # Forms returned on Discovery Info query
       # (such as Software Information)
+      #
+      # Array of [Dataforms::XData]
       attr_accessor :forms
 
       ##
       # Children returned on Discovery Item query
+      #
+      # May contain other Discovery::Responder instances
+      # which will generate an item dynamically from their
+      # first identity
+      #
+      # Array of [Discovery::Item] or [Discovery::Responder] (mixed)
       attr_accessor :items
+
+      ##
+      # Set the JID this helper feels responsible for
+      # (default: nil, responsible for any JID)
+      attr_accessor :my_jid
 
       ##
       # Initialize responder for a specific node
       # stream:: [Jabber::Stream]
       # node:: [nil] or [String]
-      def initialize(stream, node=nil, identities=[], features=[])
+      def initialize(stream, node=nil, identities=[], features=[], items=[])
         @stream = stream
+        @my_jid = nil
         @node = node
         @identities = identities
-        @features = features
+        @features = []
+        add_features(features)
         @forms = []
-        @items = []
+        @items = items
 
         @stream.add_iq_callback(180, self) do |iq|
           if iq.type == :get and
@@ -72,8 +91,12 @@ module Jabber
             answer = iq.answer(false)
             answer.type = :true
             query = answer.add(IqQueryDiscoItems.new)
-            @items.each do |element|
-              query.add(element)
+            @items.each do |item|
+              if item.kind_of? Responder
+                query.add(item.generate_item)
+              else
+                query.add(item)
+              end
             end
             @stream.send(answer)
 
@@ -111,6 +134,19 @@ module Jabber
       # caching of Service Discovery information.
       def generate_caps
         Caps::C.new(@node, Caps::generate_ver(@identities, @features, @forms))
+      end
+
+      ##
+      # Generate an item for inclusion in items discovery in other
+      # responders
+      # return:: [Discovery::Item] or nil
+      def generate_item
+        i = @identities.first
+        if i
+          Item::new(@my_jid || @stream.jid, i.iname, @node)
+        else
+          nil
+        end
       end
     end
   end
