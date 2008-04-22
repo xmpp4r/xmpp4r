@@ -6,8 +6,6 @@ require 'xmpp4r'
 require 'xmpp4r/discovery'
 require 'xmpp4r/caps/c'
 require 'xmpp4r/caps/helper/generator'
-require 'digest/sha1'
-require 'base64'
 
 module Jabber
   module Caps

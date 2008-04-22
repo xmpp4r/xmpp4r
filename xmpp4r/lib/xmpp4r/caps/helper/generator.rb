@@ -7,7 +7,7 @@ require 'xmpp4r/discovery'
 require 'xmpp4r/dataforms'
 require 'xmpp4r/caps/c'
 require 'digest'
-require 'base64'
+require 'xmpp4r/base64'
 
 module Jabber
   module Caps
