@@ -6,6 +6,8 @@ require 'xmpp4r/query'
 
 module Jabber
   module Discovery
+    NS_DISCO_ITEMS = 'http://jabber.org/protocol/disco#items'
+
     ##
     # Class for handling Service Discovery queries,
     # items
@@ -17,7 +19,7 @@ module Jabber
     # querying IqQueryDiscoInfo and further sub-items by querying
     # IqQueryDiscoItems.
     class IqQueryDiscoItems < IqQuery
-      name_xmlns 'query', 'http://jabber.org/protocol/disco#items'
+      name_xmlns 'query', NS_DISCO_ITEMS
 
       ##
       # Get the queried Service Discovery node or nil
@@ -50,7 +52,7 @@ module Jabber
     #
     # Please note that JEP 0030 requires the jid to occur
     class Item < XMPPElement
-      name_xmlns 'item', 'http://jabber.org/protocol/disco#items'
+      name_xmlns 'item', NS_DISCO_ITEMS
 
       ##
       # Initialize a new Service Discovery <item/>
