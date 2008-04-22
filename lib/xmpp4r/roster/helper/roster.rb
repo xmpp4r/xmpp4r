@@ -40,8 +40,7 @@ module Jabber
         @stream = stream
         @items = {}
         @items_lock = Mutex.new
-        @roster_wait = Mutex.new
-        @roster_wait.lock
+        @roster_wait = Semaphore.new
         @query_cbs = CallbackList.new
         @update_cbs = CallbackList.new
         @presence_cbs = CallbackList.new
@@ -76,8 +75,8 @@ module Jabber
       ##
       # Wait for first roster query result to arrive
       def wait_for_roster
-        @roster_wait.lock
-        @roster_wait.unlock
+        @roster_wait.wait
+        @roster_wait.run
       end
 
       ##
@@ -180,7 +179,7 @@ module Jabber
           @update_cbs.process(olditem, newitem)
         end
 
-        @roster_wait.unlock
+        @roster_wait.run
         @query_cbs.process(iq)
       end
       

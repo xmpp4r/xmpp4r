@@ -2,6 +2,8 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
+require 'xmpp4r/base64'
+
 module Jabber
   module Bytestreams
     ##
@@ -154,7 +156,7 @@ module Jabber
           data.add_namespace NS_IBB
           data.attributes['sid'] = @session_id
           data.attributes['seq'] = @seq_send.to_s
-          data.text = [databuf].pack('m')
+          data.text = Base64::encode64(databuf)
 
           # TODO: Implement AMP correctly
           amp = msg.add REXML::Element.new('amp')
@@ -250,7 +252,7 @@ module Jabber
       # There's no need to catch Exceptions here,
       # as none are thrown.
       def data
-        @data.unpack('m').first
+        Base64::decode64(@data)
       end
     end
   end

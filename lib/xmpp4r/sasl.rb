@@ -3,6 +3,7 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'digest/md5'
+require 'xmpp4r/base64'
 
 module Jabber
   ##
@@ -58,7 +59,7 @@ module Jabber
       def auth(password)
         auth_text = "#{@stream.jid.strip}\x00#{@stream.jid.node}\x00#{password}"
         error = nil
-        @stream.send(generate_auth('PLAIN', [auth_text].pack('m').gsub(/\s/, ''))) { |reply|
+        @stream.send(generate_auth('PLAIN', Base64::encode64(auth_text).gsub(/\s/, ''))) { |reply|
           if reply.name != 'success'
             error = reply.first_element(nil).name
           end
@@ -115,7 +116,7 @@ module Jabber
       end
 
       def decode_challenge(challenge)
-        text = challenge.unpack('m').first
+        text = Base64::decode64(challenge)
         res = {}
 
         state = :key
@@ -183,7 +184,7 @@ module Jabber
 
         r = REXML::Element.new('response')
         r.add_namespace NS_SASL
-        r.text = [response_text].pack('m').gsub(/\s/, '')
+        r.text = Base64::encode64(response_text).gsub(/\s/, '')
 
         success_already = false
         error = nil
