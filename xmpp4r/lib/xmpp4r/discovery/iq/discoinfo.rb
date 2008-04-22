@@ -78,7 +78,8 @@ module Jabber
     ##
     # Service Discovery identity to add() to IqQueryDiscoInfo
     #
-    # Please note that JEP 0030 requires both category and type to occur
+    # Please note that XEP 0030 requires both category and type to occur,
+    # for a reference see: http://www.xmpp.org/registrar/disco-categories.html
     class Identity < XMPPElement
       name_xmlns 'identity', NS_DISCO_INFO
 
@@ -173,7 +174,8 @@ module Jabber
     ##
     # Service Discovery feature to add() to IqQueryDiscoInfo
     #
-    # Please note that JEP 0030 requires var to be set
+    # Please note that JEP 0030 requires var to be set,
+    # for a reference see: http://www.xmpp.org/registrar/disco-features.html
     class Feature < XMPPElement
       name_xmlns 'feature', NS_DISCO_INFO
 
