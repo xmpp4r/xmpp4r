@@ -109,12 +109,11 @@ class Caps::HelperTest < Test::Unit::TestCase
     form.add(Dataforms::XDataField.new('os_version')).value = '10.5.1'
     ver = Caps::generate_ver([Discovery::Identity.new('client', 'Psi 0.9.1', 'pc').set_xml_lang('en'),
                               Discovery::Identity.new('client', 'Ψ 0.9.1', 'pc').set_xml_lang('el')],
-                             [Discovery::Feature.new('http://jabber.org/protocol/muc '), # re-ordered
+                             [Discovery::Feature.new('http://jabber.org/protocol/muc'), # re-ordered
                               Discovery::Feature.new('http://jabber.org/protocol/disco#info'),
-                              Discovery::Feature.new('http://jabber.org/protocol/disco#items'),
-                              Discovery::Feature.new('http://jabber.org/protocol/caps ')], # caps not in XEP
+                              Discovery::Feature.new('http://jabber.org/protocol/disco#items')],
                              [form])
-    assert_equal('8lu+88MRxmKM7yO3MEzY7YmTsWs= (copied from XEP-0115)', ver + ' (known to fail)')
+    assert_equal('8lu+88MRxmKM7yO3MEzY7YmTsWs=', ver)
   end
 
   ##
@@ -151,7 +150,7 @@ class Caps::HelperTest < Test::Unit::TestCase
     </x>
   </query>
 END
-    assert_equal('8lu+88MRxmKM7yO3MEzY7YmTsWs= (copied from XEP-0115)',
-                 Caps::generate_ver_from_discoinfo(query) + ' (known to fail)')
+    assert_equal('8lu+88MRxmKM7yO3MEzY7YmTsWs=',
+                 Caps::generate_ver_from_discoinfo(query))
   end
 end
