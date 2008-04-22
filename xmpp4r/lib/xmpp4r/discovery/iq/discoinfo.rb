@@ -6,6 +6,8 @@ require 'xmpp4r/query'
 
 module Jabber
   module Discovery
+    NS_DISCO_INFO = 'http://jabber.org/protocol/disco#info'
+
     ##
     # Class for handling Service Discovery queries,
     # info
@@ -15,7 +17,7 @@ module Jabber
     # elements, describing the type and the supported namespaces of
     # the service.
     class IqQueryDiscoInfo < IqQuery
-      name_xmlns 'query', 'http://jabber.org/protocol/disco#info'
+      name_xmlns 'query', NS_DISCO_INFO
 
       ##
       # Get the queried Service Discovery node or nil
@@ -78,7 +80,7 @@ module Jabber
     #
     # Please note that JEP 0030 requires both category and type to occur
     class Identity < XMPPElement
-      name_xmlns 'identity', 'http://jabber.org/protocol/disco#info'
+      name_xmlns 'identity', NS_DISCO_INFO
 
       ##
       # Initialize a new Identity
@@ -173,7 +175,7 @@ module Jabber
     #
     # Please note that JEP 0030 requires var to be set
     class Feature < XMPPElement
-      name_xmlns 'feature', 'http://jabber.org/protocol/disco#info'
+      name_xmlns 'feature', NS_DISCO_INFO
 
       ##
       # Create a new <feature/> element
