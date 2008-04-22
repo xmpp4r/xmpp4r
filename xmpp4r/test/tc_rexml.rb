@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-$:.unshift '../lib'
+$:.unshift File::dirname(__FILE__) + '/../lib'
 
 require 'test/unit'
 require 'xmpp4r/rexmladdons'
@@ -59,5 +59,29 @@ class REXMLTest < Test::Unit::TestCase
     assert_equal('&nbsp', e.attributes['x'])
     e.attributes['x'] = '&nbsp;'
     assert_equal('&nbsp;', e.attributes['x'])
+  end
+
+  def test_element_equal
+    assert_equal(REXML::Element.new('foo'), REXML::Element.new('foo'))
+  end
+
+  def test_element_equal_xmlns1
+    e1 = REXML::Element.new('foo')
+    e1.add_namespace('a', 'urn:test:foo')
+    e1.attributes['a:bar'] = 'baz'
+    e2 = REXML::Element.new('foo')
+    e2.add_namespace('b', 'urn:test:foo')
+    e2.attributes['b:bar'] = 'baz'
+    assert_equal(e1, e2)
+  end
+
+  def test_element_equal_xmlns2
+    e1 = REXML::Element.new('foo')
+    e1.add_namespace('t', 'urn:test:foo')
+    e1.attributes['t:bar'] = 'baz'
+    e2 = REXML::Element.new('foo')
+    e2.add_namespace('t', 'urn:test:bar')
+    e2.attributes['t:bar'] = 'baz'
+    assert_not_equal(e1, e2)
   end
 end

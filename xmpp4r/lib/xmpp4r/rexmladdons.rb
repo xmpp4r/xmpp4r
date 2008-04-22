@@ -99,6 +99,27 @@ module REXML
     def delete_elements(element)
       while(delete_element(element)) do end
     end
+
+    ##
+    # Test for equality of two elements,
+    # useful for assert_equal in test cases
+    def ==(o)
+      return false unless o.kind_of? REXML::Element
+      return false unless name == o.name
+
+      attributes.each_attribute do |attr|
+        return false unless attr.value == o.attributes[attr.name]
+      end
+      o.attributes.each_attribute do |attr|
+        return false unless attributes[attr.name] == attr.value
+      end
+
+      children.each_with_index do |child,i|
+        return false unless child.eql? o.children[i]
+      end
+
+      true
+    end
   end
 end
 
