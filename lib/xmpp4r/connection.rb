@@ -2,7 +2,10 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
-require 'openssl'
+begin
+  require 'openssl'
+rescue LoadError
+end
 require 'xmpp4r/stream'
 require 'xmpp4r/errorexception'
 
@@ -37,7 +40,7 @@ module Jabber
       super(threaded)
       @host = nil
       @port = nil
-      @allow_tls = true
+      @allow_tls = defined? OpenSSL
       @tls = false
       @ssl_capath = nil
       @ssl_verifycb = nil
