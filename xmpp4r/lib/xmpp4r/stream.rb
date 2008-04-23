@@ -359,7 +359,11 @@ module Jabber
     # The block will be called once: when receiving a stanza with the
     # same Jabber::XMPPStanza#id. There is no need to return true to
     # complete this! Instead the return value of the block will be
-    # returned.
+    # returned. This is a direct result of unique request/response
+    # stanza identification via the id attribute.
+    #
+    # The block may be omitted. Then, the result will be the response
+    # stanza.
     #
     # Be aware that if a stanza with <tt>type='error'</tt> is received
     # the function does not yield but raises an ErrorException with
@@ -381,8 +385,11 @@ module Jabber
           if received.type == :error
             error = (received.error ? received.error : Error.new)
             true
-          else
+          elsif block_given?
             res = yield(received)
+            true
+          else
+            res = received
             true
           end
         else
