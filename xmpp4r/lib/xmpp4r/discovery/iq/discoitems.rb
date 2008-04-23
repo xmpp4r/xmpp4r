@@ -44,6 +44,13 @@ module Jabber
         self.node = val
         self
       end
+
+      ##
+      # Get all item children
+      # result:: Array of [Discovery::Item]
+      def items
+        get_elements('item')
+      end
     end
 
 

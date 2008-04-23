@@ -55,11 +55,7 @@ module Jabber
       # Get list of identities
       # result:: [Array] of [Identity]
       def identities
-        res = []
-        each_element('identity') { |id|
-          res.push(id)
-        }
-        res        
+        get_elements('identity')
       end
 
       ##
