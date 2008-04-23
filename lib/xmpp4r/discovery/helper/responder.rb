@@ -75,7 +75,7 @@ module Jabber
              iq.query.node == @node
 
             answer = iq.answer(false)
-            answer.type = :true
+            answer.type = :result
             query = answer.add(IqQueryDiscoInfo.new)
             (@identities + @features + @forms).each do |element|
               query.add(element)
@@ -89,7 +89,7 @@ module Jabber
                 iq.query.node == @node
 
             answer = iq.answer(false)
-            answer.type = :true
+            answer.type = :result
             query = answer.add(IqQueryDiscoItems.new)
             @items.each do |item|
               if item.kind_of? Responder

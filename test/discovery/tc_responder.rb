@@ -38,4 +38,30 @@ class Discovery::ResponderTest < Test::Unit::TestCase
     r = Discovery::Responder.new(@client, nil, [Discovery::Identity::new('client', 'XMPP4R', 'bot')])
     assert_equal(Discovery::Item::new(@client.jid, 'XMPP4R'), r.generate_item)
   end
+
+  def test_query
+    Discovery::Responder.new(@client, nil,
+                             [Discovery::Identity::new('client', 'XMPP4R', 'bot')],
+                             ['ipv6'],
+                             [Discovery::Item::new('foo@bar', 'Foo', nil)])
+
+    iq1 = Iq::new(:get)
+    iq1.add(Discovery::IqQueryDiscoInfo::new)
+    reply1 = @server.send_with_id(iq1)
+    assert_equal(:result, reply1.type)
+    assert_kind_of(Discovery::IqQueryDiscoInfo, reply1.query)
+    assert_nil(reply1.query.node)
+    assert_equal(1, reply1.query.identities.size)
+    assert_equal('XMPP4R', reply1.query.identities[0].iname)
+    assert_equal(['ipv6'], reply1.query.features)
+
+    iq2 = Iq::new(:get)
+    iq2.add(Discovery::IqQueryDiscoItems::new)
+    reply2 = @server.send_with_id(iq2)
+    assert_equal(:result, reply2.type)
+    assert_kind_of(Discovery::IqQueryDiscoItems, reply2.query)
+    assert_nil(reply2.query.node)
+    assert_equal(1, reply2.query.items.size)
+    assert_equal(JID::new('foo@bar'), reply2.query.items[0].jid)
+  end
 end
