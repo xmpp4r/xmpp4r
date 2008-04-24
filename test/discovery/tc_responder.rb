@@ -64,4 +64,27 @@ class Discovery::ResponderTest < Test::Unit::TestCase
     assert_equal(1, reply2.query.items.size)
     assert_equal(JID::new('foo@bar'), reply2.query.items[0].jid)
   end
+
+  def test_linked
+    class << @client
+      def jid
+        JID::new('foo@bar/baz')
+      end
+    end
+    r1 = Discovery::Responder::new(@client, 'child',
+                                   [Discovery::Identity::new('client', 'Child', 'bot')])
+    r2 = Discovery::Responder::new(@client, nil,
+                                   [], [],
+                                   [r1])
+
+    iq = Iq::new(:get)
+    iq.add(Discovery::IqQueryDiscoItems::new)
+    reply = @server.send_with_id(iq)
+    assert_kind_of(Discovery::IqQueryDiscoItems, reply.query)
+    assert_nil(reply.query.node)
+    assert_equal(1, reply.query.items.size)
+    assert_equal(JID::new('foo@bar/baz'), reply.query.items[0].jid)
+    assert_equal('Child', reply.query.items[0].iname)
+    assert_equal('child', reply.query.items[0].node)
+  end
 end

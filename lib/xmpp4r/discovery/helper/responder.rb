@@ -55,6 +55,8 @@ module Jabber
       # (default: nil, responsible for any JID)
       attr_accessor :my_jid
 
+      CALLBACK_PRIORITY = 180
+
       ##
       # Initialize responder for a specific node
       # stream:: [Jabber::Stream]
@@ -69,7 +71,7 @@ module Jabber
         @forms = []
         @items = items
 
-        @stream.add_iq_callback(180, self) do |iq|
+        @stream.add_iq_callback(CALLBACK_PRIORITY, self) do |iq|
           if iq.type == :get and
              iq.query.kind_of? IqQueryDiscoInfo and
              iq.query.node == @node
