@@ -3,6 +3,7 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/iq'
+require 'xmpp4r/base64'
 
 module Jabber
   module Vcard
@@ -71,6 +72,19 @@ module Jabber
       def fields
         element_names(self).uniq
       end
+
+      ##
+      # Get the PHOTO/BINVAL (Avatar picture) field decoded from Base64
+      # result:: [String] or [nil]
+      def photo_binval
+        if (binval = self['PHOTO/BINVAL'])
+          Base64::decode64(binval)
+        else
+          nil
+        end
+      end
+
+      private
 
       ##
       # Recursive helper function,

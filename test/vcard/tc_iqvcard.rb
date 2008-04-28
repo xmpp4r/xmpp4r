@@ -49,4 +49,14 @@ class IqVcardTest < Test::Unit::TestCase
       assert_equal(nil, v['PHOTO'])
       assert_equal(nil, v['NICKNAME'])
   end
+
+  def test_photo_binval
+    v = Vcard::IqVcard.new({'PHOTO/BINVAL'=>"SGVsbG8gd29ybGQ=\n"})
+    assert_equal('Hello world', v.photo_binval)
+  end
+
+  def test_photo_binval_nil
+    v = Vcard::IqVcard.new({})
+    assert_nil(v.photo_binval)
+  end
 end
