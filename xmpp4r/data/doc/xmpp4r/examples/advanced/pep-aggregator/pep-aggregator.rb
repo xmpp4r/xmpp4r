@@ -1,0 +1,151 @@
+#!/usr/bin/env ruby
+
+require 'xmpp4r/framework/bot'
+require 'xmpp4r/pubsub'
+require 'xmpp4r/vcard'
+require 'ramaze'
+
+if ARGV.size < 3
+  puts "Usage: #{$0} <HTTP port> <JID> <Password> [Status message]"
+  exit
+end
+HTTP_PORT = ARGV.shift.to_i
+JID = ARGV.shift
+PASSWORD = ARGV.shift
+STATUS_MESSAGE = ARGV.shift
+
+def xml_namespaces(filename, excludes=[])
+  namespaces_recursive = nil
+  namespaces_recursive = lambda { |element|
+    namespaces = element.namespaces
+    element.each_element { |child|
+      namespaces.merge!(namespaces_recursive.call(child))
+    }
+    namespaces
+  }
+
+  root = REXML::Document.new(File.new(filename)).root
+  all = namespaces_recursive.call(root)
+  res = {}
+  all.each { |prefix,uri|
+    res[prefix] = uri unless excludes.include? prefix
+  }
+  res
+end
+
+Jabber::debug = true
+
+class VcardCache < Jabber::Vcard::Helper
+  attr_reader :vcards
+
+  def initialize(stream)
+    super
+    @vcards = {}
+  end
+
+  def get(jid)
+    unless @vcards[jid]
+      begin
+        @vcards[jid] = super
+      rescue Jabber::ErrorException
+        @vcards[jid] = :error
+      end
+    end
+
+    @vcards[jid]
+  end
+
+  def get_until(jid, timeout=10)
+    begin
+      Timeout::timeout(timeout) {
+        get(jid)
+      }
+    rescue Timeout::Error
+      @vcards[jid] = :timeout
+      nil
+    end
+  end
+end
+
+MAX_ITEMS = 50
+$jid_items = []
+
+$bot = Jabber::Framework::Bot.new(JID, PASSWORD)
+class << $bot
+  def accept_subscription_from?(jid)
+    roster.add(jid, nil, true)
+    true
+  end
+end
+$vcards = VcardCache.new($bot.stream)
+xml_namespaces('index.xsl', %w(xmlns xsl pa j p)).each { |prefix,node|
+        $bot.add_pep_notification(node) do |from,item|
+          from.strip!
+          item.add_namespace(Jabber::PubSub::NS_PUBSUB)
+          $jid_items.unshift([from, item])
+          $jid_items = $jid_items[0..(MAX_ITEMS-1)]
+        end
+      }
+
+$bot.set_presence(nil, STATUS_MESSAGE || "Busy aggregating PEP events...")
+
+class WebController < Ramaze::Controller
+  map '/'
+  template_root __DIR__
+  engine :XSLT
+
+  trait :xslt_options => {:fun_xmlns => "http://home.gna.org/xmpp4r/#pep-aggregator"}
+
+
+  def index
+    "<?xml version='1.0' encoding='UTF-8'?>" +
+    "<items xmlns:jabber='jabber:client'>" +
+      $jid_items.collect do |jid,item|
+        item.attributes['jabber:from'] = jid.to_s
+        item
+      end.join +
+      "</items>"
+  end
+
+  def xslt_my_jid
+    $bot.stream.jid.strip.to_s
+  end
+
+  def xslt_jid_name(jid)
+    vcard = $vcards.get_until(jid)
+    if vcard.kind_of? Jabber::Vcard::IqVcard
+      vcard['NICKNAME'] || vcard['FN'] || jid.node
+    else
+      jid.node
+    end
+  end
+
+  def xslt_has_avatar(jid)
+    vcard = $vcards.get_until(jid)
+    if vcard.kind_of? Jabber::Vcard::IqVcard and vcard['PHOTO/TYPE'] and vcard['PHOTO/BINVAL']
+      '<true/>'
+    else
+      ''
+    end
+  end
+
+  def avatar(jid)
+    trait :engine => :None
+
+    vcard = $vcards.get_until(jid)
+    if vcard
+      if vcard['PHOTO/TYPE'] and vcard.photo_binval
+        response['Content-Type'] = vcard['PHOTO/TYPE']
+        response.body = vcard.photo_binval
+      else
+        response['Status'] = 404
+      end
+    else
+        response['Status'] = 404
+    end
+
+    throw :respond
+  end
+end
+
+Ramaze::start(:port => HTTP_PORT)
