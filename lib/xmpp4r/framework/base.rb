@@ -32,6 +32,18 @@ module Jabber
         @stream = stream
         @helpers = {}
         @helpers_lock = Mutex.new
+
+        # Catch all unhandled iq stanzas (lowest priority)
+        @stream.add_iq_callback(-1000, self, &method(on_unhandled_iq))
+      end
+
+      def on_unhandled_iq(iq)
+        answer = iq.answer(true)
+        answer.type = :error
+        answer.add(Error.new('feature-not-implemented'))
+        @stream.send(answer)
+
+        true
       end
 
     end
