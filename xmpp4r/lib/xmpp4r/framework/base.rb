@@ -38,12 +38,16 @@ module Jabber
       end
 
       def on_unhandled_iq(iq)
-        answer = iq.answer(true)
-        answer.type = :error
-        answer.add(Error.new('feature-not-implemented'))
-        @stream.send(answer)
+        if iq.type != :error
+          answer = iq.answer(true)
+          answer.type = :error
+          answer.add(Error.new('feature-not-implemented'))
+          @stream.send(answer)
 
-        true
+          true
+        else
+          false
+        end
       end
 
     end
