@@ -6,6 +6,7 @@ require 'xmpp4r/iq'
 require 'xmpp4r/errorexception'
 require 'xmpp4r/discovery/iq/discoinfo'
 require 'xmpp4r/discovery/iq/discoitems'
+require 'xmpp4r/caps/helper/generator'
 
 module Jabber
   module Discovery
@@ -72,13 +73,16 @@ module Jabber
         @items = items
 
         @stream.add_iq_callback(CALLBACK_PRIORITY, self) do |iq|
+          my_nodes = [@node, "#{@node}##{generate_ver}"]
+
           if iq.type == :get and
              iq.query.kind_of? IqQueryDiscoInfo and
-             iq.query.node == @node
+             my_nodes.include?(iq.query.node)
 
             answer = iq.answer(false)
             answer.type = :result
             query = answer.add(IqQueryDiscoInfo.new)
+            query.node = iq.query.node
             (@identities + @features + @forms).each do |element|
               query.add(element)
             end
@@ -88,11 +92,12 @@ module Jabber
 
           elsif iq.type == :get and
                 iq.query.kind_of? IqQueryDiscoItems and
-                iq.query.node == @node
+                my_nodes.include?(iq.query.node)
 
             answer = iq.answer(false)
             answer.type = :result
             query = answer.add(IqQueryDiscoItems.new)
+            query.node = iq.query.node
             @items.each do |item|
               if item.kind_of? Responder
                 query.add(item.generate_item)
@@ -135,7 +140,7 @@ module Jabber
       # for inclusion in Presence stanzas. This enables efficient
       # caching of Service Discovery information.
       def generate_caps
-        Caps::C.new(@node, Caps::generate_ver(@identities, @features, @forms))
+        Caps::C.new(@node, generate_ver)
       end
 
       ##
@@ -149,6 +154,12 @@ module Jabber
         else
           nil
         end
+      end
+
+      private
+
+      def generate_ver
+        Caps::generate_ver(@identities, @features, @forms)
       end
     end
   end
