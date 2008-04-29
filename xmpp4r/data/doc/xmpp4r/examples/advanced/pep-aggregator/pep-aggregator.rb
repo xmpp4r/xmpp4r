@@ -83,8 +83,18 @@ xml_namespaces('index.xsl', %w(xmlns xsl pa j p)).each { |prefix,node|
         $bot.add_pep_notification(node) do |from,item|
           from.strip!
           item.add_namespace(Jabber::PubSub::NS_PUBSUB)
-          $jid_items.unshift([from, item])
-          $jid_items = $jid_items[0..(MAX_ITEMS-1)]
+          item.attributes['node'] = node
+          is_duplicate = false
+          $jid_items.each { |jid1,item1|
+            if jid1.to_s == from.to_s and node == item1.attributes['node']
+              is_duplicate = (item.to_s == item1.to_s)
+              break
+            end
+          }
+          unless is_duplicate
+            $jid_items.unshift([from, item])
+            $jid_items = $jid_items[0..(MAX_ITEMS-1)]
+          end
         end
       }
 
@@ -98,7 +108,8 @@ class WebController < Ramaze::Controller
   def index
     "<?xml version='1.0' encoding='UTF-8'?>" +
       "<items xmlns:jabber='jabber:client' jabber:to='#{Jabber::JID.new(JID).strip}'>" +
-      $jid_items.collect do |jid,item|
+      $jid_items.collect do |jid,item_orig|
+        item = item_orig.deep_clone
         item.attributes['jabber:from'] = jid.to_s
         vcard = $vcards.get_until(jid)
         if vcard.kind_of? Jabber::Vcard::IqVcard

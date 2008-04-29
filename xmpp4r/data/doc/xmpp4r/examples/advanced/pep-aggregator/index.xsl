@@ -36,7 +36,7 @@ h2 { margin-top: 2em; padding: 0.5em 8em; color: black; background:
 h2 a { color: black; font-decoration: none; }
 p { margin: 0.5em 4em; }
 p.footnote { margin-top: 16em; font-size: 90%; }
-img.avatar { max-width: 10%; float: left; padding: 4px; }
+img.avatar { max-width: 10%; clear: left; float: left; padding: 4px; }
 ]]>
 	</style>
       </head>
