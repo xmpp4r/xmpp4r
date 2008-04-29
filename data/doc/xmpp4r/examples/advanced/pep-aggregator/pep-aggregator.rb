@@ -52,8 +52,7 @@ class VcardCache < Jabber::Vcard::Helper
       end
     end
 
-    vcard = @vcards[jid]
-    vcard.kind_of? Jabber::Vcard::IqVcard ? vcard : nil
+    @vcards[jid]
   end
 
   def get_until(jid, timeout=10)
@@ -65,8 +64,7 @@ class VcardCache < Jabber::Vcard::Helper
       @vcards[jid] = :timeout
     end
 
-    vcard = @vcards[jid]
-    vcard.kind_of? Jabber::Vcard::IqVcard ? vcard : nil
+    @vcards[jid]
   end
 end
 
@@ -105,9 +103,8 @@ class WebController < Ramaze::Controller
         vcard = $vcards.get_until(jid)
         if vcard.kind_of? Jabber::Vcard::IqVcard
           item.attributes['jabber:from-name'] = vcard['NICKNAME'] || vcard['FN'] || jid.node
-          item.attributes['jabber:has-avatar'] = (vcard.kind_of? Jabber::Vcard::IqVcard and
-                                                  vcard['PHOTO/TYPE'] and
-                                                  vcard['PHOTO/BINVAL']) ? 'true' : 'false'
+          item.attributes['jabber:has-avatar'] = vcard['PHOTO/TYPE'] and
+            vcard['PHOTO/BINVAL']) ? 'true' : 'false'
         else
           item.attributes['jabber:from-name'] = jid.node
           item.attributes['jabber:has-avatar'] = 'false'
@@ -121,7 +118,7 @@ class WebController < Ramaze::Controller
     trait :engine => :None
 
     vcard = $vcards.get_until(jid)
-    if vcard
+    if vcard.kind_of? Jabber::Vcard::IqVcard
       if vcard['PHOTO/TYPE'] and vcard.photo_binval
         response['Content-Type'] = vcard['PHOTO/TYPE']
         response.body = vcard.photo_binval
