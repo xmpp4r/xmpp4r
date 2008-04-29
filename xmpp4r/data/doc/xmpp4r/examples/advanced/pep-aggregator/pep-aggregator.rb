@@ -53,7 +53,7 @@ class VcardCache < Jabber::Vcard::Helper
     end
 
     vcard = @vcards[jid]
-    vcard.kind_of? Jabber::IqVcard ? vcard : nil
+    vcard.kind_of? Jabber::Vcard::IqVcard ? vcard : nil
   end
 
   def get_until(jid, timeout=10)
@@ -66,7 +66,7 @@ class VcardCache < Jabber::Vcard::Helper
     end
 
     vcard = @vcards[jid]
-    vcard.kind_of? Jabber::IqVcard ? vcard : nil
+    vcard.kind_of? Jabber::Vcard::IqVcard ? vcard : nil
   end
 end
 
