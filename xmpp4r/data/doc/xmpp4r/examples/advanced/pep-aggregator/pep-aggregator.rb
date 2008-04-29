@@ -52,7 +52,8 @@ class VcardCache < Jabber::Vcard::Helper
       end
     end
 
-    @vcards[jid]
+    vcard = @vcards[jid]
+    vcard.kind_of? Jabber::IqVcard ? vcard : nil
   end
 
   def get_until(jid, timeout=10)
@@ -62,8 +63,10 @@ class VcardCache < Jabber::Vcard::Helper
       }
     rescue Timeout::Error
       @vcards[jid] = :timeout
-      nil
     end
+
+    vcard = @vcards[jid]
+    vcard.kind_of? Jabber::IqVcard ? vcard : nil
   end
 end
 
