@@ -94,39 +94,24 @@ class WebController < Ramaze::Controller
   template_root __DIR__
   engine :XSLT
 
-  trait :xslt_options => {:fun_xmlns => "http://home.gna.org/xmpp4r/#pep-aggregator"}
-
-
   def index
     "<?xml version='1.0' encoding='UTF-8'?>" +
-    "<items xmlns:jabber='jabber:client'>" +
+      "<items xmlns:jabber='jabber:client' jabber:to='#{Jabber::JID.new(JID).strip}'>" +
       $jid_items.collect do |jid,item|
         item.attributes['jabber:from'] = jid.to_s
+        vcard = $vcards.get_until(jid)
+        if vcard.kind_of? Jabber::Vcard::IqVcard
+          item.attributes['jabber:from-name'] = vcard['NICKNAME'] || vcard['FN'] || jid.node
+          item.attributes['jabber:has-avatar'] = (vcard.kind_of? Jabber::Vcard::IqVcard and
+                                                  vcard['PHOTO/TYPE'] and
+                                                  vcard['PHOTO/BINVAL']) ? 'true' : 'false'
+        else
+          item.attributes['jabber:from-name'] = jid.node
+          item.attributes['jabber:has-avatar'] = 'false'
+        end
         item
       end.join +
       "</items>"
-  end
-
-  def xslt_my_jid
-    $bot.stream.jid.strip.to_s
-  end
-
-  def xslt_jid_name(jid)
-    vcard = $vcards.get_until(jid)
-    if vcard.kind_of? Jabber::Vcard::IqVcard
-      vcard['NICKNAME'] || vcard['FN'] || jid.node
-    else
-      jid.node
-    end
-  end
-
-  def xslt_has_avatar(jid)
-    vcard = $vcards.get_until(jid)
-    if vcard.kind_of? Jabber::Vcard::IqVcard and vcard['PHOTO/TYPE'] and vcard['PHOTO/BINVAL']
-      '<true/>'
-    else
-      ''
-    end
   end
 
   def avatar(jid)

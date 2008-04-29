@@ -2,7 +2,6 @@
 <xsl:stylesheet version="1.0"
 		xmlns="http://www.w3.org/1999/xhtml"
 		xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-		xmlns:pa="http://home.gna.org/xmpp4r/#pep-aggregator"
 		xmlns:j="jabber:client"
 		xmlns:p="http://jabber.org/protocol/pubsub"
 		xmlns:tune="http://jabber.org/protocol/tune"
@@ -12,7 +11,7 @@
 		xmlns:browsing="http://www.xmpp.org/extensions/xep-0195.html#ns"
 		xmlns:gaming="http://www.xmpp.org/extensions/xep-0196.html#ns"
 		xmlns:watching="http://www.xmpp.org/extensions/xep-0197.html#ns"
-		exclude-result-prefixes="xsl j pa p
+		exclude-result-prefixes="xsl j p
 					 tune mood activity chatting
 					 browsing gaming watching">
 
@@ -23,7 +22,7 @@
             doctype-system="DTD/xhtml1-strict.dtd"
             indent="yes"/>
 
-  <xsl:template match="/">
+  <xsl:template match="/items">
     <html>
       <head>
 	<title>PEP aggregator</title>
@@ -56,7 +55,7 @@ img.avatar { max-width: 10%; float: left; padding: 4px; }
 	  (<a href="http://www.ejabberd.im/">ejabberd</a>), client
 	  (<a href="http://www.gajim.org/">Gajim</a>
 	  or <a href="http://psi-im.org/">Psi</a>)
-	  and <a href="xmpp:{pa:my-jid()}?subscribe"><xsl:value-of select="pa:my-jid()"/></a>
+	  and <a href="xmpp:{@j:to}?subscribe"><xsl:value-of select="@j:to"/></a>
 	  in your Jabber roster.  The source code can
 	  be <a href="http://svn.gna.org/viewcvs/xmpp4r/trunk/xmpp4r/data/doc/xmpp4r/examples/advanced/pep-aggregator/">viewed
 	  online</a>.
@@ -65,14 +64,14 @@ img.avatar { max-width: 10%; float: left; padding: 4px; }
     </html>
   </xsl:template>
 
-  <xsl:template match="p:item">
-    <xsl:if test="pa:has-avatar(@j:from)">
+  <xsl:template match="p:item[@j:from]">
+    <xsl:if test="@j:has-avatar = 'true'">
       <img class="avatar" src="/avatar/{@j:from}"/>
     </xsl:if>
 
     <h2>
       <a href="xmpp:{@j:from}">
-	<xsl:value-of select="pa:jid-name(@j:from)"/>
+	<xsl:value-of select="@j:from-name"/>
       </a>
     </h2>
 
