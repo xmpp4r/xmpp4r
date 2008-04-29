@@ -103,8 +103,8 @@ class WebController < Ramaze::Controller
         vcard = $vcards.get_until(jid)
         if vcard.kind_of? Jabber::Vcard::IqVcard
           item.attributes['jabber:from-name'] = vcard['NICKNAME'] || vcard['FN'] || jid.node
-          item.attributes['jabber:has-avatar'] = vcard['PHOTO/TYPE'] and
-            vcard['PHOTO/BINVAL']) ? 'true' : 'false'
+          item.attributes['jabber:has-avatar'] = (vcard['PHOTO/TYPE'] and
+                                                  vcard['PHOTO/BINVAL']) ? 'true' : 'false'
         else
           item.attributes['jabber:from-name'] = jid.node
           item.attributes['jabber:has-avatar'] = 'false'
