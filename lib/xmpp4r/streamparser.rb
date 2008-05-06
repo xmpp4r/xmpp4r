@@ -61,11 +61,11 @@ module Jabber
         end
 
         parser.listen( :characters ) do | text |
-          @current.text = @current.text.to_s + text if @current
+          @current.add(REXML::Text.new(text.to_s, @current.whitespace(), nil, @current.raw())) if @current
         end
 
         parser.listen( :cdata ) do | text |
-          raise "Not implemented !"
+          @current.add(REXML::CData.new(text)) if @current
         end
 
         parser.parse
