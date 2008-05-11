@@ -35,7 +35,15 @@ class RPC::HelperTest < Test::Unit::TestCase
     sv.add_handler("echo") do |s| s end
 
     cl = RPC::Client.new(@client, 'a@b/c')
-    assert_equal('Test string', cl.call("echo", 'Test string'))
+    assert_nothing_raised do
+      assert_equal('Test string', cl.call("echo", 'Test string'))
+    end
+
+    # exception during serialisation bug identified on xmpp4r-devel
+    # https://mail.gna.org/public/xmpp4r-devel/2008-05/msg00010.html
+    assert_raise XMLRPC::FaultException do
+      cl.call("echo")
+    end
   end
 
   def test_introspection
