@@ -38,11 +38,16 @@ module XMLRPC
     def methodResponse(is_ret, *params)
 
       if is_ret
-        resp = params.collect do |param|
-          @writer.ele("param", conv2value(param))
-        end
+        begin
+          resp = params.collect do |param|
+            @writer.ele("param", conv2value(param))
+          end
 
-        resp = [@writer.ele("params", *resp)]
+          resp = [@writer.ele("params", *resp)]
+        rescue Exception => e
+          error = XMLRPC::FaultException.new(XMLRPC::BasicServer::ERR_UNCAUGHT_EXCEPTION, "Uncaught exception '#{e.message}' serialising params into response")
+          resp = @writer.ele("fault", conv2value(error.to_h))
+        end
       else
         if params.size != 1 or params[0] === XMLRPC::FaultException
           raise ArgumentError, "no valid fault-structure given"
