@@ -28,11 +28,15 @@ class RPC::HelperTest < Test::Unit::TestCase
     assert_kind_of(RPC::Server, sv)
   end
 
+  def echo(msg = nil)
+    msg
+  end
+
   def test_simple
     give_client_jid!
 
     sv = RPC::Server.new(@server)
-    sv.add_handler("echo") do |s| s end
+    sv.add_handler("echo", &method(:echo))
 
     cl = RPC::Client.new(@client, 'a@b/c')
     assert_nothing_raised do
