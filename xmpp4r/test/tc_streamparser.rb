@@ -36,6 +36,10 @@ class StreamiParserTest < Test::Unit::TestCase
     yield parse_with_rexml(fixture)
   end
 
+  def parse_with_rexml(fixture)
+    REXML::Document.new(fixture).root
+  end
+
   def test_simple_text
     parse_simple_helper( "<a>text</a>" ) do |desired|
       assert_equal desired.name, @listener.received.name
@@ -76,7 +80,15 @@ class StreamiParserTest < Test::Unit::TestCase
     end
   end
 
-  def parse_with_rexml(fixture)
-    REXML::Document.new(fixture).root
+  def test_entity_escaping1
+    parse_simple_helper( "<a>&apos;&amp;&quot;</a>" ) do |desired|
+      assert_equal "'&\"", @listener.received.text
+    end
+  end
+
+  def test_entity_escaping2
+    parse_simple_helper( "<a>&amp;amp;amp;</a>" ) do |desired|
+      assert_equal "&amp;amp;", @listener.received.text
+    end
   end
 end

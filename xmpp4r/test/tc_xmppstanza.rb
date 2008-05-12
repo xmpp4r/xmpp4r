@@ -90,6 +90,15 @@ class XMPPStanzaTest < Test::Unit::TestCase
     assert_equal(field.type, feature2.x.fields.first.type)
   end
 
+  def test_import_xml_entities
+    e = REXML::Element.new('e')
+    e.text = '&'
+    assert_equal('<e>&amp;</e>', e.to_s)
+
+    e2 = REXML::Element.new('e').import(e)
+    assert_equal('<e>&amp;</e>', e2.to_s)
+  end
+
   def test_error
     x = MyXMPPStanza::new
     assert_equal(nil, x.error)
