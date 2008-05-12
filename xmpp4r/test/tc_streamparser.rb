@@ -83,12 +83,14 @@ class StreamiParserTest < Test::Unit::TestCase
   def test_entity_escaping1
     parse_simple_helper( "<a>&apos;&amp;&quot;</a>" ) do |desired|
       assert_equal "'&\"", @listener.received.text
+      assert_equal "<a>&apos;&amp;&quot;</a>", @listener.received.to_s
     end
   end
 
   def test_entity_escaping2
     parse_simple_helper( "<a>&amp;amp;amp;</a>" ) do |desired|
       assert_equal "&amp;amp;", @listener.received.text
+      assert_equal "<a>&amp;amp;amp;</a>", @listener.received.to_s
     end
   end
 end
