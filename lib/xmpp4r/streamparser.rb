@@ -39,7 +39,7 @@ module Jabber
         parser = REXML::Parsers::SAX2Parser.new @stream 
 
         parser.listen( :start_element ) do |uri, localname, qname, attributes|
-          e = REXML::Element::new(qname, nil, :raw => :all)
+          e = REXML::Element::new(qname)
           e.add_attributes attributes
           @current = @current.nil? ? e : @current.add_element(e)
 
@@ -61,7 +61,7 @@ module Jabber
         end
 
         parser.listen( :characters ) do | text |
-          @current.add(REXML::Text.new(text.to_s, @current.whitespace(), nil, @current.raw())) if @current
+          @current.add(REXML::Text.new(text.to_s, @current.whitespace, nil, true)) if @current
         end
 
         parser.listen( :cdata ) do | text |
