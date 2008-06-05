@@ -112,7 +112,7 @@ end
 ##
 # Main loop
 ##
-  
+
   require 'mprofiler'
   MemoryProfiler.start(:string_debug=>true)
 
@@ -144,4 +144,3 @@ loop {
 
   sleep(interval)
 }
-

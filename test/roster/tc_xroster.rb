@@ -33,7 +33,7 @@ class Roster::XRosterTest < Test::Unit::TestCase
     assert_kind_of(Roster::XRosterItem, r.first_element('item'))
     assert_kind_of(Roster::XRosterItem, r.typed_add(REXML::Element.new('item')))
   end
-  
+
   def test_items
     j1 = Roster::XRosterItem.new
     assert_equal(JID.new(nil), j1.jid)

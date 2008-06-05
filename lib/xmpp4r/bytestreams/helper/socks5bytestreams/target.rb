@@ -45,7 +45,7 @@ module Jabber
             rescue Exception => e
               error = e
             end
-              
+
             connect_sem.run
             true
           else
@@ -60,4 +60,3 @@ module Jabber
     end
   end
 end
-

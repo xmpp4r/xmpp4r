@@ -23,7 +23,7 @@ module Jabber
     class RosterX < XRoster
       name_xmlns 'x', 'http://jabber.org/protocol/rosterx'
     end
-    
+
     ##
     # Class containing an <item/> element
     #
@@ -46,7 +46,7 @@ module Jabber
         self.jid = jid
         self.iname = iname
       end
-      
+
       ##
       # Get name of roster item
       #
@@ -55,14 +55,14 @@ module Jabber
       def iname
         attributes['name']
       end
-      
+
       ##
       # Set name of roster item
       # val:: [String] Name for this item
       def iname=(val)
         attributes['name'] = val
       end
-      
+
       ##
       # Get JID of roster item
       # Resource of the JID will _not_ be stripped
@@ -70,14 +70,14 @@ module Jabber
       def jid
         JID::new(attributes['jid'])
       end
-      
+
       ##
       # Set JID of roster item
       # val:: [JID] or nil
       def jid=(val)
         attributes['jid'] = val.nil? ? nil : val.to_s
       end
-      
+
       ##
       # Get action for this roster item
       # * :add
@@ -91,7 +91,7 @@ module Jabber
           else :add
         end
       end
-      
+
       ##
       # Set action for this roster item
       # (see action)
@@ -113,7 +113,7 @@ module Jabber
         }
         result
       end
-      
+
       ##
       # Set groups the item belongs to,
       # deletes old groups first.
@@ -123,7 +123,7 @@ module Jabber
       def groups=(ary)
         # Delete old group elements
         delete_elements('group')
-        
+
         # Add new group elements
         ary.uniq.each { |group|
           add_element('group').text = group

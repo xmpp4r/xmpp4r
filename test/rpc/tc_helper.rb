@@ -93,4 +93,3 @@ class RPC::HelperTest < Test::Unit::TestCase
     assert(correct)
   end
 end
-

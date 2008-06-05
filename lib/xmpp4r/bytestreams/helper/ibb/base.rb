@@ -151,7 +151,7 @@ module Jabber
           msg = Message.new
           msg.from = @my_jid
           msg.to = @peer_jid
-          
+
           data = msg.add REXML::Element.new('data')
           data.add_namespace NS_IBB
           data.attributes['sid'] = @session_id
@@ -169,7 +169,7 @@ module Jabber
           match_resource.attributes['condition'] = 'match-resource'
           match_resource.attributes['value'] = 'exact'
           match_resource.attributes['action'] = 'error'
-   
+
           @stream.send(msg)
 
           @seq_send += 1

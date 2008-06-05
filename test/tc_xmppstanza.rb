@@ -73,7 +73,7 @@ class XMPPStanzaTest < Test::Unit::TestCase
     assert_raise(RuntimeError) { iq = Iq.import(x) }
     x.name = 'iq'
     iq = Iq.import(x)
-    
+
     assert_equal(x.id, iq.id)
     assert_equal(q.to_s, iq.query.to_s)
     assert_equal(x.to_s, iq.to_s)

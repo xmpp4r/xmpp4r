@@ -84,11 +84,11 @@ cl.add_iq_callback { |iq|
       if iq.query.node.nil?
         # Make items from group names
         groups = []
-        
+
         roster.items.each { |jid,item|
           groups += item.groups
         }
-        
+
         groups.uniq.each { |group|
           iq.query.add(Jabber::DiscoItem.new(cl.jid, group, group))
         }
@@ -127,4 +127,3 @@ loop do
 end
 
 cl.close
-

@@ -79,7 +79,7 @@ module Jabber
     ##
     # Returns the iq's query child, or nil
     # result:: [IqQuery]
-    def query 
+    def query
       first_element('query')
     end
 

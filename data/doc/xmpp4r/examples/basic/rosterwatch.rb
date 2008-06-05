@@ -61,13 +61,13 @@ roster.add_update_callback { |olditem,item|
     puts("Subscribing to #{item.jid}")
     item.subscribe
   end
-  
+
   # Print the item
-  if olditem.nil?                                                    
-    # We didn't knew before:                                       
+  if olditem.nil?
+    # We didn't knew before:
     puts("#{item.iname} (#{item.jid}, #{item.subscription}) #{item.groups.join(', ')}")
-  else                                                             
-    # Showing whats different:                                     
+  else
+    # Showing whats different:
     puts("#{olditem.iname} (#{olditem.jid}, #{olditem.subscription}) #{olditem.groups.join(', ')} -> #{item.iname} (#{item.jid}, #{item.subscription}) #{item.groups.join(', ')}")
   end
 
@@ -115,7 +115,7 @@ roster.add_presence_callback { |item,oldpres,pres|
     # ...so create it:
     oldpres = Jabber::Presence.new
   end
-  
+
   # Print name and jid:
   name = "#{pres.from}"
   if item.iname
@@ -169,4 +169,3 @@ cl.send(Jabber::Presence.new.set_show(:dnd).set_status('Watching my roster chang
 Thread.stop
 
 cl.close
-

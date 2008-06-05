@@ -82,4 +82,3 @@ puts "Waiting."
 Thread.stop
 
 cl.close
-

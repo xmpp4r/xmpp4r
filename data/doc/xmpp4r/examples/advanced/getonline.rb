@@ -47,8 +47,8 @@ cl.add_iq_callback { |i|
   end
 }
 for d in domains do
-	cl.send(Iq::new_browseget.set_to("#{d}/admin"))
-	nb += 1
+  cl.send(Iq::new_browseget.set_to("#{d}/admin"))
+  nb += 1
 end
 while nb > 0
   cl.process(1)

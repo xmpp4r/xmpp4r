@@ -10,4 +10,3 @@ muc.configure(
       'muc#roomconfig_roomname' => 'roomname',
       'muc#roomconfig_persistentroom' => 1
 )
-

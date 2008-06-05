@@ -7,7 +7,7 @@ $:.unshift '../lib'
 require 'GD'
 require 'cgi'
 require 'digest/md5'
-        
+
 require 'rexml/document'
 
 require 'xmpp4r'
@@ -54,7 +54,7 @@ class BannerTable
   def last
     @lines[@lines.size - 1]
   end
-  
+
   def add_line
     @lines.push(BannerLine.new)
   end
@@ -68,10 +68,10 @@ class BannerTable
       end
       height += line.h
     end
-    
+
     gd = GD::Image.new(width + 6, height + 6)
     white = gd.colorAllocate(255,255,255)
-    black = gd.colorAllocate(0,0,0)       
+    black = gd.colorAllocate(0,0,0)
 
     gd.fill(0, 0, black)
     gd.interlace = true
@@ -82,7 +82,7 @@ class BannerTable
       line.paint(gd, 3, y + (line.h / 2))
       y += line.h
     end
-    
+
     gd
   end
 end

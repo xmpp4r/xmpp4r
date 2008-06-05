@@ -69,7 +69,7 @@ class IBBTest < Test::Unit::TestCase
 
     assert_equal(buffer, received)
   end
-  
+
   def test_ibb_pingpong
     ignored_stanzas = 0
     wait = Semaphore.new

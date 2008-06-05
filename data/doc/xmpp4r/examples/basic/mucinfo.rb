@@ -23,7 +23,7 @@ if name.nil?
   puts " Sorry, but the queried MUC component doesn't seem to support MUC or Groupchat."
 else
   puts " #{name}"
-  
+
   print "Querying #{muc_jid} for its rooms..."; $stdout.flush
   rooms = browser.muc_rooms(muc_jid)
   puts " #{rooms.size} rooms found"

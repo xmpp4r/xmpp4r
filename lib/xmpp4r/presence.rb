@@ -7,7 +7,7 @@ require 'xmpp4r/x'
 
 module Jabber
   ##
-  # The presence class is used to construct presence messages to 
+  # The presence class is used to construct presence messages to
   # send to the Jabber service.
   class Presence < XMPPStanza
     name_xmlns 'presence', 'jabber:client'

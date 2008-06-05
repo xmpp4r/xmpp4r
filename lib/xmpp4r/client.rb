@@ -67,7 +67,7 @@ module Jabber
         end
         # Fallback to normal connect method
       end
-      
+
       super(host.nil? ? jid.domain : host, port)
       self
     end
@@ -190,7 +190,7 @@ module Jabber
         raise "AnonymousUnsupported"
       end
     end
-    
+
     ##
     # Reports whether or not anonymous authentication is reported
     # by the client.
@@ -309,5 +309,5 @@ module Jabber
         end
       }
     end
-  end  
+  end
 end

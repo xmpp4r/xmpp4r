@@ -512,4 +512,3 @@ class Roster::HelperTest < Test::Unit::TestCase
     assert_nil(update_args[1])
   end
 end
-

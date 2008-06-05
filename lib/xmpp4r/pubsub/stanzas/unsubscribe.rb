@@ -13,30 +13,30 @@ module Jabber
       def initialize(myjid=nil,mynode=nil)
         super()
         jid = myjid
-	node =  mynode
+        node =  mynode
       end
-      
+
       ##
       # shows the jid
       # return:: [String]
       def jid
         (a = attribute('jid')).nil? ? a : JID::new(a.value)
       end
-      
+
       ##
       # sets the jid
       # =:: [Jabber::JID] or [String]
       def jid=(myjid)
         add_attribute('jid', myjid ? myjid.to_s : nil)
       end
-      
+
       ##
       # shows the node
       # return:: [String]
       def node
         attributes['node']
       end
-      
+
       ##
       # sets the node
       # =:: [String]

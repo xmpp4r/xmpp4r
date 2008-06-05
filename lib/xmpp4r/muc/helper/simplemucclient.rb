@@ -102,7 +102,7 @@ module Jabber
           @subject = msg.subject
           @subject_block.call(time, sender_nick, @subject) if @subject_block
         end
-        
+
         if msg.body
           if sender_nick.nil?
             @room_message_block.call(time, msg.body) if @room_message_block

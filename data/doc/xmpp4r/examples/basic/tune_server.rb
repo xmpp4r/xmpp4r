@@ -27,7 +27,7 @@ cl = Jabber::Client.new(jid)
 cl.connect
 cl.auth(pw)
 
-# Following XEP-0163 PEP we need to 
+# Following XEP-0163 PEP we need to
 # ensure we have a 'both' subscription to the Tune client
 roster = Jabber::Roster::Helper.new(cl)
 roster.add_subscription_request_callback do |item,pres|
@@ -46,7 +46,7 @@ itunes=OSA.app('iTunes')
 
 loop do
   track = itunes.current_track
- 
+
   if track
     puts "Now playing: #{track.name} by #{track.artist}"
     t.now_playing(Jabber::UserTune::Tune.new(track.artist, track.name))

@@ -55,7 +55,7 @@ module Jabber
         if errortype.nil? || errorcode.nil?
           raise("Unknown error condition when initializing Error")
         end
-        
+
         super()
         set_error(errorcondition)
         set_type(errortype)
@@ -155,7 +155,7 @@ module Jabber
       self.text = s
       self
     end
-    
+
     ##
     # Get the type of error
     # (meaning how to proceed)

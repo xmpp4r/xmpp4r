@@ -54,4 +54,3 @@ RFC3920:
 
 Compliant server implementations MUST ensure in-order processing of
 XML stanzas between any two entities."
-

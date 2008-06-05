@@ -72,13 +72,13 @@ class UserTune::HelperTest < Test::Unit::TestCase
   # an example from the Wild
   def psi_usertune
     "<message from='admin@new-big-computer.local' to='matt@new-big-computer.local/trackbot' xmlns='jabber:client'><event xmlns='http://jabber.org/protocol/pubsub#event'><items node='http://jabber.org/protocol/tune'><item id='current'>
-    
+
     <tune xmlns='http://jabber.org/protocol/tune'>
-    
-    
-    
-    
-    
+
+
+
+
+
     <artist>Wes Montgomery</artist><title>Jingles</title><source>Bags Meets Wes</source><track>8</track><length>410</length></tune></item></items></event></message>"
   end
 end

@@ -22,7 +22,7 @@ class Caps::HelperTest < Test::Unit::TestCase
       assert_kind_of(Jabber::Presence, presence)
       c = presence.first_element('c')
       assert_kind_of(Jabber::Caps::C, c)
-      
+
       # see http://www.xmpp.org/extensions/xep-0115.html#ver
       assert_equal('SrFo9ar2CCk2EnOH4q4QANeuxLQ=', c.ver)
 
@@ -30,14 +30,14 @@ class Caps::HelperTest < Test::Unit::TestCase
       assert_equal('sha-1', c.hash)
 
       assert_equal("http://home.gna.org/xmpp4r/##{Jabber::XMPP4R_VERSION}", c.node)
-      
+
       send(iq_discovering_capabilities)
     }
 
     # Construct Caps::Helper which will send a <presence>
     # stanza (with embedded <c/> advert) to the 'server'
     h = Caps::Helper.new(@client, identities, features)
-    
+
     # The 'server' will receive the <presence> stanza and
     # yield it to the 'state' block above, where an <iq> query
     # will be sent back to the 'client,' to discover its capabilities.
@@ -47,7 +47,7 @@ class Caps::HelperTest < Test::Unit::TestCase
     # The Caps::Helper will process the <iq> query from the 'server'
     # and reply with an <iq> result providing the details of its
     # identities and features.
- 
+
     state { |iq|
       assert_kind_of(Jabber::Iq, iq)
       assert_equal(:result, iq.type)
@@ -72,10 +72,10 @@ class Caps::HelperTest < Test::Unit::TestCase
 
   def test_custom_node
     client_id='http://new-big-computer.local/client#321'
-  
+
     state { |presence|
       c = presence.first_element('c')
-      assert_kind_of(Jabber::Caps::C, c)      
+      assert_kind_of(Jabber::Caps::C, c)
       assert_equal(client_id, c.node)
       assert_equal('SrFo9ar2CCk2EnOH4q4QANeuxLQ=', c.ver)
     }

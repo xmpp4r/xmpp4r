@@ -30,7 +30,7 @@ class SOCKS5BytestreamsTest < Test::Unit::TestCase
     buf1 = create_buffer(8192)
     buf2 = create_buffer(8192)
 
-    Thread.new do 
+    Thread.new do
       target1.accept
       target1.write(buf1)
       target1.flush
@@ -99,5 +99,5 @@ class SOCKS5BytestreamsTest < Test::Unit::TestCase
 
     initiator.close
   end
-  
+
 end

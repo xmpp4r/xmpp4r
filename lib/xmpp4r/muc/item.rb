@@ -60,7 +60,7 @@ module Jabber
         self.nick = n
         self
       end
-      
+
       def role
         case attributes['role']
           when 'moderator' then :moderator
@@ -141,4 +141,3 @@ module Jabber
     end
   end
 end
-

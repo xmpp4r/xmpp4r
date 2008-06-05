@@ -20,7 +20,7 @@ module Jabber
     # This <query/> contains multiple <item/> children. See RosterItem.
     class IqQueryRoster < IqQuery
       name_xmlns 'query', 'jabber:iq:roster'
-      
+
       ##
       # Iterate through all items
       # &block:: Yield for every [RosterItem]
@@ -30,7 +30,7 @@ module Jabber
           yield(item) if item.kind_of?(RosterItem)
         }
       end
-      
+
       ##
       # Get roster item by JID
       # jid:: [JID] or [Nil]
@@ -41,7 +41,7 @@ module Jabber
         }
         nil
       end
-      
+
       ##
       # Get all items
       # result:: [Array] of [RosterItem]
@@ -52,7 +52,7 @@ module Jabber
         }
         a
       end
-      
+
       ##
       # Update roster by <iq/> stanza
       # (to be fed by an iq_callback)
@@ -62,10 +62,10 @@ module Jabber
         if filter && (((iq.type != :set) && (iq.type != :result)) || (iq.queryns != 'jabber:iq:roster'))
           return
         end
-        
+
         import(iq.query)
       end
-      
+
       ##
       # Output for "p"
       #
@@ -76,7 +76,7 @@ module Jabber
         jids.join(', ')
       end
     end
-    
+
     ##
     # Class containing the <item/> elements of the roster
     #
@@ -99,7 +99,7 @@ module Jabber
         self.subscription = subscription
         self.ask = ask
       end
-    
+
       ##
       # Get name of roster item
       #
@@ -108,14 +108,14 @@ module Jabber
       def iname
         attributes['name']
       end
-      
+
       ##
       # Set name of roster item
       # val:: [String] Name for this item
       def iname=(val)
         attributes['name'] = val
       end
-      
+
       ##
       # Get JID of roster item
       # Resource of the JID will _not_ be stripped
@@ -123,14 +123,14 @@ module Jabber
       def jid
         (a = attributes['jid']) ? JID::new(a) : nil
       end
-      
+
       ##
       # Set JID of roster item
       # val:: [JID] or nil
       def jid=(val)
         attributes['jid'] = val.nil? ? nil : val.to_s
       end
-      
+
       ##
       # Get subscription type of roster item
       # result:: [Symbol] or [Nil] The following values are valid according to RFC3921:
@@ -149,7 +149,7 @@ module Jabber
           else nil
         end
       end
-      
+
       ##
       # Set subscription type of roster item
       # val:: [Symbol] or [Nil] See subscription for possible Symbols
@@ -163,7 +163,7 @@ module Jabber
           else attributes['subscription'] = nil
         end
       end
-      
+
       ##
       # Get if asking for subscription
       # result:: [Symbol] nil or :subscribe
@@ -173,7 +173,7 @@ module Jabber
           else nil
         end
       end
-      
+
       ##
       # Set if asking for subscription
       # val:: [Symbol] nil or :subscribe
@@ -183,7 +183,7 @@ module Jabber
           else attributes['ask'] = nil
         end
       end
-      
+
       ##
       # Get groups the item belongs to
       # result:: [Array] of [String] The groups
@@ -194,7 +194,7 @@ module Jabber
         }
         result.uniq
       end
-      
+
       ##
       # Set groups the item belongs to,
       # deletes old groups first.
@@ -204,7 +204,7 @@ module Jabber
       def groups=(ary)
         # Delete old group elements
         delete_elements('group')
-        
+
         # Add new group elements
         ary.uniq.each { |group|
           add_element('group').text = group

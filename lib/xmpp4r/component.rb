@@ -36,7 +36,7 @@ module Jabber
         @server_port = server_port
       end
     end
-    
+
     # Connect to the server
     # (chaining-friendly)
     # server:: [String] Hostname
@@ -81,7 +81,7 @@ module Jabber
     # Send auth with given secret and wait for result
     #
     # Throws AuthenticationFailure
-    # secret:: [String] the shared secret 
+    # secret:: [String] the shared secret
     def auth(secret)
       hash = Digest::SHA1::hexdigest(@streamid.to_s + secret)
       authenticated = false
@@ -99,5 +99,5 @@ module Jabber
         raise AuthenticationFailure.new, "Component authentication failed"
       end
     end
-  end  
+  end
 end

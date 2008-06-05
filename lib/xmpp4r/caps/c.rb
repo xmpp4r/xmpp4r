@@ -14,7 +14,7 @@ module Jabber
     # See http://www.xmpp.org/extensions/xep-0115.html#protocol.
     #
     # You should not need to construct this element directly, see
-    # Jabber::Caps::Helper. 
+    # Jabber::Caps::Helper.
     class C < XMPPElement
       name_xmlns 'c', NS_CAPS
       force_xmlns true
@@ -36,7 +36,7 @@ module Jabber
       end
 
       ##
-      # Get the value of this element's 'node' attribute, 
+      # Get the value of this element's 'node' attribute,
       # a 'unique identifier for the software underlying the entity'
       def node
         attributes['node']

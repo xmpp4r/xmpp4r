@@ -25,7 +25,7 @@ module Jabber
 
       ##
       # Construct a new Caps Helper.
-      # 
+      #
       # This will send a <presence> message containing
       # a <c/> (Jabber::Caps::C) stanza to your server.
       # client:: [Jabber::Stream]
@@ -48,7 +48,7 @@ module Jabber
           else
             false
           end
-        end      
+        end
 
         p = Jabber::Presence.new()
         p.add(c)
@@ -70,7 +70,7 @@ module Jabber
         caps_reply.query = Jabber::Discovery::IqQueryDiscoInfo.new
         @identities.each { |i| caps_reply.query.add(i) }
         @features.each { |f| caps_reply.query.add(f) }
-        
+
         @stream.send(caps_reply)
       end
 

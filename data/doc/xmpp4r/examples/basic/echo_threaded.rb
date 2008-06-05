@@ -12,7 +12,7 @@ if ARGV.length != 2
   exit 1
 end
 myJID = JID::new(ARGV[0])
-myPassword = ARGV[1] 
+myPassword = ARGV[1]
 cl = Client::new(myJID)
 cl.connect
 cl.auth(myPassword)

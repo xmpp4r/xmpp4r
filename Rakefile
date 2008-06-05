@@ -20,11 +20,11 @@ PKG_VERSION = '0.3.2'
 
 PKG_FILES = ['ChangeLog', 'README', 'COPYING', 'LICENSE', 'setup.rb', 'Rakefile', 'UPDATING']
 Find.find('lib/', 'data/', 'test/', 'tools/') do |f|
-	if FileTest.directory?(f) and f =~ /\.svn/
-		Find.prune
-	else
-		PKG_FILES << f
-	end
+  if FileTest.directory?(f) and f =~ /\.svn/
+    Find.prune
+  else
+    PKG_FILES << f
+  end
 end
 
 
@@ -33,8 +33,8 @@ end
 task :default => [:package]
 
 Rake::TestTask.new do |t|
-	t.libs << "test"
-	t.test_files = ['test/ts_xmpp4r.rb']
+  t.libs << "test"
+  t.test_files = ['test/ts_xmpp4r.rb']
 end
 
 Rake::RDocTask.new do |rd|
@@ -61,42 +61,42 @@ Rake::RDocTask.new do |rd|
 end
 
 task :doctoweb => [:rdoc] do |t|
-   # copies the rdoc to the CVS repository for xmpp4r website
-	# repository is in $CVSDIR (default: ~/dev/xmpp4r-web)
-   sh "tools/doctoweb.bash"
+  # copies the rdoc to the CVS repository for xmpp4r website
+  # repository is in $CVSDIR (default: ~/dev/xmpp4r-web)
+  sh "tools/doctoweb.bash"
 end
 
 Rake::PackageTask.new(PKG_NAME, PKG_VERSION) do |p|
-	p.need_tar = true
-	p.package_files = PKG_FILES
+  p.need_tar = true
+  p.package_files = PKG_FILES
 end
 
 if RCOV
-	Rcov::RcovTask.new do |t|
-		t.test_files = ['test/ts_xmpp4r.rb']
-	end
+  Rcov::RcovTask.new do |t|
+    t.test_files = ['test/ts_xmpp4r.rb']
+  end
 end
 
 # "Gem" part of the Rakefile
 begin
-	require 'rake/gempackagetask'
+  require 'rake/gempackagetask'
 
-	spec = Gem::Specification.new do |s|
-		s.platform = Gem::Platform::RUBY
-		s.summary = "Ruby library for Jabber Instant-Messaging"
-		s.name = PKG_NAME
-		s.version = PKG_VERSION
-		s.requirements << 'none'
-		s.require_path = 'lib'
-		s.autorequire = 'xmpp4r'
-		s.files = PKG_FILES
-		s.description = "Ruby library for Jabber Instant-Messaging"
-		s.has_rdoc = true
-	end
+  spec = Gem::Specification.new do |s|
+    s.platform = Gem::Platform::RUBY
+    s.summary = "Ruby library for Jabber Instant-Messaging"
+    s.name = PKG_NAME
+    s.version = PKG_VERSION
+    s.requirements << 'none'
+    s.require_path = 'lib'
+    s.autorequire = 'xmpp4r'
+    s.files = PKG_FILES
+    s.description = "Ruby library for Jabber Instant-Messaging"
+    s.has_rdoc = true
+  end
 
-	Rake::GemPackageTask.new(spec) do |pkg|
-		pkg.need_zip = true
-		pkg.need_tar = true
-	end
+  Rake::GemPackageTask.new(spec) do |pkg|
+    pkg.need_zip = true
+    pkg.need_tar = true
+  end
 rescue LoadError
 end

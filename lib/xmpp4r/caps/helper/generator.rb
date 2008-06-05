@@ -80,7 +80,7 @@ module Jabber
         end
 
         # 7.3. For each field:
-        
+
         fields.each do |field|
           # 7.3.1. Append the value of the "var" attribute, followed by
           # the '<' character.

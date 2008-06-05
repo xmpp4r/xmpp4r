@@ -31,7 +31,7 @@ class Jabber::UserTune::TuneTest < Test::Unit::TestCase
 
   def test_stop_playing
     t=Jabber::UserTune::Tune.new
-    
+
     assert_kind_of Jabber::UserTune::Tune,t
     assert_equal 0,t.elements.size
     assert_equal false, t.playing?
@@ -48,7 +48,7 @@ class Jabber::UserTune::TuneTest < Test::Unit::TestCase
     assert_equal(10, Jabber::UserTune::Tune.new(artist,title,length,track,source,uri,11.5).rating)
     assert_equal(nil, Jabber::UserTune::Tune.new(artist,title,length,track,source,uri,'fantastic').rating)
   end
-  
+
   def artist
     'Mike Flowers Pops'
   end

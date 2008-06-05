@@ -192,7 +192,7 @@ module Jabber
 
       ##
       # Set the feature's var
-      # 
+      #
       # This is a namespace the identity supports.
       # val:: [String]
       def var=(val)
@@ -209,4 +209,3 @@ module Jabber
     end
   end
 end
-

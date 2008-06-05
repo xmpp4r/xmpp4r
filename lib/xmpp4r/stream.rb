@@ -109,7 +109,7 @@ module Jabber
     end
 
     ##
-    # Mounts a block to handle exceptions if they occur during the 
+    # Mounts a block to handle exceptions if they occur during the
     # poll send.  This will likely be the first indication that
     # the socket dropped in a Jabber Session.
     #
@@ -174,7 +174,7 @@ module Jabber
     end
 
     ##
-    # Processes a received REXML::Element and executes 
+    # Processes a received REXML::Element and executes
     # registered thread blocks and filters against it.
     #
     # element:: [REXML::Element] The received element
@@ -201,7 +201,7 @@ module Jabber
 
             unless element.attributes['version']  # isn't XMPP compliant, so
               Jabber::debuglog("FEATURES: server not XMPP compliant, will not wait for features")
-              @features_sem.run                   # don't wait for <stream:features/> 
+              @features_sem.run                   # don't wait for <stream:features/>
             end
           when 'features'
             stanza = element
@@ -406,9 +406,9 @@ module Jabber
 
     ##
     # Adds a callback block to process received XML messages
-    # 
+    #
     # priority:: [Integer] The callback's priority, the higher, the sooner
-    # ref:: [String] The callback's reference 
+    # ref:: [String] The callback's reference
     # &block:: [Block] The optional block
     def add_xml_callback(priority = 0, ref = nil, &block)
       @xmlcbs.add(priority, ref, block)
@@ -424,9 +424,9 @@ module Jabber
 
     ##
     # Adds a callback block to process received Messages
-    # 
+    #
     # priority:: [Integer] The callback's priority, the higher, the sooner
-    # ref:: [String] The callback's reference 
+    # ref:: [String] The callback's reference
     # &block:: [Block] The optional block
     def add_message_callback(priority = 0, ref = nil, &block)
       @messagecbs.add(priority, ref, block)
@@ -442,9 +442,9 @@ module Jabber
 
     ##
     # Adds a callback block to process received Stanzas
-    # 
+    #
     # priority:: [Integer] The callback's priority, the higher, the sooner
-    # ref:: [String] The callback's reference 
+    # ref:: [String] The callback's reference
     # &block:: [Block] The optional block
     def add_stanza_callback(priority = 0, ref = nil, &block)
       @stanzacbs.add(priority, ref, block)
@@ -457,12 +457,12 @@ module Jabber
     def delete_stanza_callback(ref)
       @stanzacbs.delete(ref)
     end
-    
+
     ##
-    # Adds a callback block to process received Presences 
-    # 
+    # Adds a callback block to process received Presences
+    #
     # priority:: [Integer] The callback's priority, the higher, the sooner
-    # ref:: [String] The callback's reference 
+    # ref:: [String] The callback's reference
     # &block:: [Block] The optional block
     def add_presence_callback(priority = 0, ref = nil, &block)
       @presencecbs.add(priority, ref, block)
@@ -475,12 +475,12 @@ module Jabber
     def delete_presence_callback(ref)
       @presencecbs.delete(ref)
     end
-    
+
     ##
     # Adds a callback block to process received Iqs
-    # 
+    #
     # priority:: [Integer] The callback's priority, the higher, the sooner
-    # ref:: [String] The callback's reference 
+    # ref:: [String] The callback's reference
     # &block:: [Block] The optional block
     def add_iq_callback(priority = 0, ref = nil, &block)
       @iqcbs.add(priority, ref, block)

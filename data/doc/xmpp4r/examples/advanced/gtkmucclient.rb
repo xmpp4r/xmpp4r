@@ -57,7 +57,7 @@ class SetupWindow < Gtk::Window
     @entry_resource.show
     layout1.attach(@entry_resource, 1, 2, 3, 4)
 
-    
+
     frame2 = Gtk::Frame.new('Multi-User Chat Settings')
     frame2.set_border_width(4)
     frame2.show
@@ -174,7 +174,7 @@ class ChatWindow < Gtk::Window
     roster_scroll.show
     roster_scroll.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC)
     layout_mid.pack2(roster_scroll, true, true)
-    
+
     @roster = Gtk::ListStore.new(String)
     @roster.set_sort_column_id(0)
     roster_view = Gtk::TreeView.new(@roster)
@@ -196,7 +196,7 @@ class ChatWindow < Gtk::Window
 
     print_buffer "Welcome to the XMPP4R sample GTK2 Multi-User Chat client"
     print_buffer "Commands start with a slash, type \"/help\" for a list"
-    
+
     @client = Jabber::Client.new(jid)
     Jabber::Version::SimpleResponder.new(@client, "XMPP4R example: GtkMUCClient", Jabber::XMPP4R_VERSION, IO.popen("uname -sr").readlines.to_s.strip)
     Thread.new {

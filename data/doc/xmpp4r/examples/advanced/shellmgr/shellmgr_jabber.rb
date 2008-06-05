@@ -19,7 +19,7 @@ cl = Client::new(myjid)
 cl.connect
 cl.auth(mypassword)
 mainthread = Thread.current
-sh = Shell::new { |str| 
+sh = Shell::new { |str|
   puts "-----RECEIVING-----\n#{str}"
   cl.send(Message::new(authjid, str)) }
 cl.add_message_callback do |m|

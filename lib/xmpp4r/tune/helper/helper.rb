@@ -11,7 +11,7 @@ module Jabber
     ##
     # A Helper for XEP-0118 User Tune
     #
-    # Use this helper to send user tunes, or receive them from a 
+    # Use this helper to send user tunes, or receive them from a
     # specified jid. Described at http://www.xmpp.org/extensions/xep-0118.html
     #
     # For example:
@@ -31,7 +31,7 @@ module Jabber
       def now_playing(track)
         item = Jabber::PubSub::Item.new()
         item.add(track)
-        
+
         publish_item_to(NS_USERTUNE, item)
       end
 

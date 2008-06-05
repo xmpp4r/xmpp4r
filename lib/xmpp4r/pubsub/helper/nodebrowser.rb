@@ -82,8 +82,8 @@ module Jabber
       def items(jid,node)
         iq = Iq.new(:get,jid)
         iq.from = @stream.jid
-	discoitems = Discovery::IqQueryDiscoItems.new
-	discoitems.node = node
+        discoitems = Discovery::IqQueryDiscoItems.new
+        discoitems.node = node
         iq.add(discoitems)
         items = []
         err = nil
@@ -109,52 +109,50 @@ module Jabber
       # node:: [String]
       # return:: [Hash] with possible keys type:: [String] ,category:: [String],features:: [Array] of feature, nodeinformation:: [Jabber::XData]
       # check http://www.xmpp.org/extensions/xep-0060.html#entity for more infos
-      
-      
+
+
       def get_info(jid,node)
         iq = Iq.new(:get,jid)
-	iq.from = @stream.jid
-	discoinfo = Discovery::IqQueryDiscoInfo.new
-	discoinfo.node = node
-	iq.add(discoinfo)
-	info = {}
-	@stream.send_with_id(iq) { |answer|
-	  if answer.type == :result
-	    
-	    identity = answer.query.identity
-	    info['type'] = identity.type
-	    info['category'] = identity.category
-	    
-	    info['features'] = answer.query.features
-	    
-	    answer.query.each_element('x') { |x|
-	      info['nodeinformation'] = x 
-	    }
-	  end
-	}
-	return info
+        iq.from = @stream.jid
+        discoinfo = Discovery::IqQueryDiscoInfo.new
+        discoinfo.node = node
+        iq.add(discoinfo)
+        info = {}
+        @stream.send_with_id(iq) { |answer|
+          if answer.type == :result
+            identity = answer.query.identity
+            info['type'] = identity.type
+            info['category'] = identity.category
+            info['features'] = answer.query.features
+
+            answer.query.each_element('x') { |x|
+              info['nodeinformation'] = x
+            }
+          end
+        }
+        return info
       end
       # this is only for a xep <-> nodebrowser.rb understanding
       alias get_metadata get_info
-      
+
       ##
       # get type of node
       # jid:: [Jabber::JID]
       # node:: [String]
-      # 
+      #
       def type(jid,node)
         info = get_info(jid,node)
-	return info['type']
+        return info['type']
       end
-      
+
       ##
       # get category of node
       # jid:: [Jabber::JID]
       # node:: [String]
-      # 
+      #
       def category(jid,node)
         info = get_info(jid,node)
-	return info['category']
+        return info['category']
       end
 
     end #class

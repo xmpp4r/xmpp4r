@@ -33,7 +33,7 @@ class StreamComponentTest < Test::Unit::TestCase
         end
       end
       @server.start(serversock)
-      
+
       serverwait.run
     end
 
@@ -63,7 +63,7 @@ class StreamComponentTest < Test::Unit::TestCase
       assert_kind_of(Iq, iq)
       stanzas += 1
       iq_lock.run
-    } 
+    }
     @stream.add_presence_callback { |pres|
       assert_kind_of(Presence, pres)
       stanzas += 1

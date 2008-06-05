@@ -27,9 +27,9 @@ class IqVcardTest < Test::Unit::TestCase
     f.each { |s|
       v[s.downcase] = s.upcase
     }
-    
+
     assert_equal(f, v.fields.sort)
-    
+
     f.each { |s|
       assert_equal(s.upcase, v[s.downcase])
       assert_equal(nil, v[s.upcase])
@@ -41,7 +41,7 @@ class IqVcardTest < Test::Unit::TestCase
       'FN' => 'John D. Random',
       'PHOTO/TYPE' => 'image/png',
       'PHOTO/BINVAL' => '===='})
-    
+
       assert_equal(['FN', 'PHOTO/BINVAL', 'PHOTO/TYPE'], v.fields.sort)
       assert_equal('John D. Random', v['FN'])
       assert_equal('image/png', v['PHOTO/TYPE'])

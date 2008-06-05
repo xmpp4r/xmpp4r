@@ -91,9 +91,9 @@ module Jabber
         each_element('instructions') do |xe|
           fields << xe
         end
-        fields        
+        fields
       end
-  
+
       ##
       # Add Data Form instructions
       # i:: [String]
@@ -295,4 +295,3 @@ module Jabber
     end
   end
 end
-

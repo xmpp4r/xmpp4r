@@ -5,7 +5,7 @@
 # For a documentation of the retunvalues please look into the
 # documentation of [Jabber::PubSub::ServiceHelper]
 # This class is only a wrapper around [Jabber::PubSub::ServiceHelper]
-# 
+#
 
 
 require 'xmpp4r/pubsub/helper/servicehelper'
@@ -20,7 +20,7 @@ module Jabber
       attr_reader :jiod
       attr_reader :my_subscriptions
       ##
-      # creates a new node  
+      # creates a new node
       # new(client,service,nodename)
       # stream:: [Jabber::Stream]
       # jid:: [String] (jid of the pubsub service)
@@ -28,18 +28,18 @@ module Jabber
       def initialize(stream,jid,nodename = nil,create_if_not_exist = true)
         super(stream,jid)
         @nodename = nodename
-	@jid = jid
-	@stream = stream
+        @jid = jid
+        @stream = stream
 
-	if create_if_not_exist and not node_exist?
-	  # if no nodename is given a instant node will created 
-	  # (if the service supports instant nodes)
-	  @nodename = create_node 
-	else
-	 get_subscriptions 
-	end
+        if create_if_not_exist and not node_exist?
+          # if no nodename is given a instant node will created
+          # (if the service supports instant nodes)
+          @nodename = create_node
+        else
+         get_subscriptions
+        end
       end
-      
+
       ##
       # creates the node
       # create(configuration=nil)
@@ -47,11 +47,11 @@ module Jabber
       def create_node(configuration = nil)
         if ! node_exist?
             create(@nodename,configuration)
-	else
-	    false
-	end
+        else
+          false
+        end
       end
-      
+
       ##
       # get the configuration of the node
       # get_configuration(configuration=nil)
@@ -59,7 +59,7 @@ module Jabber
       def get_configuration(subid = nil)
         get_options(@nodename,subid)
       end
-      
+
       ##
       # set the configuration of the node
       # set_configuration(configuration=nil)
@@ -77,7 +77,7 @@ module Jabber
       end
 
       ##
-      # publishing content on this node 
+      # publishing content on this node
       # publish_content(items)
       # items:: [REXML::Element]
       def publish_content(items)
@@ -85,14 +85,14 @@ module Jabber
       end
 
       ##
-      # gets all items from the node 
+      # gets all items from the node
       # get_all_items
       def get_all_items
         items(@nodename)
       end
 
       ##
-      # get a count of items 
+      # get a count of items
       # get_items(count)
       # count:: [Fixnum]
       def get_items(count)
@@ -125,7 +125,7 @@ module Jabber
       # do_subscribe
       def do_subscribe
         subscribe(@nodename)
-	get_subscriptions
+        get_subscriptions
       end
 
       ##
@@ -135,16 +135,16 @@ module Jabber
       def do_unsubscribe(subid)
         unsubscribe(@nodename,subid)
       end
-      
+
       ##
       # purge all items from this node
       # purge_items
       def purge_items
         purge(@nodename)
       end
-      
+
     private
-    
+
       def node_exist?
         nodebrowser = PubSub::NodeBrowser.new(@stream)
         nodebrowser.nodes(@jid).include?(@nodename)

@@ -21,7 +21,7 @@ module Jabber
   def Jabber::debug
     @@debug
   end
-    
+
   # Outputs a string only if debugging mode is enabled. If the string includes
   # several lines, 4 spaces are added at the begginning of each line but the
   # first one. Time is prepended to the string.

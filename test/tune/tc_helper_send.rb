@@ -31,10 +31,10 @@ class UserTune::HelperTest < Test::Unit::TestCase
     state { |now_playing|
       assert_kind_of(Jabber::Iq, now_playing)
       assert_equal :set, now_playing.type
-    
+
       assert_kind_of(Jabber::PubSub::IqPubSub,now_playing.first_element('pubsub'))
       assert_equal(Jabber::UserTune::NS_USERTUNE,now_playing.first_element('pubsub').first_element('publish').node)
-   
+
       tune=now_playing.first_element('pubsub').first_element('publish').first_element('item').first_element('tune')
       assert_kind_of Jabber::UserTune::Tune,tune
       assert_equal true, tune.playing?
@@ -53,10 +53,10 @@ class UserTune::HelperTest < Test::Unit::TestCase
 
   def test_send_stop_playing
     h = UserTune::Helper.new(@client, nil)
-  
+
     state { |now_playing|
       tune = now_playing.first_element('pubsub').first_element('publish').first_element('item').first_element('tune')
- 
+
       assert_kind_of Jabber::UserTune::Tune, tune
       assert_equal false, tune.playing?
       assert_equal nil, tune.artist

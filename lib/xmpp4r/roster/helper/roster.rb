@@ -182,7 +182,7 @@ module Jabber
         @roster_wait.run
         @query_cbs.process(iq)
       end
-      
+
       ##
       # Handle received <tt><presence/></tt> stanzas,
       # used internally
@@ -257,7 +257,7 @@ module Jabber
 
       ##
       # Returns the list of RosterItems which, stripped, are equal to the
-      # one you are looking for. 
+      # one you are looking for.
       def find(jid)
         jid = JID.new(jid) unless jid.kind_of? JID
 
@@ -388,7 +388,7 @@ module Jabber
           request.query.add(self)
           @stream.send(request)
         end
-        
+
         ##
         # Remove item
         #
@@ -416,7 +416,7 @@ module Jabber
             }.size > 0
           }
         end
-        
+
         ##
         # Iterate through all received <tt><presence/></tt> stanzas
         def each_presence(&block)
@@ -425,7 +425,7 @@ module Jabber
             yield(pres)
           }
         end
-        
+
         ##
         # Get specific presence
         # jid:: [JID] Full JID
@@ -517,4 +517,3 @@ module Jabber
     end #Class Roster
   end #Module Roster
 end #Module Jabber
-

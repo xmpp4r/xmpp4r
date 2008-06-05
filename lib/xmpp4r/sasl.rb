@@ -65,13 +65,13 @@ module Jabber
           end
           true
         }
-        
+
         raise error if error
       end
     end
-    
+
     ##
-    # SASL Anonymous authentication helper 
+    # SASL Anonymous authentication helper
     class Anonymous < Base
       ##
       # Authenticate by sending nothing with the ANONYMOUS token
@@ -84,7 +84,7 @@ module Jabber
           end
           true
         }
-        
+
         raise error if error
       end
     end
@@ -196,7 +196,7 @@ module Jabber
           end
           true
         }
-        
+
         return if success_already
         raise error if error
 
@@ -209,7 +209,7 @@ module Jabber
           end
           true
         }
-        
+
         raise error if error
       end
 
@@ -221,7 +221,7 @@ module Jabber
       ##
       # Function from RFC2831
       def hh(s); Digest::MD5.hexdigest(s); end
-      
+
       ##
       # Calculate the value for the response field
       def response_value(username, realm, digest_uri, passwd, nonce, cnonce, qop)

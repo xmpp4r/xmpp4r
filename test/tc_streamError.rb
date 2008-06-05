@@ -20,7 +20,7 @@ class ConnectionErrorTest < Test::Unit::TestCase
       @server = servlisten.accept
       servlisten.close
       @server.sync = true
-      
+
       serverwait.run
     end
 
@@ -62,7 +62,7 @@ class ConnectionErrorTest < Test::Unit::TestCase
     error = false
     @stream.start(@conn)
     @stream.on_exception do |e, o, w|
-      if w == :disconnected 
+      if w == :disconnected
         assert_equal(nil, e)
         assert_equal(Jabber::Stream, o.class)
       else

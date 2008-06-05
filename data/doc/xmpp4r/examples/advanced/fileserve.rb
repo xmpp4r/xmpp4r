@@ -198,7 +198,7 @@ class FileServe
     @socksserver = Jabber::Bytestreams::SOCKS5BytestreamsServer.new(conf['socks']['port'])
 
     conf['socks']['addresses'].each { |addr| @socksserver.add_address(addr) }
-    
+
     @proxies = []
     conf['socks']['proxies'].collect { |jid|
       puts "Querying proxy #{jid}..."
@@ -207,8 +207,8 @@ class FileServe
       rescue
         puts "Error: #{$!}"
       end
-    } 
-    
+    }
+
     Thread.new { presence }
     Thread.new { cleaner }
 
@@ -253,7 +253,7 @@ class FileServe
     }
 
     @ft.add_incoming_callback { |iq,file|
-      
+
       say = lambda { |text|
         say(iq.from, text)
       }
@@ -261,23 +261,23 @@ class FileServe
       puts "Incoming file transfer from #{iq.from}: #{file.fname} (#{file.size / 1024} KB)"
       filename = file.fname.split(/\//).last
       filename.gsub!(/^\.+/, '')
-      
+
       puts "Range: #{file.range != nil}"
       transfer = Upload.new(@ft, iq, "#{@directory}/#{filename}", file.size, file.range != nil, say)
       @uploads += 1
-      
+
       @transfers_lock.synchronize {
         @transfers.push(transfer)
       }
-    
+
     }
 
     roster = Jabber::Roster::Helper.new(@client)
-    
+
     roster.add_subscription_request_callback { |item,presence|
       roster.accept_subscription(presence.from)
     }
-    
+
   end
 
   def command(from, cmd, arg)
@@ -330,11 +330,11 @@ class FileServe
 
   def cleaner
     loop {
-    
+
       @transfers_lock.synchronize {
         @transfers.delete_if { |t| t.done? }
       }
-    
+
       sleep 1
     }
   end

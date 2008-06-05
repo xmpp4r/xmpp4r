@@ -46,4 +46,3 @@ class Vcard::HelperTest < Test::Unit::TestCase
     assert_equal('====', res['PHOTO/BINVAL'])
   end
 end
-

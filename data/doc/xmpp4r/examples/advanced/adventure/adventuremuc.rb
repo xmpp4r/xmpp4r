@@ -3,7 +3,7 @@ require 'world'
 class AdventureMUC
   def initialize(jid, secret, addr, port=5347)
     @worlds = {}
-    
+
     @component = Jabber::Component::new(jid)
     @component.connect(addr, port)
     @component.auth(secret)
@@ -54,7 +54,7 @@ class AdventureMUC
       false
     end
   end
-  
+
   def handle_disco_info(iq)
     if iq.type != :get
       answer = iq.answer
@@ -84,7 +84,7 @@ class AdventureMUC
     end
     @component.send(answer)
   end
-  
+
   def handle_disco_items(iq)
     if iq.type != :get
       answer = iq.answer
@@ -104,7 +104,7 @@ class AdventureMUC
 
   def handle_presence(pres)
     puts "presence: from #{pres.from} type #{pres.type} to #{pres.to}"
-    
+
     world = @worlds[pres.to.node]
     if world.nil?
       answer = pres.answer

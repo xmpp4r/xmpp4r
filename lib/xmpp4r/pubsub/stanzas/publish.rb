@@ -9,11 +9,11 @@ module Jabber
 
     ##
     # Publish
-    # 
+    #
     # A <publish> XMPP element, see example 1 in
     # http://www.xmpp.org/extensions/xep-0060.html#intro-howitworks
     class Publish < XMPPElement
-      name_xmlns 'publish', NS_PUBSUB 
+      name_xmlns 'publish', NS_PUBSUB
       ##
       # return the node for this publication
       def node

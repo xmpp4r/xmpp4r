@@ -80,7 +80,7 @@ class JIDTest < Test::Unit::TestCase
     assert_kind_of(Class, Jabber::Bytestreams::SOCKS5Error)
     assert_kind_of(Class, Jabber::Bytestreams::SOCKS5Socket)
   end
-  
+
   def test_dataforms
     require 'xmpp4r/dataforms'
     assert_kind_of(Module, Jabber::Dataforms)
@@ -90,7 +90,7 @@ class JIDTest < Test::Unit::TestCase
     assert_kind_of(Class, Jabber::Dataforms::XDataField)
     assert_kind_of(Class, Jabber::Dataforms::XDataReported)
   end
-  
+
   def test_delay
     require 'xmpp4r/delay'
     assert_kind_of(Module, Jabber::Delay)
@@ -134,7 +134,7 @@ class JIDTest < Test::Unit::TestCase
     assert_kind_of(Class, Jabber::RPC::Server)
     assert_kind_of(Class, Jabber::RPC::Client)
   end
-  
+
   def test_pubsub
     require 'xmpp4r/pubsub'
     assert_kind_of(Module, Jabber::PubSub)

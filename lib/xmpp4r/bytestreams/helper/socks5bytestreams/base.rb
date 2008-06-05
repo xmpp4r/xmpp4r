@@ -26,7 +26,7 @@ module Jabber
       #
       # default: nil, use the OS' default timeout
       attr_accessor :connect_timeout
-      
+
       def initialize(stream, session_id, initiator_jid, target_jid)
         @stream = stream
         @session_id = session_id

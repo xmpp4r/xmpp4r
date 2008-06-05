@@ -36,7 +36,7 @@ module Jabber
     def parse
       @started = false
       begin
-        parser = REXML::Parsers::SAX2Parser.new @stream 
+        parser = REXML::Parsers::SAX2Parser.new @stream
 
         parser.listen( :start_element ) do |uri, localname, qname, attributes|
           e = REXML::Element::new(qname)

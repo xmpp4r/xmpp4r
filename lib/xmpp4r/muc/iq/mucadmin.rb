@@ -8,7 +8,7 @@ module Jabber
   module MUC
     class IqQueryMUCAdmin < IqQuery
       name_xmlns 'query', 'http://jabber.org/protocol/muc#admin'
-      
+
       include XParent
 
       def items

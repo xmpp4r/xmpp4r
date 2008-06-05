@@ -33,7 +33,7 @@ class StreamSendTest < Test::Unit::TestCase
     @stream.send(s)
     @stream.send("\n") #needed for easy test writing
   end
-  
+
   ##
   # Tries to send a basic message
   def test_sendbasic

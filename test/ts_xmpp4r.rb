@@ -28,7 +28,7 @@ Find.find(File.dirname(__FILE__)) do |f|
   elsif File::basename(f) =~ /^tc.*\.rb$/
     tc_files << f
   end
-end 
+end
 
 tc_subdirs.each do |dir|
   Find.find(dir) do |f|

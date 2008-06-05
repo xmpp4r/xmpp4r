@@ -8,7 +8,7 @@ require 'rexml/element'
 module Jabber
   module UserTune
     NS_USERTUNE = 'http://jabber.org/protocol/tune'
-    
+
     ##
     # The <tune> XMPP element, as defined in XEP-0118 User Tune
     #
@@ -29,9 +29,9 @@ module Jabber
       #
       # Supply no arguments to make an
       # empty element to indicate that tune playing has stopped.
-      # 
-      # artist:: [String] the artist or performer of the song or piece  
-      # title:: [String] the title of the song or piece 
+      #
+      # artist:: [String] the artist or performer of the song or piece
+      # title:: [String] the title of the song or piece
       # length:: [Fixnum] the duration of the song or piece in seconds
       # track:: [String] a unique identifier for the tune; e.g., the track number within a collection or the specific URI for the object (e.g., a stream or audio file)
       # source:: [String] the collection (e.g., album) or other source (e.g., a band website that hosts streams or audio files)
@@ -39,9 +39,9 @@ module Jabber
       # rating:: [Numeric] a number indicating how much you like this song - will be clamped into an integer 0 <= x <= 10
       def initialize(artist = nil, title = nil, length = nil, track = nil, source = nil, uri = nil, rating = nil)
         super()
-        
+
         add_element(REXML::Element.new('artist')).text = artist if artist
-        
+
         add_element(REXML::Element.new('title')).text = title if title
 
         add_element(REXML::Element.new('length')).text = length.to_s if length
@@ -72,9 +72,9 @@ module Jabber
       def artist
         first_element('artist').text if first_element('artist')
       end
-     
+
       ##
-      # Get the title of this tune. 
+      # Get the title of this tune.
       def title
         first_element('title').text  if first_element('title')
       end
@@ -102,7 +102,7 @@ module Jabber
       def uri
         first_element('uri').text if first_element('uri')
       end
-    
+
       ##
       # Get the rating for this track
       def rating

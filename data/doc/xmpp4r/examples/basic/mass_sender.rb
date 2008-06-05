@@ -63,6 +63,6 @@ STDIN.each_line { |l|
   cl.send(m)
 }
 while not exit do
-	cl.process(1)
+  cl.process(1)
 end
 cl.close

@@ -14,6 +14,6 @@ module Jabber
     class IqPubSubOwner < XMPPElement
       name_xmlns 'pubsub', NS_PUBSUB + '#owner'
       force_xmlns true
-    end 
+    end
   end
 end

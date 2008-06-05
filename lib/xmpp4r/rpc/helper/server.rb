@@ -72,4 +72,3 @@ module Jabber
     end # RPCServer
   end  # Helpers
 end   # Jabber
-

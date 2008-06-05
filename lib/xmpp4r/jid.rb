@@ -4,7 +4,7 @@
 
 module Jabber
   ##
-  # The JID class represents a Jabber Identifier as described by 
+  # The JID class represents a Jabber Identifier as described by
   # RFC3920 section 3.1.
   #
   # Note that you can use JIDs also for Sorting, Hash keys, ...

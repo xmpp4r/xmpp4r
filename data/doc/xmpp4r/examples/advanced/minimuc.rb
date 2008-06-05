@@ -17,7 +17,7 @@ class Room
       @error = Jabber::Error.new(error, msg)
     end
   end
-  
+
   def initialize(stream, name)
     @users = {}   # nick => jid
     @stream = stream
@@ -49,7 +49,7 @@ class Room
 
   def handle_presence(pres)
     reason = nil
-    
+
     # Check if nick already registered
     @users.each { |nick,jid|
       if pres.from != jid && pres.to.resource == nick
@@ -76,7 +76,7 @@ class Room
         @stream.send(userinfo)
       }
       puts " Ok"
-      
+
       # Add the new user
       puts "Adding #{pres.from} as #{pres.to}"
       @users[pres.to.resource] = pres.from
@@ -97,7 +97,7 @@ class Room
         reason = "#{was_nick} has left #{@name.node}"
       end
     end
-    
+
     # Advertise users presence to all
     puts "Advertising user to all"
     x = Jabber::XMUCUserItem.new(:none, :participant, pres.from)
@@ -114,7 +114,7 @@ class Room
     msg.body = body
     broadcast(msg)
   end
-  
+
   def broadcast(stanza)
     x = stanza.class::import(stanza)
     @users.each { |nick,jid|
@@ -127,7 +127,7 @@ end
 class MUC
   def initialize(jid, secret, addr, port=5347)
     @rooms = {}
-    
+
     @component = Jabber::Component::new(jid, addr, port)
     @component.connect
     @component.auth(secret)
@@ -199,7 +199,7 @@ class MUC
       @component.send(msg)
     end
   end
-  
+
   def handle_disco_info(iq)
     if (iq.type == :get)
       iq.type = :result

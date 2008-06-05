@@ -171,7 +171,7 @@ class World < REXML::Element
         send(player.iname, pres)
       }
     end
-    
+
     # Remove the player instantly
     if pres.type == :error || pres.type == :unavailable
       move_thing(player, nil)
@@ -336,7 +336,7 @@ class Thing < REXML::Element
       end
     }
   end
-  
+
   def on_enter(thing, from)
     each_element('on-enter') { |c|
       command(thing, c, [from])
@@ -374,7 +374,7 @@ class Player < Thing
     attributes['name'] = iname
     attributes['jid'] = jid.to_s
   end
-  
+
   def jid
     attributes['jid'].nil? ? nil : Jabber::JID::new(attributes['jid'])
   end
@@ -422,4 +422,3 @@ class Player < Thing
     end
   end
 end
-

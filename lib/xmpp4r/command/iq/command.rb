@@ -1,7 +1,7 @@
 require 'xmpp4r/iq'
 
 module Jabber
-  
+
   module Command
 
     ##

@@ -62,7 +62,7 @@ cl.add_presence_callback { |pres|
     roster_set_iq.add(Jabber::IqQueryRoster.new).add(Jabber::RosterItem.new(pres.from.strip))
     cl.send(roster_set_iq)
   end
-  
+
   presences[pres.from] = pres
   write_state(ARGV[2], roster, presences)
 }

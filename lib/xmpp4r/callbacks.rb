@@ -30,7 +30,7 @@ module Jabber
   # In XMPP4R, callbacks' priorities are quite normalized since we want to be
   # able to "cascade" callbacks in a clean way. Here are values your code should
   # take into account :
-  # 
+  #
   # >= 200::  logging & debugging callbacks. Those callbacks should not consume
   #           elements.
   # 100-199:: Where Helpers register their callbacks. The normal value is 100,
@@ -107,7 +107,7 @@ module Jabber
     # The Callback's reference, using for deleting purposes
     attr_reader :ref
 
-    # The Callback's block to execute 
+    # The Callback's block to execute
     attr_reader :block
 
     ##

@@ -55,7 +55,7 @@ module Jabber
       clientsock = TCPSocket.new('localhost', @@SOCKET_PORT)
       clientsock.sync = true
       @client = Stream.new(true)
-#=begin 
+#=begin
       class << @client
         def jid
           begin
@@ -69,7 +69,7 @@ module Jabber
 #=end
       @client.start(clientsock)
       @client.send(stream) { |reply| true }
-     
+
       @state = 0
       @states = []
       @state_wait = Semaphore.new
@@ -85,10 +85,10 @@ module Jabber
           @state_wait2.wait
           @state_wait.run
         end
-        
+
         false
       }
-      
+
       serverwait.wait
     end
 

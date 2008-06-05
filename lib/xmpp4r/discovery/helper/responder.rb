@@ -164,4 +164,3 @@ module Jabber
     end
   end
 end
-

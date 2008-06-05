@@ -101,7 +101,7 @@ module Jabber
             length = @length - @bytes_read  # Truncate it!
           end
         end
-        
+
         buf = @file.read(length)
         @bytes_read += buf.size if buf
         buf

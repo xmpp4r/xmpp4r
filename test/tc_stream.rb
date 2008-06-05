@@ -119,7 +119,7 @@ class StreamTest < Test::Unit::TestCase
       called_outer += 1
       assert_kind_of(Iq, reply)
       assert_equal(:result, reply.type)
-      
+
       if reply.id == '1'
         @stream.send(Iq.new(:set)) do |reply2|
           called_inner += 1

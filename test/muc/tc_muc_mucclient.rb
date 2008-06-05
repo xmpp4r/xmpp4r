@@ -26,7 +26,7 @@ class MUCClientTest < Test::Unit::TestCase
       assert_kind_of(Presence, pres)
       assert_equal(JID.new('hag66@shakespeare.lit/pda'), pres.from)
       assert_equal(JID.new('darkcave@macbeth.shakespeare.lit/thirdwitch'), pres.to)
-      send("<presence from='darkcave@macbeth.shakespeare.lit' to='hag66@shakespeare.lit/pda' type='error'>" + 
+      send("<presence from='darkcave@macbeth.shakespeare.lit' to='hag66@shakespeare.lit/pda' type='error'>" +
            "<error code='400' type='modify'>" +
            "<jid-malformed xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
            "</error></presence>")
@@ -195,7 +195,7 @@ class MUCClientTest < Test::Unit::TestCase
 
   def test_locked_room
     state { |pres|
-      send("<presence from='darkcave@macbeth.shakespeare.lit' to='hag66@shakespeare.lit/pda' type='error'>" + 
+      send("<presence from='darkcave@macbeth.shakespeare.lit' to='hag66@shakespeare.lit/pda' type='error'>" +
            "<error code='404' type='cancel'><item-not-found xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/></error>" +
            "</presence>")
     }
@@ -365,7 +365,7 @@ class MUCClientTest < Test::Unit::TestCase
       messages_client += 1
       message_lock.run
     }
-    
+
     m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
     messages_muc = 0
@@ -425,7 +425,7 @@ class MUCClientTest < Test::Unit::TestCase
     @client.add_presence_callback { |pres|
       presences_client += 1
       presence_lock.run
-    }   
+    }
     m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
     presences_join = 0
@@ -522,7 +522,7 @@ class MUCClientTest < Test::Unit::TestCase
       assert_equal(JID.new('darkcave@macbeth.shakespeare.lit/firstwitch'), stanza.to)
       assert_equal('Third message', stanza.body)
     }
-    
+
     m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
 
@@ -610,9 +610,9 @@ class MUCClientTest < Test::Unit::TestCase
       assert_equal(jid, iq.from)
       assert_equal(room.strip, iq.to)
       assert_equal(:get, iq.type)
-      
+
       assert_kind_of(Jabber::MUC::IqQueryMUCOwner, iq.first_element('query'))
-      
+
       send(muc_config_form.sub("id='config1'","id='#{iq.id}'"))
     }
 
@@ -620,16 +620,16 @@ class MUCClientTest < Test::Unit::TestCase
       assert_kind_of(Jabber::Iq, room_config)
       assert_equal(room.strip, room_config.to)
       assert_equal(:set, room_config.type)
-      
+
       assert_kind_of(Jabber::MUC::IqQueryMUCOwner, room_config.first_element('query'))
-      
+
       form = room_config.first_element('query/x')
       assert_kind_of(Dataforms::XData, form)
       assert_equal(:submit, form.type)
       assert_equal(1, form.elements.size)
       assert_equal('muc#roomconfig_roomname', form.first_element('field').var)
       assert_equal(['Dunsinane'], form.first_element('field').values)
-      
+
       send(muc_config_acknowledgement.sub("id='config1'","id='#{room_config.id}'"))
     }
 
@@ -639,10 +639,10 @@ class MUCClientTest < Test::Unit::TestCase
     wait_state
     assert_equal(true, m.owner?)
 
-    assert_equal(%w{muc#roomconfig_roomname muc#roomconfig_roomdesc 
-      muc#roomconfig_enablelogging muc#roomconfig_changesubject muc#roomconfig_allowinvites 
+    assert_equal(%w{muc#roomconfig_roomname muc#roomconfig_roomdesc
+      muc#roomconfig_enablelogging muc#roomconfig_changesubject muc#roomconfig_allowinvites
       muc#roomconfig_maxusers muc#roomconfig_presencebroadcast muc#roomconfig_getmemberlist
-      muc#roomconfig_publicroom muc#roomconfig_persistentroom muc#roomconfig_moderatedroom 
+      muc#roomconfig_publicroom muc#roomconfig_persistentroom muc#roomconfig_moderatedroom
       muc#roomconfig_membersonly muc#roomconfig_passwordprotectedroom muc#roomconfig_roomsecret
       muc#roomconfig_whois muc#roomconfig_roomadmins muc#roomconfig_roomowners}, m.get_room_configuration)
     wait_state
@@ -815,7 +815,7 @@ class MUCClientTest < Test::Unit::TestCase
         </query>
       </iq>"
   end
-    
+
   def muc_config_acknowledgement
       "<iq from='darkcave@macbeth.shakespeare.lit'
           id='config1'

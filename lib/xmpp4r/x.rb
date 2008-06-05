@@ -25,7 +25,7 @@ module Jabber
       if wanted_xmlns.kind_of? Class and wanted_xmlns.ancestors.include? XMPPElement
         wanted_xmlns = wanted_xmlns.new.namespace
       end
-      
+
         each_element('x') { |x|
         if wanted_xmlns.nil? or wanted_xmlns == x.namespace
           return x

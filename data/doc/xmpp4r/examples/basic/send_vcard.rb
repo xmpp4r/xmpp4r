@@ -35,7 +35,7 @@ begin
   puts "Retrieving vCard information for #{cl.jid.strip}"
   vcard = vcard_helper.get
 
-  
+
   # Inspect the command line for vCard fields to be changed
   ARGV.each { |arg|
     arg.scan(/^(.+?)=(.*)$/) { |field,text|
@@ -65,4 +65,3 @@ rescue Exception => e
 end
 
 cl.close
-

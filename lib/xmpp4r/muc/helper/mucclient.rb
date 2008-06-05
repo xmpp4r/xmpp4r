@@ -73,7 +73,7 @@ module Jabber
         if active?
           raise "MUCClient already active"
         end
-        
+
         @jid = (jid.kind_of?(JID) ? jid : JID.new(jid))
         activate
 
@@ -183,7 +183,7 @@ module Jabber
         unless active?
           raise "MUCClient not active"
         end
-        
+
         new_jid = JID.new(@jid.node, @jid.domain, new_nick)
 
         # Joining
@@ -400,17 +400,17 @@ module Jabber
         get_room_configuration
         submit_room_configuration(options)
       end
-      
-      # :nodoc: 
+
+      # :nodoc:
       def get_room_configuration
         raise 'You are not the owner' unless owner?
-        
+
         iq = Iq.new(:get, jid.strip)
         iq.from = my_jid
         iq.add(IqQueryMUCOwner.new)
 
         fields = []
-        
+
         @stream.send_with_id(iq) do |answer|
           raise "Configuration not possible for this room" unless answer.query && answer.query.x(Dataforms::XData)
 
@@ -420,12 +420,12 @@ module Jabber
             end
           end
         end
-        
+
         fields
       end
-      
-      # :nodoc: 
-      def submit_room_configuration(options) 
+
+      # :nodoc:
+      def submit_room_configuration(options)
         # fill out the reply form
         iq = Iq.new(:set, jid.strip)
         iq.from = my_jid
@@ -439,7 +439,7 @@ module Jabber
           form.add(field)
         end
         query.add(form)
-        iq.add(query)   
+        iq.add(query)
 
         @stream.send_with_id(iq)
       end
