@@ -4,23 +4,23 @@
 #
 # It's recommented to read the XEP-0066 before you use this Helper. (Maybe its
 # better not use the helper for now ) ;)
-# The whole code is buggy - you have been warned!
+# This code is buggy - you have been warned!
 #
 # Maybe the following structure is good
 # ( taken form the xep-0060 )
 #
 # entity usecases
-#  retrieve all suscriptions
+#  retrieve all subscriptions
 #  retrieve all affiliations
 # NOTE: the disco stuff will done by the nodebrowserhelper
 # subscriber usecases
 #   subscribe
 #   unsubscribe
 #   configure subscription options
-#   retrive items from a node
+#   retrieve items from a node
 # publisher usecases
-#   publish a item to a node
-#   delete a item from a node
+#   publish an item to a node
+#   delete an item from a node
 # owner usecases
 #   create a node
 #   configure a node
@@ -34,8 +34,8 @@
 #
 # collection nodes
 #
-#  If someone want to implement something i think its better to do this in
-#  this order because everyone who reads the xep-0060 do know where to search in the file
+#  If someone wants to implement something new here I think it's better to do this in
+#  this order so that everyone who reads XEP-0060 will know where to search in the file
 #
 require 'xmpp4r/pubsub/iq/pubsub'
 require 'xmpp4r/pubsub/stanzas/event'
@@ -105,7 +105,7 @@ module Jabber
       end
 
       ##
-      # Unsubscibe from a node with an optional subscription id
+      # Unsubsrcibe from a node with an optional subscription id
       #
       # May raise ErrorException
       # node:: [String]
@@ -154,13 +154,12 @@ module Jabber
       end
 
       ##
-      # NOTE: this method sends only one item per publish request because some services may not
-      # allow batch processing
-      # maybe this will changed in the future
+      # NOTE: this method sends only one item per publish request because some services
+      # may not allow batch processing.  Maybe this will change in the future?
       # node:: [String]
       # item:: [Jabber::PubSub::Item]
       # return:: true
-      # it automaticly generates a id for the item
+      # it automatically generates an id for the item
       def publish_item_to(node,item)
         iq = basic_pubsub_query(:set)
         publish = iq.pubsub.add(REXML::Element.new('publish'))
@@ -195,7 +194,7 @@ module Jabber
       end
 
       ##
-      # purges all items on a persist node
+      # purges all items on a persistent node
       # node:: [String]
       # return:: true
       def purge_items_from(node)
@@ -208,8 +207,8 @@ module Jabber
 
       ##
       # Create a new node on the pubsub service
-      # node:: [String] you node name - otherwise you get a automaticly generated one (in most cases)
-      # configure:: [Jabber::XMPPElement] if you want to configure you node (default nil)
+      # node:: [String] your node name - otherwise you get an automatically generated one (in most cases)
+      # configure:: [Jabber::XMPPElement] if you want to configure your node (default nil)
       # return:: [String]
       def create_node(node=nil, configure=nil)
         rnode = nil

@@ -2,8 +2,7 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 #
-# For a documentation of the retunvalues please look into the
-# documentation of [Jabber::PubSub::ServiceHelper]
+# For documentation of the return values please see [Jabber::PubSub::ServiceHelper]
 # This class is only a wrapper around [Jabber::PubSub::ServiceHelper]
 #
 

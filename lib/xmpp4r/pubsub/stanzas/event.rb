@@ -31,7 +31,7 @@ module Jabber
       # return the payload type
       def event_type?
         # each child of event
-        # this should interate only one time
+        # this should iterate only one time
         each_element('./event/*') { |plelement|
           case plelement.name
             when 'collection' 	   then return :collection

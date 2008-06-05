@@ -16,7 +16,7 @@ module Jabber
       end
 
       ##
-      # Retrive the nodes
+      # Retrieve the nodes
       # Throws an ErrorException when receiving
       # <tt><iq type='error'/></tt>
       # jid:: [JID] Target entity (set only domain!)
@@ -44,8 +44,8 @@ module Jabber
       end
 
       ##
-      # Retrive the nodes with names
-      # Throws an ErrorExeption when reciving
+      # Retrieve the nodes with names
+      # Throws an ErrorExeption when receiving
       # <tt><iq type='error'/></tt>
       # jid:: [Jabber::JID] Target entity (set only domain!)
       # return:: [Array] of [Hash] with keys 'node' => [String] and 'name' => [String] or [nil]
@@ -73,8 +73,8 @@ module Jabber
 
 
       ##
-      # Retrive the items from a node
-      # Throws an ErrorExeption when reciving
+      # Retrieve the items from a node
+      # Throws an ErrorExeption when receiving
       # <tt><iq type='error'/></tt>
       # jid:: [Jabber::JID] Target entity (set only domain!)
       # node:: [String]
