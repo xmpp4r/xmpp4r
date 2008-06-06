@@ -20,6 +20,7 @@ class Vcard::HelperTest < Test::Unit::TestCase
   def test_callback
     @server.on_exception{|*e| p e}
     class << @client
+      remove_method(:jid)
       def jid
         JID.new('b@b.com/b')
       end

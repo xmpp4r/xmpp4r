@@ -6,6 +6,11 @@ require "xmlrpc/utils"     # ParserWriterChooseMixin
 
 module XMLRPC
   class Create
+
+    # Avoids warnings
+    remove_method(:methodCall)
+    remove_method(:methodResponse)
+
     ##
     # create a Method Call
     # name:: [String] name of the method

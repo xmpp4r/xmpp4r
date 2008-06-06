@@ -15,6 +15,7 @@ class RPC::HelperTest < Test::Unit::TestCase
 
   def give_client_jid!
     class << @client
+      remove_method(:jid) # avoids warning
       def jid; Jabber::JID.new('client@test.com/clienttester'); end
     end
   end

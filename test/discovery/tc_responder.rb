@@ -67,6 +67,7 @@ class Discovery::ResponderTest < Test::Unit::TestCase
 
   def test_linked
     class << @client
+      remove_method(:jid) # avoids warning
       def jid
         JID::new('foo@bar/baz')
       end
