@@ -53,7 +53,7 @@ module Jabber
     # start the Jabber parser,
     # invoke to accept_features to wait for TLS,
     # start the keep-alive thread
-    def connect(host, port)
+    def connect(host, port, use_ssl = false)
       @host = host
       @port = port
       # Reset is_tls?, so that it works when reconnecting
@@ -61,6 +61,16 @@ module Jabber
 
       Jabber::debuglog("CONNECTING:\n#{@host}:#{@port}")
       @socket = TCPSocket.new(@host, @port)
+
+      # We want to use the old and deprecated SSL protocol (usually on port 5223)
+      if use_ssl
+        ssl = OpenSSL::SSL::SSLSocket.new(@socket)
+        ssl.connect # start SSL session
+        ssl.sync_close = true
+        Jabber::debuglog("SSL connection established.")
+        @socket = ssl
+      end
+
       start
 
       accept_features
