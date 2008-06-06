@@ -10,6 +10,7 @@ XMPP4R 0.3.3 (XX/XX/XXXX)
 * initial support for XEP-0118 User Tune
 ^ fix for an xmlrpc exception-during-serialisation bug, which would cause a hang
 * Support auto-gem generation on GitHub with improved and DRY'er RakeFile and gemspec.
+* Add support for the old SSL protocol (needed to connect to GTalk)
 
 XMPP4R 0.3.2 (15/10/2007)
 =========================
