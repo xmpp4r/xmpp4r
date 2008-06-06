@@ -33,6 +33,10 @@ module Jabber
     # Optional callback for verification of SSL peer
     attr_accessor :ssl_verifycb
 
+    #whether to use the old and deprecated SSL protocol
+    #Defaults to false
+    attr_accessor :use_ssl
+
     ##
     # Create a new connection to the given host and port, using threaded mode
     # or not.
@@ -46,6 +50,7 @@ module Jabber
       @ssl_verifycb = nil
       @features_timeout = 10
       @keepalive_interval = 60
+      @use_ssl = false
     end
 
     ##
@@ -53,7 +58,7 @@ module Jabber
     # start the Jabber parser,
     # invoke to accept_features to wait for TLS,
     # start the keep-alive thread
-    def connect(host, port, use_ssl = false)
+    def connect(host, port)
       @host = host
       @port = port
       # Reset is_tls?, so that it works when reconnecting
@@ -137,7 +142,7 @@ module Jabber
         error = nil
 
         # Context/user set-able stuff
-        ctx = OpenSSL::SSL::SSLContext.new('TLSv1')
+        ctx = OpenSSL::SSL::SSLContext.new
         if @ssl_capath
           ctx.verify_mode = OpenSSL::SSL::VERIFY_PEER
           ctx.ca_path = @ssl_capath

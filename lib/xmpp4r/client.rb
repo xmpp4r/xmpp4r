@@ -41,7 +41,7 @@ module Jabber
     # host:: [String] Optional c2s host, will be extracted from jid if nil
     # use_ssl:: [Boolean] Optional. Use (old, deprecated) SSL when connecting.
     # return:: self
-    def connect(host = nil, port = 5222, use_ssl = false)
+    def connect(host = nil, port = 5222)
       if host.nil?
         begin
           srv = []
@@ -56,7 +56,7 @@ module Jabber
 
           srv.each { |record|
             begin
-              connect(record.target.to_s, record.port, use_ssl)
+              connect(record.target.to_s, record.port)
               # Success
               return self
             rescue SocketError
@@ -69,7 +69,7 @@ module Jabber
         # Fallback to normal connect method
       end
 
-      super(host.nil? ? jid.domain : host, port, use_ssl)
+      super(host.nil? ? jid.domain : host, port)
       self
     end
 
