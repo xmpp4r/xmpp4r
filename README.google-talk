@@ -1,0 +1,11 @@
+== Connecting to Google Talk
+
+Google Talk doesn't seem to allow XMPP-compliant connections on the 5222 port,
+according to http://www.google.com/talk/otherclients.html and the various
+tutorials liked from there.
+
+The solution is to use an SSL connection:
+cl = Client::new(myJID)
+cl.connect("talk.l.google.com", 5223, true) # use port 5223 and SSL mode
+cl.auth(myPassword)
+cl.send(Presence::new)
