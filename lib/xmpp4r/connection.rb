@@ -68,7 +68,7 @@ module Jabber
       @socket = TCPSocket.new(@host, @port)
 
       # We want to use the old and deprecated SSL protocol (usually on port 5223)
-      if use_ssl
+      if @use_ssl
         ssl = OpenSSL::SSL::SSLSocket.new(@socket)
         ssl.connect # start SSL session
         ssl.sync_close = true
