@@ -1,7 +1,6 @@
 #!/usr/bin/ruby
 
 # This bot will reply to every message it receives. To end the game, send 'exit'
-# THREADED VERSION
 
 require 'xmpp4r/client'
 include Jabber
