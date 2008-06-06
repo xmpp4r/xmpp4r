@@ -56,12 +56,6 @@ Rake::RDocTask.new do |rd|
   rd.rdoc_dir = 'rdoc'
 end
 
-task :doctoweb => [:rdoc] do |t|
-  # copies the rdoc to the CVS repository for xmpp4r website
-  # repository is in $CVSDIR (default: ~/dev/xmpp4r-web)
-  sh "tools/doctoweb.bash"
-end
-
 if RCOV
   Rcov::RcovTask.new do |t|
     t.test_files = ['test/ts_xmpp4r.rb']
