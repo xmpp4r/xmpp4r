@@ -1,7 +1,7 @@
-require 'rake/testtask'
-require 'rake/packagetask'
-require 'rake/rdoctask'
 require 'rake'
+require 'rake/gempackagetask'
+require 'rake/testtask'
+require 'rake/rdoctask'
 require 'find'
 
 begin
@@ -12,25 +12,21 @@ rescue LoadError
   RCOV = false
 end
 
+task :default => [:test]
 
-# Globals
+# read the contents of the gemspec, eval it, and assign it to 'spec'
+# this lets us maintain all gemspec info in one place.  Nice and DRY.
+spec = eval(IO.read("xmpp4r.gemspec"))
 
-PKG_NAME = 'xmpp4r'
-PKG_VERSION = '0.3.2'
-
-PKG_FILES = ['ChangeLog', 'README', 'COPYING', 'LICENSE', 'setup.rb', 'Rakefile', 'UPDATING']
-Find.find('lib/', 'data/', 'test/', 'tools/') do |f|
-  if FileTest.directory?(f) and f =~ /\.svn/
-    Find.prune
-  else
-    PKG_FILES << f
-  end
+Rake::GemPackageTask.new(spec) do |pkg|
+  pkg.gem_spec = spec
+  pkg.need_zip = true
+  pkg.need_tar = true
 end
 
-
-# Tasks
-
-task :default => [:package]
+task :install => [:package] do
+  sh %{sudo gem install pkg/#{GEM}-#{VER}}
+end
 
 Rake::TestTask.new do |t|
   t.libs << "test"
@@ -66,37 +62,9 @@ task :doctoweb => [:rdoc] do |t|
   sh "tools/doctoweb.bash"
 end
 
-Rake::PackageTask.new(PKG_NAME, PKG_VERSION) do |p|
-  p.need_tar = true
-  p.package_files = PKG_FILES
-end
-
 if RCOV
   Rcov::RcovTask.new do |t|
     t.test_files = ['test/ts_xmpp4r.rb']
   end
 end
 
-# "Gem" part of the Rakefile
-begin
-  require 'rake/gempackagetask'
-
-  spec = Gem::Specification.new do |s|
-    s.platform = Gem::Platform::RUBY
-    s.summary = "Ruby library for Jabber Instant-Messaging"
-    s.name = PKG_NAME
-    s.version = PKG_VERSION
-    s.requirements << 'none'
-    s.require_path = 'lib'
-    s.autorequire = 'xmpp4r'
-    s.files = PKG_FILES
-    s.description = "Ruby library for Jabber Instant-Messaging"
-    s.has_rdoc = true
-  end
-
-  Rake::GemPackageTask.new(spec) do |pkg|
-    pkg.need_zip = true
-    pkg.need_tar = true
-  end
-rescue LoadError
-end

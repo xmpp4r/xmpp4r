@@ -1,0 +1,60 @@
+= XMPP4R
+
+== Contributors
+
+  Lucas Nussbaum <lucas@lucas-nussbaum.net>
+  Stephan Maka <stephan@spaceboyz.net>
+  Kirill A. Shutemov <k.shutemov@gmail.com>
+  Yuki Mitsui
+  Peter Schrammel
+  Olli
+  Vojtech Vobr
+  Andreas Wiese
+  Chris Zelenak
+  Sam Ruby
+  Glenn Rempe
+
+
+== Project Info
+
+You can find info about the xmpp4r project and how to contribute
+at the project home page:
+
+http://home.gna.org/xmpp4r/
+
+If you need to ask questions, feel free to ask them on the
+xmpp4r-devel@gna.org mailing list. When reporting problems,
+please include a protocol dump which can be enabled with:
+
+  Jabber::debug = true
+
+
+== Source Code
+
+The source for xmpp4r is managed in a Git repository and can currently be
+found in our GitHub.com project page:
+
+http://github.com/ln/xmpp4r/tree/master
+
+
+== Installation
+
+=== Using RubyGems
+
+You can install current releases of the xmpp4r library from a release copy
+using RubyGems:
+
+  sudo gem install xmpp4r
+
+If you want to install a gem snapshot built from the latest source code
+found on the master branch of our Git repository you can install using:
+
+  sudo gem install ln-xmpp4r -s http://gems.github.com
+
+
+== License
+
+XMPP4R is released under the Ruby license (see the LICENSE file), which is
+compatible with the GNU GPL (see the COPYING file) via an explicit
+dual-licensing clause.
+

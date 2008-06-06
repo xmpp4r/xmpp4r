@@ -9,6 +9,7 @@ XMPP4R 0.3.3 (XX/XX/XXXX)
 * MUC room configuration fixes
 * initial support for XEP-0118 User Tune
 ^ fix for an xmlrpc exception-during-serialisation bug, which would cause a hang
+* Support auto-gem generation on GitHub with improved and DRY'er RakeFile and gemspec.
 
 XMPP4R 0.3.2 (15/10/2007)
 =========================
