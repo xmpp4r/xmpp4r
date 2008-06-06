@@ -34,6 +34,6 @@ Gem::Specification.new do |s|
 
   s.has_rdoc = true
   s.rdoc_options = ["--quiet", "--title", "xmpp4r documentation", "--opname", "index.html", "--line-numbers", "--main", "README.rdoc", "--inline-source"]
-  s.extra_rdoc_files = ["README.rdoc", "README.ruby19", "ChangeLog", "LICENSE", "COPYING"]
+  s.extra_rdoc_files = ["README.rdoc", "README_ruby19.txt", "ChangeLog", "LICENSE", "COPYING"]
 
 end
