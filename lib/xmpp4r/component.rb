@@ -23,8 +23,8 @@ module Jabber
 
     # Create a new Component
     # jid:: [JID]
-    def initialize(jid, server_address=nil, server_port=5347, threaded = true)
-      super(threaded)
+    def initialize(jid, server_address=nil, server_port=5347)
+      super()
       @jid = (jid.kind_of?(JID) ? jid : JID.new(jid.to_s))
 
       if server_address

@@ -38,10 +38,9 @@ module Jabber
     attr_accessor :use_ssl
 
     ##
-    # Create a new connection to the given host and port, using threaded mode
-    # or not.
-    def initialize(threaded = true)
-      super(threaded)
+    # Create a new connection to the given host and port
+    def initialize
+      super()
       @host = nil
       @port = nil
       @allow_tls = defined? OpenSSL

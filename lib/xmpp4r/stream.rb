@@ -37,12 +37,8 @@ module Jabber
     attr_reader :status
 
     ##
-    # Create a new stream
-    # (just initializes)
-    def initialize(threaded = true)
-      unless threaded
-        raise "Non-threaded mode was removed from XMPP4R."
-      end
+    # Initialize a new stream
+    def initialize
       @fd = nil
       @status = DISCONNECTED
       @xmlcbs = CallbackList::new

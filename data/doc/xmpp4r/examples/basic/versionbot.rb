@@ -23,7 +23,7 @@ end
 
 jid = Jabber::JID.new(ARGV[0])
 
-cl = Jabber::Client.new(jid, false)
+cl = Jabber::Client.new(jid)
 cl.connect
 cl.auth(ARGV[1])
 

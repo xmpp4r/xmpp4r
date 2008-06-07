@@ -26,8 +26,8 @@ module Jabber
     # Create a new Client.
     #
     # Remember to *always* put a resource in your JID unless the server can do SASL.
-    def initialize(jid, threaded = true)
-      super(threaded)
+    def initialize(jid)
+      super()
       @jid = (jid.kind_of?(JID) ? jid : JID.new(jid.to_s))
     end
 

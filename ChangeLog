@@ -13,6 +13,8 @@ XMPP4R 0.3.3 (XX/XX/XXXX)
 * Support auto-gem generation on GitHub with improved and DRY'er RakeFile and
   gemspec.
 * Add support for the old SSL protocol (needed to connect to GTalk)
+* Changed API for Client, Component, Connection, Stream to remove
+  need for antiquated 'threaded' param in the initializer.
 
 XMPP4R 0.3.2 (15/10/2007)
 =========================

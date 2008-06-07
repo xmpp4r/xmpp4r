@@ -23,7 +23,7 @@ class StreamComponentTest < Test::Unit::TestCase
       serversock = servlisten.accept
       servlisten.close
       serversock.sync = true
-      @server = Stream.new(true)
+      @server = Stream.new
       @server.add_xml_callback do |xml|
         if xml.prefix == 'stream' and xml.name == 'stream'
           @server.send("<#{STREAM} xmlns='jabber:component:accept'>")

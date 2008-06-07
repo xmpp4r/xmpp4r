@@ -38,7 +38,7 @@ module Jabber
         serversock = servlisten.accept
         servlisten.close
         serversock.sync = true
-        @server = Stream.new(true)
+        @server = Stream.new
         @server.add_xml_callback do |xml|
           if xml.prefix == 'stream' and xml.name == 'stream'
             send(stream)
@@ -54,7 +54,7 @@ module Jabber
 
       clientsock = TCPSocket.new('localhost', @@SOCKET_PORT)
       clientsock.sync = true
-      @client = Stream.new(true)
+      @client = Stream.new
 #=begin
       class << @client
         def jid
