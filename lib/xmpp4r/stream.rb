@@ -86,10 +86,7 @@ module Jabber
               @exception_block.call(e, self, :start)
             end
           else
-            if Jabber::debug
-              puts "Exception caught in Parser thread! (#{e.class})"
-              puts e.backtrace
-            end
+            Jabber::debuglog "Exception caught in Parser thread! (#{e.class})\n#{e.backtrace.join("\n")}"
             close!
             raise
           end
@@ -132,9 +129,8 @@ module Jabber
           @exception_block.call(e, self, :parser)
         end
       else
-        puts "Stream#parse_failure was called by XML parser. Dumping " +
-        "backtrace...\n" + e.exception + "\n"
-        puts e.backtrace
+        Jabber::debuglog "Stream#parse_failure was called by XML parser. Dumping " +
+          "backtrace...\n" + e.exception + "\n#{e.backtrace.join("\n")}"
         close
         raise
       end
@@ -331,10 +327,7 @@ module Jabber
             @exception_block.call(e, self, :sending)
           end
         else
-          if Jabber::debug
-            puts "Exception caught while sending! (#{e.class})"
-            puts e.backtrace
-          end
+          Jabber::debuglog "Exception caught while sending! (#{e.class})\n#{e.backtrace.join("\n")}"
           close!
           raise
         end

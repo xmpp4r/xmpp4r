@@ -231,7 +231,7 @@ module Jabber
               close; @exception_block.call(e, self, :parser)
             end
           else
-            puts "Exception caught when parsing HTTP response!"
+            Jabber::debuglog "Exception caught when parsing HTTP response!"
             close
             raise
           end
