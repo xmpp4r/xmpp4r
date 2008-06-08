@@ -17,7 +17,7 @@ class MockListener
   end
 end
 
-class StreamiParserTest < Test::Unit::TestCase
+class StreamParserTest < Test::Unit::TestCase
   STREAM = '<stream:stream xmlns:stream="http://etherx.jabber.org/streams">'
 
   def setup
