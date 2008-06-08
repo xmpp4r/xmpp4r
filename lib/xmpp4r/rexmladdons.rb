@@ -10,28 +10,15 @@ require 'rexml/source'
 oldverbose = $VERBOSE
 $VERBOSE = false
 
-# REXML module. This file only adds the following methods to the REXML module, to
-# ease the coding:
-# * replace_element_text
-# * first_element
-# * first_element_text
-# * typed_add
-# * import
-# * self.import
-# * delete_elements
+# REXML : Adds custom helper methods to the REXML module.
 #
-# Further definitions are just copied from REXML out of Ruby-1.8.4 to solve issues
-# with REXML in Ruby-1.8.2.
-#
-# The redefinitions of Text::normalize and Attribute#initialize address an issue
-# where entities in element texts and attributes were not escaped. This modifies
-# the behavious of REXML a bit but Sean Russell intends a similar behaviour for
-# the future of REXML.
 module REXML
+
   # this class adds a few helper methods to REXML::Element
   class Element
+
     ##
-    # Replaces or add a child element of name <tt>e</tt> with text <tt>t</tt>.
+    # Replaces or adds a child element of name <tt>e</tt> with text <tt>t</tt>.
     def replace_element_text(e, t)
       el = first_element(e)
       if el.nil?
@@ -106,12 +93,14 @@ module REXML
     # Test for equality of two elements,
     # useful for assert_equal in test cases
     def ==(o)
+      return false unless self.kind_of? REXML::Element
       return false unless o.kind_of? REXML::Element
       return false unless name == o.name
 
       attributes.each_attribute do |attr|
         return false unless attr.value == o.attributes[attr.name]
       end
+
       o.attributes.each_attribute do |attr|
         return false unless attributes[attr.name] == attr.value
       end
@@ -120,16 +109,16 @@ module REXML
         return false unless child.eql? o.children[i]
       end
 
-      true
+      return true
     end
-  end
-end
 
-# very dirty fix for the :progress problem in REXML from Ruby 1.8.3
-# http://www.germane-software.com/projects/rexml/ticket/34
-# the fix proposed in REXML changeset 1145 only fixes this for pipes, not for
-# TCP sockets, so we have to keep this.
-module REXML
+  end # class Element
+
+  # FIXME : Is this still needed now that we're a bit past Ruby 1.8.3??
+  # Very dirty fix for the :progress problem in REXML from Ruby 1.8.3
+  # http://www.germane-software.com/projects/rexml/ticket/34
+  # the fix proposed in REXML changeset 1145 only fixes this for pipes, not for
+  # TCP sockets, so we have to keep this.
   class IOSource
     def position
       0
@@ -138,8 +127,10 @@ module REXML
     def current_line
       [0, 0, ""]
     end
-  end
-end
+  end # class IOSource
+
+end # module REXML
 
 # Restore the old $VERBOSE setting
 $VERBOSE = oldverbose
+

@@ -61,27 +61,79 @@ class REXMLTest < Test::Unit::TestCase
     assert_equal('&nbsp;', e.attributes['x'])
   end
 
-  def test_element_equal
+  # test '==(o)'
+
+  def test_passing_in_non_rexml_element_as_self
+    o = Object.new
+    assert_not_equal(o, REXML::Element.new('foo'))
+  end
+
+  def test_passing_in_non_rexml_element_as_comparison_object
+    o = Object.new
+    assert_not_equal(REXML::Element.new('foo'), o)
+  end
+
+  def test_element_equal_simple
     assert_equal(REXML::Element.new('foo'), REXML::Element.new('foo'))
   end
 
-  def test_element_equal_xmlns1
+  def test_element_not_equal_simple
+    assert_not_equal(REXML::Element.new('foo'), REXML::Element.new('bar'))
+  end
+
+  def test_element_equal_when_all_are_same
+    e1 = REXML::Element.new('foo')
+    e1.add_namespace('a', 'urn:test:foo')
+    e1.attributes['a:bar'] = 'baz'
+    e2 = REXML::Element.new('foo')
+    e2.add_namespace('a', 'urn:test:foo')
+    e2.attributes['a:bar'] = 'baz'
+
+    assert_equal(e1, e2)
+  end
+
+  def test_element_not_equal_when_namespace_name_differs
     e1 = REXML::Element.new('foo')
     e1.add_namespace('a', 'urn:test:foo')
     e1.attributes['a:bar'] = 'baz'
     e2 = REXML::Element.new('foo')
     e2.add_namespace('b', 'urn:test:foo')
-    e2.attributes['b:bar'] = 'baz'
-    assert_equal(e1, e2)
-  end
+    e2.attributes['a:bar'] = 'baz'
 
-  def test_element_equal_xmlns2
-    e1 = REXML::Element.new('foo')
-    e1.add_namespace('t', 'urn:test:foo')
-    e1.attributes['t:bar'] = 'baz'
-    e2 = REXML::Element.new('foo')
-    e2.add_namespace('t', 'urn:test:bar')
-    e2.attributes['t:bar'] = 'baz'
     assert_not_equal(e1, e2)
   end
+
+  def test_element_not_equal_when_namespace_value_differs
+    e1 = REXML::Element.new('foo')
+    e1.add_namespace('a', 'urn:test:foo')
+    e1.attributes['a:bar'] = 'baz'
+    e2 = REXML::Element.new('foo')
+    e2.add_namespace('a', 'urn:test:bar')
+    e2.attributes['a:bar'] = 'baz'
+
+    assert_not_equal(e1, e2)
+  end
+
+  def test_element_not_equal_when_attribute_name_differs
+    e1 = REXML::Element.new('foo')
+    e1.add_namespace('a', 'urn:test:foo')
+    e1.attributes['a:bar'] = 'baz'
+    e2 = REXML::Element.new('foo')
+    e1.add_namespace('a', 'urn:test:foo')
+    e2.attributes['b:bar'] = 'baz'
+
+    assert_not_equal(e1, e2)
+  end
+
+  def test_element_not_equal_when_attribute_value_differs
+    e1 = REXML::Element.new('foo')
+    e1.add_namespace('a', 'urn:test:foo')
+    e1.attributes['a:bar'] = 'baz'
+    e2 = REXML::Element.new('foo')
+    e1.add_namespace('a', 'urn:test:foo')
+    e2.attributes['a:bar'] = 'bar'
+
+    assert_not_equal(e1, e2)
+  end
+
 end
