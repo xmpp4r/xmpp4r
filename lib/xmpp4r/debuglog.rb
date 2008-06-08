@@ -3,6 +3,10 @@
 # Website::http://home.gna.org/xmpp4r/
 
 module Jabber
+  def Jabber::logger
+    @@logger ||= Logger.new($stderr)
+  end
+
   # Is debugging mode enabled ?
   @@debug = false
 
@@ -27,8 +31,6 @@ module Jabber
   # first one. Time is prepended to the string.
   def Jabber::debuglog(string)
     return if not @@debug
-    s = string.chomp.gsub("\n", "\n    ")
-    t = Time::new.strftime('%H:%M:%S')
-    puts "#{t} #{s}"
+    logger.debug string.chomp.gsub("\n", "\n    ")
   end
 end
