@@ -62,3 +62,7 @@ if RCOV
   end
 end
 
+desc "Generate Requires Graph"
+task :gen_requires_graph do
+  sh %{cd tools; ./gen_requires.bash}
+end
