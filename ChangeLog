@@ -15,6 +15,7 @@ XMPP4R 0.3.3 (XX/XX/XXXX)
 * Add support for the old SSL protocol (needed to connect to GTalk)
 * Changed API for Client, Component, Connection, Stream to remove
   need for antiquated 'threaded' param in the initializer.
+* Use a Logger instance instead of directly writing to stdout
 
 XMPP4R 0.3.2 (15/10/2007)
 =========================
