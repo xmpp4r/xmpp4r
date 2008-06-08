@@ -39,7 +39,7 @@ http://github.com/ln/xmpp4r/tree/master
 
 == Installation
 
-=== Using RubyGems
+=== Install over the network
 
 You can install current releases of the xmpp4r library from a release copy
 using RubyGems:
@@ -50,6 +50,29 @@ If you want to install a gem snapshot built from the latest source code
 found on the master branch of our Git repository you can install using:
 
   sudo gem install ln-xmpp4r -s http://gems.github.com
+
+=== Install from local sources
+
+If you have a local copy of the source repository or a tarball
+you can install xmpp4r using Rake/RubyGems.  First you'll
+need to get a local copy.
+
+Download using the Git SCM:
+
+  git clone git://github.com/ln/xmpp4r.git
+
+OR download a .tar.gz archive from:
+
+  http://github.com/ln/xmpp4r/tarball/master
+
+Now that you have the code, install using Rake:
+
+  # Show all available rake tasks
+  cd xmpp4r/
+  rake -T
+
+  # Package up the gem file and install it
+  rake install
 
 
 == License
