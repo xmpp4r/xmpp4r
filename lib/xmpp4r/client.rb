@@ -3,9 +3,7 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'resolv'
-
 require 'xmpp4r/connection'
-require 'xmpp4r/authenticationfailure'
 require 'xmpp4r/sasl'
 
 module Jabber
@@ -97,7 +95,7 @@ module Jabber
     ##
     # Authenticate with the server
     #
-    # Throws AuthenticationFailure
+    # Throws ClientAuthenticationFailure
     #
     # Authentication mechanisms are used in the following preference:
     # * SASL DIGEST-MD5
@@ -115,7 +113,7 @@ module Jabber
         end
       rescue
         Jabber::debuglog("#{$!.class}: #{$!}\n#{$!.backtrace.join("\n")}")
-        raise AuthenticationFailure.new, $!.to_s
+        raise ClientAuthenticationFailure.new, $!.to_s
       end
     end
 
@@ -178,17 +176,17 @@ module Jabber
     ##
     # Shortcut for anonymous connection to server
     #
-    # Throws AnonymousUnsupported, AuthenticationFailure
+    # Throws ClientAuthenticationFailure
     def auth_anonymous_sasl
       if self.supports_anonymous?
         begin
           auth_sasl SASL.new(self, 'ANONYMOUS'), ""
         rescue
           Jabber::debuglog("#{$!.class}: #{$!}\n#{$!.backtrace.join("\n")}")
-          raise AuthenticationFailure.new, $!.to_s
+          raise ClientAuthenticationFailure, $!.to_s
         end
       else
-        raise "AnonymousUnsupported"
+        raise ClientAuthenticationFailure, 'Anonymous authentication unsupported'
       end
     end
 
@@ -205,7 +203,7 @@ module Jabber
     # Send auth with given password and wait for result
     # (non-SASL)
     #
-    # Throws ErrorException
+    # Throws ServerError
     # password:: [String] the password
     # digest:: [Boolean] use Digest authentication
     def auth_nonsasl(password, digest=true)
@@ -255,10 +253,30 @@ module Jabber
     # Register a new user account
     # (may be used instead of Client#auth)
     #
-    # This method may raise ErrorException if the registration was
+    # This method may raise ServerError if the registration was
     # not successful.
+    #
     # password:: String
     # fields:: {String=>String} additional registration information
+    #
+    # XEP-0077 Defines the following fields for registration information:
+    # http://www.xmpp.org/extensions/xep-0077.html
+    #
+    # 'username'    => 'Account name associated with the user'
+    # 'nick'        => 'Familiar name of the user'
+    # 'password'    => 'Password or secret for the user'
+    # 'name'        => 'Full name of the user'
+    # 'first'       => 'First name or given name of the user'
+    # 'last'        => 'Last name, surname, or family name of the user'
+    # 'email'       => 'Email address of the user'
+    # 'address'     => 'Street portion of a physical or mailing address'
+    # 'city'        => 'Locality portion of a physical or mailing address'
+    # 'state'       => 'Region portion of a physical or mailing address'
+    # 'zip'         => 'Postal code portion of a physical or mailing address'
+    # 'phone'       => 'Telephone number of the user'
+    # 'url'         => 'URL to web page describing the user'
+    # 'date'        => 'Some date (e.g., birth date, hire date, sign-up date)'
+    #
     def register(password, fields={})
       reg = Iq.new_register(jid.node, password)
       reg.to = jid.domain
@@ -292,7 +310,7 @@ module Jabber
     # Threading is suggested, as this code waits
     # for an answer.
     #
-    # Raises an exception upon error response (ErrorException from
+    # Raises an exception upon error response (ServerError from
     # Stream#send_with_id).
     # new_password:: [String] New password
     def password=(new_password)

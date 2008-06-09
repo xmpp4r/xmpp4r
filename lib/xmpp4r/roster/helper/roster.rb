@@ -309,7 +309,7 @@ module Jabber
       # Add a user to your roster
       #
       # Threading is encouraged as the function waits for
-      # a result. ErrorException is thrown upon error.
+      # a result. ServerError is thrown upon error.
       #
       # See Jabber::Roster::Helper::RosterItem#subscribe for details
       # about subscribing. (This method isn't used here but the
@@ -396,7 +396,7 @@ module Jabber
         # and from you *to* the contact.
         #
         # The methods waits for a roster push from the server (success)
-        # or throws ErrorException upon failure.
+        # or throws ServerError upon failure.
         def remove
           request = Iq.new_rosterset
           request.query.add(Jabber::Roster::RosterItem.new(jid, nil, :remove))
@@ -487,7 +487,7 @@ module Jabber
         # Unsubscribe from a contact's presence
         #
         # This method waits for a presence with type='unsubscribed'
-        # from the contact. It may throw ErrorException upon failure.
+        # from the contact. It may throw ServerError upon failure.
         #
         # subscription attribute of the item is *from* or *none*
         # afterwards. As long as you don't remove that item and

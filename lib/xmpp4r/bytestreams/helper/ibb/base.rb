@@ -124,7 +124,7 @@ module Jabber
       # Close the stream
       #
       # Waits for acknowledge from peer,
-      # may throw ErrorException
+      # may throw ServerError
       def close
         if active?
           flush

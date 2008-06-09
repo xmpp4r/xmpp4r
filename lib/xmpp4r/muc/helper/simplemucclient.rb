@@ -166,7 +166,7 @@ module Jabber
       ##
       # Administratively remove one or more users from the room.
       #
-      # Will wait for response, possibly raising ErrorException
+      # Will wait for response, possibly raising ServerError
       #
       # Sample usage:
       #   my_muc.kick 'pistol', 'Avaunt, you cullion!'

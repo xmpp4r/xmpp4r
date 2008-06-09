@@ -73,9 +73,9 @@ class JIDTest < Test::Unit::TestCase
 
   def test_create9
     assert_nothing_raised { JID::new("#{'n'*1023}@#{'d'*1023}/#{'r'*1023}") }
-    assert_raises(ArgumentError) { JID::new("#{'n'*1024}@#{'d'*1023}/#{'r'*1023}") }
-    assert_raises(ArgumentError) { JID::new("#{'n'*1023}@#{'d'*1024}/#{'r'*1023}") }
-    assert_raises(ArgumentError) { JID::new("#{'n'*1023}@#{'d'*1023}/#{'r'*1024}") }
+    assert_raises(Jabber::ArgumentError) { JID::new("#{'n'*1024}@#{'d'*1023}/#{'r'*1023}") }
+    assert_raises(Jabber::ArgumentError) { JID::new("#{'n'*1023}@#{'d'*1024}/#{'r'*1023}") }
+    assert_raises(Jabber::ArgumentError) { JID::new("#{'n'*1023}@#{'d'*1023}/#{'r'*1024}") }
   end
 
   def test_create10

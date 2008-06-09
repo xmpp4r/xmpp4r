@@ -3,7 +3,6 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/iq'
-require 'xmpp4r/errorexception'
 require 'xmpp4r/discovery/iq/discoinfo'
 require 'xmpp4r/discovery/iq/discoitems'
 require 'xmpp4r/caps/helper/generator'

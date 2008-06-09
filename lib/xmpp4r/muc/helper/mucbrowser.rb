@@ -30,7 +30,7 @@ module Jabber
       # does not exist or does not support Service Discovery!
       # nil just means that this is not a MUC-compliant service.
       #
-      # Throws an ErrorException when receiving
+      # Throws an ServerError when receiving
       # <tt><iq type='error'/></tt>
       # jid:: [JID] Target entity (set only domain!)
       # return:: [String] or [nil]

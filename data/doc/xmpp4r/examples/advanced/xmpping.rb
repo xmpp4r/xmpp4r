@@ -132,7 +132,7 @@ loop {
         print_reply(reply, Time.new - time1)
         true
       }
-    rescue Jabber::ErrorException => e
+    rescue Jabber::ServerError => e
       puts "Error for #{iq.query.namespace} to #{iq.to}: #{e.error.to_s.inspect}"
     end
   }

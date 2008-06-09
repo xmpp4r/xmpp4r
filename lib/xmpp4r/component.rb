@@ -80,7 +80,7 @@ module Jabber
     ##
     # Send auth with given secret and wait for result
     #
-    # Throws AuthenticationFailure
+    # Throws ComponentAuthenticationFailure
     # secret:: [String] the shared secret
     def auth(secret)
       hash = Digest::SHA1::hexdigest(@streamid.to_s + secret)
@@ -96,7 +96,7 @@ module Jabber
         end
       }
       unless authenticated
-        raise AuthenticationFailure.new, "Component authentication failed"
+        raise ComponentAuthenticationFailure.new, "Component authentication failed"
       end
     end
   end

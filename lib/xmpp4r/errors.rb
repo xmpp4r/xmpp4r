@@ -3,9 +3,65 @@
 # Website::http://home.gna.org/xmpp4r/
 
 module Jabber
+
+  # CUSTOM ERROR CLASSES
+
+  # All of our custom errors are superclassed by JabberError < RuntimeError
+  class JabberError < RuntimeError; end
+
+  # A client side only argument error
+  class ArgumentError < JabberError; end
+
+  ##
+  # An error returned from the server
+  #
+  # e.g. This exception can be raised by helpers when they
+  # receive a server reply with <tt>type='error'</tt>
+  #
+  # The ServerError carries a Jabber::Error element
+  #
+  # Note : this was formerly called ErrorException
+  #
+  class ServerError < JabberError #:nodoc:
+
+    ##
+    # The error element which caused this exception
+    attr_reader :error
+
+    ##
+    # Initialize an ServerError by passing an Error instance
+    # error:: [Error]
+    def initialize(error)
+      @error = error
+    end
+
+    ##
+    # Sample output:
+    # 'subscription-required: Please subscribe first'
+    def to_s
+      "#{@error.error}: #{@error.text}"
+    end
+  end
+
+  class ClientAuthenticationFailure < JabberError; end
+
+  class ComponentAuthenticationFailure < JabberError; end
+
+  class NoNameXmlnsRegistered < JabberError
+    def initialize(klass)
+      super "Class #{klass} has not set name and xmlns"
+    end
+  end
+
+  class SOCKS5Error < JabberError; end
+
   ##
   # A class used to build/parse <error/> elements.
-  # Look at JEP 0086 for explanation.
+  # Look at XEP-0086 for explanation:
+  # http://www.xmpp.org/extensions/xep-0086.html
+  #
+  # FIXME : XEP-0086 is officially deprecated.  What effect does that have on this class? Any?
+  #
   class Error < XMPPElement
     name_xmlns 'error'
 
@@ -197,8 +253,7 @@ module Jabber
     end
 
     ##
-    # Possible XMPP error conditions, types and codes
-    # (JEP 0086)
+    # Possible XMPP error conditions, types and codes (XEP-0086)
     @@Errors = [['bad-request', :modify, 400],
                 ['conflict', :cancel, 409],
                 ['feature-not-implemented', :cancel, 501],
@@ -222,4 +277,5 @@ module Jabber
                 ['undefined-condition', nil, 500],
                 ['unexpected-request', :wait, 400]]
   end
+
 end

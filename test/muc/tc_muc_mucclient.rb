@@ -52,7 +52,7 @@ class MUCClientTest < Test::Unit::TestCase
     assert(!m.active?)
     assert_nil(m.room)
 
-    assert_raises(ErrorException) {
+    assert_raises(ServerError) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
     wait_state
@@ -110,7 +110,7 @@ class MUCClientTest < Test::Unit::TestCase
 
     m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
-    assert_raises(ErrorException) {
+    assert_raises(ServerError) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
     wait_state
@@ -131,7 +131,7 @@ class MUCClientTest < Test::Unit::TestCase
 
     m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
-    assert_raises(ErrorException) {
+    assert_raises(ServerError) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
     assert(!m.active?)
@@ -149,7 +149,7 @@ class MUCClientTest < Test::Unit::TestCase
 
     m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
-    assert_raises(ErrorException) {
+    assert_raises(ServerError) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
     assert(!m.active?)
@@ -167,7 +167,7 @@ class MUCClientTest < Test::Unit::TestCase
 
     m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
-    assert_raises(ErrorException) {
+    assert_raises(ServerError) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
     assert(!m.active?)
@@ -185,7 +185,7 @@ class MUCClientTest < Test::Unit::TestCase
 
     m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
-    assert_raises(ErrorException) {
+    assert_raises(ServerError) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
     assert(!m.active?)
@@ -202,7 +202,7 @@ class MUCClientTest < Test::Unit::TestCase
 
     m = MUC::MUCClient.new(@client)
     m.my_jid = 'hag66@shakespeare.lit/pda'
-    assert_raises(ErrorException) {
+    assert_raises(ServerError) {
       m.join('darkcave@macbeth.shakespeare.lit/thirdwitch')
     }
     assert(!m.active?)
@@ -579,7 +579,7 @@ class MUCClientTest < Test::Unit::TestCase
     assert(m.active?)
     assert_equal('thirdwitch', m.nick)
 
-    assert_raises(ErrorException) {
+    assert_raises(ServerError) {
       m.nick = 'secondwitch'
     }
     wait_state

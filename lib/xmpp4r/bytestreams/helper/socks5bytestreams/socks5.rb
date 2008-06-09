@@ -6,10 +6,6 @@ require 'socket'
 
 module Jabber
   module Bytestreams
-    ##
-    # Can be thrown upon communication error with
-    # a SOCKS5 proxy
-    class SOCKS5Error < RuntimeError; end
 
     ##
     # A SOCKS5 client implementation

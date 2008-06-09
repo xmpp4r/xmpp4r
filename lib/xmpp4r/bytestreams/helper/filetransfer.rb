@@ -241,7 +241,7 @@ module Jabber
       # The result is a stream which you can configure, or nil
       # if the peer responded with an invalid stream-method.
       #
-      # May raise an ErrorException
+      # May raise an ServerError
       # jid:: [JID] to send the file to
       # source:: File-transfer source, implementing the FileSource interface
       # desc:: [String] or [nil] Optional file description
@@ -295,7 +295,7 @@ module Jabber
             end
             true
           }
-        rescue ErrorException => e
+        rescue ServerError => e
           if e.error.code == 403  # Declined
             return false
           else

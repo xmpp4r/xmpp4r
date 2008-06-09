@@ -7,7 +7,6 @@ begin
 rescue LoadError
 end
 require 'xmpp4r/stream'
-require 'xmpp4r/errorexception'
 
 module Jabber
   ##
@@ -132,7 +131,7 @@ module Jabber
         true
       }
       if reply.name != 'proceed'
-        raise ErrorException(reply.first_element('error'))
+        raise ServerError(reply.first_element('error'))
       end
       # Don't be interrupted
       stop

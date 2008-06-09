@@ -17,7 +17,7 @@ module Jabber
 
       ##
       # Retrieve the nodes
-      # Throws an ErrorException when receiving
+      # Throws an ServerError when receiving
       # <tt><iq type='error'/></tt>
       # jid:: [JID] Target entity (set only domain!)
       # return:: [Array] of [String] or [nil]

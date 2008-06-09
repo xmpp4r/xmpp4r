@@ -10,7 +10,6 @@ require 'xmpp4r/streamparser'
 require 'xmpp4r/presence'
 require 'xmpp4r/message'
 require 'xmpp4r/iq'
-require 'xmpp4r/errorexception'
 require 'xmpp4r/debuglog'
 require 'xmpp4r/idgenerator'
 
@@ -355,7 +354,7 @@ module Jabber
     # stanza.
     #
     # Be aware that if a stanza with <tt>type='error'</tt> is received
-    # the function does not yield but raises an ErrorException with
+    # the function does not yield but raises an ServerError with
     # the corresponding error element.
     #
     # Please see Stream#send for some implementational details.
@@ -387,7 +386,7 @@ module Jabber
       end
 
       unless error.nil?
-        raise ErrorException.new(error)
+        raise ServerError.new(error)
       end
 
       res

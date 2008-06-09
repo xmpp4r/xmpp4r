@@ -3,7 +3,6 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/iq'
-require 'xmpp4r/errorexception'
 
 module Jabber
   module Vcard
@@ -20,7 +19,7 @@ module Jabber
       # Retrieve vCard of an entity
       #
       # Raises exception upon retrieval error, please catch that!
-      # (The exception is ErrorException and is raisen by
+      # (The exception is ServerError and is raisen by
       # Stream#send_with_id.
       #
       # Usage of Threads is suggested here as vCards can be very

@@ -14,7 +14,7 @@ module Jabber
       # Open the stream to the peer,
       # waits for successful result
       #
-      # May throw ErrorException
+      # May throw ServerError
       def open
         iq = Iq.new(:set, @peer_jid)
         open = iq.add REXML::Element.new('open')

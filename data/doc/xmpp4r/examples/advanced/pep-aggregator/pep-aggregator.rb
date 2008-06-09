@@ -47,7 +47,7 @@ class VcardCache < Jabber::Vcard::Helper
     unless @vcards[jid]
       begin
         @vcards[jid] = super
-      rescue Jabber::ErrorException
+      rescue Jabber::ServerError
         @vcards[jid] = :error
       end
     end

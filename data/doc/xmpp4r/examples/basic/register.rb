@@ -26,7 +26,7 @@ begin
   }
   cl.register(ARGV[1], fields)
   puts "Successful"
-rescue Jabber::ErrorException => e
+rescue Jabber::ServerError => e
   puts "Error: #{e.error.text}"
   if e.error.type == :modify
     puts "Accepted registration information:"

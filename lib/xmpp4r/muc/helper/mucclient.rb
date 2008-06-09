@@ -64,7 +64,7 @@ module Jabber
       #
       # This registers its own callbacks on the stream
       # provided to initialize and sends initial presence
-      # to the room. May throw ErrorException if joining
+      # to the room. May throw ServerError if joining
       # fails.
       # jid:: [JID] room@component/nick
       # password:: [String] Optional password
@@ -112,7 +112,7 @@ module Jabber
 
         if error
           deactivate
-          raise ErrorException.new(error)
+          raise ServerError.new(error)
         end
 
         self
@@ -178,7 +178,7 @@ module Jabber
       # transient JID, one indicating availability of the new
       # transient JID.
       #
-      # If the service denies nick-change, ErrorException will be raisen.
+      # If the service denies nick-change, ServerError will be raised.
       def nick=(new_nick)
         unless active?
           raise "MUCClient not active"
@@ -222,7 +222,7 @@ module Jabber
         }
 
         if error
-          raise ErrorException.new(error)
+          raise ServerError.new(error)
         end
 
         # Apply new JID

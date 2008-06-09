@@ -9,12 +9,14 @@ require 'xmpp4r'
 class JIDTest < Test::Unit::TestCase
   def test_base
     assert_kind_of(Module, Jabber)
-    assert_kind_of(Class, Jabber::AuthenticationFailure)
+    assert_kind_of(Class, Jabber::JabberError)
+    assert_kind_of(Class, Jabber::ClientAuthenticationFailure)
+    assert_kind_of(Class, Jabber::ComponentAuthenticationFailure)
     assert_kind_of(Class, Jabber::Client)
     assert_kind_of(Class, Jabber::Component)
     assert_kind_of(Class, Jabber::Connection)
     assert_kind_of(Class, Jabber::Error)
-    assert_kind_of(Class, Jabber::ErrorException)
+    assert_kind_of(Class, Jabber::ServerError)
     assert_kind_of(Class, Jabber::IdGenerator)
     assert_kind_of(Class, Jabber::Iq)
     assert_kind_of(Class, Jabber::IqQuery)
@@ -57,6 +59,7 @@ class JIDTest < Test::Unit::TestCase
 
   def test_bytestreams
     require 'xmpp4r/bytestreams'
+    assert_kind_of(Class, Jabber::SOCKS5Error)
     assert_kind_of(Module, Jabber::FileTransfer)
     assert_kind_of(Module, Jabber::FileTransfer::TransferSource)
     assert_kind_of(Class, Jabber::FileTransfer::FileSource)
@@ -77,7 +80,6 @@ class JIDTest < Test::Unit::TestCase
     assert_kind_of(Class, Jabber::Bytestreams::SOCKS5Bytestreams)
     assert_kind_of(Class, Jabber::Bytestreams::SOCKS5BytestreamsInitiator)
     assert_kind_of(Class, Jabber::Bytestreams::SOCKS5BytestreamsTarget)
-    assert_kind_of(Class, Jabber::Bytestreams::SOCKS5Error)
     assert_kind_of(Class, Jabber::Bytestreams::SOCKS5Socket)
   end
 

@@ -107,7 +107,7 @@ module Jabber
       ##
       # Unsubsrcibe from a node with an optional subscription id
       #
-      # May raise ErrorException
+      # May raise ServerError
       # node:: [String]
       # subid:: [String] or nil
       # return:: true
