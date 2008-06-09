@@ -38,11 +38,11 @@
 #  this order so that everyone who reads XEP-0060 will know where to search in the file
 #
 require 'xmpp4r/pubsub/iq/pubsub'
-require 'xmpp4r/pubsub/stanzas/event'
-require 'xmpp4r/pubsub/stanzas/item'
-require 'xmpp4r/pubsub/stanzas/items'
-require 'xmpp4r/pubsub/stanzas/subscription'
-require 'xmpp4r/pubsub/stanzas/unsubscribe'
+require 'xmpp4r/pubsub/children/event'
+require 'xmpp4r/pubsub/children/item'
+require 'xmpp4r/pubsub/children/items'
+require 'xmpp4r/pubsub/children/subscription'
+require 'xmpp4r/pubsub/children/unsubscribe'
 require 'xmpp4r/dataforms'
 
 module Jabber
