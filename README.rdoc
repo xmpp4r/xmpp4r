@@ -12,7 +12,7 @@
   Andreas Wiese
   Chris Zelenak
   Sam Ruby
-  Glenn Rempe
+  Glenn Rempe <glenn@rempe.us>
 
 
 == Project Info
