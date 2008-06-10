@@ -59,7 +59,7 @@ class AdventureMUC
     if iq.type != :get
       answer = iq.answer
       answer.type = :error
-      answer.add(Jabber::Error.new('bad-request'))
+      answer.add(Jabber::ErrorResponse.new('bad-request'))
       @component.send(answer) if iq.type != :error
       return
     end
@@ -73,7 +73,7 @@ class AdventureMUC
       world = @worlds[iq.to.node]
       if world.nil?
         answer.type = :error
-        answer.query.add(Jabber::Error.new('item-not-found', 'The world you are trying to reach is currently unavailable.'))
+        answer.query.add(Jabber::ErrorResponse.new('item-not-found', 'The world you are trying to reach is currently unavailable.'))
       else
         answer.query.add(Jabber::Discovery::Identity.new('conference', world.iname, 'text'))
         answer.query.add(Jabber::Discovery::Feature.new(Jabber::Discovery::IqQueryDiscoInfo.new.namespace))
@@ -88,7 +88,7 @@ class AdventureMUC
   def handle_disco_items(iq)
     if iq.type != :get
       answer = iq.answer
-      answer.add(Jabber::Error.new('bad-request'))
+      answer.add(Jabber::ErrorResponse.new('bad-request'))
       @component.send(answer)
       return
     end
@@ -109,7 +109,7 @@ class AdventureMUC
     if world.nil?
       answer = pres.answer
       answer.type = :error
-      answer.add(Jabber::Error.new('item-not-found', 'The world you are trying to reach is currently unavailable.'))
+      answer.add(Jabber::ErrorResponse.new('item-not-found', 'The world you are trying to reach is currently unavailable.'))
       @component.send(answer)
     else
       world.handle_presence(pres)
@@ -125,7 +125,7 @@ class AdventureMUC
     if world.nil?
       answer = msg.answer
       answer.type = :error
-      answer.add(Jabber::Error.new('item-not-found', 'The world you are trying to reach is currently unavailable.'))
+      answer.add(Jabber::ErrorResponse.new('item-not-found', 'The world you are trying to reach is currently unavailable.'))
       @component.send(answer)
     else
       world.handle_message(msg)

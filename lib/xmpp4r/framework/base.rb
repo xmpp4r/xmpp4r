@@ -41,7 +41,7 @@ module Jabber
         if iq.type == :get or iq.type == :set
           answer = iq.answer(true)
           answer.type = :error
-          answer.add(Error.new('feature-not-implemented'))
+          answer.add(ErrorResponse.new('feature-not-implemented'))
           @stream.send(answer)
 
           true

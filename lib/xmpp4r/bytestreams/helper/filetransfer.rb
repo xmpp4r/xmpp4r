@@ -213,7 +213,7 @@ module Jabber
         else
           eanswer = iq.answer(false)
           eanswer.type = :error
-          eanswer.add(Error.new('bad-request')).type = :cancel
+          eanswer.add(ErrorResponse.new('bad-request')).type = :cancel
           eanswer.error.add(REXML::Element.new('no-valid-streams')).add_namespace('http://jabber.org/protocol/si')
           @stream.send(eanswer)
 
@@ -228,7 +228,7 @@ module Jabber
       def decline(iq)
         answer = iq.answer(false)
         answer.type = :error
-        error = answer.add(Error.new('forbidden', 'Offer declined'))
+        error = answer.add(ErrorResponse.new('forbidden', 'Offer declined'))
         error.type = :cancel
         @stream.send(answer)
       end

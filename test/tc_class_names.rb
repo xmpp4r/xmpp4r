@@ -10,6 +10,7 @@ class JIDTest < Test::Unit::TestCase
   def test_base
     assert_kind_of(Module, Jabber)
     assert_kind_of(Class, Jabber::JabberError)
+    assert_kind_of(Class, Jabber::ErrorResponse)
     assert_kind_of(Class, Jabber::ClientAuthenticationFailure)
     assert_kind_of(Class, Jabber::ComponentAuthenticationFailure)
     assert_kind_of(Class, Jabber::Client)

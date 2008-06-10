@@ -64,7 +64,7 @@ module Jabber
       def handle_rpc_requests(rpcdata)
         resp = process(rpcdata.to_s)
         if resp == nil or resp.size <= 0
-          raise Jabber::Error.new(:forbidden)
+          raise Jabber::ErrorResponse.new(:forbidden)
         else
           return resp
         end

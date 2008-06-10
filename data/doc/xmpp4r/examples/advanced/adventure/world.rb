@@ -135,7 +135,7 @@ class World < REXML::Element
       if thing.kind_of?(Player) && (pres.from == thing.jid) && (player != thing)
         answer = pres.answer(false)
         answer.type = :error
-        answer.add(Jabber::Error.new('not-acceptable', 'Nickchange not allowed'))
+        answer.add(Jabber::ErrorResponse.new('not-acceptable', 'Nickchange not allowed'))
         send(thing.iname, answer)
         return(true)
       end

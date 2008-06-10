@@ -14,7 +14,7 @@ class Room
   class RoomException < Exception
     attr_reader :error
     def initialize(error, msg)
-      @error = Jabber::Error.new(error, msg)
+      @error = Jabber::ErrorResponse.new(error, msg)
     end
   end
 
@@ -168,7 +168,7 @@ class MUC
     elsif room.nil? && pres.type != :error
       pres.to, pres.from = pres.from, pres.to
       pres.type = :error
-      pres.add(Jabber::Error.new('item-not-found'))
+      pres.add(Jabber::ErrorResponse.new('item-not-found'))
       @component.send(pres)
       return(true)
     end
@@ -195,7 +195,7 @@ class MUC
     else
       msg.to, msg.from = msg.from, msg.to
       msg.type = :error
-      msg.add(Jabber::Error.new('item-not-found', 'The chatroom you are trying to reach is currently not available.'))
+      msg.add(Jabber::ErrorResponse.new('item-not-found', 'The chatroom you are trying to reach is currently not available.'))
       @component.send(msg)
     end
   end
@@ -210,7 +210,7 @@ class MUC
         room = @rooms[iq.to]
         if room.nil?
           iq.type = :error
-          iq.add_element(Jabber::Error.new('item-not-found'))
+          iq.add_element(Jabber::ErrorResponse.new('item-not-found'))
         else
           iq.query.add(Jabber::DiscoIdentity.new('conference', "#{iq.to.node} (#{room.num_users})", 'text'))
         end
@@ -223,7 +223,7 @@ class MUC
       }
     else
       iq.type = :error
-      iq.add_element(Jabber::Error.new('bad-request'))
+      iq.add_element(Jabber::ErrorResponse.new('bad-request'))
     end
     iq.to, iq.from = iq.from, iq.to
     @component.send(iq)
@@ -244,12 +244,12 @@ class MUC
           }
         else
           iq.type = :error
-          iq.add_element(Jabber::Error.new('item-not-found'))
+          iq.add_element(Jabber::ErrorResponse.new('item-not-found'))
         end
       end
     else
       iq.type = :error
-      iq.add_element(Jabber::Error.new('bad-request'))
+      iq.add_element(Jabber::ErrorResponse.new('bad-request'))
     end
     iq.to, iq.from = iq.from, iq.to
     @component.send(iq)

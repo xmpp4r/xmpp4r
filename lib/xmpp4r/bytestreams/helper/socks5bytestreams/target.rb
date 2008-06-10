@@ -39,7 +39,7 @@ module Jabber
                 reply.query.add(StreamHostUsed.new(@streamhost_used.jid))
               else
                 reply.type = :error
-                reply.add(Error.new('item-not-found'))
+                reply.add(ErrorResponse.new('item-not-found'))
               end
               @stream.send(reply)
             rescue Exception => e
