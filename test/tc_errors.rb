@@ -23,7 +23,7 @@ class ServerErrorTest < Test::Unit::TestCase
   end
 
   def test_create_invalid
-    assert_raise(RuntimeError) {
+    assert_raise(Jabber::ArgumentError) {
       e = ErrorResponse.new('invalid error')
       ee = ServerError.new(e)
     }
@@ -77,7 +77,7 @@ class ErrorTest < Test::Unit::TestCase
   end
 
   def test_create_invalid
-    assert_raise(RuntimeError) {
+    assert_raise(Jabber::ArgumentError) {
       e = ErrorResponse.new('invalid error')
     }
   end

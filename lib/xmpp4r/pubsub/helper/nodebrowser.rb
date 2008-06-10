@@ -45,7 +45,7 @@ module Jabber
 
       ##
       # Retrieve the nodes with names
-      # Throws an ErrorExeption when receiving
+      # Throws a ServerError when receiving
       # <tt><iq type='error'/></tt>
       # jid:: [Jabber::JID] Target entity (set only domain!)
       # return:: [Array] of [Hash] with keys 'node' => [String] and 'name' => [String] or [nil]
@@ -74,7 +74,7 @@ module Jabber
 
       ##
       # Retrieve the items from a node
-      # Throws an ErrorExeption when receiving
+      # Throws an ServerError when receiving
       # <tt><iq type='error'/></tt>
       # jid:: [Jabber::JID] Target entity (set only domain!)
       # node:: [String]

@@ -9,7 +9,7 @@ module Jabber
   # All of our custom errors are superclassed by JabberError < StandardError
   class JabberError < StandardError; end
 
-  # A client side only argument error
+  # A client-side only argument error
   class ArgumentError < JabberError; end
 
   ##
@@ -27,7 +27,7 @@ module Jabber
     attr_reader :error
 
     ##
-    # Initialize an ServerError by passing an Error instance
+    # Initialize a ServerError by passing an ErrorResponse instance
     # error:: [Error]
     def initialize(error)
       @error = error
@@ -45,12 +45,14 @@ module Jabber
 
   class ComponentAuthenticationFailure < JabberError; end
 
+  # TODO : Give this a better name
   class NoNameXmlnsRegistered < JabberError
     def initialize(klass)
       super "Class #{klass} has not set name and xmlns"
     end
   end
 
+  # TODO : Give this a better name
   class SOCKS5Error < JabberError; end
 
   ##
@@ -91,7 +93,7 @@ module Jabber
     #
     # Also sets type and code to appropriate values according to errorcondition
     #
-    # text: [nil] or [String] Error text
+    # text: [nil] or [String] ErrorResponse text
     def initialize(errorcondition=nil, text=nil)
       if errorcondition.nil?
         super()
@@ -107,7 +109,7 @@ module Jabber
         }
 
         if errortype.nil? || errorcode.nil?
-          raise("Unknown error condition when initializing Error")
+          raise ArgumentError, "Unknown error condition when initializing ErrorReponse"
         end
 
         super()
@@ -231,7 +233,7 @@ module Jabber
     end
 
     ##
-    # Set the type of error (see Error#type)
+    # Set the type of error (see ErrorResponse#type)
     def type=(t)
       case t
         when :auth then attributes['type'] = 'auth'

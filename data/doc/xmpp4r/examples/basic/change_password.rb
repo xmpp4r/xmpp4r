@@ -16,7 +16,7 @@ def with_status(str, &block)
     yield
     puts " Ok"
   rescue Exception => e
-    puts " Error: #{e.to_s}"
+    puts " Exception: #{e.to_s}"
     raise e
   end
 end

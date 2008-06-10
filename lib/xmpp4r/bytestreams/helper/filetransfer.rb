@@ -310,7 +310,7 @@ module Jabber
         else  # Target responded with a stream_method we didn't offer
           eanswer = response.answer
           eanswer.type = :error
-          eanswer.add Error.new('bad-request')
+          eanswer.add ErrorResponse.new('bad-request')
           @stream.send(eanswer)
           nil
         end

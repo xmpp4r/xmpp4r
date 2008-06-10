@@ -95,7 +95,7 @@ class IqTest < Test::Unit::TestCase
     e = REXML::Element.new('error')
     x.add(e)
     # test if, after an import, the error element is successfully changed
-    # into an Error object.
+    # into an ErrorResponse object.
     x2 = Iq.new.import(x)
     assert_equal(ErrorResponse, x2.first_element('error').class)
   end
