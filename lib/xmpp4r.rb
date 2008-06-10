@@ -63,7 +63,7 @@
 #
 # Because it is built in an extensible way, it might be hard for newcomers to
 # understand where to look at documentation for a specific method. For example,
-# Client heritates from Connection, which itself heritates from Stream.
+# Client inherits from Connection, which itself inherits from Stream.
 #
 # A newcomer should have a look at the <tt>Jabber::Client</tt> and
 # <tt>Jabber::Component</tt> classes, and their parent classes
@@ -73,7 +73,7 @@
 #
 # ==Non-basic features
 #
-# <tt>require 'xmpp4r'</tt> does only include basic functionality as
+# <tt>require 'xmpp4r'</tt> only includes basic functionality for
 # Connections, Authentication, Stream processing, Callbacks, Stanza handling
 # and Debugging to keep the library's footprint small.
 #
@@ -100,7 +100,7 @@
 #
 # Helpers are intended to give more simplistic interfaces to various tasks
 # of Jabber clients at the cost of flexibility. But you won't need that
-# order of flexibility for the most things.
+# level of flexibility in most cases.
 #
 # * Jabber::Roster::Helper: <tt>require 'xmpp4r/roster'</tt>
 # * Jabber::MUC::MUCBrowser, Jabber::MUC::MUCClient, Jabber::MUC::SimpleMUCClient: <tt>require 'xmpp4r/muc'</tt>
