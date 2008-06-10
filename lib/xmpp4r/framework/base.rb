@@ -6,7 +6,7 @@ module Jabber
 
       def self.helper(name, klass=nil, &factory)
         if klass.nil? and factory.nil?
-          raise "helper #{name} needs at class or factory"
+          raise "helper #{name} needs a class or factory"
         end
 
         define_method(name) do
