@@ -6,6 +6,7 @@ require 'test/unit'
 require 'socket'
 require 'xmpp4r/rexmladdons'
 require 'xmpp4r/presence'
+require 'xmpp4r/errors'
 include Jabber
 
 class PresenceTest < Test::Unit::TestCase
@@ -103,8 +104,8 @@ class PresenceTest < Test::Unit::TestCase
     x.add(e)
     x2 = Presence::new.import(x)
     # test if, after an import, the error element is successfully changed
-    # into an Error object.
-    assert_equal(Error, x2.first_element('error').class)
+    # into an ErrorResponse object.
+    assert_equal(ErrorResponse, x2.first_element('error').class)
   end
 
   def test_sample

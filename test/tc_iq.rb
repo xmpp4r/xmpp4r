@@ -6,6 +6,7 @@ require 'test/unit'
 require 'socket'
 require 'xmpp4r/rexmladdons'
 require 'xmpp4r/iq'
+require 'xmpp4r/errors'
 include Jabber
 
 class IqTest < Test::Unit::TestCase
@@ -96,7 +97,7 @@ class IqTest < Test::Unit::TestCase
     # test if, after an import, the error element is successfully changed
     # into an Error object.
     x2 = Iq::new.import(x)
-    assert_equal(Error, x2.first_element('error').class)
+    assert_equal(ErrorResponse, x2.first_element('error').class)
   end
 
   def test_new_query

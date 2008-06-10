@@ -6,6 +6,7 @@ require 'test/unit'
 require 'socket'
 require 'xmpp4r/rexmladdons'
 require 'xmpp4r/message'
+require 'xmpp4r/errors'
 include Jabber
 
 class MessageTest < Test::Unit::TestCase
@@ -89,9 +90,9 @@ class MessageTest < Test::Unit::TestCase
     e = REXML::Element::new('error')
     x.add(e)
     # test if, after an import, the error element is successfully changed
-    # into an Error object.
+    # into an ErrorResponse object.
     x2 = Message::new.import(x)
-    assert_equal(Error, x2.first_element('error').class)
+    assert_equal(ErrorResponse, x2.first_element('error').class)
   end
 
   def test_answer

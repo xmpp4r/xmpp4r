@@ -30,7 +30,7 @@
 #
 # This is not only useful for stanzas but all other XML processing, too:
 # * <tt><x/></tt> children elements of <tt><message/></tt> and <tt><presence/></tt> are converted to Jabber::X
-# * <tt><error/></tt> children elements of all three stanzas are converted to Jabber::Error
+# * <tt><error/></tt> children elements of all three stanzas are converted to Jabber::ErrorResponse
 # * <tt><query/></tt> children elements of <tt><iq/></tt> are converted to Jabber::IqQuery
 # * <tt><vCard/></tt> children elements of <tt><iq/></tt> are converted to Jabber::IqVcard
 #

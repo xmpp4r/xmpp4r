@@ -9,6 +9,7 @@ require 'xmpp4r/xmppstanza'
 require 'xmpp4r/iq'
 require 'xmpp4r/feature_negotiation'
 require 'xmpp4r/dataforms'
+require 'xmpp4r/errors'
 include Jabber
 
 class XMPPStanzaTest < Test::Unit::TestCase
@@ -104,7 +105,7 @@ class XMPPStanzaTest < Test::Unit::TestCase
     assert_equal(nil, x.error)
     x.typed_add(REXML::Element.new('error'))
     assert_equal('<error/>', x.error.to_s)
-    assert_equal(Error, x.error.class)
+    assert_equal(ErrorResponse, x.error.class)
   end
 
   def test_clone_and_dup

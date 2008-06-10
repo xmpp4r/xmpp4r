@@ -371,7 +371,7 @@ module Jabber
       send(xml) do |received|
         if received.kind_of? XMPPStanza and received.id == xml.id
           if received.type == :error
-            error = (received.error ? received.error : Error.new)
+            error = (received.error ? received.error : ErrorResponse.new)
             true
           elsif block_given?
             res = yield(received)

@@ -18,9 +18,7 @@ module Jabber
   # e.g. This exception can be raised by helpers when they
   # receive a server reply with <tt>type='error'</tt>
   #
-  # The ServerError carries a Jabber::Error element
-  #
-  # Note : this was formerly called ErrorException
+  # The ServerError carries a Jabber::ErrorResponse element
   #
   class ServerError < JabberError #:nodoc:
 
@@ -62,7 +60,7 @@ module Jabber
   #
   # FIXME : XEP-0086 is officially deprecated.  What effect does that have on this class? Any?
   #
-  class Error < XMPPElement
+  class ErrorResponse < XMPPElement
     name_xmlns 'error'
 
     ##

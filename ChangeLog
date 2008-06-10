@@ -17,12 +17,14 @@ XMPP4R 0.3.3 (XX/XX/XXXX)
   need for antiquated 'threaded' param in the initializer.
 * Use a Logger instance instead of directly writing to stdout
 * Re-factored & consolidated Error classes.  See xmpp4r/errors.rb for all custom
-  errors that can be caught.  All inherit from JabberError. This is a first
-  step in re-factoring errors.  Next step will be to convert all 'raise' calls
-  to raise a custom Jabber error instead of anonymous RuntimeErrors.  This
-  allows much more granularity in catching and handling errors later. If you
-  were catching Jabber::ErrorException before you should probably change that in your
-  code to catch Jabber::ServerError now which is a name that makes more sense.
+  errors that can be caught.  All inherit from Jabber::Error which itself inherits
+  from Ruby's StandardError. This is a first step in re-factoring errors.  The next
+  step will be to convert all 'raise' calls to raise a custom Jabber error instead
+  of anonymous RuntimeErrors.  This allows much more granularity in catching and
+  handling errors later. If you were catching Jabber::ErrorException before you
+  should probably change that in your code to catch Jabber::Error if you want
+  to catch everything or one of the custom children of Jabber::Error that
+  are defined in 'lib/xmpp4r/errors.rb'.
 
 XMPP4R 0.3.2 (15/10/2007)
 =========================

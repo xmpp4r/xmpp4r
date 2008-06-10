@@ -4,6 +4,8 @@ $:.unshift '../lib'
 
 require 'test/unit'
 require 'xmpp4r/jid'
+require 'xmpp4r/xmppelement'
+require 'xmpp4r/errors'
 include Jabber
 
 class JIDTest < Test::Unit::TestCase
