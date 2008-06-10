@@ -6,8 +6,8 @@ module Jabber
 
   # CUSTOM ERROR CLASSES
 
-  # All of our custom errors are superclassed by JabberError < RuntimeError
-  class JabberError < RuntimeError; end
+  # All of our custom errors are superclassed by JabberError < StandardError
+  class JabberError < StandardError; end
 
   # A client side only argument error
   class ArgumentError < JabberError; end
@@ -91,7 +91,7 @@ module Jabber
     # * "unexpected-request"
     # Will raise an [Exception] if not [nil] and none of the above
     #
-    # Does also set type and code to appropriate values according to errorcondition
+    # Also sets type and code to appropriate values according to errorcondition
     #
     # text: [nil] or [String] Error text
     def initialize(errorcondition=nil, text=nil)
