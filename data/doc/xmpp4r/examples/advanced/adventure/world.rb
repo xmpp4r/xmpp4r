@@ -146,9 +146,9 @@ class World < REXML::Element
       answer = pres.answer
       answer.type = :error
       if (pres.to.resource.to_s.size > 1)
-        answer.add(Jabber::Error::new('conflict', 'Nickname already used'))
+        answer.add(Jabber::ErrorResponse.new('conflict', 'Nickname already used'))
       else
-        answer.add(Jabber::Error::new('not-acceptable', 'Please use a nickname'))
+        answer.add(Jabber::ErrorResponse.new('not-acceptable', 'Please use a nickname'))
       end
       send(nil, answer)
       return(true)
@@ -190,7 +190,7 @@ class World < REXML::Element
     if player.nil?
       answer = msg.answer
       answer.type = :error
-      answer.add(Jabber::Error::new('forbidden'))
+      answer.add(Jabber::ErrorResponse.new('forbidden'))
       send(msg.to.resource, answer)
       return(true)
     end
