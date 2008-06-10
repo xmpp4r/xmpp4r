@@ -68,7 +68,7 @@ module Jabber
       # Resource of the JID will _not_ be stripped
       # return:: [JID]
       def jid
-        JID::new(attributes['jid'])
+        JID.new(attributes['jid'])
       end
 
       ##

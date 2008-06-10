@@ -129,8 +129,8 @@ module Jabber
     # Create a new Iq stanza with an unspecified query child
     # (<query/> has no namespace)
     def Iq.new_query(type = nil, to = nil)
-      iq = Iq::new(type, to)
-      query = IqQuery::new
+      iq = Iq.new(type, to)
+      query = IqQuery.new
       iq.add(query)
       iq
     end
@@ -138,12 +138,12 @@ module Jabber
     ##
     # Create a new jabber:iq:auth set Stanza.
     def Iq.new_authset(jid, password)
-      iq = Iq::new(:set)
-      query = IqQuery::new
+      iq = Iq.new(:set)
+      query = IqQuery.new
       query.add_namespace('jabber:iq:auth')
-      query.add(REXML::Element::new('username').add_text(jid.node))
-      query.add(REXML::Element::new('password').add_text(password))
-      query.add(REXML::Element::new('resource').add_text(jid.resource)) if not jid.resource.nil?
+      query.add(REXML::Element.new('username').add_text(jid.node))
+      query.add(REXML::Element.new('password').add_text(password))
+      query.add(REXML::Element.new('resource').add_text(jid.resource)) if not jid.resource.nil?
       iq.add(query)
       iq
     end
@@ -151,12 +151,12 @@ module Jabber
     ##
     # Create a new jabber:iq:auth set Stanza for Digest authentication
     def Iq.new_authset_digest(jid, session_id, password)
-      iq = Iq::new(:set)
-      query = IqQuery::new
+      iq = Iq.new(:set)
+      query = IqQuery.new
       query.add_namespace('jabber:iq:auth')
-      query.add(REXML::Element::new('username').add_text(jid.node))
-      query.add(REXML::Element::new('digest').add_text(Digest::SHA1.hexdigest(session_id + password)))
-      query.add(REXML::Element::new('resource').add_text(jid.resource)) if not jid.resource.nil?
+      query.add(REXML::Element.new('username').add_text(jid.node))
+      query.add(REXML::Element.new('digest').add_text(Digest::SHA1.hexdigest(session_id + password)))
+      query.add(REXML::Element.new('resource').add_text(jid.resource)) if not jid.resource.nil?
       iq.add(query)
       iq
     end
@@ -166,11 +166,11 @@ module Jabber
     # username:: [String] (Element will be ommited if unset)
     # password:: [String] (Element will be ommited if unset)
     def Iq.new_register(username=nil, password=nil)
-      iq = Iq::new(:set)
-      query = IqQuery::new
+      iq = Iq.new(:set)
+      query = IqQuery.new
       query.add_namespace('jabber:iq:register')
-      query.add(REXML::Element::new('username').add_text(username)) if username
-      query.add(REXML::Element::new('password').add_text(password)) if password
+      query.add(REXML::Element.new('username').add_text(username)) if username
+      query.add(REXML::Element.new('password').add_text(password)) if password
       iq.add(query)
       iq
     end
@@ -179,8 +179,8 @@ module Jabber
     # Create a new jabber:iq:register get stanza for retrieval
     # of accepted registration information
     def Iq.new_registerget
-      iq = Iq::new(:get)
-      query = IqQuery::new
+      iq = Iq.new(:get)
+      query = IqQuery.new
       query.add_namespace('jabber:iq:register')
       iq.add(query)
       iq
@@ -191,8 +191,8 @@ module Jabber
     #
     # IqQueryRoster is unused here because possibly not require'd
     def Iq.new_rosterget
-      iq = Iq::new(:get)
-      query = IqQuery::new
+      iq = Iq.new(:get)
+      query = IqQuery.new
       query.add_namespace('jabber:iq:roster')
       iq.add(query)
       iq
@@ -201,8 +201,8 @@ module Jabber
     ##
     # Create a new jabber:iq:roster get Stanza.
     def Iq.new_browseget
-      iq = Iq::new(:get)
-      query = IqQuery::new
+      iq = Iq.new(:get)
+      query = IqQuery.new
       query.add_namespace('jabber:iq:browse')
       iq.add(query)
       iq
@@ -211,8 +211,8 @@ module Jabber
     ##
     # Create a new jabber:iq:roster set Stanza.
     def Iq.new_rosterset
-      iq = Iq::new(:set)
-      query = IqQuery::new
+      iq = Iq.new(:set)
+      query = IqQuery.new
       query.add_namespace('jabber:iq:roster')
       iq.add(query)
       iq

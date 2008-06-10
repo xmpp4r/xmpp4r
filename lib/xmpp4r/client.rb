@@ -209,9 +209,9 @@ module Jabber
     def auth_nonsasl(password, digest=true)
       authset = nil
       if digest
-        authset = Iq::new_authset_digest(@jid, @streamid.to_s, password)
+        authset = Iq.new_authset_digest(@jid, @streamid.to_s, password)
       else
-        authset = Iq::new_authset(@jid, password)
+        authset = Iq.new_authset(@jid, password)
       end
       send_with_id(authset) do |r|
         true
@@ -314,7 +314,7 @@ module Jabber
     # Stream#send_with_id).
     # new_password:: [String] New password
     def password=(new_password)
-      iq = Iq::new_query(:set, @jid.domain)
+      iq = Iq.new_query(:set, @jid.domain)
       iq.query.add_namespace('jabber:iq:register')
       iq.query.add(REXML::Element.new('username')).text = @jid.node
       iq.query.add(REXML::Element.new('password')).text = new_password

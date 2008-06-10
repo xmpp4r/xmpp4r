@@ -95,7 +95,7 @@ module Jabber
       def self.query_streamhost(stream, streamhost, my_jid=nil)
         res = nil
 
-        iq = Iq::new(:get, streamhost)
+        iq = Iq.new(:get, streamhost)
         iq.from = my_jid
         iq.add(IqQueryBytestreams.new)
         stream.send_with_id(iq) { |reply|

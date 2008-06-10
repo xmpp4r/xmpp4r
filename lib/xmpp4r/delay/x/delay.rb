@@ -75,7 +75,7 @@ module Jabber
       # result:: [JID]
       def from
         if attributes['from']
-          JID::new(attributes['from'])
+          JID.new(attributes['from'])
         else
           nil
         end

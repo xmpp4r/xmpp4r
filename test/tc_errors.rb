@@ -11,27 +11,27 @@ include Jabber
 class ServerErrorTest < Test::Unit::TestCase
 
   def test_create_with_empty_error
-    e = ErrorResponse::new()
-    ee = ServerError::new(e)
+    e = ErrorResponse.new()
+    ee = ServerError.new(e)
     assert_equal(nil, e.error)
   end
 
   def test_create_with_error_code
-    e = ErrorResponse::new('payment-required')
-    ee = ServerError::new(e)
+    e = ErrorResponse.new('payment-required')
+    ee = ServerError.new(e)
     assert_equal("payment-required: ", ee.to_s)
   end
 
   def test_create_invalid
     assert_raise(RuntimeError) {
-      e = ErrorResponse::new('invalid error')
-      ee = ServerError::new(e)
+      e = ErrorResponse.new('invalid error')
+      ee = ServerError.new(e)
     }
   end
 
   def test_to_s_with_error_code_but_no_text
-    e = ErrorResponse::new('payment-required')
-    ee = ServerError::new(e)
+    e = ErrorResponse.new('payment-required')
+    ee = ServerError.new(e)
     assert_equal("payment-required: ", ee.to_s)
     assert_equal('payment-required', e.error)
     assert_equal(402, ee.error.code)
@@ -40,8 +40,8 @@ class ServerErrorTest < Test::Unit::TestCase
   end
 
   def test_to_s_with_error_code_and_text
-    e = ErrorResponse::new('payment-required', 'cuz you are a deadbeat.')
-    ee = ServerError::new(e)
+    e = ErrorResponse.new('payment-required', 'cuz you are a deadbeat.')
+    ee = ServerError.new(e)
     assert_equal("payment-required: cuz you are a deadbeat.", ee.to_s)
     assert_equal('payment-required', e.error)
     assert_equal(402, ee.error.code)
@@ -53,7 +53,7 @@ end
 
 class ErrorTest < Test::Unit::TestCase
   def test_create
-    e = ErrorResponse::new
+    e = ErrorResponse.new
     assert_equal(nil, e.error)
     assert_equal(nil, e.code)
     assert_equal(nil, e.type)
@@ -61,7 +61,7 @@ class ErrorTest < Test::Unit::TestCase
   end
 
   def test_create2
-    e = ErrorResponse::new('payment-required')
+    e = ErrorResponse.new('payment-required')
     assert_equal('payment-required', e.error)
     assert_equal(402, e.code)
     assert_equal(:auth, e.type)
@@ -69,7 +69,7 @@ class ErrorTest < Test::Unit::TestCase
   end
 
   def test_create3
-    e = ErrorResponse::new('gone', 'User moved to afterlife.gov')
+    e = ErrorResponse.new('gone', 'User moved to afterlife.gov')
     assert_equal('gone', e.error)
     assert_equal(302, e.code)
     assert_equal(:modify, e.type)
@@ -78,12 +78,12 @@ class ErrorTest < Test::Unit::TestCase
 
   def test_create_invalid
     assert_raise(RuntimeError) {
-      e = ErrorResponse::new('invalid error')
+      e = ErrorResponse.new('invalid error')
     }
   end
 
   def test_type
-    e = ErrorResponse::new
+    e = ErrorResponse.new
     assert_nil(e.type)
     e.type = :auth
     assert_equal(:auth, e.type)
@@ -100,7 +100,7 @@ class ErrorTest < Test::Unit::TestCase
   end
 
   def test_code
-    e = ErrorResponse::new
+    e = ErrorResponse.new
     assert_nil(e.code)
     e.code = 404
     assert_equal(404, e.code)
@@ -110,7 +110,7 @@ class ErrorTest < Test::Unit::TestCase
   end
 
   def test_error
-    e = ErrorResponse::new
+    e = ErrorResponse.new
     assert_nil(e.error)
     e.error = 'gone'
     assert_equal('gone', e.error)

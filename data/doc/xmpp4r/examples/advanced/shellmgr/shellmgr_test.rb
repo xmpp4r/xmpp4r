@@ -2,7 +2,7 @@
 
 require 'shellmgr'
 
-sh = Shell::new { |s| puts s }
+sh = Shell.new { |s| puts s }
 
 while true do
   l = gets

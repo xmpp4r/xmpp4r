@@ -36,7 +36,7 @@ module Jabber
       end
 
       def jid
-        attributes['jid'].nil? ? nil : JID::new(attributes['jid'])
+        attributes['jid'].nil? ? nil : JID.new(attributes['jid'])
       end
 
       def jid=(j)
@@ -121,7 +121,7 @@ module Jabber
       def actors
         a = []
         each_element('actor') { |xe|
-          a.push(JID::new(xe.attributes['jid']))
+          a.push(JID.new(xe.attributes['jid']))
         }
         a
       end

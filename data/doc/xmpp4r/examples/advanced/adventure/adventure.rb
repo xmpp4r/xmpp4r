@@ -17,7 +17,7 @@ if ARGV.size != 3
   exit
 end
 
-muc = AdventureMUC::new(Jabber::JID::new(ARGV[0]), ARGV[1], ARGV[2])
+muc = AdventureMUC.new(Jabber::JID.new(ARGV[0]), ARGV[1], ARGV[2])
 muc.add_world('tower.xml')
 muc.add_world('cube.xml')
 Thread.stop

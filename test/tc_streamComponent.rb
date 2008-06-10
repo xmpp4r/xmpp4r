@@ -37,7 +37,7 @@ class StreamComponentTest < Test::Unit::TestCase
       serverwait.run
     end
 
-    @stream = Component::new('test')
+    @stream = Component.new('test')
     @stream.connect('localhost', @@SOCKET_PORT)
 
     serverwait.wait

@@ -13,18 +13,18 @@ class StreamTest < Test::Unit::TestCase
   STREAM = '<stream:stream xmlns:stream="http://etherx.jabber.org/streams">'
 
   def setup
-    @tmpfile = Tempfile::new("StreamSendTest")
+    @tmpfile = Tempfile.new("StreamSendTest")
     @tmpfilepath = @tmpfile.path()
     @tmpfile.unlink
-    @servlisten = UNIXServer::new(@tmpfilepath)
+    @servlisten = UNIXServer.new(@tmpfilepath)
     thServer = Thread.new { @server = @servlisten.accept }
-    @iostream = UNIXSocket::new(@tmpfilepath)
+    @iostream = UNIXSocket.new(@tmpfilepath)
     n = 0
     while not defined? @server and n < 10
       sleep 0.1
       n += 1
     end
-    @stream = Stream::new
+    @stream = Stream.new
     @stream.start(@iostream)
   end
 

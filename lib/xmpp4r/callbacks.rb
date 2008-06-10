@@ -15,7 +15,7 @@ module Jabber
   #
   # Callbacks are processed for a given set of objects as long as they return
   # false. If you want to stop processing, you must return true. Example :
-  #  cbl = CallbackList::new
+  #  cbl = CallbackList.new
   #  c1 = false
   #  c2 = false
   #  c3 = false
@@ -56,7 +56,7 @@ module Jabber
     # return:: [Jabber::CallbackList] The list, for chaining
     def add(prio = 0, ref = nil, proc = nil, &block)
       block = proc if proc
-      @list.push(Callback::new(prio, ref, block))
+      @list.push(Callback.new(prio, ref, block))
       @list.sort! { |a, b| b.priority <=> a.priority }
       self
     end
@@ -115,7 +115,7 @@ module Jabber
     # priority:: [Integer] the callback's priority. The higher, the sooner it
     # will be executed
     # ref:: [String] The callback's reference
-    def initialize(priority = 0, ref = nil, block = Proc::new {})
+    def initialize(priority = 0, ref = nil, block = Proc.new {})
       @priority = priority
       @ref = ref
       @block = block

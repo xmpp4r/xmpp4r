@@ -24,7 +24,7 @@ class ConnectionErrorTest < Test::Unit::TestCase
       serverwait.run
     end
 
-    @conn = TCPSocket::new('localhost', @@SOCKET_PORT)
+    @conn = TCPSocket.new('localhost', @@SOCKET_PORT)
 
     serverwait.wait
   end
@@ -35,7 +35,7 @@ class ConnectionErrorTest < Test::Unit::TestCase
   end
 
   def test_connectionError_start_withexcblock
-    @stream = Stream::new
+    @stream = Stream.new
     error = false
     @stream.on_exception do |e, o, w|
       # strange exception, it's caused by REXML, actually
@@ -47,7 +47,7 @@ class ConnectionErrorTest < Test::Unit::TestCase
     assert(!error)
     begin
       # wrong port on purpose
-      conn = TCPSocket::new('localhost', 1)
+      conn = TCPSocket.new('localhost', 1)
     rescue
     end
     @stream.start(conn)
@@ -58,7 +58,7 @@ class ConnectionErrorTest < Test::Unit::TestCase
   end
 
   def test_connectionError_parse_withexcblock
-    @stream = Stream::new
+    @stream = Stream.new
     error = false
     @stream.start(@conn)
     @stream.on_exception do |e, o, w|
@@ -84,7 +84,7 @@ class ConnectionErrorTest < Test::Unit::TestCase
   end
 
   def test_connectionError_send_withexcblock
-    @stream = Stream::new
+    @stream = Stream.new
     error = 0
     @stream.start(@conn)
     @stream.on_exception do |exc, o, w|
@@ -115,7 +115,7 @@ class ConnectionErrorTest < Test::Unit::TestCase
   end
 
   def test_connectionError_send_withoutexcblock
-    @stream = Stream::new
+    @stream = Stream.new
     @stream.start(@conn)
     @server.puts(STREAM)
     @server.flush

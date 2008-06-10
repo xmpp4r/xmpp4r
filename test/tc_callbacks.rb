@@ -9,7 +9,7 @@ include Jabber
 class CallbacksTest < Test::Unit::TestCase
   def test_test1
     called = 0
-    cb = Callback::new(5, "toto", Proc::new { called += 1 })
+    cb = Callback.new(5, "toto", Proc.new { called += 1 })
     assert_equal(5, cb.priority)
     assert_equal("toto", cb.ref)
     cb.block.call
@@ -19,7 +19,7 @@ class CallbacksTest < Test::Unit::TestCase
   end
 
   def test_callbacklist1
-    cbl = CallbackList::new
+    cbl = CallbackList.new
     called1 = false
     called2 = false
     called3 = false
@@ -37,7 +37,7 @@ class CallbacksTest < Test::Unit::TestCase
   end
 
   def test_callbacklist2
-    cbl = CallbackList::new
+    cbl = CallbackList.new
     assert(0, cbl.length)
     cbl.add(5, "ref1") { called1 = true }
     assert(1, cbl.length)
@@ -50,7 +50,7 @@ class CallbacksTest < Test::Unit::TestCase
   end
 
   def test_callbacklist4
-    cbl = CallbackList::new
+    cbl = CallbackList.new
     cbl.add(5, "ref1") { false }
     cbl.add(7, "ref1") { false }
     o = "o"
@@ -58,7 +58,7 @@ class CallbacksTest < Test::Unit::TestCase
    end
 
   def test_callbacklist5
-    cbl = CallbackList::new
+    cbl = CallbackList.new
     cbl.add(5, "ref1") { true }
     cbl.add(7, "ref1") { false }
     o = "o"
@@ -66,7 +66,7 @@ class CallbacksTest < Test::Unit::TestCase
    end
 
   def test_callbacklist6
-    cbl = CallbackList::new
+    cbl = CallbackList.new
     ok = false
     c = 'a'
     d = 'b'
@@ -81,7 +81,7 @@ class CallbacksTest < Test::Unit::TestCase
    end
 
   def test_callbacklist7
-    cbl = CallbackList::new
+    cbl = CallbackList.new
     called1 = false
     called2 = false
     called3 = false

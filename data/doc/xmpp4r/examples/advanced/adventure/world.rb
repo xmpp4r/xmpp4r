@@ -24,9 +24,9 @@ class World < REXML::Element
 
   def add(xmlelement)
     if xmlelement.kind_of?(REXML::Element) && (xmlelement.name == 'place')
-      super(Place::new.import(xmlelement))
+      super(Place.new.import(xmlelement))
     elsif xmlelement.kind_of?(REXML::Element) && (xmlelement.name == 'thing') && !xmlelement.kind_of?(Player)
-      super(Thing::new(self).import(xmlelement))
+      super(Thing.new(self).import(xmlelement))
     else
       super(xmlelement)
     end
@@ -376,7 +376,7 @@ class Player < Thing
   end
 
   def jid
-    attributes['jid'].nil? ? nil : Jabber::JID::new(attributes['jid'])
+    attributes['jid'].nil? ? nil : Jabber::JID.new(attributes['jid'])
   end
 
   def see(place)

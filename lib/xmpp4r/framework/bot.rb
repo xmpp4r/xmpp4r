@@ -28,7 +28,7 @@ module Jabber
       }
 
       def initialize(jid, password)
-        cl = Jabber::Client::new(jid)
+        cl = Jabber::Client.new(jid)
         cl.connect
         cl.auth(password)
 

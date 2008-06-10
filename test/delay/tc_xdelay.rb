@@ -26,8 +26,8 @@ class XDelayTest < Test::Unit::TestCase
   def test_from
     d = Delay::XDelay.new
     assert_equal(nil, d.from)
-    d.from = JID::new('astro@spaceboyz.net')
-    assert_equal(JID::new('astro@spaceboyz.net'), d.from)
+    d.from = JID.new('astro@spaceboyz.net')
+    assert_equal(JID.new('astro@spaceboyz.net'), d.from)
     assert_equal(d, d.set_from(nil))
     assert_equal(nil, d.from)
   end

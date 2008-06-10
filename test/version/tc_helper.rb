@@ -14,14 +14,14 @@ class Version::HelperTest < Test::Unit::TestCase
   include ClientTester
 
   def test_create
-    h = Version::Responder::new(@client)
+    h = Version::Responder.new(@client)
     assert_kind_of(Version::Responder, h)
     assert_respond_to(h, :add_version_callback)
   end
 
   def test_callback
     # Prepare helper
-    h = Version::Responder::new(@client)
+    h = Version::Responder.new(@client)
 
     calls = 0
     h.add_version_callback { |iq,responder|

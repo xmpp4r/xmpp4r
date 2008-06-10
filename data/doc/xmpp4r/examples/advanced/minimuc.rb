@@ -37,7 +37,7 @@ class Room
     msg.from = nil
     @users.each { |nick,jid|
       if jid == origin
-        msg.from = Jabber::JID::new(@name.node, @name.domain, nick)
+        msg.from = Jabber::JID.new(@name.node, @name.domain, nick)
       end
     }
     unless msg.from.nil?
@@ -71,7 +71,7 @@ class Room
       userinfo.add(Jabber::XMUCUser.new).add(Jabber::XMUCUserItem.new(:none, :participant))
       print "Sending all users for #{pres.to} to #{pres.from}:"
       @users.each { |nick,jid|
-        userinfo.from = Jabber::JID::new(@name.node, @name.domain, nick)
+        userinfo.from = Jabber::JID.new(@name.node, @name.domain, nick)
         print " #{nick} (#{jid})"
         @stream.send(userinfo)
       }
@@ -108,8 +108,8 @@ class Room
   end
 
   def send_message(body)
-    msg = Jabber::Message::new
-    msg.from = Jabber::JID::new(@name.node, @name.domain, "")
+    msg = Jabber::Message.new
+    msg.from = Jabber::JID.new(@name.node, @name.domain, "")
     msg.type = :groupchat
     msg.body = body
     broadcast(msg)
@@ -128,7 +128,7 @@ class MUC
   def initialize(jid, secret, addr, port=5347)
     @rooms = {}
 
-    @component = Jabber::Component::new(jid, addr, port)
+    @component = Jabber::Component.new(jid, addr, port)
     @component.connect
     @component.auth(secret)
 
@@ -234,13 +234,13 @@ class MUC
       iq.type = :result
       if iq.to.node == nil
         @rooms.each { |name,room|
-          iq.query.add(Jabber::DiscoItem::new(Jabber::JID::new(name, @component.jid.domain), name))
+          iq.query.add(Jabber::DiscoItem.new(Jabber::JID.new(name, @component.jid.domain), name))
         }
       elsif iq.to.resource == nil
         room = @rooms[iq.to.strip]
         unless room.nil?
           room.each_user { |nick,jid|
-            iq.query.add(Jabber::DiscoItem::new(jid, nick))
+            iq.query.add(Jabber::DiscoItem.new(jid, nick))
           }
         else
           iq.type = :error
@@ -262,5 +262,5 @@ if ARGV.size != 3
   exit
 end
 
-muc = MUC::new(Jabber::JID::new(ARGV[0]), ARGV[1], ARGV[2])
+muc = MUC.new(Jabber::JID.new(ARGV[0]), ARGV[1], ARGV[2])
 Thread.stop

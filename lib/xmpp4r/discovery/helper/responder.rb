@@ -149,7 +149,7 @@ module Jabber
       def generate_item
         i = @identities.first
         if i
-          Item::new(@my_jid || @stream.jid, i.iname, @node)
+          Item.new(@my_jid || @stream.jid, i.iname, @node)
         else
           nil
         end

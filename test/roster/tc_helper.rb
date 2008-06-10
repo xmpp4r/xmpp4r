@@ -31,7 +31,7 @@ class Roster::HelperTest < Test::Unit::TestCase
     }
 
     query_waiter = Semaphore.new
-    h = Roster::Helper::new(@client)
+    h = Roster::Helper.new(@client)
     h.add_query_callback { |iq|
       query_waiter.run
     }
@@ -74,7 +74,7 @@ class Roster::HelperTest < Test::Unit::TestCase
     }
 
     query_waiter = Semaphore.new
-    h = Roster::Helper::new(@client)
+    h = Roster::Helper.new(@client)
     h.add_query_callback { |iq| query_waiter.run }
     wait_state
     query_waiter.wait
@@ -142,7 +142,7 @@ class Roster::HelperTest < Test::Unit::TestCase
 
     query_waiter = Semaphore.new
     presence_waiter = Semaphore.new
-    h = Roster::Helper::new(@client)
+    h = Roster::Helper.new(@client)
     h.add_query_callback { |iq|
       query_waiter.run
     }
@@ -289,7 +289,7 @@ class Roster::HelperTest < Test::Unit::TestCase
     }
 
     query_waiter = Semaphore.new
-    h = Roster::Helper::new(@client)
+    h = Roster::Helper.new(@client)
     h.add_query_callback { |iq| query_waiter.run }
     wait_state
     query_waiter.wait
@@ -326,7 +326,7 @@ class Roster::HelperTest < Test::Unit::TestCase
     }
 
     query_waiter = Semaphore.new
-    h = Roster::Helper::new(@client)
+    h = Roster::Helper.new(@client)
     h.add_query_callback { |iq| query_waiter.run }
     wait_state
     query_waiter.wait
@@ -369,7 +369,7 @@ class Roster::HelperTest < Test::Unit::TestCase
     }
 
     query_waiter = Semaphore.new
-    h = Roster::Helper::new(@client)
+    h = Roster::Helper.new(@client)
     h.add_query_callback { |iq| query_waiter.run }
     wait_state
     query_waiter.wait

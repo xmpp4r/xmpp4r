@@ -14,7 +14,7 @@ module Jabber
       end
 
       def to
-        attributes['to'].nil? ? nil : JID::new(attributes['to'])
+        attributes['to'].nil? ? nil : JID.new(attributes['to'])
       end
 
       def to=(j)
@@ -27,7 +27,7 @@ module Jabber
       end
 
       def from
-        attributes['from'].nil? ? nil : JID::new(attributes['from'])
+        attributes['from'].nil? ? nil : JID.new(attributes['from'])
       end
 
       def from=(j)

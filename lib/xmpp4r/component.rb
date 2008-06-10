@@ -28,7 +28,7 @@ module Jabber
       @jid = (jid.kind_of?(JID) ? jid : JID.new(jid.to_s))
 
       if server_address
-        $stderr.puts "Passing server and port to Jabber::Component::new is " +
+        $stderr.puts "Passing server and port to Jabber::Component.new is " +
                      "obsolete and will vanish in some later XMPP4R release. " +
                      "Please use these arguments when calling " +
                      "Jabber::Client#connect"

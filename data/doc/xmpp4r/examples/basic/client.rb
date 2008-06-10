@@ -53,8 +53,8 @@ class BasicClient
   # connect <jid> <password>
   def do_connect(args)
     @jid, @password = args.split(' ', 2)
-    @jid = JID::new(@jid)
-    @cl = Client::new(@jid)
+    @jid = JID.new(@jid)
+    @cl = Client.new(@jid)
     @cl.connect
   end
 
@@ -65,4 +65,4 @@ class BasicClient
   end
 end
 
-BasicClient::new
+BasicClient.new

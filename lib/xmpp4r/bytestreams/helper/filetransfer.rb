@@ -259,7 +259,7 @@ module Jabber
           offered_methods[Bytestreams::IBB::NS_IBB] = nil
         end
 
-        iq = Iq::new(:set, jid)
+        iq = Iq.new(:set, jid)
         iq.from = from
         si = iq.add(Bytestreams::IqSi.new(session_id, Bytestreams::PROFILE_FILETRANSFER, source.mime))
 
@@ -310,7 +310,7 @@ module Jabber
         else  # Target responded with a stream_method we didn't offer
           eanswer = response.answer
           eanswer.type = :error
-          eanswer.add Error::new('bad-request')
+          eanswer.add Error.new('bad-request')
           @stream.send(eanswer)
           nil
         end

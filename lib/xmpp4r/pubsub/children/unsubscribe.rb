@@ -20,7 +20,7 @@ module Jabber
       # shows the jid
       # return:: [String]
       def jid
-        (a = attribute('jid')).nil? ? a : JID::new(a.value)
+        (a = attribute('jid')).nil? ? a : JID.new(a.value)
       end
 
       ##

@@ -5,7 +5,7 @@ $:.unshift '../lib'
 require 'xmpp4r'
 include Jabber
 
-c = Component::new('example.blop.info', 'linux.ensimag.fr', 2609)
+c = Component.new('example.blop.info', 'linux.ensimag.fr', 2609)
 c.connect
 c.auth('BenEuh')
 c.add_iq_callback { |i|

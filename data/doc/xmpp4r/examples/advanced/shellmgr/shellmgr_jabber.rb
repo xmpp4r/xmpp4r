@@ -10,24 +10,24 @@ if ARGV.length != 3
   exit(1)
 end
 
-myjid = JID::new(ARGV[0])
+myjid = JID.new(ARGV[0])
 mypassword = ARGV[1]
-authjid = JID::new(ARGV[2])
+authjid = JID.new(ARGV[2])
 
-myjid = JID::new(myjid.node, myjid.domain, 'RSM')
-cl = Client::new(myjid)
+myjid = JID.new(myjid.node, myjid.domain, 'RSM')
+cl = Client.new(myjid)
 cl.connect
 cl.auth(mypassword)
 mainthread = Thread.current
-sh = Shell::new { |str|
+sh = Shell.new { |str|
   puts "-----RECEIVING-----\n#{str}"
-  cl.send(Message::new(authjid, str)) }
+  cl.send(Message.new(authjid, str)) }
 cl.add_message_callback do |m|
-  if JID::new(m.from).strip.to_s != authjid.strip.to_s
+  if JID.new(m.from).strip.to_s != authjid.strip.to_s
     puts "Received message from non-authorized user #{m.from}"
   else
     if m.body == "killshell"
-      cl.send(Message::new(authjid, "Exiting..."))
+      cl.send(Message.new(authjid, "Exiting..."))
       mainthread.wakeup
     else
       puts "-----EXECUTING-----\n#{m.body}"
@@ -35,9 +35,9 @@ cl.add_message_callback do |m|
     end
   end
 end
-cl.send(Presence::new)
+cl.send(Presence.new)
 puts "Connected ! Ask #{authjid.to_s} to send commands to #{myjid.to_s}"
-cl.send(Message::new(authjid, "I'm ready to receive commands from you."))
+cl.send(Message.new(authjid, "I'm ready to receive commands from you."))
 Thread.stop
 cl.close
 sh.kill

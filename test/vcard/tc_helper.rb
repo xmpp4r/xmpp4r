@@ -13,7 +13,7 @@ class Vcard::HelperTest < Test::Unit::TestCase
   include ClientTester
 
   def test_create
-    h = Vcard::Helper::new(@client)
+    h = Vcard::Helper.new(@client)
     assert_kind_of(Vcard::Helper, h)
   end
 

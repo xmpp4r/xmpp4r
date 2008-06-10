@@ -22,7 +22,7 @@ module REXML
     def replace_element_text(e, t)
       el = first_element(e)
       if el.nil?
-        el = REXML::Element::new(e)
+        el = REXML::Element.new(e)
         add_element(el)
       end
       if t

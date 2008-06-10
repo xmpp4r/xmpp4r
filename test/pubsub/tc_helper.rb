@@ -368,7 +368,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     assert_kind_of(Jabber::PubSub::Subscription,s[3])
     assert_equal(:subscribed,s[0].state)
     assert_equal(:unconfigured,s[1].state)
-    assert_equal(JID::new("hamlet@denmark.lit"),s[0].jid)
+    assert_equal(JID.new("hamlet@denmark.lit"),s[0].jid)
     assert_equal("123-abc",s[2].subid)
     wait_state
   end
@@ -435,7 +435,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     assert_equal(:subscribed,s[0].state)
     assert_equal(:unconfigured,s[2].state)
     assert_equal(:pending,s[3].state)
-    assert_equal(JID::new("francisco@denmark.lit"),s[0].jid)
+    assert_equal(JID.new("francisco@denmark.lit"),s[0].jid)
     assert_equal("node1",s[0].node)
 
     wait_state

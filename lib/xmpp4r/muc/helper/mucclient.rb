@@ -250,7 +250,7 @@ module Jabber
           stanza.type = to ? :chat : :groupchat
         end
         stanza.from = @my_jid
-        stanza.to = JID::new(jid.node, jid.domain, to)
+        stanza.to = JID.new(jid.node, jid.domain, to)
         @stream.send(stanza)
       end
 

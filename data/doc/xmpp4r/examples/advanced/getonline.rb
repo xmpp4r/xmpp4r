@@ -7,14 +7,14 @@ require 'xmpp4r'
 include Jabber
 
 get = true
-jid = JID::new('lucastest@linux.ensimag.fr/rosterget')
+jid = JID.new('lucastest@linux.ensimag.fr/rosterget')
 password = 'lucastest'
 domains = []
 
-OptionParser::new do |opts|
+OptionParser.new do |opts|
   opts.banner = 'Usage: roster.rb -j jid -p password -d domain'
   opts.separator ''
-  opts.on('-j', '--jid JID', 'sets the jid') { |j| jid = JID::new(j) }
+  opts.on('-j', '--jid JID', 'sets the jid') { |j| jid = JID.new(j) }
   opts.on('-p', '--password PASSWORD', 'sets the password') { |p| password = p }
   opts.on('-d', '--domain DOMAIN', 'sets the domain') { |d| domains << d }
   opts.on_tail('-h', '--help', 'Show this message') {
@@ -24,13 +24,13 @@ OptionParser::new do |opts|
   opts.parse!(ARGV)
 end
 
-cl = Client::new(jid, false)
+cl = Client.new(jid, false)
 cl.connect
 cl.auth(password)
 exit = false
 nb = 0
 cl.add_iq_callback { |i|
-  fjid = JID::new(i.from)
+  fjid = JID.new(i.from)
   if i.type == :result and fjid.resource == "admin"
     domain = fjid.domain
     items = nil
@@ -47,7 +47,7 @@ cl.add_iq_callback { |i|
   end
 }
 for d in domains do
-  cl.send(Iq::new_browseget.set_to("#{d}/admin"))
+  cl.send(Iq.new_browseget.set_to("#{d}/admin"))
   nb += 1
 end
 while nb > 0

@@ -18,7 +18,7 @@ module Jabber
         state = mysubscription
       end
       def jid
-        (a = attribute('jid')).nil? ? a : JID::new(a.value)
+        (a = attribute('jid')).nil? ? a : JID.new(a.value)
       end
       def jid=(myjid)
         add_attribute('jid', myjid ? myjid.to_s : nil)

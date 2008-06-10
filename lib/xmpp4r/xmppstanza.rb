@@ -28,7 +28,7 @@ module Jabber
     # import:: [true or false] Copy attributes and children of source
     # result:: [XMPPStanza] answer stanza
     def XMPPStanza.answer(xmppstanza, import=true)
-      x = xmppstanza.class::new
+      x = xmppstanza.class.new
       if import
         x.import(xmppstanza)
       end
@@ -64,7 +64,7 @@ module Jabber
     #
     # return:: [String] the element's to attribute
     def to
-      (a = attribute('to')).nil? ? a : JID::new(a.value)
+      (a = attribute('to')).nil? ? a : JID.new(a.value)
     end
 
     ##
@@ -89,7 +89,7 @@ module Jabber
     #
     # return:: [String] the element's from attribute
     def from
-      (a = attribute('from')).nil? ? a : JID::new(a.value)
+      (a = attribute('from')).nil? ? a : JID.new(a.value)
     end
 
     ##

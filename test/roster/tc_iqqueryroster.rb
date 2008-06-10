@@ -11,7 +11,7 @@ include Jabber
 
 class Roster::IqQueryRosterTest < Test::Unit::TestCase
   def test_create
-    r = Roster::IqQueryRoster::new
+    r = Roster::IqQueryRoster.new
     assert_equal('jabber:iq:roster', r.namespace)
     assert_equal(r.to_a.size, 0)
     assert_equal(r.to_a, [])
@@ -19,16 +19,16 @@ class Roster::IqQueryRosterTest < Test::Unit::TestCase
   end
 
   def test_import
-    iq = Iq::new
-    q = REXML::Element::new('query')
+    iq = Iq.new
+    q = REXML::Element.new('query')
     q.add_namespace('jabber:iq:roster')
     iq.add(q)
-    iq2 = Iq::new.import(iq)
+    iq2 = Iq.new.import(iq)
     assert_equal(Roster::IqQueryRoster, iq2.query.class)
   end
 
   def test_answer
-    iq = Iq::new_rosterget
+    iq = Iq.new_rosterget
     assert_equal(:get, iq.type)
     assert_nil(iq.to)
     assert_equal('jabber:client', iq.namespace)
@@ -59,7 +59,7 @@ class Roster::IqQueryRosterTest < Test::Unit::TestCase
   end
 
   def test_items
-    r = Roster::IqQueryRoster::new
+    r = Roster::IqQueryRoster.new
     r.add(Roster::RosterItem.new)
     r.add(Roster::RosterItem.new(JID.new('a@b/d'), 'ABC', :none, :subscribe)).groups = ['a']
     itemstr = "<item jid='astro@spaceboyz.net' name='Astro' subscribtion='both'>" \
@@ -88,10 +88,10 @@ class Roster::IqQueryRosterTest < Test::Unit::TestCase
   end
 
   def test_dupitems
-    r = Roster::IqQueryRoster::new
-    jid = JID::new('a@b')
-    jid2 = JID::new('c@d')
-    ri = Roster::RosterItem::new(jid, 'ab')
+    r = Roster::IqQueryRoster.new
+    jid = JID.new('a@b')
+    jid2 = JID.new('c@d')
+    ri = Roster::RosterItem.new(jid, 'ab')
     r.add(ri)
     assert_equal('ab', ri.iname)
     assert_equal('ab', r[jid].iname)
@@ -121,13 +121,13 @@ end
 
 class Roster::RosterItemTest < Test::Unit::TestCase
   def test_create
-    ri = Roster::RosterItem::new
+    ri = Roster::RosterItem.new
     assert_equal(JID.new, ri.jid)
     assert_equal(nil, ri.iname)
     assert_equal(nil, ri.subscription)
     assert_equal(nil, ri.ask)
 
-    ri = Roster::RosterItem::new(JID.new('a@b/c'), 'xyz', :both, nil)
+    ri = Roster::RosterItem.new(JID.new('a@b/c'), 'xyz', :both, nil)
     assert_equal(JID.new('a@b/c'), ri.jid)
     assert_equal('xyz', ri.iname)
     assert_equal(:both, ri.subscription)
@@ -135,11 +135,11 @@ class Roster::RosterItemTest < Test::Unit::TestCase
   end
 
   def test_modify
-    ri = Roster::RosterItem::new(JID.new('a@b/c'), 'xyz', :both, :subscribe)
+    ri = Roster::RosterItem.new(JID.new('a@b/c'), 'xyz', :both, :subscribe)
 
     assert_equal(JID.new('a@b/c'), ri.jid)
     ri.jid = nil
-    assert_equal(JID::new, ri.jid)
+    assert_equal(JID.new, ri.jid)
 
     assert_equal('xyz', ri.iname)
     ri.iname = nil
@@ -155,7 +155,7 @@ class Roster::RosterItemTest < Test::Unit::TestCase
   end
 
   def test_groupdeletion
-    ri = Roster::RosterItem::new
+    ri = Roster::RosterItem.new
     g1 = ['a', 'b', 'c']
     ri.groups = g1
     assert_equal(g1, ri.groups.sort)
@@ -165,7 +165,7 @@ class Roster::RosterItemTest < Test::Unit::TestCase
   end
 
   def test_dupgroups
-    ri = Roster::RosterItem::new
+    ri = Roster::RosterItem.new
     mygroups = ['a', 'a', 'b']
     ri.groups = mygroups
     assert_equal(mygroups.uniq, ri.groups)

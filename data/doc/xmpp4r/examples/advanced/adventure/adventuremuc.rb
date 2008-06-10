@@ -4,7 +4,7 @@ class AdventureMUC
   def initialize(jid, secret, addr, port=5347)
     @worlds = {}
 
-    @component = Jabber::Component::new(jid)
+    @component = Jabber::Component.new(jid)
     @component.connect(addr, port)
     @component.auth(secret)
     @component.on_exception { |e,|
@@ -37,7 +37,7 @@ class AdventureMUC
   end
 
   def send(worldnode, worldresource, stanza)
-    stanza.from = Jabber::JID::new(worldnode, @component.jid.domain, worldresource)
+    stanza.from = Jabber::JID.new(worldnode, @component.jid.domain, worldresource)
     @component.send(stanza)
   end
 
@@ -96,7 +96,7 @@ class AdventureMUC
     answer.type = :result
     if iq.to.node == nil
       @worlds.each { |node,world|
-        answer.query.add(Jabber::Discovery::Item.new(Jabber::JID::new(node, @component.jid.domain), world.iname))
+        answer.query.add(Jabber::Discovery::Item.new(Jabber::JID.new(node, @component.jid.domain), world.iname))
       }
     end
     @component.send(answer)

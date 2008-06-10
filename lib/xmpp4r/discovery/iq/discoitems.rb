@@ -78,7 +78,7 @@ module Jabber
       # Get the item's jid or nil
       # result:: [String]
       def jid
-        JID::new(attributes['jid'])
+        JID.new(attributes['jid'])
       end
 
       ##

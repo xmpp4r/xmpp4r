@@ -26,7 +26,7 @@ module Jabber
         set_to(to)
       end
       if !body.nil?
-        add_element(REXML::Element::new("body").add_text(body))
+        add_element(REXML::Element.new("body").add_text(body))
       end
     end
 

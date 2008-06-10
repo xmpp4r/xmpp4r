@@ -19,14 +19,14 @@ class Shell
       exec("/bin/bash")
     end
     buffer = ""
-    semaphore = Mutex::new
-    Thread::new do
+    semaphore = Mutex.new
+    Thread.new do
       while true
         c = @child_to_parent_read.read(1)
         semaphore.synchronize { buffer += c }
       end
     end
-    Thread::new do
+    Thread.new do
       ch = ""
       while true do
         sleep @delay

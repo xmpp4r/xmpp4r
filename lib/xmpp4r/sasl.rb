@@ -16,7 +16,7 @@ module Jabber
 
     ##
     # Factory function to obtain a SASL helper for the specified mechanism
-    def SASL::new(stream, mechanism)
+    def SASL.new(stream, mechanism)
       case mechanism
         when 'DIGEST-MD5'
           DigestMD5.new(stream)

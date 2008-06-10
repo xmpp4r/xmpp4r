@@ -40,7 +40,7 @@ module Jabber
       # wait for an answer and
       # connect to the host the target chose.
       def open
-        iq1 = Iq::new(:set, @target_jid)
+        iq1 = Iq.new(:set, @target_jid)
         iq1.from = @initiator_jid
         bs = iq1.add IqQueryBytestreams.new(@session_id)
         @streamhosts.each { |se|
@@ -77,7 +77,7 @@ module Jabber
             @streamhost_cbs.process(@streamhost_used, :failure, e)
             raise e
           end
-          iq2 = Iq::new(:set, @streamhost_used.jid)
+          iq2 = Iq.new(:set, @streamhost_used.jid)
           iq2.add(IqQueryBytestreams.new(@session_id)).activate = @target_jid.to_s
           @stream.send_with_id(iq2) { |reply|
             reply.type == :result

@@ -40,11 +40,11 @@ module Jabber
     def initialize
       @fd = nil
       @status = DISCONNECTED
-      @xmlcbs = CallbackList::new
-      @stanzacbs = CallbackList::new
-      @messagecbs = CallbackList::new
-      @iqcbs = CallbackList::new
-      @presencecbs = CallbackList::new
+      @xmlcbs = CallbackList.new
+      @stanzacbs = CallbackList.new
+      @messagecbs = CallbackList.new
+      @iqcbs = CallbackList.new
+      @presencecbs = CallbackList.new
       @send_lock = Mutex.new
       @last_send = Time.now
       @exception_block = nil

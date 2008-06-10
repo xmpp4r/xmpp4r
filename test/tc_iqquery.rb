@@ -9,13 +9,13 @@ include Jabber
 
 class IqQueryTest < Test::Unit::TestCase
   def test_create
-    x = IqQuery::new()
+    x = IqQuery.new()
     assert_equal("query", x.name)
     assert_equal("<query/>", x.to_s)
   end
 
   def test_import
-    q = IqQuery::new
+    q = IqQuery.new
     assert_equal(IqQuery, q.class)
 
     e = REXML::Element.new('query')

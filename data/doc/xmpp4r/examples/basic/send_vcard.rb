@@ -22,9 +22,9 @@ if ARGV.length < 2
 end
 
 # Do the client stuff...
-myJID = JID::new(ARGV.shift)
+myJID = JID.new(ARGV.shift)
 myPassword = ARGV.shift
-cl = Client::new(myJID)
+cl = Client.new(myJID)
 cl.connect
 cl.auth(myPassword)
 

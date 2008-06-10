@@ -11,20 +11,20 @@ include Jabber
 
 class MessageTest < Test::Unit::TestCase
   def test_create
-    x = Message::new()
+    x = Message.new()
     assert_equal("message", x.name)
     assert_equal("jabber:client", x.namespace)
     assert_equal(nil, x.to)
     assert_equal(nil, x.body)
 
-    x = Message::new("lucas@linux.ensimag.fr", "coucou")
+    x = Message.new("lucas@linux.ensimag.fr", "coucou")
     assert_equal("message", x.name)
     assert_equal("lucas@linux.ensimag.fr", x.to.to_s)
     assert_equal("coucou", x.body)
   end
 
   def test_import
-    x = Message::new
+    x = Message.new
     assert_kind_of(REXML::Element, x.typed_add(REXML::Element.new('thread')))
     assert_kind_of(X, x.typed_add(REXML::Element.new('x')))
     assert_kind_of(X, x.x)
@@ -48,7 +48,7 @@ class MessageTest < Test::Unit::TestCase
   end
 
   def test_body
-    x = Message::new()
+    x = Message.new()
     assert_equal(nil, x.body)
     assert_equal(x, x.set_body("trezrze ezfrezr ezr zer ezr ezrezrez ezr z"))
     assert_equal("trezrze ezfrezr ezr zer ezr ezrezrez ezr z", x.body)
@@ -57,7 +57,7 @@ class MessageTest < Test::Unit::TestCase
   end
 
   def test_subject
-    x = Message::new
+    x = Message.new
     assert_equal(nil, x.subject)
     subject = REXML::Element.new('subject')
     subject.text = 'A'
@@ -71,7 +71,7 @@ class MessageTest < Test::Unit::TestCase
   end
 
   def test_thread
-    x = Message::new
+    x = Message.new
     assert_equal(nil, x.thread)
     thread = REXML::Element.new('thread')
     thread.text = '123'
@@ -85,18 +85,18 @@ class MessageTest < Test::Unit::TestCase
   end
 
   def test_error
-    x = Message::new()
+    x = Message.new()
     assert_equal(nil, x.error)
-    e = REXML::Element::new('error')
+    e = REXML::Element.new('error')
     x.add(e)
     # test if, after an import, the error element is successfully changed
     # into an ErrorResponse object.
-    x2 = Message::new.import(x)
+    x2 = Message.new.import(x)
     assert_equal(ErrorResponse, x2.first_element('error').class)
   end
 
   def test_answer
-    orig = Message::new
+    orig = Message.new
     orig.from = 'a@b'
     orig.to = 'b@a'
     orig.id = '123'

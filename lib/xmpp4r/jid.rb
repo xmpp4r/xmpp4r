@@ -63,7 +63,7 @@ module Jabber
     # Returns a new JID with resource removed.
     # return:: [JID]
     def strip
-      JID::new(@node, @domain)
+      JID.new(@node, @domain)
     end
     alias_method :bare, :strip
 
