@@ -14,12 +14,12 @@ Gem::Specification.new do |s|
   s.authors = AUTHORS
   s.email = EMAIL
   s.homepage = HOMEPAGE
+  s.rubyforge_project = GEM
   s.summary = SUMMARY
   s.description = s.summary
   s.platform = Gem::Platform::RUBY
 
   s.require_path = 'lib'
-  s.autorequire = 'xmpp4r'
   s.executables = []
 
   # Get this easily and accurately by running 'Dir.glob("{lib,test,data}/**/*")'
