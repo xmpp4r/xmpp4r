@@ -8,7 +8,6 @@ require 'xmpp4r/pubsub/iq/pubsub'
 module Jabber
   module PubSub
 
-
     class Configuration < XMPPElement
       ##
       # get the underlying XData form element
@@ -34,14 +33,14 @@ module Jabber
         if options
           self.form = form_for_options( form_type, options )
         end
-      end 
+      end
 
       ##
       # get a list of the configured options represented by this stanza
       # return:: [Hash] the options and their values
       def options
         configured_options = {}
-       
+
         if !form.nil?
           form.fields.each do |f|
             f.values.size == 1 ? configured_options[f.var] = f.values.first : configured_options[f.var] = f.values
@@ -50,7 +49,7 @@ module Jabber
 
         configured_options
       end
-     
+
       def node=(node)
         attributes['node'] = node
       end
@@ -58,7 +57,7 @@ module Jabber
       def node
         attributes['node']
       end
- 
+
       private
 
       ##
@@ -74,7 +73,7 @@ module Jabber
           f.values = value
           form.add(f)
         end
-      
+
         form
       end
     end

@@ -9,11 +9,11 @@ module Jabber
   module PubSub
     ##
     # NodeConfig
-    # 
+    #
     # A <configure> XMPP element for pubsub nodes, see example 123 in
     # http://www.xmpp.org/extensions/xep-0060.html#owner-create-and-configure
     class NodeConfig < Configuration
-      name_xmlns 'configure', NS_PUBSUB 
+      name_xmlns 'configure', NS_PUBSUB
 
       ##
       # Construct a <configure> element.
@@ -28,7 +28,7 @@ module Jabber
 
       private
 
-      def form_type 
+      def form_type
         'http://jabber.org/protocol/pubsub#node_config'
       end
     end
@@ -38,7 +38,7 @@ module Jabber
     # OwnerNodeConfig
     #
     # A <configure> stanza for 'Owner' use cases
-    # 
+    #
     # see example 125 in
     # http://www.xmpp.org/extensions/xep-0060.html#owner-configure-request
     class OwnerNodeConfig < NodeConfig

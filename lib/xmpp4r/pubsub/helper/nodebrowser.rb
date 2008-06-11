@@ -109,8 +109,6 @@ module Jabber
       # node:: [String]
       # return:: [Hash] with possible keys type:: [String] ,category:: [String],features:: [Array] of feature, nodeinformation:: [Jabber::XData]
       # check http://www.xmpp.org/extensions/xep-0060.html#entity for more infos
-
-
       def get_info(jid,node)
         iq = Iq.new(:get,jid)
         iq.from = @stream.jid

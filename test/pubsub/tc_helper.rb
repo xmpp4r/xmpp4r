@@ -11,8 +11,6 @@ include Jabber
 
 # Jabber.debug = true
 
-
-
 class PubSub::ServiceHelperTest < Test::Unit::TestCase
   include ClientTester
 

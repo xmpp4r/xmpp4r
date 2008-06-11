@@ -10,11 +10,11 @@ module Jabber
   module PubSub
     ##
     # SubscriptionConfig
-    # 
+    #
     # An <options> XMPP element, see example 57 in
     # http://www.xmpp.org/extensions/xep-0060.html#subscriber-configure-success
     class SubscriptionConfig < Configuration
-      name_xmlns 'options', NS_PUBSUB 
+      name_xmlns 'options', NS_PUBSUB
 
       ##
       # Construct a new Options stanza
@@ -29,7 +29,7 @@ module Jabber
         self.jid = jid
         self.options = options
         self.subid = subid
-      end   
+      end
 
       ##
       # set the 'jid' attribute of this stanza
