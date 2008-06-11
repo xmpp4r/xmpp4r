@@ -11,29 +11,31 @@ include Jabber
 
 # Jabber.debug = true
 
-
-
 class PubSub::ServiceHelperTest < Test::Unit::TestCase
   include ClientTester
 
   ##
   # subscribe_to
+  # examples 30 and 31 from
+  # http://www.xmpp.org/extensions/xep-0060.html#subscriber-subscribe
   def test_subscribe
-    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
+    pubsub = 'pubsub.example.org'
+    h = PubSub::ServiceHelper.new(@client,pubsub)
     assert_kind_of(Jabber::PubSub::ServiceHelper,h)
     state { |iq|
       assert_kind_of(Jabber::Iq,iq)
       assert_equal(:set,iq.type)
+      assert_equal(pubsub, iq.to.to_s)
+      assert_equal(@client.jid, iq.from)
       assert_equal(1, iq.children.size)
       assert_equal('http://jabber.org/protocol/pubsub', iq.pubsub.namespace)
       assert_equal(1, iq.pubsub.children.size)
       assert_equal('subscribe',iq.pubsub.children.first.name)
       assert_equal('princely_musings',iq.pubsub.children.first.attributes['node'])
-      #assert_equal(@client.jid.strip.to_s,iq.pubsub.children.first.attributes['jid'])
-      assert_equal(iq.from,iq.pubsub.children.first.attributes['jid'])
+      assert_equal(@client.jid.strip.to_s,iq.pubsub.children.first.attributes['jid'])
       send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'>
             <pubsub xmlns='http://jabber.org/protocol/pubsub'>
-                <subscription node='#{iq.pubsub.children.first.attributes['node']}' jid='#{iq.from}'
+                <subscription node='#{iq.pubsub.children.first.attributes['node']}' jid='#{iq.from.strip}'
                     subid='ba49252aaa4f5d320c24d3766f0bdcade78c78d3'
                     subscription='subscribed'/>
            </pubsub>
@@ -48,8 +50,10 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     wait_state
   end
 
-=begin
-  # not implemented yet
+  ##
+  # subscribe error condition
+  # example 44 from
+  # http://www.xmpp.org/extensions/xep-0060.html#subscriber-subscribe-configure
   def test_subscribe_configuration_required
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
     assert_kind_of(PubSub::ServiceHelper,h)
@@ -63,15 +67,15 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       assert_equal('princely_musings',iq.pubsub.children.first.attributes['node'])
       assert_equal(@client.jid.strip.to_s,iq.pubsub.children.first.attributes['jid'])
       send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'>
-      <pubsub xmlns='http://jabber.org/protocol/pubsub'>
-          <subscription node='#{iq.pubsub.children.first.attributes['node']}' jid='#{iq.from}'
-            subid='ba49252aaa4f5d320c24d3766f0bdcade78c78d3'
-          subscription='unconfigured'/>
-   <subscribe-options>
-     <required/>
-   </subscribe-options>
-      </pubsub>
-   </iq>")
+		    <pubsub xmlns='http://jabber.org/protocol/pubsub'>
+		        <subscription node='#{iq.pubsub.children.first.attributes['node']}' jid='#{iq.from.strip}'
+		        subid='ba49252aaa4f5d320c24d3766f0bdcade78c78d3'
+		        subscription='unconfigured'/>
+			<subscribe-options>
+			  <required/>
+			</subscribe-options>
+	 	   </pubsub>
+	  </iq>")
     }
     subscription = h.subscribe_to('princely_musings')
     assert_kind_of(Jabber::PubSub::Subscription,subscription)
@@ -81,8 +85,11 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     assert_equal(:unconfigured,subscription.subscription)
     wait_state
   end
-=end
 
+  ##
+  # subscribe error condition
+  # example 43 from
+  # http://www.xmpp.org/extensions/xep-0060.html#subscriber-subscribe-approval
   def test_subscribe_approval_required
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
     assert_kind_of(PubSub::ServiceHelper,h)
@@ -96,11 +103,12 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       assert_equal('princely_musings',iq.pubsub.children.first.attributes['node'])
       assert_equal(@client.jid.strip.to_s,iq.pubsub.children.first.attributes['jid'])
       send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'>
-            <pubsub xmlns='http://jabber.org/protocol/pubsub'>
-              <subscription node='#{iq.pubsub.children.first.attributes['node']}' jid='#{iq.from}'
-                subid='ba49252aaa4f5d320c24d3766f0bdcade78c78d3'
-                subscription='pending'/>
-            </pubsub>
+		          <pubsub xmlns='http://jabber.org/protocol/pubsub'>
+                <subscription node='#{iq.pubsub.children.first.attributes['node']}' jid='#{iq.from.strip}'
+				          subid='ba49252aaa4f5d320c24d3766f0bdcade78c78d3'
+                  subscription='pending'/>
+			
+              </pubsub>
             </iq>")
     }
     subscription = h.subscribe_to('princely_musings')
@@ -113,9 +121,10 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     wait_state
   end
 
-
   ##
-  # unsubscribe_from
+  # unsubscribe from
+  # examples 48 and 49 from
+  # http://www.xmpp.org/extensions/xep-0060.html#subscriber-unsubscribe-request
   def test_unsubscribe
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
     assert_kind_of(PubSub::ServiceHelper,h)
@@ -128,19 +137,92 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       assert_equal('unsubscribe',iq.pubsub.children.first.name)
       assert_equal('princely_musings',iq.pubsub.children.first.attributes['node'])
       assert_equal(@client.jid.strip.to_s,iq.pubsub.children.first.attributes['jid'])
-      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'>
-            <pubsub xmlns='http://jabber.org/protocol/pubsub'>
-                <unsubscribe node='#{iq.pubsub.children.first.attributes['node']}' jid='#{iq.from}'/>
-           </pubsub>
-           </iq>")
+      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
     }
     unsubscribe = h.unsubscribe_from('princely_musings')
-    assert_equal(true,unsubscribe)
+    assert_equal(true, unsubscribe)
     wait_state
   end
 
+  ##
+  # get subscription options
+  # examples 56 and 57 from
+  # http://www.xmpp.org/extensions/xep-0060.html#subscriber-configure-request
+  def test_get_subscription_options
+    pubsub = Jabber::JID.new('pubsub.example.org')
+    node = 'princely_musings'
+    jid = Jabber::JID.new('test@test.com/test')
+    h = PubSub::ServiceHelper.new(@client, pubsub)
 
+    state { |iq|
+      assert_kind_of(Jabber::Iq, iq)
+      assert_equal(:get, iq.type)
+      assert_equal(pubsub, iq.to)
+      assert_kind_of(Jabber::PubSub::SubscriptionConfig, iq.pubsub.first_element('options'))
+      assert_equal(node, iq.pubsub.first_element('options').node)
+      assert_equal(jid.strip, iq.pubsub.first_element('options').jid)
 
+      send( "<iq type='result'
+        from='#{iq.to}'
+        to='#{iq.from}'
+        id='#{iq.id}'>
+        <pubsub xmlns='http://jabber.org/protocol/pubsub'>
+          <options node='#{iq.pubsub.first_element('options').node}' jid='#{iq.pubsub.first_element('options').jid}'>
+            <x xmlns='jabber:x:data' type='form'>
+            <field var='FORM_TYPE' type='hidden'>
+              <value>http://jabber.org/protocol/pubsub#subscribe_options</value>
+            </field>
+            <field var='pubsub#deliver' type='boolean'
+              label='Enable delivery?'>
+              <value>1</value>
+            </field>
+            </x>
+          </options>
+        </pubsub>
+        </iq>")
+    }
+
+    options = h.get_options_from(node, jid)
+    assert_kind_of(Jabber::PubSub::SubscriptionConfig, options)
+    assert_equal({'pubsub#deliver'=>'1'}, options.options)
+    wait_state
+  end
+
+  ##
+  # set subscription options
+  # examples 65 and 66 from
+  # http://www.xmpp.org/extensions/xep-0060.html#subscriber-configure-submit
+  def test_get_subscription_options
+    pubsub = Jabber::JID.new('pubsub.example.org')
+    node = 'princely_musings'
+    jid = Jabber::JID.new('test@test.com/test')
+    options = {'pubsub#deliver' => '0'}
+    h = PubSub::ServiceHelper.new(@client, pubsub)
+
+    state { |iq|
+      assert_kind_of(Jabber::Iq, iq)
+      assert_equal(:set, iq.type)
+      assert_equal(pubsub, iq.to)
+      assert_kind_of(Jabber::PubSub::SubscriptionConfig, iq.pubsub.first_element('options'))
+      assert_equal(node, iq.pubsub.first_element('options').node)
+      assert_equal(jid.strip, iq.pubsub.first_element('options').jid)
+
+      send( "<iq type='result'
+        from='#{iq.to}'
+        to='#{iq.from}'
+        id='#{iq.id}'/>")
+    }
+
+    assert_nothing_raised do
+      assert_equal(true, h.set_options_for(node, jid, options) )
+    end
+    wait_state
+  end
+
+  ##
+  # create node with default configuration
+  # example 119 and 121 from
+  # http://www.xmpp.org/extensions/xep-0060.html#owner-create-default
   def test_create
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
     assert_kind_of(PubSub::ServiceHelper, h)
@@ -150,20 +232,25 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       assert_equal(:set, iq.type)
       assert_equal(1, iq.children.size)
       assert_equal('http://jabber.org/protocol/pubsub', iq.pubsub.namespace)
-      assert_equal(1, iq.pubsub.children.size)
+      assert_equal(2, iq.pubsub.children.size)
       assert_equal('create', iq.pubsub.children.first.name)
       assert_equal('mynode', iq.pubsub.children.first.attributes['node'])
-      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'>
-              <pubsub xmlns='http://jabber.org/protocol/pubsub'>
-                <create node='#{iq.pubsub.children.first.attributes['node']}'/>
-              </pubsub>
-            </iq>")
+      assert_equal('configure', iq.pubsub.children[1].name)
+      assert_equal({}, iq.pubsub.children[1].attributes)
+      assert_equal([], iq.pubsub.children[1].children)
+      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
     }
     assert_equal('mynode', h.create_node('mynode'))
     wait_state
   end
 
+  ##
+  # create node with configuration
+  # example 123 and 124 from
+  # http://www.xmpp.org/extensions/xep-0060.html#owner-create-and-configure
   def test_create_configure
+    node = 'mynode'
+    options = {'pubsub#access_model'=>'open'}
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 
     state { |iq|
@@ -173,26 +260,23 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       assert_equal('http://jabber.org/protocol/pubsub', iq.pubsub.namespace)
       assert_equal(2, iq.pubsub.children.size)
       assert_equal('create', iq.pubsub.children.first.name)
-      assert_equal('mynode', iq.pubsub.children.first.attributes['node'])
-      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'>
-              <pubsub xmlns='http://jabber.org/protocol/pubsub'>
-                <create node='#{iq.pubsub.children.first.attributes['node']}'/>
-              </pubsub>
-            </iq>")
+      assert_equal(node, iq.pubsub.children.first.attributes['node'])
+      assert_kind_of(Jabber::PubSub::NodeConfig, iq.pubsub.children[1])
+      assert_equal(options, iq.pubsub.children[1].options)
+      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
     }
 
-    form = Jabber::Dataforms::XData.new :submit
-    pubsub_config = Jabber::Dataforms::XDataField.new('FORM_TYPE', :hidden)
-    pubsub_config.values = 'http://jabber.org/protocol/pubsub#node_config'
-    form.add pubsub_config
-    f = Jabber::Dataforms::XDataField.new('pubsub#access_model')
-    f.values = 'open'
-    form.add f
+    assert_nothing_raised do
+      assert_equal(node, h.create_node(node, Jabber::PubSub::NodeConfig.new(node, options)))
+    end
 
-    assert_nothing_raised { h.create_node('mynode', form) }
     wait_state
   end
 
+  ##
+  # delete node
+  # example 144 and 145 from
+  # http://www.xmpp.org/extensions/xep-0060.html#owner-delete-request
   def test_delete
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 
@@ -209,7 +293,12 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     wait_state
   end
 
+  ##
+  # publish to a node
+  # example 88 and 89 from
+  # http://www.xmpp.org/extensions/xep-0060.html#publisher-publish
   def test_publish
+    node = 'mynode'
     item1 = Jabber::PubSub::Item.new
     item1.text = 'foobar'
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
@@ -219,16 +308,21 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       assert_equal(1, iq.children.size)
       assert_equal(1, iq.pubsub.children.size)
       assert_equal('publish', iq.pubsub.children[0].name)
+      assert_equal(node, iq.pubsub.children[0].attributes['node'])
       assert_equal(1, iq.pubsub.children[0].children.size)
       assert_equal('item', iq.pubsub.children[0].children[0].name)
       assert_equal(1, iq.pubsub.children[0].children[0].children.size)
       assert_equal(item1.children.to_s, iq.pubsub.children[0].children[0].children[0].to_s)
       send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
     }
-    h.publish_item_to('mynode', item1)
+    assert_nothing_raised { h.publish_item_to(node, item1) }
     wait_state
   end
 
+  ##
+  # publish item with id
+  # example 88 and 89 from
+  # http://www.xmpp.org/extensions/xep-0060.html#publisher-publish
   def test_publish_pubsub_item_with_id
     item1 = Jabber::PubSub::Item.new
     item1.text = 'foobar'
@@ -247,14 +341,30 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       assert_equal(item1.children.to_s, iq.pubsub.children[0].children[0].children[0].to_s)
       send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
     }
-    h.publish_item_with_id_to('mynode', item1,"blubb")
+    assert_nothing_raised { h.publish_item_with_id_to('mynode', item1,"blubb") }
     wait_state
   end
 
-=begin
-# i dont know how to catch the runtime error - if you know please fix :)
+  ##
+  # publish item and trap client-side error
+  # examples 88 from
+  # http://www.xmpp.org/extensions/xep-0060.html#publisher-publish
+  def test_publish_pubsub_item_with_id_and_produce_a_local_error
+    item1 = 'foobarbaz'
+    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
+
+    assert_raise RuntimeError do h.publish_item_with_id_to('mynode', item1,"blubb") end
+  end
+  
+  ##
+  # publish item and trap server-side error
+  # examples 88 from
+  # http://www.xmpp.org/extensions/xep-0060.html#publisher-publish
+  # and 93 from
+  # http://www.xmpp.org/extensions/xep-0060.html#publisher-publish-error-forbidden
   def test_publish_pubsub_item_with_id_and_produce_an_error
-    item1 = "foobar"
+    item1 = Jabber::PubSub::Item.new
+    item1.text = "foobarbaz"
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 
     state { |iq|
@@ -268,13 +378,24 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       assert_equal('blubb', iq.pubsub.children[0].children[0].attributes['id'] )
       assert_equal(1, iq.pubsub.children[0].children[0].children.size)
       assert_equal(item1.children.to_s, iq.pubsub.children[0].children[0].children[0].to_s)
-      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
+      send("<iq type='error' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>
+      <pubsub xmlns='http://jabber.org/protocol/pubsub'>
+        <publish node='#{iq.pubsub.children[0].attributes['node']}'>
+          <item id='#{iq.pubsub.children[0].children[0].attributes['id']}'/>
+       </publish>
+      </pubsub>
+      <error type='auth'>
+        <forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
+      </error>")
     }
-    h.publish_item_with_id_to('mynode', item1,"blubb")
+    assert_raise Jabber::ErrorException do h.publish_item_with_id_to('mynode', item1,"blubb") end
     wait_state
   end
-=end
 
+  ##
+  # retrieve all items
+  # examples 70 and 71 from
+  # http://www.xmpp.org/extensions/xep-0060.html#subscriber-retrieve-returnall 
   def test_items
     item1 = Jabber::PubSub::Item.new("1")
     item1.text = 'foobar'
@@ -282,7 +403,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     item2.text = 'barfoo'
 
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
-
+    
     state { |iq|
       assert_kind_of(Jabber::Iq, iq)
       assert_equal(:get, iq.type)
@@ -308,6 +429,10 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     wait_state
   end
 
+  ##
+  # get affiliation
+  # example 184 and 185 from
+  # http://www.xmpp.org/extensions/xep-0060.html#owner-affiliations-retrieve-success1
   def test_affiliations
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 
@@ -340,6 +465,8 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
 
   ##
   # get_subscriptions_from
+  # example 171 and 172 from
+  # http://www.xmpp.org/extensions/xep-0060.html#owner-subscriptions-retrieve-request
   def test_subscriptions
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
     state { |iq|
@@ -373,7 +500,10 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     wait_state
   end
 
-
+  ##
+  # get_subscribers
+  # example 171 and 172 from
+  # http://www.xmpp.org/extensions/xep-0060.html#owner-subscriptions-retrieve
   def test_subscribers
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 
@@ -441,7 +571,8 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     wait_state
   end
 
-
+  ##
+  # get all subscriptions with no subscriptions 
   def test_get_all_subscriptions_with_no_subscriptions
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 
@@ -463,9 +594,45 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     wait_state
   end
 
+  ##
+  # get configuration for a node
+  # example 125 and 126 from
+  # http://www.xmpp.org/extensions/xep-0060.html#owner-configure-request
+  def test_get_node_config
+    pubsub = 'pubsub.example.org'
+    h = PubSub::ServiceHelper.new(@client, pubsub)
+
+    state { |iq|
+      assert_kind_of(Jabber::Iq, iq)
+      assert_equal(:get, iq.type)
+      assert_equal(pubsub, iq.to.to_s)
+      assert_kind_of(Jabber::PubSub::OwnerNodeConfig, iq.pubsub.first_element('configure'))
+
+      send( "<iq type='result'
+        from='#{iq.to}'
+        to='#{iq.from}'
+        id='#{iq.id}'>
+        <pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>
+          <configure node='princely_musings'>
+            <x xmlns='jabber:x:data' type='form'>
+              <field var='FORM_TYPE' type='hidden'>
+                <value>http://jabber.org/protocol/pubsub#node_config</value>
+              </field>
+              <field var='pubsub#title' type='text-single'
+               label='A friendly name for the node'/>
+            </x>
+          </configure>
+        </pubsub>
+        </iq>")
+    }
+
+    config = h.get_config_from('princelymusings')
+    assert_kind_of(Jabber::PubSub::OwnerNodeConfig, config)
+    wait_state
+  end
+
   def test_to_s
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
     assert_equal('pubsub.example.org',h.to_s)
   end
-
 end
