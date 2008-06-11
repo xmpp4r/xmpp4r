@@ -4,20 +4,20 @@
 #
 # It's recommented to read the XEP-0066 before you use this Helper. (Maybe its 
 # better not use the helper for now ) ;)
-# The whole code is buggy - you have been warned!
+# The whole code is getting better, but may still contain bugs - be careful!
 # 
 # Maybe the following structure is good 
 # ( taken form the xep-0060 )
 #
 # entity usecases
-#  retrieve all suscriptions
+#  retrieve all subscriptions
 #  retrieve all affiliations
 # NOTE: the disco stuff will done by the nodebrowserhelper
-# subscriber usecases 
+# subscriber usecases
 #   subscribe
 #   unsubscribe
 #   configure subscription options
-#   retrive items from a node
+#   retrieve items from a node
 # publisher usecases
 #   publish a item to a node
 #   delete a item from a node
@@ -29,7 +29,7 @@
 #   purge all node items
 #   manage subscription requests
 #   process pending subscriptions
-#   manage subscriptions 
+#   manage subscriptions
 #   manage affiliations
 #  
 # collection nodes
@@ -77,8 +77,8 @@ module Jabber
           if reply.pubsub.first_element('subscriptions')
             res = []
             reply.pubsub.first_element('subscriptions').each_element('subscription') { |subscription|
-    	        res << Jabber::PubSub::Subscription.import(subscription)
-             } 
+              res << Jabber::PubSub::Subscription.import(subscription)
+            }
           end
           true
         }
@@ -107,28 +107,25 @@ module Jabber
       end
 
       ##
-      # Unsubscibe from a node with an optional subscription id
+      # Unsubscribe from a node with an optional subscription id
       #
       # May raise ErrorException
       # node:: [String]
-      # subid:: [String] or nil
+      # subid:: [String] or nil (not supported)
       # return:: true
       def unsubscribe_from(node,subid=nil)
         iq = basic_pubsub_query(:set)
-	unsub = PubSub::Unsubscribe.new
-	unsub.node = node
-	unsub.jid = @stream.jid.strip
+        unsub = PubSub::Unsubscribe.new
+        unsub.node = node
+        unsub.jid = @stream.jid.strip
         iq.pubsub.add(unsub)
         ret = false
         @stream.send_with_id(iq) { |reply| 
           ret = reply.kind_of?(Jabber::Iq) and reply.type == :result
+          true
         } # @stream.send_with_id(iq)
         ret
       end
-      
-      
-      
-      
       
       ##
       # gets all items from a pubsub node
@@ -154,20 +151,19 @@ module Jabber
       end
 
       ##
-      # NOTE: this method sends only one item per publish request because some services may not
-      # allow batch processing
-      # maybe this will changed in the future
+      # NOTE: this method sends only one item per publish request because some services 
+      # may not allow batch processing.  Maybe this will changed in the future?
       # node:: [String]
       # item:: [Jabber::PubSub::Item]
       # return:: true
-      # it automaticly generates a id for the item 
+      # it automatically generates an id for the item 
       def publish_item_to(node,item)
         iq = basic_pubsub_query(:set)
 	publish = iq.pubsub.add(REXML::Element.new('publish'))
         publish.attributes['node'] = node
         
         if item.kind_of?(Jabber::PubSub::Item)
-    	  item.id = Jabber::IdGenerator.generate_id
+          item.id = Jabber::IdGenerator.generate_id
           publish.add(item)
           @stream.send_with_id(iq) { |reply| true }
         end
@@ -195,21 +191,21 @@ module Jabber
       end
 
       ##
-      # purges all items on a persist node
+      # purges all items on a persistent node
       # node:: [String]
       # return:: true
       def purge_items_from(node)
         iq = basic_pubsub_query(:set)
-	purge = REXML::Element.new('purge')
-	purge.attributes['node'] = node
-	iq.pubsub.add(purge)
-	@stream.send_with_id(iq) { |reply| true }
+        purge = REXML::Element.new('purge')
+        purge.attributes['node'] = node
+        iq.pubsub.add(purge)
+        @stream.send_with_id(iq) { |reply| true }
       end
 
       ##
       # Create a new node on the pubsub service
       # node:: [String] you node name - otherwise you get a automaticly generated one (in most cases)
-      # configure:: [Jabber::PubSub::Configure] if you want to configure you node (default nil)
+      # configure:: [Jabber::PubSub::NodeConfig] if you want to configure your node (default nil)
       # return:: [String]
       def create_node(node = nil, configure = Jabber::PubSub::NodeConfig.new)
         rnode = nil
@@ -276,7 +272,7 @@ module Jabber
       def get_affiliations(node = nil)
         iq = basic_pubsub_query(:get)
         affiliations = iq.pubsub.add(REXML::Element.new('affiliations'))
-	affiliations.attributes['node'] = node
+        affiliations.attributes['node'] = node
         res = nil
         @stream.send_with_id(iq) { |reply|
           if reply.pubsub.first_element('affiliations')
@@ -310,11 +306,11 @@ module Jabber
         @stream.send_with_id(iq) { |reply|
           if reply.pubsub.first_element('subscriptions')
             res = []
-	    if reply.pubsub.first_element('subscriptions').attributes['node'] == node
+            if reply.pubsub.first_element('subscriptions').attributes['node'] == node
               reply.pubsub.first_element('subscriptions').each_element('subscription') { |subscription|
     	        res << PubSub::Subscription.import(subscription)
               } 
-	    end
+            end
           end
           true
         }
@@ -328,7 +324,6 @@ module Jabber
       def get_subscribers_from(node)
         res = []
         get_subscriptions_from(node).each { |sub|
-	 
           res << sub.jid
         }
         res
@@ -392,13 +387,13 @@ module Jabber
       # type:: [Symbol]
       def basic_pubsub_query(type,ownerusecase = false)
         iq = Jabber::Iq::new(type,@pubsubjid)
-	if ownerusecase 
-	  iq.add(IqPubSubOwner.new)
+        if ownerusecase
+          iq.add(IqPubSubOwner.new)
 	else
           iq.add(IqPubSub.new)
-	end
+        end
         iq.from = @stream.jid #.strip
-	iq
+        iq
       end
 
       ##
