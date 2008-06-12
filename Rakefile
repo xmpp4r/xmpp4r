@@ -83,6 +83,7 @@ begin
     pkg.need_tar = true
   end
 
+  desc "Build and install Gem locally"
   task :install_gem => [:package] do
     sh %{sudo gem install pkg/#{GEM}-#{VER}}
   end
