@@ -24,7 +24,7 @@ Rake::GemPackageTask.new(spec) do |pkg|
   pkg.need_tar = true
 end
 
-task :install => [:package] do
+task :install_gem => [:package] do
   sh %{sudo gem install pkg/#{GEM}-#{VER}}
 end
 
