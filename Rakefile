@@ -1,31 +1,55 @@
+#!/usr/bin/ruby -w
+
 require 'rake'
-require 'rake/gempackagetask'
 require 'rake/testtask'
+require 'rake/packagetask'
 require 'rake/rdoctask'
 require 'find'
 
 begin
-  require 'rubygems'
   require 'rcov/rcovtask'
   RCOV = true
 rescue LoadError
   RCOV = false
 end
 
-task :default => [:test]
+PKG_NAME = 'xmpp4r'
+PKG_VERSION = '0.3.2'
 
-# read the contents of the gemspec, eval it, and assign it to 'spec'
-# this lets us maintain all gemspec info in one place.  Nice and DRY.
-spec = eval(IO.read("xmpp4r.gemspec"))
-
-Rake::GemPackageTask.new(spec) do |pkg|
-  pkg.gem_spec = spec
-  pkg.need_zip = true
-  pkg.need_tar = true
+PKG_FILES = ['ChangeLog', 'README', 'COPYING', 'LICENSE', 'setup.rb', 'Rakefile', 'UPDATING']
+Find.find('lib/', 'data/', 'test/', 'tools/') do |f|
+  if FileTest.directory?(f) and f =~ /\.svn/
+    Find.prune
+  else
+    PKG_FILES << f
+  end
 end
 
-task :install_gem => [:package] do
-  sh %{sudo gem install pkg/#{GEM}-#{VER}}
+Rake::PackageTask.new(PKG_NAME, PKG_VERSION) do |p|
+  p.need_tar = true
+  p.package_files = PKG_FILES
+end
+
+begin
+  require 'rubygems'
+  require 'rake/gempackagetask'
+
+  # read the contents of the gemspec, eval it, and assign it to 'spec'
+  # this lets us maintain all gemspec info in one place.  Nice and DRY.
+  spec = eval(IO.read("xmpp4r.gemspec"))
+
+  Rake::GemPackageTask.new(spec) do |pkg|
+    pkg.gem_spec = spec
+    pkg.need_zip = true
+    pkg.need_tar = true
+  end
+
+  task :install_gem => [:package] do
+    sh %{sudo gem install pkg/#{GEM}-#{VER}}
+  end
+
+rescue LoadError
+  puts "Will not generate Rubygem"
 end
 
 Rake::TestTask.new do |t|
