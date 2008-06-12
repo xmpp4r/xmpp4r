@@ -16,7 +16,7 @@ class JIDTest < Test::Unit::TestCase
     assert_kind_of(Class, Jabber::Client)
     assert_kind_of(Class, Jabber::Component)
     assert_kind_of(Class, Jabber::Connection)
-    assert_kind_of(Class, Jabber::Error)
+    assert_kind_of(Class, Jabber::ErrorResponse)
     assert_kind_of(Class, Jabber::ServerError)
     assert_kind_of(Class, Jabber::IdGenerator)
     assert_kind_of(Class, Jabber::Iq)

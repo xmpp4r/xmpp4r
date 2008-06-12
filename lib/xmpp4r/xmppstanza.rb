@@ -3,7 +3,7 @@
 # Website::http://home.gna.org/xmpp4r/
 
 require 'xmpp4r/xmppelement'
-require 'xmpp4r/error'
+require 'xmpp4r/errors'
 require 'xmpp4r/jid'
 
 module Jabber
