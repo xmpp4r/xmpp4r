@@ -1,0 +1,558 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<title>XMPP4R: XMPP/Jabber Library for Ruby</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<meta name="keywords" content="xmpp,jabber,library,ruby"/>
+	<meta name="description" content="XMPP4R is a XMPP/Jabber library for Ruby"/>
+	<link rel="stylesheet" type="text/css" href="xmpp4r.css" />
+</head>
+
+<body>
+
+<div class="menu">
+<a href="#introduction">Introduction</a> | 
+<a href="#related">Related Projects</a> | 
+<a href="#download">Download</a> | 
+<a href="#installation">Installation</a> |
+<a href="#developer">Mailing Lists &amp; Developers</a> |
+<a href="rdoc/">RDOC Documentation</a> |
+<a href="http://gna.org/projects/xmpp4r/">GNA project page</a>
+</div>
+
+<div class="main">
+
+<div class="titre">
+<h1>XMPP4R</h1>
+</div>
+
+<a name="introduction"></a>
+<h2>Introduction</h2>
+
+<p>XMPP4R is a <a href="http://www.xmpp.org/">XMPP</a>/<a
+href="http://www.jabber.org/">Jabber</a> library for <a
+href="http://www.ruby-lang.org/">Ruby</a>. Its goal is to provide a complete
+framework to develop Jabber-related applications or scripts in Ruby.</p>
+
+<h3>Features</h3>
+<ul>
+<li>Fully object-oriented (well, it's Ruby ;)</li>
+<li>Aims at being XMPP compliant</li>
+<!--li>Threaded and non-threaded mode</li-->
+<li>Threaded</li>
+<li>Well unit-tested and documented code</li>
+<li>Uses well-known and well-tested software like REXML, instead of reinventing the wheel</li>
+<li>Very easy to extend</li>
+<li>Released under <a href="http://www.ruby-lang.org/en/LICENSE.txt">Ruby's license</a>, which is compatible with the <a href="http://www.gnu.org/copyleft/gpl.html">GNU GPL</a> via an explicit dual-licensing clause.</li>
+</ul>
+
+<h3>Current status</h3>
+
+<p>You can basically do everything you want with XMPP4R, especially if you are willing to hack some code in the library itself. All the base classes can be considered stable, and their interface shouldn't change in the future.</p>
+
+<p>The features which are currently implemented are:</p>
+<table class="features">
+<thead>
+<tr>
+  <th class="axis">Feature</th>
+  <th>0.3 release</th>
+  <th>0.3.1 release</th>
+  <th>0.3.2 release</th>
+  <th>GIT tree</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+	<td class="axis">TLS support</td>
+	<td>Basic</td>
+	<td>Basic</td>
+	<td>Basic</td>
+	<td>Basic</td>
+</tr>
+<tr>
+  <td class="axis">SASL authentication</td>
+  <td>Basic</td>
+  <td>Basic &amp; fixed</td>
+  <td>Basic &amp; fixed</td>
+  <td>Basic &amp; fixed</td>
+</tr>
+<tr>
+	<td class="axis">XMPP stanza processing</td>
+	<td>Present</td>
+	<td>Present &amp; fixed</td>
+	<td>Fixed &amp; enhanced</td>
+	<td>Fixed &amp; enhanced</td>
+</tr>
+<tr>
+	<td class="axis">XMPP stanza id generating</td>
+	<td>Present</td>
+	<td>Present</td>
+	<td>Present</td>
+	<td>Present</td>
+</tr>
+<tr>
+	<td class="axis">JID processing</td>
+	<td>Rewritten</td>
+	<td>Rewritten</td>
+	<td>Rewritten</td>
+	<td>Rewritten</td>
+</tr>
+<tr>
+	<td class="axis">message processing</td>
+	<td>Complete</td>
+	<td>Complete</td>
+	<td>Complete</td>
+	<td>Complete</td>
+</tr>
+<tr>
+	<td class="axis">presence processing</td>
+	<td>Complete</td>
+	<td>Complete</td>
+	<td>Complete</td>
+	<td>Complete</td>
+</tr>
+<tr>
+	<td class="axis">iq processing</td>
+	<td>Present</td>
+	<td>Present</td>
+	<td>Present</td>
+	<td>Present</td>
+</tr>
+<tr>
+	<td class="axis">XMPP stanza error responses</td>
+	<td>Present</td>
+	<td>Present</td>
+	<td>Present</td>
+	<td>Present</td>
+</tr>
+<tr>
+	<td class="axis">Client SRV lookup capability</td>
+	<td>Present</td>
+	<td>Present</td>
+	<td>Present</td>
+	<td>Present</td>
+</tr>
+<tr>
+	<td class="axis">Client digest authentication</td>
+	<td>Complete</td>
+	<td>Complete</td>
+	<td>Complete</td>
+	<td>Complete</td>
+</tr>
+<tr>
+	<td class="axis">Component digest authentication</td>
+	<td>Complete</td>
+	<td>Complete</td>
+	<td>Complete</td>
+	<td>Complete</td>
+</tr>
+<tr>
+	<td class="axis">Roster protocol</td>
+	<td>Complete</td>
+	<td>Complete</td>
+	<td>Complete</td>
+	<td>Complete</td>
+</tr>
+<tr>
+	<td class="axis">Roster helper</td>
+	<td>Present</td>
+	<td>Present</td>
+	<td>Present</td>
+	<td>Present</td>
+</tr>
+<tr>
+	<td class="axis">vCard (<a href="http://www.xmpp.org/extensions/xep-0054.html">JEP-0054</a>) handling</td>
+	<td>Complete</td>
+	<td>Complete</td>
+	<td>Complete</td>
+	<td>Complete</td>
+</tr>
+<tr>
+	<td class="axis">vCard helper</td>
+	<td>Present</td>
+	<td>Present &amp; fixed</td>
+	<td>Present &amp; fixed</td>
+	<td>Present &amp; fixed</td>
+</tr>
+<tr>
+	<td class="axis">Software Version (<a href="http://www.xmpp.org/extensions/xep-0092.html">JEP-0092</a>) protocol</td>
+	<td>Complete</td>
+	<td>Complete</td>
+	<td>Complete</td>
+	<td>Complete</td>
+</tr>
+<tr>
+	<td class="axis">Software Version (<a href="http://www.xmpp.org/extensions/xep-0092.html">JEP-0092</a>) helper</td>
+	<td>Complete</td>
+	<td>Complete</td>
+	<td>Complete</td>
+	<td>Complete</td>
+</tr>
+<tr>
+	<td class="axis">Service Discovery (<a href="http://www.xmpp.org/extensions/xep-0030.html">JEP-0030</a>) protocol</td>
+	<td>Complete</td>
+	<td>Complete</td>
+	<td>Complete</td>
+	<td>Complete</td>
+</tr>
+<tr>
+	<td class="axis">jabber:x namespaces support</td>
+	<td>Present</td>
+	<td>Present</td>
+	<td>Present</td>
+	<td>Present</td>
+</tr>
+<tr>
+	<td class="axis">Roster Item Exchange (<a href="http://www.xmpp.org/extensions/xep-0144.html">JEP-0144</a>) protocol</td>
+	<td>Present</td>
+	<td>Present</td>
+	<td>Present</td>
+	<td>Present</td>
+</tr>
+<tr>
+	<td class="axis">Delayed Delivery (<a href="http://www.xmpp.org/extensions/xep-0091.html">JEP-0091</a>) protocol</td>
+	<td>Present</td>
+	<td>Present</td>
+	<td>Present</td>
+	<td>Present</td>
+</tr>
+<tr>
+	<td class="axis">MUC (<a href="http://www.xmpp.org/extensions/xep-0045.html">JEP-0045</a>) protocol</td>
+	<td>Basic</td>
+	<td>Basic</td>
+	<td>Basic</td>
+	<td>Basic</td>
+</tr>
+<tr>
+	<td class="axis">Multi-User Chat helpers</td>
+	<td>Basic</td>
+	<td>Basic</td>
+	<td>Basic</td>
+	<td>Basic</td>
+</tr>
+<tr>
+	<td class="axis">Data Forms support</td>
+	<td>Basic</td>
+	<td>Basic</td>
+	<td>Basic</td>
+	<td>Basic</td>
+</tr>
+<tr>
+  <td class="axis">Stream Initiation (<a href="http://www.xmpp.org/extensions/xep-0095.html">JEP-0095</a>) support</td>
+	<td>Basic</td>
+	<td>Basic</td>
+	<td>Basic</td>
+	<td>Basic</td>
+</tr>
+<tr>
+  <td class="axis">SOCKS5 Bytestreams (<a href="http://www.xmpp.org/extensions/xep-0065.html">JEP-0065</a>) support</td>
+	<td>Basic</td>
+	<td>Basic</td>
+	<td>Basic</td>
+	<td>Basic</td>
+</tr>
+<tr>
+  <td class="axis">SOCKS5 Bytestreams helper</td>
+	<td>Basic</td>
+	<td>Improved</td>
+	<td>Improved</td>
+	<td>Improved</td>
+</tr>
+<tr>
+  <td class="axis">In-Band Bytestreams helper</td>
+	<td>Basic</td>
+	<td>Basic</td>
+	<td>Basic</td>
+	<td>Basic</td>
+</tr>
+<tr>
+  <td class="axis">File Transfer helper</td>
+	<td>Basic</td>
+	<td>Basic &amp; fixed</td>
+	<td>Basic &amp; fixed</td>
+	<td>Basic &amp; fixed</td>
+</tr>
+<tr>
+  <td class="axis">Jabber RPC (<a href="http://www.xmpp.org/extensions/xep-0009.html">JEP-0009</a>) support</td>
+	<td></td>
+	<td></td>
+	<td>Basic</td>
+	<td>Basic</td>
+</tr>
+<tr>
+  <td class="axis">HTTP Binding (<a href="http://www.xmpp.org/extensions/xep-0124.html">JEP-0124</a>) support</td>
+	<td></td>
+	<td></td>
+	<td>Basic</td>
+	<td>Basic</td>
+</tr>
+<tr>
+  <td class="axis">Publish-Subscribe (<a href="http://www.xmpp.org/extensions/xep-0060.html">JEP-0060</a>) support</td>
+	<td></td>
+	<td></td>
+	<td>Experimental</td>
+	<td>Experimental</td>
+</tr>
+</tbody>
+</table>
+
+<p>A lot of examples are shipped with XMPP4R (see <i>/usr/share/doc/xmpp4r/examples/</i> or <i>/usr/local/share/doc/xmpp4r/examples/</i>, depending on how you installed XMPP4R), including:</p>
+
+<table class="features" id="examples">
+<thead>
+<tr>
+  <th>Filename</th>
+  <th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="subcaption" colspan="2"><i>Basic examples</i></td>
+</tr>
+<tr>
+	<td class="filename axis">basic/change_password.rb</td>
+	<td>Change the password of an account on the command-line</td>
+</tr>
+<tr>
+	<td class="filename axis">basic/client.rb</td>
+	<td>console-only jabber client</td>
+</tr>
+<tr>
+	<td class="filename axis">basic/component.rb</td>
+	<td>very basic jabber component</td>
+</tr>
+<tr>
+	<td class="filename axis">basic/echo_threaded.rb</td>
+	<td>Auto-responder that just repeats what you say to it.<br/>This version uses thread.</td>
+</tr>
+<tr>
+	<td class="filename axis">basic/echo_nonthreaded.rb</td>
+	<td>Auto-responder that just repeats what you say to it.<br/>This version waits for calls to <i>process()</i> to process messages.</td>
+</tr>
+<tr>
+	<td class="filename axis">basic/jabbersend.rb</td>
+	<td>Sends a message to a specified JID.</td>
+</tr>
+<tr>
+	<td class="filename axis">basic/mass_sender.rb</td>
+	<td>Sends a message to a list of JIDs.</td>
+</tr>
+<tr>
+	<td class="filename axis">basic/mucinfo.rb</td>
+  <td>Retrieve a list of rooms from a MUC component.</td>
+</tr>
+<tr>
+	<td class="filename axis">basic/mucsimplebot.rb</td>
+  <td>Demonstration of SimpleMUCClient usage.</td>
+</tr>
+<tr>
+	<td class="filename axis">basic/register.rb</td>
+	<td>Register a new user account on a server.</td>
+</tr>
+<tr>
+	<td class="filename axis">basic/remove_registration.rb</td>
+  <td>Remove registration on a server.</td>
+</tr>
+<tr>
+	<td class="filename axis">basic/roster.rb</td>
+	<td>Get a user's roster.</td>
+</tr>
+<tr>
+	<td class="filename axis">basic/rosterprint.rb</td>
+	<td>Print your roster by groups</td>
+</tr>
+<tr>
+	<td class="filename axis">basic/rosterrename.rb</td>
+	<td>Rename an item in your roster</td>
+</tr>
+<tr>
+	<td class="filename axis">basic/rosterwatch.rb</td>
+	<td>Demonstration of Roster and vCard helpers</td>
+</tr>
+<tr>
+	<td class="filename axis">basic/send_vcard.rb</td>
+	<td>Modify your vCard with command-line arguments</td>
+</tr>
+<tr>
+	<td class="filename axis">basic/versionbot.rb</td>
+	<td>A bot that get your contacts' jabber:iq:version.</td>
+</tr>
+<tr>
+<td class="subcaption" colspan="2"><i>More complex examples</i></td>
+</tr>
+<tr>
+	<td class="filename axis">advanced/adventure/</td>
+	<td>A MUC-based adventure game.</td>
+</tr>
+<tr>
+	<td class="filename axis">advanced/fileserve.rb</td>
+	<td>Bot accepting and initiating file-transfers</td>
+</tr>
+<tr>
+	<td class="filename axis">advanced/getonline.rb</td>
+	<td>Use admin superpowers to get the list of online users.</td>
+</tr>
+<tr>
+	<td class="filename axis">advanced/gtkmucclient.rb</td>
+	<td>Simple Multi-User Chat client with Gtk+ interface</td>
+</tr>
+<tr>
+	<td class="filename axis">advanced/migrate.rb</td>
+	<td>Help migrate from one JID to another.</td>
+</tr>
+<tr>
+	<td class="filename axis">advanced/minimuc.rb</td>
+	<td>A lightweight and very basic MUC implementation.</td>
+</tr>
+<tr>
+	<td class="filename axis">advanced/recvfile.rb</td>
+	<td>Receive files over file transfer</td>
+</tr>
+<tr>
+	<td class="filename axis">advanced/rosterdiscovery.rb</td>
+	<td>Expose your Roster using service discovery.</td>
+</tr>
+<tr>
+	<td class="filename axis">advanced/send_vcard.rb</td>
+	<td>Retrieve, print &amp; send your vCard</td>
+</tr>
+<tr>
+	<td class="filename axis">advanced/sendfile.rb</td>
+	<td>Send a file over file transfer</td>
+</tr>
+<tr>
+	<td class="filename axis">advanced/shellmgr/</td>
+	<td>Run shell commands over Jabber.</td>
+</tr>
+<tr>
+	<td class="filename axis">advanced/versionbot.rb</td>
+	<td>Ask online users for their version info</td>
+</tr>
+<tr>
+<td class="subcaption" colspan="2"><i>Buggy examples (they just need more attention ;)</i></td>
+</tr>
+<tr>
+	<td class="filename axis">buggy/jabber2jabber/</td>
+	<td>A Jabber to Jabber gateway.</td>
+</tr>
+<tr>
+	<td class="filename axis">buggy/jud.rb</td>
+	<td>A complete Jabber User Directory with MySQL support.</td>
+</tr>
+<tr>
+	<td class="filename axis">buggy/miniedgar_*</td>
+	<td>An edgar-like bot.</td>
+</tr>
+</tbody>
+</table>
+
+<a name="related"></a>
+<h2>Related Projects</h2>
+
+<h3>Alternative Jabber libraries for Ruby</h3>
+<ul>
+<li><a href="http://jabber4r.rubyforge.org/">Jabber4R</a> (<a
+href="http://rubyforge.org/projects/jabber4r/">projet homepage at
+Rubyforge</a>): Not maintained anymore. XMPP4R is slightly based on,
+but far more advanced than Jabber4R.</li>
+<li><a
+  href="http://netxmpp-ruby.jabberstudio.org/">Net::XMPP</a>:
+was a Google SoC 2005 project by Yuki Mitsui (aka Silphire).
+He later contributed code to XMPP4R resulting in TLS &amp; SASL support.</li>
+</ul>
+
+<h3>Libraries on top of XMPP4R</h3>
+<ul>
+<li><a href="http://xmpp4r-simple.rubyforge.org/">Jabber::Simple</a>:
+  An extremely easy-to-use Jabber client library.</li>
+<li><a href="http://trypticon.org/software/actionmessenger/">Action Messenger</a>:
+a Ruby on Rails convenience framework like Action Mailer, only for instant messaging.</li>
+</ul>
+
+<h3>Applications</h3>
+<ul>
+<li><b>iBota</b> is a plugin-capable bot using XMPP4R by Vojtech Vobr. A homepage doesn't exist yet, but you may <a href="http://dev.jabbim.cz/websvn/listing.php?repname=ibota&amp;path=%2Ftrunk%2F">browse</a> or <a href="svn://soumar.netlab.cz/home/svn/ibota/trunk">check out</a> the source code.</li>
+<li><b>RbIRC-t</b> is an IRC gateway based upon XMPP4R. It is already documented and has features, but needs some refactorization for more flexibility. It will be released once this has been done. RbIRC-t is hosted within XMPP4R: <a href="http://svn.gna.org/viewcvs/xmpp4r/trunk/rbirc-t/">Source Browser</a> &amp; <a href="svn://svn.gna.org/svn/xmpp4r/trunk/rbirc-t">Repository</a>.</li>
+<li><b>Jabberhole</b> is for Jabber what <a href="http://code.whytheluckystiff.net/mouseHole/">MouseHole</a> is for the Web. It serves as a connection proxy and loaded scripts may rewrite trespassing XMPP stanzas instead of web pages. It is experimental and old, but feel free to have fun with it: <a href="http://svn.gna.org/viewcvs/xmpp4r/trunk/jabberhole/">Source Browser</a> &amp; <a href="svn://svn.gna.org/svn/xmpp4r/trunk/jabberhole">Repository</a>.</li>
+<li><b>rabber</b> was born out of the idea to have a Jabber client utilizing Gtk and XMPP4R. The project is still before its infancy due to lack of time and knowledge of Gtk. A <a href="https://svn.usrportage.de/rabber/trunk">SVN repository</a> exists, contact <a href="xmpp:lars@strojny.net">Lars Strojny</a> if you want to help.</li>
+<li><b>Jabber Disk</b> is a very cool service, providing online file storage via Jabber. Look at the <a href="http://dev.jabbim.cz/jdisk">project homepage</a> or just try it at <a href="xmpp:disk.jabbim.cz">disk.jabbim.cz</a>.</li>
+</ul>
+
+<!-- TODO:
+     * ragde
+     * rjud
+     * maybe botijo?
+ -->
+
+<a name="download"></a>
+<h2>Download</h2>
+<p>Releases are available here: <a href="http://download.gna.org/xmpp4r/">http://download.gna.org/xmpp4r/</a>.</p>
+<p>Latest release: <a href="http://download.gna.org/xmpp4r/xmpp4r-0.3.2.tgz">xmpp4r-0.3.2.tgz</a>.</p>
+<p>There's also a package available in Debian and Ubuntu. You can simply <code>apt-get install libxmpp4r-ruby</code></p>
+<p>
+  <em>Repository has moved:</em>
+  the XMPP4R developers are on their way migrating
+  to <a href="http://github.com/ln/xmpp4r">GitHub</a>. Check out
+  with <code>git-clone git://github.com/ln/xmpp4r.git</code>
+</p>
+
+<a name="installation"></a>
+<h2>Installation Instructions</h2>
+<p>Untar the archive and run <code>./setup.rb</code></p>
+
+<a name="developer"></a>
+<h2>Developers</h2>
+<h3>Mailing Lists</h3>
+<p><a href="mailto:xmpp4r-develATgnaDOTorg">xmpp4r-devel at gna dot org</a> is a mailing list for development and general discussion.</p>
+<ul><li><a href="https://mail.gna.org/listinfo/xmpp4r-devel/">xmpp4r-devel Info Page</a> (to subscribe/unsubscribe, etc)</li>
+<li><a href="https://mail.gna.org/public/xmpp4r-devel/">xmpp4r-devel archives</a></li>
+</ul>
+<p>SVN and CVS commits are sent to <a href="mailto:xmpp4r-commitsATgnaDOTorg">xmpp4r-commits at gna dot org</a>. Discussion about them takes place on xmpp4r-devel.</p>
+<ul><li><a href="https://mail.gna.org/listinfo/xmpp4r-commits/">xmpp4r-commits Info Page</a> (to subscribe/unsubscribe, etc)</li>
+<li><a href="https://mail.gna.org/public/xmpp4r-commits/">xmpp4r-commits archives</a></li>
+</ul>
+<p>When reporting bugs, please provide as much information as possible:</p>
+<ul>
+  <li>XMPP4R version or GIT revision</li>
+  <li>Use <em>Jabber::debug = true</em> but remove any sensitive information</li>
+  <li>Describe your environment (Ruby version, OS, server software)</li>
+  <li>Cool hackers send test cases</li>
+</ul>
+
+<h3>(Sort of) Developer Documentation</h3>
+
+<p>Development takes place on the <a href="https://gna.org/projects/xmpp4r/">GNA project page</a>. Don't hesitate to post feature requests, bugs or patches.</p>
+
+<p>XMPP4R is written in <a href="http://www.ruby-lang.org">Ruby</a>. If you don't know this language yet, continue to ignore it. Learning it will make you realize what you missed until now, and you might run into severe problems (depression, etc).</p>
+
+<p><b>We are currently evaluating a move from SVN to Git. Our git "master" branch is <a href="http://github.com/ln/xmpp4r/tree/master">hosted on Github</a> and we encourage all developers to create any new patches from that codebase. You can learn more about our Git development process on our <a href="http://github.com/ln/xmpp4r/wikis/developer-faq">GitHub FAQ Page</a>.  Feel free to make a GitHub 'fork' of the project and send us pull requests :-)</b></p>
+
+<p>The SVN repository isn't updated anymore, but is still accessible at <code>svn co svn://svn.gna.org/svn/xmpp4r/trunk/xmpp4r</code></p>
+
+<p>The RDOC source code documentation is <a href="rdoc/">browseable here</a>. It might not be update to date (but we try hard to make it be). You can generate your own using <code>rake rdoc</code></p>
+
+<p><b>Famundo Dev Blog</b> has a series of introductionary articles about XMPP4R:</p>
+<ul>
+  <li><a href="http://devblog.famundo.com/articles/2006/10/10/ruby-and-xmpp-jabber-a-multi-posts-series">Ruby and XMPP/Jabber - a Multi Posts Series, Part 1</a></li>
+  <li><a href="http://devblog.famundo.com/articles/2006/10/14/ruby-and-xmpp-jabber-part-2-logging-in-and-sending-simple-messages">Ruby and XMPP/Jabber Part 2: Logging in and sending simple messages</a></li>
+  <li><a href="http://devblog.famundo.com/articles/2006/10/18/ruby-and-xmpp-jabber-part-3-adding-html-to-the-messages">Ruby and XMPP/Jabber Part 3: Adding html to the messages</a></li>
+</ul>
+
+<p>Another two-part Tutorial can be found at <b>Ruby Fleebie</b>:</p>
+<ul>
+  <li><a href="http://www.rubyfleebie.com/im-integration-with-xmpp4r">IM
+  Integration With XMPP4r</a></li>
+  <li><a href="http://www.rubyfleebie.com/im-integration-with-xmpp4r-part-2/">IM
+  Integration With XMPP4r : Part 2</a></li>
+</ul>
+
+<p>A german tutorial is available at the BSD-Crew Wiki: <a href="http://wiki.bsd-crew.de/index.php/Jabberbots_mit_XMPP4R">Jabberbots mit XMPP4R</a></p>
+
+</div>
+
+</body>
+</html>
