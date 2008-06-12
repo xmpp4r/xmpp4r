@@ -388,7 +388,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
         <forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
       </error>")
     }
-    assert_raise Jabber::ErrorException do h.publish_item_with_id_to('mynode', item1,"blubb") end
+    assert_raise Jabber::ServerError do h.publish_item_with_id_to('mynode', item1,"blubb") end
     wait_state
   end
 
