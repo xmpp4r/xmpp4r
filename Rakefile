@@ -30,28 +30,6 @@ Rake::PackageTask.new(PKG_NAME, PKG_VERSION) do |p|
   p.package_files = PKG_FILES
 end
 
-begin
-  require 'rubygems'
-  require 'rake/gempackagetask'
-
-  # read the contents of the gemspec, eval it, and assign it to 'spec'
-  # this lets us maintain all gemspec info in one place.  Nice and DRY.
-  spec = eval(IO.read("xmpp4r.gemspec"))
-
-  Rake::GemPackageTask.new(spec) do |pkg|
-    pkg.gem_spec = spec
-    pkg.need_zip = true
-    pkg.need_tar = true
-  end
-
-  task :install_gem => [:package] do
-    sh %{sudo gem install pkg/#{GEM}-#{VER}}
-  end
-
-rescue LoadError
-  puts "Will not generate Rubygem"
-end
-
 Rake::TestTask.new do |t|
   t.libs << "test"
   t.test_files = ['test/ts_xmpp4r.rb']
@@ -89,4 +67,26 @@ end
 desc "Generate Requires Graph"
 task :gen_requires_graph do
   sh %{cd tools; ./gen_requires.bash}
+end
+
+begin
+  require 'rubygems'
+  require 'rake/gempackagetask'
+
+  # read the contents of the gemspec, eval it, and assign it to 'spec'
+  # this lets us maintain all gemspec info in one place.  Nice and DRY.
+  spec = eval(IO.read("xmpp4r.gemspec"))
+
+  Rake::GemPackageTask.new(spec) do |pkg|
+    pkg.gem_spec = spec
+    pkg.need_zip = true
+    pkg.need_tar = true
+  end
+
+  task :install_gem => [:package] do
+    sh %{sudo gem install pkg/#{GEM}-#{VER}}
+  end
+
+rescue LoadError
+  puts "Will not generate Rubygem"
 end
