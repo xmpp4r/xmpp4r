@@ -2,12 +2,12 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 #
-# It's recommented to read the XEP-0066 before you use this Helper. (Maybe its 
+# It's recommented to read the XEP-0060 before you use this Helper. (Maybe its 
 # better not use the helper for now ) ;)
 # The whole code is getting better, but may still contain bugs - be careful!
 # 
 # Maybe the following structure is good 
-# ( taken form the xep-0060 )
+# ( taken from the xep-0060 )
 #
 # entity usecases
 #  retrieve all subscriptions
