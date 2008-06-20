@@ -187,6 +187,88 @@ module Jabber
       end
 
       ##
+      # Administratively ban one or more user jids from the room.
+      #
+      # Will wait for response, possibly raising ServerError
+      #
+      # Sample usage:
+      #   my_muc.ban 'pistol@foobar.com', 'Avaunt, you cullion!'
+      #
+      # recipients:: [Array] of, or single [String]: JIDs
+      # reason:: [String] Ban reason
+      def ban(recipients, reason)
+        recipients = [recipients] unless recipients.kind_of? Array
+        items = recipients.collect { |recipient|
+          item = IqQueryMUCAdminItem.new
+          item.jid = recipient
+          item.affiliation = :outcast
+          item.reason = reason
+          item
+        }
+        send_affiliations(items)
+      end
+
+      ##
+      # Unban one or more user jids for the room.
+      #
+      # Will wait for response, possibly raising ServerError
+      #
+      # Sample usage:
+      #   my_muc.unban 'pistol@foobar.com'
+      #
+      # recipients:: [Array] of, or single [String]: JIDs
+      def unban(recipients)
+        recipients = [recipients] unless recipients.kind_of? Array
+        items = recipients.collect { |recipient|
+          item = IqQueryMUCAdminItem.new
+          item.jid = recipient
+          item.affiliation = :none
+          item
+        }
+        send_affiliations(items)
+      end
+
+      ##
+      # Promote one or more users in the room to moderator.
+      #
+      # Will wait for response, possibly raising ServerError
+      #
+      # Sample usage:
+      #   my_muc.promote 'pistol'
+      #
+      # recipients:: [Array] of, or single [String]: Nicks
+      def promote(recipients)
+        recipients = [recipients] unless recipients.kind_of? Array
+        items = recipients.collect { |recipient|
+          item = IqQueryMUCAdminItem.new
+          item.nick = recipient
+          item.role = :moderator
+          item
+        }
+        send_affiliations(items)
+      end
+
+      ##
+      # Demote one or more users in the room to participant.
+      #
+      # Will wait for response, possibly raising ServerError
+      #
+      # Sample usage:
+      #   my_muc.demote 'pistol'
+      #
+      # recipients:: [Array] of, or single [String]: Nicks
+      def demote(recipients)
+        recipients = [recipients] unless recipients.kind_of? Array
+        items = recipients.collect { |recipient|
+          item = IqQueryMUCAdminItem.new
+          item.nick = recipient
+          item.role = :participant
+          item
+        }
+        send_affiliations(items)
+      end
+
+      ##
       # Block to be invoked when a message *from* the room arrives
       #
       # Example:
