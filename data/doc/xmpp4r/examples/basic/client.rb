@@ -5,6 +5,8 @@
 # connect login@server/resource password
 # auth
 
+$:.unshift '../../../../../lib'
+
 require 'xmpp4r/client'
 include Jabber
 

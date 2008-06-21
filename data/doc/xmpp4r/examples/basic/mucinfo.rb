@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+$:.unshift '../../../../../lib'
+
 require 'xmpp4r'
 require 'xmpp4r/muc/helper/mucbrowser'
 

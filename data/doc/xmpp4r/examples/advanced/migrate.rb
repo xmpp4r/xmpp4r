@@ -2,7 +2,7 @@
 
 # This script can be used to migrate from one jabber account to another
 
-$:.unshift '../lib'
+$:.unshift '../../../../../lib'
 
 require 'optparse'
 require 'xmpp4r'

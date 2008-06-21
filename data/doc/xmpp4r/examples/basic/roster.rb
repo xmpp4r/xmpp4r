@@ -2,6 +2,8 @@
 
 # This script can get all roster entries
 
+#$:.unshift '../../../../../lib'
+
 require 'optparse'
 require 'xmpp4r'
 require 'xmpp4r/roster/iq/roster'

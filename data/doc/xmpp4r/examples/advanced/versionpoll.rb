@@ -3,7 +3,7 @@
 # This script will request the version information of a list of JID given
 # on stdin.
 
-$:.unshift '../lib'
+$:.unshift '../../../../../lib'
 
 require 'optparse'
 require 'xmpp4r/client'

@@ -2,6 +2,8 @@
 
 # This bot will reply to every message it receives. To end the game, send 'exit'
 
+$:.unshift '../../../../../lib'
+
 require 'xmpp4r/client'
 include Jabber
 
