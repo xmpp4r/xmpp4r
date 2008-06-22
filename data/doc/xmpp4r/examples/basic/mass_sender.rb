@@ -36,7 +36,7 @@ end
 
 body = IO::read(filename).chomp
 
-cl = Client.new(jid, false)
+cl = Client.new(jid)
 cl.connect
 cl.auth(password)
 exit = false

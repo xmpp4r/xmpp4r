@@ -24,7 +24,7 @@ OptionParser.new do |opts|
   opts.parse!(ARGV)
 end
 
-cl = Client.new(jid, false)
+cl = Client.new(jid)
 cl.connect
 cl.auth(password)
 exit = false

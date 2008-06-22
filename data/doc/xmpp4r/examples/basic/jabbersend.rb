@@ -31,7 +31,7 @@ if to.nil?
   puts "No receiver specified. See jabbersend -h"
 end
 
-cl = Client.new(myJID, false)
+cl = Client.new(myJID)
 cl.connect
 cl.auth(myPassword)
 body = STDIN.readlines.join

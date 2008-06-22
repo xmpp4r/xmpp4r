@@ -16,10 +16,10 @@ pwto = 'z'
 BOTHOLD = "Hi, you are subscribed to my presence. I just changed my JID. The new one is #{jidto.strip}. You might want to update your roster. Thank you, and sorry for the inconvenience !"
 BOTHNEW = "Hi, you are subscribed to the presence of my previous JID : #{jidfrom.strip}. I just changed my JID, and this is the new one. You might want to update your roster. Thank you, and sorry for the inconvenience !"
 
-clfrom = Client.new(jidfrom, false)
+clfrom = Client.new(jidfrom)
 clfrom.connect
 clfrom.auth(pwfrom)
-clto = Client.new(jidto, false)
+clto = Client.new(jidto)
 clto.connect
 clto.auth(pwto)
 #clfrom.send(Presence.new)
