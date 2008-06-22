@@ -96,3 +96,13 @@ begin
 rescue LoadError
   puts "Will not generate Rubygem"
 end
+
+##############################################################################
+# SYNTAX CHECKING
+##############################################################################
+
+desc "Check syntax of all Ruby files."
+task :check_syntax do
+  `find . -name "*.rb" |xargs -n1 ruby -c |grep -v "Syntax OK"`
+  puts "* Done"
+end
