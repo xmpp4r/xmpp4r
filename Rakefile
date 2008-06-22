@@ -16,6 +16,11 @@ end
 PKG_NAME = 'xmpp4r'
 PKG_VERSION = '0.3.2'
 
+# The task that will run when a simple 'rake' command is issued.
+# Default to running the test suite as that's a nice safe command
+# we should run frequently.
+task :default => [:test]
+
 PKG_FILES = ['ChangeLog', 'README.rdoc', 'COPYING', 'LICENSE', 'setup.rb', 'Rakefile', 'README_ruby19.txt', 'xmpp4r.gemspec' ]
 Find.find('lib/', 'data/', 'test/', 'tools/') do |f|
   if FileTest.directory?(f) and f =~ /\.svn/
