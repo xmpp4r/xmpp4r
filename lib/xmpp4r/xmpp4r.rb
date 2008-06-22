@@ -3,11 +3,11 @@
 # Website::http://home.gna.org/xmpp4r/
 
 ##
-# The Jabber module is the root namespace of the library. You might want
-# to Include it in your script to ease your coding. It provides
-# a simple debug logging support.
+# The Jabber module is the root namespace of the library.
 module Jabber
-  # XMPP4R Version number
+  # XMPP4R Version number.  This is the ONLY place where the version number
+  # should be specified.  This constant is used to determine the version of
+  # package tarballs and generated gems.
   XMPP4R_VERSION = '0.3.2'
 end
 
