@@ -6,7 +6,9 @@ require 'rake/testtask'
 require 'rake/gempackagetask'
 require 'rake/rdoctask'
 require 'find'
-require "lib/xmpp4r/xmpp4r"
+
+$:.unshift 'lib'
+require "xmpp4r"
 
 PKG_NAME  = 'xmpp4r'
 AUTHORS   = ['Lucas Nussbaum', 'Stephan Maka']
