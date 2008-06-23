@@ -103,7 +103,7 @@ end
 CLEAN.include ["*.gem", "pkg", "rdoc", "coverage", "tools/*.png"]
 
 # The file list used to package tarballs, gems, and for generating the xmpp4r.gemspec.
-PKG_FILES = %w( LICENSE COPYING README.rdoc README_ruby19.txt ChangeLog Rakefile setup.rb xmpp4r.gemspec ) + Dir["{lib,test,data,tools}/**/*"]
+PKG_FILES = %w( LICENSE COPYING README.rdoc README_ruby19.txt CHANGELOG Rakefile setup.rb xmpp4r.gemspec ) + Dir["{lib,test,data,tools}/**/*"]
 
 spec = Gem::Specification.new do |s|
   s.name = PKG_NAME
@@ -122,7 +122,7 @@ spec = Gem::Specification.new do |s|
 
   # rdoc
   s.has_rdoc = true
-  s.extra_rdoc_files = %w( README.rdoc README_ruby19.txt ChangeLog LICENSE COPYING )
+  s.extra_rdoc_files = %w( README.rdoc README_ruby19.txt CHANGELOG LICENSE COPYING )
   s.rdoc_options = ["--quiet", "--title", "xmpp4r documentation", "--opname", "index.html", "--line-numbers", "--main", "README.rdoc", "--inline-source"]
 
   s.required_ruby_version = ">= 1.8.4"
