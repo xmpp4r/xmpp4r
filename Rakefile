@@ -103,7 +103,7 @@ end
 CLEAN.include ["*.gem", "pkg", "rdoc", "coverage", "tools/*.png"]
 
 # The file list used to package tarballs, gems, and for generating the xmpp4r.gemspec.
-PKG_FILES = %w( LICENSE COPYING README.rdoc README_ruby19.txt ChangeLog Rakefile setup.rb Rakefile xmpp4r.gemspec ) + Dir["{lib,test,data,tools}/**/*"]
+PKG_FILES = %w( LICENSE COPYING README.rdoc README_ruby19.txt ChangeLog Rakefile setup.rb xmpp4r.gemspec ) + Dir["{lib,test,data,tools}/**/*"]
 
 spec = Gem::Specification.new do |s|
   s.name = PKG_NAME
@@ -171,7 +171,7 @@ namespace :gem do
       else
         case value
         when Array
-          value =  name != "files" ? value.inspect : value.inspect.split(",").join(",\n")
+          value =  name != "files" ? value.inspect : value.sort.uniq.inspect.split(",").join(",\n")
         when String
           value = value.to_i if integer_fields.include?(name)
           value = value.inspect
