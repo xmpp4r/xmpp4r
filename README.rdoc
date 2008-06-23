@@ -87,7 +87,7 @@ OR download a snapshot of the latest source in .tar.gz format from:
   rake -T
 
   # Package up the gem file and install it
-  rake install_gem
+  rake gem:install
 
 ==== Install : Using setup.rb
 
