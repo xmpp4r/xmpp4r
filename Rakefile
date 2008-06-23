@@ -153,7 +153,7 @@ namespace :gem do
   # Thanks to the Merb project for this code.
   desc "Update Github Gemspec"
   task :update_gemspec do
-    skip_fields = %w(new_platform original_platform)
+    skip_fields = %w(new_platform original_platform date)
     integer_fields = %w(specification_version)
 
     result = "# WARNING : RAKE AUTO-GENERATED FILE.  DO NOT MANUALLY EDIT!\n"

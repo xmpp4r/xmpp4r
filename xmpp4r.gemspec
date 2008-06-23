@@ -1,11 +1,8 @@
 # WARNING : RAKE AUTO-GENERATED FILE.  DO NOT MANUALLY EDIT!
-# LAST UPDATED : Sun Jun 22 15:18:52 -0700 2008
-#
 # RUN : 'rake gem:update_gemspec'
 
 Gem::Specification.new do |s|
   s.extra_rdoc_files = ["README.rdoc", "README_ruby19.txt", "ChangeLog", "LICENSE", "COPYING"]
-  s.date = "Sun Jun 22 00:00:00 -0700 2008"
   s.authors = ["Lucas Nussbaum", "Stephan Maka"]
   s.required_rubygems_version = ">= 0"
   s.version = "0.3.2"
