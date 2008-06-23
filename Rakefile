@@ -3,7 +3,6 @@
 require 'rake'
 require "rake/clean"
 require 'rake/testtask'
-require 'rake/gempackagetask'
 require 'rake/rdoctask'
 require 'find'
 
@@ -105,85 +104,124 @@ CLEAN.include ["*.gem", "pkg", "rdoc", "coverage", "tools/*.png"]
 # The file list used to package tarballs, gems, and for generating the xmpp4r.gemspec.
 PKG_FILES = %w( LICENSE COPYING README.rdoc README_ruby19.txt CHANGELOG Rakefile setup.rb xmpp4r.gemspec ) + Dir["{lib,test,data,tools}/**/*"]
 
-spec = Gem::Specification.new do |s|
-  s.name = PKG_NAME
-  s.version = Jabber::XMPP4R_VERSION
-  s.authors = AUTHORS
-  s.email = EMAIL
-  s.homepage = HOMEPAGE
-  s.rubyforge_project = PKG_NAME
-  s.summary = SUMMARY
-  s.description = s.summary
-  s.platform = Gem::Platform::RUBY
-  s.require_path = 'lib'
-  s.executables = []
-  s.files = PKG_FILES
-  s.test_files = []
+# Add rake package tasks conditionally.  Full gem + tarball on systems
+# with RubyGems.  More limited on systems without.
 
-  # rdoc
-  s.has_rdoc = true
-  s.extra_rdoc_files = %w( README.rdoc README_ruby19.txt CHANGELOG LICENSE COPYING )
-  s.rdoc_options = ["--quiet", "--title", "xmpp4r documentation", "--opname", "index.html", "--line-numbers", "--main", "README.rdoc", "--inline-source"]
+@rubygems = nil
 
-  s.required_ruby_version = ">= 1.8.4"
+begin
+  require 'rake/gempackagetask'
+  @rubygems = true
 
-end
-
-Rake::GemPackageTask.new(spec) do |pkg|
-  pkg.gem_spec = spec
-  pkg.need_tar = true
-end
-
-# also keep the gemspec up to date each time we package a tarball or gem
-task :package => ['gem:update_gemspec']
-task :gem => ['gem:update_gemspec']
-
-namespace :gem do
-
-  desc "Run :package and install the .gem locally"
-  task :install => [:update_gemspec, :package] do
-    sh %{sudo gem install --local pkg/#{PKG_NAME}-#{Jabber::XMPP4R_VERSION}.gem --no-rdoc --no-ri}
+  spec = Gem::Specification.new do |s|
+    s.name = PKG_NAME
+    s.version = Jabber::XMPP4R_VERSION
+    s.authors = AUTHORS
+    s.email = EMAIL
+    s.homepage = HOMEPAGE
+    s.rubyforge_project = PKG_NAME
+    s.summary = SUMMARY
+    s.description = s.summary
+    s.platform = Gem::Platform::RUBY
+    s.require_path = 'lib'
+    s.executables = []
+    s.files = PKG_FILES
+    s.test_files = []
+    s.has_rdoc = true
+    s.extra_rdoc_files = %w( README.rdoc README_ruby19.txt CHANGELOG LICENSE COPYING )
+    s.rdoc_options = ["--quiet", "--title", "xmpp4r documentation", "--opname", "index.html", "--line-numbers", "--main", "README.rdoc", "--inline-source"]
+    s.required_ruby_version = ">= 1.8.4"
   end
 
-  desc "Run :clean and uninstall the .gem"
-  task :uninstall => :clean do
-    sh %{sudo gem uninstall #{PKG_NAME}}
+  Rake::GemPackageTask.new(spec) do |pkg|
+    pkg.gem_spec = spec
+    pkg.need_tar = true
   end
 
-  # Thanks to the Merb project for this code.
-  desc "Update Github Gemspec"
-  task :update_gemspec do
-    skip_fields = %w(new_platform original_platform date)
-    integer_fields = %w(specification_version)
+  namespace :gem do
 
-    result = "# WARNING : RAKE AUTO-GENERATED FILE.  DO NOT MANUALLY EDIT!\n"
-    result << "# RUN : 'rake gem:update_gemspec'\n\n"
-    result << "Gem::Specification.new do |s|\n"
-    spec.instance_variables.each do |ivar|
-      value = spec.instance_variable_get(ivar)
-      name  = ivar.split("@").last
-      next if skip_fields.include?(name) || value.nil? || value == "" || (value.respond_to?(:empty?) && value.empty?)
-      if name == "dependencies"
-        value.each do |d|
-          dep, *ver = d.to_s.split(" ")
-          result <<  "  s.add_dependency #{dep.inspect}, #{ver.join(" ").inspect.gsub(/[()]/, "")}\n"
-        end
-      else
-        case value
-        when Array
-          value =  name != "files" ? value.inspect : value.sort.uniq.inspect.split(",").join(",\n")
-        when String
-          value = value.to_i if integer_fields.include?(name)
-          value = value.inspect
-        else
-          value = value.to_s.inspect
-        end
-        result << "  s.#{name} = #{value}\n"
-      end
+    desc "Run :package and install the .gem locally"
+    task :install => [:update_gemspec, :package] do
+      sh %{sudo gem install --local pkg/#{PKG_NAME}-#{Jabber::XMPP4R_VERSION}.gem --no-rdoc --no-ri}
     end
-    result << "end"
-    File.open(File.join(File.dirname(__FILE__), "#{spec.name}.gemspec"), "w"){|f| f << result}
-  end
 
+    desc "Run :clean and uninstall the .gem"
+    task :uninstall => :clean do
+      sh %{sudo gem uninstall #{PKG_NAME}}
+    end
+
+    # Thanks to the Merb project for this code.
+    desc "Update Github Gemspec"
+    task :update_gemspec do
+      skip_fields = %w(new_platform original_platform date)
+      integer_fields = %w(specification_version)
+
+      result = "# WARNING : RAKE AUTO-GENERATED FILE.  DO NOT MANUALLY EDIT!\n"
+      result << "# RUN : 'rake gem:update_gemspec'\n\n"
+      result << "Gem::Specification.new do |s|\n"
+      spec.instance_variables.each do |ivar|
+        value = spec.instance_variable_get(ivar)
+        name  = ivar.split("@").last
+        next if skip_fields.include?(name) || value.nil? || value == "" || (value.respond_to?(:empty?) && value.empty?)
+        if name == "dependencies"
+          value.each do |d|
+            dep, *ver = d.to_s.split(" ")
+            result <<  "  s.add_dependency #{dep.inspect}, #{ver.join(" ").inspect.gsub(/[()]/, "")}\n"
+          end
+        else
+          case value
+          when Array
+            value =  name != "files" ? value.inspect : value.sort.uniq.inspect.split(",").join(",\n")
+          when String
+            value = value.to_i if integer_fields.include?(name)
+            value = value.inspect
+          else
+            value = value.to_s.inspect
+          end
+          result << "  s.#{name} = #{value}\n"
+        end
+      end
+      result << "end"
+      File.open(File.join(File.dirname(__FILE__), "#{spec.name}.gemspec"), "w"){|f| f << result}
+    end
+
+  end # namespace :gem
+
+  # also keep the gemspec up to date each time we package a tarball or gem
+  task :package => ['gem:update_gemspec']
+  task :gem => ['gem:update_gemspec']
+
+rescue LoadError
+  @rubygems = false
+  warning = <<EOF
+###
+  Packaging Warning : RubyGems is apparently not installed on this
+  system and any file add/remove/rename/deletes will not
+  be auto-updated in the 'xmpp4r.gemspec' when you run any
+  package tasks.  All such file changes are recommended
+  to be packaged on a system with RubyGems installed
+  if you intend to push commits to the Git repo so the
+  gemspec will also stay in sync for others.
+###
+EOF
+  puts warning
 end
 
+# we are apparently on a system that does not have RubyGems installed.
+# Lets try to provide only the basic tarball package tasks as a fallback.
+if @rubygems == false
+  begin
+    require 'rake/packagetask'
+    Rake::PackageTask.new(PKG_NAME, Jabber::XMPP4R_VERSION) do |p|
+      p.package_files = PKG_FILES
+      p.need_tar = true
+    end
+  rescue LoadError
+    warning = <<EOF
+###
+  Warning : Unable to require the 'rake/packagetask'. Is Rake installed?
+###
+EOF
+    puts warning
+  end
+end
