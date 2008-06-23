@@ -9,7 +9,7 @@ http://home.gna.org/xmpp4r/
 
 If you need to ask questions, or want feedback on proposed changes
 please feel free to ask them on the 'xmpp4r-devel@gna.org' mailing
-list.  You can join or view archives of the the mailing list at:
+list.  You can join or view archives of the mailing list at:
 
 https://gna.org/mail/?group=xmpp4r
 
