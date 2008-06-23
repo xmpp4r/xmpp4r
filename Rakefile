@@ -101,8 +101,10 @@ end
 # What files/dirs should 'rake clean' remove?
 CLEAN.include ["*.gem", "pkg", "rdoc", "coverage", "tools/*.png"]
 
-# The file list used to package tarballs, gems, and for generating the xmpp4r.gemspec.
-PKG_FILES = %w( LICENSE COPYING README.rdoc README_ruby19.txt CHANGELOG Rakefile setup.rb xmpp4r.gemspec ) + Dir["{lib,test,data,tools}/**/*"]
+# The file list used for rdocs, tarballs, gems, and for generating the xmpp4r.gemspec.
+RDOC_FILES  = %w( README.rdoc README_ruby19.txt CHANGELOG LICENSE COPYING )
+PKG_FILES   = %w( Rakefile setup.rb xmpp4r.gemspec ) + RDOC_FILES + Dir["{lib,test,data,tools}/**/*"]
+PKG_VERSION = Jabber::XMPP4R_VERSION
 
 # Add rake package tasks conditionally.  Full gem + tarball on systems
 # with RubyGems.  More limited on systems without.
@@ -115,7 +117,7 @@ begin
 
   spec = Gem::Specification.new do |s|
     s.name = PKG_NAME
-    s.version = Jabber::XMPP4R_VERSION
+    s.version = PKG_VERSION
     s.authors = AUTHORS
     s.email = EMAIL
     s.homepage = HOMEPAGE
@@ -128,7 +130,7 @@ begin
     s.files = PKG_FILES
     s.test_files = []
     s.has_rdoc = true
-    s.extra_rdoc_files = %w( README.rdoc README_ruby19.txt CHANGELOG LICENSE COPYING )
+    s.extra_rdoc_files = RDOC_FILES
     s.rdoc_options = ["--quiet", "--title", "xmpp4r documentation", "--opname", "index.html", "--line-numbers", "--main", "README.rdoc", "--inline-source"]
     s.required_ruby_version = ">= 1.8.4"
   end
@@ -142,7 +144,7 @@ begin
 
     desc "Run :package and install the .gem locally"
     task :install => [:update_gemspec, :package] do
-      sh %{sudo gem install --local pkg/#{PKG_NAME}-#{Jabber::XMPP4R_VERSION}.gem --no-rdoc --no-ri}
+      sh %{sudo gem install --local pkg/#{PKG_NAME}-#{PKG_VERSION}.gem --no-rdoc --no-ri}
     end
 
     desc "Run :clean and uninstall the .gem"
@@ -212,7 +214,7 @@ end
 if @rubygems == false
   begin
     require 'rake/packagetask'
-    Rake::PackageTask.new(PKG_NAME, Jabber::XMPP4R_VERSION) do |p|
+    Rake::PackageTask.new(PKG_NAME, PKG_VERSION) do |p|
       p.package_files = PKG_FILES
       p.need_tar = true
     end
