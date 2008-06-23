@@ -157,7 +157,6 @@ namespace :gem do
     integer_fields = %w(specification_version)
 
     result = "# WARNING : RAKE AUTO-GENERATED FILE.  DO NOT MANUALLY EDIT!\n"
-    result << "# LAST UPDATED : #{Time.now.to_s}\n#\n"
     result << "# RUN : 'rake gem:update_gemspec'\n\n"
     result << "Gem::Specification.new do |s|\n"
     spec.instance_variables.each do |ivar|
