@@ -16,18 +16,19 @@ XMPP4R 0.3.3 (XX/XX/XXXX)
 * Changed API for Client, Component, Connection, Stream to remove
   need for antiquated 'threaded' param in the initializer.
 * Use a Logger instance instead of directly writing to stdout
-* Re-factored & consolidated Error classes.  See xmpp4r/errors.rb for all custom
-  errors that can be caught.  All inherit from Jabber::Error which itself inherits
-  from Ruby's StandardError. This is a first step in re-factoring errors.  The next
-  step will be to convert all 'raise' calls to raise a custom Jabber::Error or
-  one of its children instead of anonymous RuntimeErrors.  This allows much more
-  granularity in catching and handling errors later. If you were catching
-  Jabber::ErrorException before you should probably change that in your code
-  to now catch Jabber::Error if you want to catch everything or one of the
-  custom children of Jabber::Error defined in 'lib/xmpp4r/errors.rb'.  Additionally,
-  the Error class which encapsulated the xmpp error response, has been renamed to
-  ErrorResponse to reflect its real usage.  This free's up 'Jabber::Error' for
-  use as our base Error class.
+* Re-factored & consolidated Error classes.  See xmpp4r/errors.rb for all
+  custom errors that can be caught.  All inherit from Jabber::Error which
+  itself inherits from Ruby's StandardError. This is a first step in
+  re-factoring errors.  The next step will be to convert all 'raise' calls to
+  raise a custom Jabber::Error or one of its children instead of anonymous
+  RuntimeErrors.  This allows much more granularity in catching and handling
+  errors later.
+  If you were catching Jabber::ErrorException before you should probably
+  change that in your code to now catch Jabber::Error if you want to
+  catch everything or one of the custom children of Jabber::Error defined in
+  'lib/xmpp4r/errors.rb'.  Additionally, the Error class which encapsulated
+  the xmpp error response, has been renamed to ErrorResponse to reflect its
+  real usage.  This free's up 'Jabber::Error' for use as our base Error class.
 
 XMPP4R 0.3.2 (15/10/2007)
 =========================
