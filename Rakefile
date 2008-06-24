@@ -198,7 +198,7 @@ rescue LoadError
   warning = <<EOF
 ###
   Packaging Warning : RubyGems is apparently not installed on this
-  system and any file add/remove/rename/deletes will not
+  system and any file add/remove/rename will not
   be auto-updated in the 'xmpp4r.gemspec' when you run any
   package tasks.  All such file changes are recommended
   to be packaged on a system with RubyGems installed
