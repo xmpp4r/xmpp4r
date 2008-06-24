@@ -2,13 +2,10 @@
 # RUN : 'rake gem:update_gemspec'
 
 Gem::Specification.new do |s|
-  s.authors = ["Lucas Nussbaum", "Stephan Maka"]
-  s.version = "0.3.2.99"
   s.extra_rdoc_files = ["README.rdoc", "README_ruby19.txt", "CHANGELOG", "LICENSE", "COPYING"]
+  s.authors = ["Lucas Nussbaum", "Stephan Maka"]
   s.required_rubygems_version = ">= 0"
-  s.has_rdoc = "true"
-  s.specification_version = "2"
-  s.email = "xmpp4r-devel@gna.org"
+  s.version = "0.3.2.99"
   s.files = ["CHANGELOG",
  "COPYING",
  "LICENSE",
@@ -166,7 +163,6 @@ Gem::Specification.new do |s|
  "lib/xmpp4r/pubsub/helper/servicehelper.rb",
  "lib/xmpp4r/pubsub/iq",
  "lib/xmpp4r/pubsub/iq/pubsub.rb",
- "lib/xmpp4r/pubsub/stanzas",
  "lib/xmpp4r/query.rb",
  "lib/xmpp4r/rexmladdons.rb",
  "lib/xmpp4r/roster",
@@ -275,16 +271,19 @@ Gem::Specification.new do |s|
  "tools/gen_requires.bash",
  "tools/xmpp4r-gemspec-test.rb",
  "xmpp4r.gemspec"]
+  s.has_rdoc = "true"
+  s.specification_version = "2"
+  s.loaded = "false"
+  s.email = "xmpp4r-devel@gna.org"
   s.required_ruby_version = ">= 1.8.4"
   s.rdoc_options = ["--quiet", "--title", "xmpp4r documentation", "--opname", "index.html", "--line-numbers", "--main", "README.rdoc", "--inline-source"]
-  s.rubygems_version = "1.1.1"
-  s.homepage = "http://home.gna.org/xmpp4r/"
-  s.name = "xmpp4r"
-  s.loaded = "false"
-  s.rubyforge_project = "xmpp4r"
   s.bindir = "bin"
+  s.rubygems_version = "1.2.0"
+  s.homepage = "http://home.gna.org/xmpp4r/"
+  s.platform = "ruby"
+  s.rubyforge_project = "xmpp4r"
+  s.name = "xmpp4r"
   s.summary = "XMPP4R is an XMPP/Jabber library for Ruby."
   s.description = "XMPP4R is an XMPP/Jabber library for Ruby."
-  s.platform = "ruby"
   s.require_paths = ["lib"]
 end
