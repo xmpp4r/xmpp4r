@@ -18,6 +18,7 @@
 <a href="#introduction">Introduction</a> | 
 <a href="#related">Related Projects</a> | 
 <a href="#download">Download</a> | 
+<a href="#related">Related Projects</a> |
 <a href="#developer">Mailing Lists &amp; Developers</a> |
 <a href="rdoc/">RDOC Documentation</a> |
 <a href="http://gna.org/projects/xmpp4r/">GNA project page</a>
@@ -54,6 +55,30 @@ framework to develop Jabber-related applications or scripts in Ruby.</p>
 
 <p>A lot of examples are shipped with XMPP4R (see <i>/usr/share/doc/xmpp4r/examples/</i> or <i>/usr/local/share/doc/xmpp4r/examples/</i>, depending on how you installed XMPP4R).</p>
 
+<a name="download"></a>
+<h2>Download and Installation</h2>
+
+<p>The latest stable XMPP4R release is <b>XMPP4R 0.3.2</b>.</p>
+
+<h3>From a tarball</h3>
+<p>Releases are available here: <a href="http://download.gna.org/xmpp4r/">http://download.gna.org/xmpp4r/</a>.
+Untar the archive and run <code>./setup.rb</code></p>
+
+<h3>Using Rubygems</h3>
+<p><code>gem install xmpp4r -s http://download.gna.org/xmpp4r/</code></p>
+<!-- FIXME http://download.gna.org/xmpp4r/ does not appear to be a repository -->
+
+<h3>Using a package for your distribution</h3>
+<p>There's a package available in Debian and Ubuntu. Just <code>apt-get install libxmpp4r-ruby</code>. With Gentoo, XMPP4R can be installed via <code>emerge dev-ruby/xmpp4r</code>.</p>
+
+<h3>Using Rubygems to install from GitHub (development version)</h3>
+<p><code>gem sources -a http://gems.github.com</code> (you only need to do this once!)<br/>
+<code>gem install ln-xmpp4r</code></p>
+
+<h3>Using GIT to install the development version</h3>
+<p><code>git-clone git://github.com/ln/xmpp4r.git</code> (see <a href="http://github.com/ln/xmpp4r">GitHub</a>)</p>
+
+
 <a name="related"></a>
 <h2>Related Projects</h2>
 
@@ -86,49 +111,25 @@ a Ruby on Rails convenience framework like Action Mailer, only for instant messa
 <li><b>Jabber Disk</b> is a very cool service, providing online file storage via Jabber. Look at the <a href="http://dev.jabbim.cz/jdisk">project homepage</a> or just try it at <a href="xmpp:disk.jabbim.cz">disk.jabbim.cz</a>.</li>
 </ul>
 
-<a name="download"></a>
-<h2>Download and Installation</h2>
-
-<p>The latest XMPP4R release is <b>XMPP4R 0.3.2</b>.</p>
-
-<h3>From a Tarball</h3>
-<p>Releases are available here: <a href="http://download.gna.org/xmpp4r/">http://download.gna.org/xmpp4r/</a>.
-Untar the archive and run <code>./setup.rb</code></p>
-
-<h3>From a Rubygem</h3>
-<p><code>gem install xmpp4r -s http://download.gna.org/xmpp4r/</code></p>
-<!-- FIXME check that it actually works -->
-
-<h3>Using a package for your distribution</h3>
-<p>There's a package available in Debian and Ubuntu. Just <code>apt-get install libxmpp4r-ruby</code></p>
-
-<h3>Using GIT to install the development version</h3>
-<p><code>git-clone git://github.com/ln/xmpp4r.git</code> (see <a href="http://github.com/ln/xmpp4r">GitHub</a>)</p>
-
 <a name="developer"></a>
 <h2>Developers</h2>
-<h3>Mailing Lists</h3>
-<p><a href="mailto:xmpp4r-develATgnaDOTorg">xmpp4r-devel at gna dot org</a> is a mailing list for development and general discussion.</p>
+<p>Discussions take place on the <a href="mailto:xmpp4r-develATgnaDOTorg">xmpp4r-devel at gna dot org</a> mailing list.</p>
 <ul><li><a href="https://mail.gna.org/listinfo/xmpp4r-devel/">xmpp4r-devel Info Page</a> (to subscribe/unsubscribe, etc)</li>
 <li><a href="https://mail.gna.org/public/xmpp4r-devel/">xmpp4r-devel archives</a></li>
 </ul>
+<p>Bug can be reported to the mailing or on the <a href="https://gna.org/projects/xmpp4r/">GNA project page</a>.</p>
 <p>When reporting bugs, please provide as much information as possible:</p>
 <ul>
+  <li>Contact information</li>
   <li>XMPP4R version or GIT revision</li>
   <li>Use <em>Jabber::debug = true</em> but remove any sensitive information</li>
   <li>Describe your environment (Ruby version, OS, server software)</li>
   <li>Cool hackers send test cases</li>
 </ul>
 
-<h3>(Sort of) Developer Documentation</h3>
+<p>The main development branch is hosted on <a href="http://github.com/ln/xmpp4r/tree/master">Github</a></b>. We encourage contributors to get familiarized with git, as git makes it very easy to get patches into the project, not just for the maintainer but also for the contributor himself. A few typical questions are answered on the <a href="http://github.com/ln/xmpp4r/wikis/developer-faq">GitHub FAQ Page</a>.  Feel free to make a GitHub 'fork' of the project and send us pull requests or patches to the xmpp4r-devel mailing list.</p>
 
-<p>Development takes place on the <a href="https://gna.org/projects/xmpp4r/">GNA project page</a>. Don't hesitate to post feature requests, bugs or patches.</p>
-
-<p>XMPP4R is written in <a href="http://www.ruby-lang.org">Ruby</a>. If you don't know this language yet, continue to ignore it. Learning it will make you realize what you missed until now, and you might run into severe problems (depression, etc).</p>
-
-<p><b>We are currently evaluating a move from SVN to Git. Our git "master" branch is <a href="http://github.com/ln/xmpp4r/tree/master">hosted on Github</a> and we encourage all developers to create any new patches from that codebase. You can learn more about our Git development process on our <a href="http://github.com/ln/xmpp4r/wikis/developer-faq">GitHub FAQ Page</a>.  Feel free to make a GitHub 'fork' of the project and send us pull requests :-)</b></p>
-
-<p>The SVN repository isn't updated anymore, but is still accessible at <code>svn co svn://svn.gna.org/svn/xmpp4r/trunk/xmpp4r</code></p>
+<p>The SVN repository isn't updated anymore, but is still accessible at <code>svn co svn://svn.gna.org/svn/xmpp4r/trunk/xmpp4r</code> for historical reasons.</p>
 
 <p>The RDOC source code documentation is <a href="rdoc/">browseable here</a>. It might not be update to date (but we try hard to make it be). You can generate your own using <code>rake rdoc</code></p>
 
