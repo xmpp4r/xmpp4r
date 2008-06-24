@@ -401,7 +401,6 @@ module Jabber
         submit_room_configuration(options)
       end
 
-      # :nodoc:
       def get_room_configuration
         raise 'You are not the owner' unless owner?
 
@@ -424,7 +423,6 @@ module Jabber
         fields
       end
 
-      # :nodoc:
       def submit_room_configuration(options)
         # fill out the reply form
         iq = Iq.new(:set, jid.strip)
