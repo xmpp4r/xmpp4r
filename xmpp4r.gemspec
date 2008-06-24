@@ -276,7 +276,7 @@ Gem::Specification.new do |s|
   s.loaded = "false"
   s.email = "xmpp4r-devel@gna.org"
   s.required_ruby_version = ">= 1.8.4"
-  s.rdoc_options = ["--quiet", "--title", "xmpp4r documentation", "--opname", "index.html", "--line-numbers", "--main", "README.rdoc", "--inline-source"]
+  s.rdoc_options = ["--quiet", "--title", "XMPP4R is an XMPP/Jabber library for Ruby.", "--opname", "index.html", "--main", "lib/xmpp4r.rb", "--line-numbers", "--inline-source"]
   s.bindir = "bin"
   s.rubygems_version = "1.2.0"
   s.homepage = "http://home.gna.org/xmpp4r/"

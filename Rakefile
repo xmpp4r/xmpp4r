@@ -9,11 +9,36 @@ require 'find'
 $:.unshift 'lib'
 require "xmpp4r"
 
-PKG_NAME  = 'xmpp4r'
-AUTHORS   = ['Lucas Nussbaum', 'Stephan Maka']
-EMAIL     = "xmpp4r-devel@gna.org"
-HOMEPAGE  = "http://home.gna.org/xmpp4r/"
-SUMMARY   = "XMPP4R is an XMPP/Jabber library for Ruby."
+##############################################################################
+# OPTIONS
+##############################################################################
+
+PKG_NAME      = 'xmpp4r'
+PKG_VERSION   = Jabber::XMPP4R_VERSION
+AUTHORS       = ['Lucas Nussbaum', 'Stephan Maka']
+EMAIL         = "xmpp4r-devel@gna.org"
+HOMEPAGE      = "http://home.gna.org/xmpp4r/"
+SUMMARY       = "XMPP4R is an XMPP/Jabber library for Ruby."
+
+# These are the common rdoc options that are shared between generation of
+# rdoc files using BOTH 'rake rdoc' and the installation by users of a
+# RubyGem version which builds rdoc's along with its installation.  Any
+# rdoc options that are ONLY for developers running 'rake rdoc' should be
+# added in the 'Rake::RDocTask' block below.
+RDOC_OPTIONS  = [
+                "--quiet",
+                "--title", SUMMARY,
+                "--opname", "index.html",
+                "--main", "lib/xmpp4r.rb",
+                "--line-numbers",
+                "--inline-source"
+                ]
+
+# Extra files outside of the lib dir that should be included with the rdocs.
+RDOC_FILES    = %w( README.rdoc README_ruby19.txt CHANGELOG LICENSE COPYING )
+
+# The full file list used for rdocs, tarballs, gems, and for generating the xmpp4r.gemspec.
+PKG_FILES     = %w( Rakefile setup.rb xmpp4r.gemspec ) + RDOC_FILES + Dir["{lib,test,data,tools}/**/*"]
 
 ##############################################################################
 # DEFAULT TASK
@@ -40,27 +65,30 @@ end
 # RDOC
 #######
 Rake::RDocTask.new do |rd|
-  f = []
-  require 'find'
-  Find.find('lib/') do |file|
-    # Skip hidden files (.svn/ directories and Vim swapfiles)
-    if file.split(/\//).last =~ /^\./
-      Find.prune
-    else
-      f << file if not FileTest.directory?(file)
-    end
-  end
-  f.delete('lib/xmpp4r.rb')
-  # hack to document the Jabber module properly
-  f.unshift('lib/xmpp4r.rb')
-  rd.rdoc_files.include(f)
-  rd.options << '--all'
-  rd.options << '--fileboxes'
-  rd.options << '--diagram'
-  rd.options << '--inline-source'
-  rd.options << '--line-numbers'
+
+  # which dir should rdoc files be installed in?
   rd.rdoc_dir = 'rdoc'
+
+  # the full list of files to be included
+  rd.rdoc_files.include(RDOC_FILES, "lib/**/*.rb")
+
+  # the full list of options that are common between gem build
+  # and 'rake rdoc' build of docs.
+  rd.options = RDOC_OPTIONS
+
+  # Devs Only : Uncomment to also document private methods in the rdocs
+  # Please don't check this change in to the source repo.
+  #rd.options << '--all'
+
+  # Devs Only : Uncomment to generate dot (graphviz) diagrams along with rdocs.
+  # This requires that graphiz (dot) be installed as a local binary and on your path.
+  # See : http://www.graphviz.org/
+  # Please don't check this change in to the source repo as it introduces a binary dependency.
+  #rd.options << '--diagram'
+  #rd.options << '--fileboxes'
+
 end
+
 
 # RCOV
 #######
@@ -108,18 +136,14 @@ end
 # What files/dirs should 'rake clean' remove?
 CLEAN.include ["*.gem", "pkg", "rdoc", "coverage", "tools/*.png"]
 
-# The file list used for rdocs, tarballs, gems, and for generating the xmpp4r.gemspec.
-RDOC_FILES  = %w( README.rdoc README_ruby19.txt CHANGELOG LICENSE COPYING )
-PKG_FILES   = %w( Rakefile setup.rb xmpp4r.gemspec ) + RDOC_FILES + Dir["{lib,test,data,tools}/**/*"]
-PKG_VERSION = Jabber::XMPP4R_VERSION
-
-# Add rake package tasks conditionally.  Full gem + tarball on systems
-# with RubyGems.  More limited on systems without.
-
+# Flag for RubyGems installation used to add rake package tasks conditionally.
+# Full gem + tarball on systems with RubyGems.  More limited on systems without.
 @rubygems = nil
 
 begin
   require 'rake/gempackagetask'
+
+  # RubyGems is installed, known since require 'rake/gempackagetask' succeeded.
   @rubygems = true
 
   spec = Gem::Specification.new do |s|
@@ -138,7 +162,7 @@ begin
     s.test_files = []
     s.has_rdoc = true
     s.extra_rdoc_files = RDOC_FILES
-    s.rdoc_options = ["--quiet", "--title", "xmpp4r documentation", "--opname", "index.html", "--line-numbers", "--main", "README.rdoc", "--inline-source"]
+    s.rdoc_options = RDOC_OPTIONS
     s.required_ruby_version = ">= 1.8.4"
   end
 
@@ -151,6 +175,11 @@ begin
 
     desc "Run :package and install the .gem locally"
     task :install => [:update_gemspec, :package] do
+      sh %{sudo gem install --local pkg/#{PKG_NAME}-#{PKG_VERSION}.gem}
+    end
+
+    desc "Like gem:install but without ri or rdocs"
+    task :install_fast => [:update_gemspec, :package] do
       sh %{sudo gem install --local pkg/#{PKG_NAME}-#{PKG_VERSION}.gem --no-rdoc --no-ri}
     end
 
