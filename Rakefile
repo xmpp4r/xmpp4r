@@ -1,10 +1,7 @@
-#!/usr/bin/ruby -w
-
 require 'rake'
 require "rake/clean"
 require 'rake/testtask'
 require 'rake/rdoctask'
-require 'find'
 
 $:.unshift 'lib'
 require "xmpp4r"
