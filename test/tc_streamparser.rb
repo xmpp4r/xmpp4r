@@ -15,6 +15,10 @@ class MockListener
   def receive(element)
     @received = element
   end
+
+  def parse_failure(exception)
+    raise exception
+  end
 end
 
 class StreamParserTest < Test::Unit::TestCase
@@ -91,6 +95,12 @@ class StreamParserTest < Test::Unit::TestCase
     parse_simple_helper( "<a>&amp;amp;amp;</a>" ) do |desired|
       assert_equal "&amp;amp;", @listener.received.text
       assert_equal "<a>&amp;amp;amp;</a>", @listener.received.to_s
+    end
+  end
+
+  def test_unbound_prefix
+    parse_simple_helper("<message><soe:instantMessage/></message>") do |desired|
+      assert_equal desired.first_element('*').name, 'instantMessage'
     end
   end
 end
