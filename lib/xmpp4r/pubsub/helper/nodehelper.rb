@@ -43,9 +43,9 @@ module Jabber
       # creates the node
       # create(configuration=nil)
       # configuration:: [Jabber::XData]
-      def create_node(configuration = nil)
+      def create_node(configuration = Jabber::PubSub::NodeConfig.new)
         if ! node_exist?
-            create(@nodename,configuration)
+            super(@nodename,configuration)
         else
           false
         end
@@ -109,7 +109,7 @@ module Jabber
       # get all subscriptions on this node
       # get_subscriptions
       def get_subscriptions
-        subscriptions(@nodename)
+        get_subscriptions_from(@nodename)
       end
 
       ##
@@ -123,7 +123,7 @@ module Jabber
       # subscribe to this node
       # do_subscribe
       def do_subscribe
-        subscribe(@nodename)
+        subscribe_to(@nodename)
         get_subscriptions
       end
 
