@@ -9,6 +9,10 @@ module Jabber
     @@logger ||= Logger.new($stderr)
   end
 
+  def Jabber::logger=(logger)
+    @@logger = logger
+  end
+
   # Is debugging mode enabled ?
   @@debug = false
 
