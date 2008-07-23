@@ -9,7 +9,7 @@ require 'xmpp4r/iq'
 require 'xmpp4r/errors'
 include Jabber
 
-require './lib/assert_equal_xml'
+require File::dirname(__FILE__) + '/lib/assert_equal_xml'
 
 class IqTest < Test::Unit::TestCase
   def test_create
