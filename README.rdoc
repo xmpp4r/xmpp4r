@@ -31,8 +31,11 @@ which can be enabled in your code with:
   Vojtech Vobr
   Andreas Wiese
   Chris Zelenak
+  Matthew Wood
   Sam Ruby
   Glenn Rempe <glenn@rempe.us>
+  Tim Carey-Smith
+  Scott Lillibridge
 
 
 == Source Code
