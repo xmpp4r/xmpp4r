@@ -159,7 +159,7 @@ module Jabber
       # it automatically generates an id for the item 
       def publish_item_to(node,item)
         iq = basic_pubsub_query(:set)
-	publish = iq.pubsub.add(REXML::Element.new('publish'))
+	      publish = iq.pubsub.add(REXML::Element.new('publish'))
         publish.attributes['node'] = node
         
         if item.kind_of?(Jabber::PubSub::Item)

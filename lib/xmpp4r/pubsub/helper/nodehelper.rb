@@ -43,9 +43,9 @@ module Jabber
       # creates the node
       # create(configuration=nil)
       # configuration:: [Jabber::XData]
-      def create_node(configuration = nil)
-        if ! node_exist?
-            create(@nodename,configuration)
+      def create_node(configuration = Jabber::PubSub::NodeConfig.new)
+        if !node_exist?
+          super(@nodename,configuration)
         else
           false
         end
@@ -80,7 +80,7 @@ module Jabber
       # publish_content(items)
       # items:: [REXML::Element]
       def publish_content(items)
-        publish(@nodename,items)
+        publish_item_to(@nodename,items)
       end
 
       ##
@@ -109,7 +109,7 @@ module Jabber
       # get all subscriptions on this node
       # get_subscriptions
       def get_subscriptions
-        subscriptions(@nodename)
+        get_subscriptions_from(@nodename)
       end
 
       ##
