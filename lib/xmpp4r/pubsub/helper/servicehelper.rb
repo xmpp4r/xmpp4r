@@ -204,7 +204,7 @@ module Jabber
 
       ##
       # Create a new node on the pubsub service
-      # node:: [String] you node name - otherwise you get a automaticly generated one (in most cases)
+      # node:: [String] the node name - otherwise you get a automatically generated one (in most cases)
       # configure:: [Jabber::PubSub::NodeConfig] if you want to configure your node (default nil)
       # return:: [String]
       def create_node(node = nil, configure = Jabber::PubSub::NodeConfig.new)
@@ -225,6 +225,19 @@ module Jabber
         end
 
         rnode
+      end
+
+      ##
+      # Create a new collection node on the pubsub service
+      # node:: [String] the node name - otherwise you get an automatically generated one (in most cases)
+      # configure:: [Jabber::PubSub::NodeConfig] if you want to configure your node (default nil)
+      # return:: [String]
+      def create_collection_node(node = nil, configure = Jabber::PubSub::NodeConfig.new)
+        if configure.options['pubsub#node_type'] && configure.options['pubsub#node_type'] != 'collection'
+          raise Jabber::ArgumentError, "Invalid node_type specified in node configuration. Either do not specify one, or use 'collection'"
+        end
+        configure.options = configure.options.merge({'pubsub#node_type' => 'collection'})
+        create_node(node, configure)
       end
 
       ##

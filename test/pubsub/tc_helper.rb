@@ -274,6 +274,30 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
   end
 
   ##
+  # create node a collection node
+  # example 203 and 204 from
+  # http://www.xmpp.org/extensions/xep-0060.html#collections-createnode
+  def test_create_collection
+    node = 'mynode'
+    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
+    required_options = {'pubsub#node_type' => 'collection'}
+    state { |iq|
+      assert_kind_of(Jabber::Iq, iq)
+      assert_equal(:set, iq.type)
+      assert_equal(1, iq.children.size)
+      assert_equal('http://jabber.org/protocol/pubsub', iq.pubsub.namespace)
+      assert_equal(2, iq.pubsub.children.size)
+      assert_equal('create', iq.pubsub.children.first.name)
+      assert_equal(node, iq.pubsub.children.first.attributes['node'])
+      assert_kind_of(Jabber::PubSub::NodeConfig, iq.pubsub.children[1])
+      assert_equal(required_options, iq.pubsub.children[1].options)
+      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
+    }
+    assert_equal('mynode', h.create_collection_node('mynode'))
+    wait_state
+  end
+
+  ##
   # delete node
   # example 144 and 145 from
   # http://www.xmpp.org/extensions/xep-0060.html#owner-delete-request
