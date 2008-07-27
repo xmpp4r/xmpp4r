@@ -389,7 +389,7 @@ module Jabber
         iq = Jabber::Iq.new(type,@pubsubjid)
         if ownerusecase
           iq.add(IqPubSubOwner.new)
-	else
+        else
           iq.add(IqPubSub.new)
         end
         iq.from = @stream.jid #.strip
