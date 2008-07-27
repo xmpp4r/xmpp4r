@@ -113,7 +113,7 @@ module Jabber
       # node:: [String]
       # subid:: [String] or nil (not supported)
       # return:: true
-      def unsubscribe_from(node,subid=nil)
+      def unsubscribe_from(node, subid=nil)
         iq = basic_pubsub_query(:set)
         unsub = PubSub::Unsubscribe.new
         unsub.node = node
@@ -132,7 +132,7 @@ module Jabber
       # node:: [String]
       # count:: [Fixnum]
       # return:: [Hash] { id => [Jabber::PubSub::Item] }
-      def get_items_from(node,count=nil)
+      def get_items_from(node, count=nil)
         iq = basic_pubsub_query(:get)
         items = Jabber::PubSub::Items.new
         items.node = node
@@ -248,7 +248,7 @@ module Jabber
       # return:: true on success
       def set_config_for(node, config)
         iq = basic_pubsub_query( :set )
-        iq.pubsub.add(Jabber::PubSub::NodeConfig(options).form)
+        iq.pubsub.add(config.form)
         @stream.send_with_id(iq) { |reply| true }
       end
 

@@ -90,11 +90,26 @@ module REXML
     end
 
     ##
-    # Test for equality of two elements,
-    # useful for assert_equal in test cases
+    # Test for equality of two elements, useful for assert_equal in
+    # test cases. Tries to parse String o as XML.
+    #
+    # See Test::Unit::Assertions
     def ==(o)
       return false unless self.kind_of? REXML::Element
-      return false unless o.kind_of? REXML::Element
+      if o.kind_of? REXML::Element
+        # Ok
+      elsif o.kind_of? String
+        # Parse o
+        begin
+          o = REXML::Document.new(o).root
+        rescue REXML::ParseException
+          return false
+        end
+      else
+        # Cannot compare with anything other than Elements or Strings
+        return false
+      end
+
       return false unless name == o.name
 
       attributes.each_attribute do |attr|
@@ -106,7 +121,7 @@ module REXML
       end
 
       children.each_with_index do |child,i|
-        return false unless child.eql? o.children[i]
+        return false unless child == o.children[i]
       end
 
       return true

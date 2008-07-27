@@ -29,6 +29,11 @@ module Jabber
         add(form)
       end
 
+      # Implemented by NodeConfig and SubscriptionConfig
+      def form_type
+        ''
+      end
+
       def options=(options)
         if options
           self.form = form_for_options( form_type, options )
@@ -66,11 +71,11 @@ module Jabber
       def form_for_options(type, options)
         form = Jabber::Dataforms::XData.new(:submit)
         pubsub_config = Jabber::Dataforms::XDataField.new('FORM_TYPE', :hidden)
-        pubsub_config.values = type
+        pubsub_config.values = [type]
         form.add(pubsub_config)
         options.each_pair do |key, value|
           f = Jabber::Dataforms::XDataField.new(key)
-          f.values = value
+          f.values = [value]
           form.add(f)
         end
 
