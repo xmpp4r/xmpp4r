@@ -57,7 +57,7 @@ module Jabber
               connect(record.target.to_s, record.port)
               # Success
               return self
-            rescue SocketError
+            rescue SocketError, Errno::ECONNREFUSED
               # Try next SRV record
             end
           }
