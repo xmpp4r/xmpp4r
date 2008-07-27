@@ -183,7 +183,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     }
 
     options = h.get_options_from(node, jid)
-    assert_kind_of(Jabber::PubSub::SubscriptionConfig, options)
+    #sassert_kind_of(Jabber::PubSub::SubscriptionConfig, options)
     assert_equal({'pubsub#deliver'=>'1'}, options.options)
     wait_state
   end
@@ -192,7 +192,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
   # set subscription options
   # examples 65 and 66 from
   # http://www.xmpp.org/extensions/xep-0060.html#subscriber-configure-submit
-  def test_get_subscription_options
+  def test_set_subscription_options
     pubsub = Jabber::JID.new('pubsub.example.org')
     node = 'princely_musings'
     jid = Jabber::JID.new('test@test.com/test')
