@@ -35,7 +35,7 @@ module Jabber
       # set the 'jid' attribute of this stanza
       # jid:: [Jabber::JID] or [String] the jid owning the subscription
       def jid=(jid)
-        attributes['jid'] = jid
+        attributes['jid'] = jid.to_s
       end
 
       ##
