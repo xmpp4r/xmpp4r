@@ -100,4 +100,14 @@ class SOCKS5BytestreamsTest < Test::Unit::TestCase
     initiator.close
   end
 
+  def test_timeout
+    target = Bytestreams::SOCKS5BytestreamsTarget.new(@server, '1', '1@a.com/1', '1@a.com/2')
+
+    assert_nothing_raised do
+      Timeout::timeout(2) do
+        target.connect_timeout = 1
+        assert target.accept == false
+      end
+    end
+  end
 end

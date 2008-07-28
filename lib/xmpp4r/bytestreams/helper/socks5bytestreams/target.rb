@@ -53,7 +53,12 @@ module Jabber
           end
         }
 
-        connect_sem.wait
+        begin
+          Timeout::timeout(@connect_timeout) { connect_sem.wait }
+        rescue Timeout::Error
+          @stream.delete_iq_callback(self)
+        end
+
         raise error if error
         (@socks != nil)
       end
