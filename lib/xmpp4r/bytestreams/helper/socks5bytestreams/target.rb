@@ -8,6 +8,12 @@ module Jabber
     # SOCKS5 Bytestreams implementation of the target site
     class SOCKS5BytestreamsTarget < SOCKS5Bytestreams
       ##
+      # See SOCKS5Bytestreams#initialize
+      def initialize(stream, session_id, initiator_jid, target_jid)
+        @connect_timeout = 60
+        super
+      end
+      ##
       # Wait until the stream has been established
       #
       # May raise various exceptions
