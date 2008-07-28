@@ -16,7 +16,7 @@ module Jabber
 
       attr_reader :nodename
       attr_reader :name
-      attr_reader :jiod
+      attr_reader :jid
       attr_reader :my_subscriptions
       ##
       # creates a new node
@@ -80,7 +80,7 @@ module Jabber
       # publish_content(items)
       # items:: [REXML::Element]
       def publish_content(items)
-        publish(@nodename, items)
+        publish_item_to(@nodename,items)
       end
 
       ##
