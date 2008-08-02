@@ -36,6 +36,7 @@ which can be enabled in your code with:
   Glenn Rempe <glenn@rempe.us>
   Tim Carey-Smith
   Scott Lillibridge
+  Joshua Sierles
 
 
 == Source Code
