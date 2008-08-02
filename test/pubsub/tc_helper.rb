@@ -183,7 +183,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     }
 
     options = h.get_options_from(node, jid)
-    #sassert_kind_of(Jabber::PubSub::SubscriptionConfig, options)
+    assert_kind_of(Jabber::PubSub::SubscriptionConfig, options)
     assert_equal({'pubsub#deliver'=>'1'}, options.options)
     wait_state
   end
