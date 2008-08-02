@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = ["README.rdoc", "README_ruby19.txt", "CHANGELOG", "LICENSE", "COPYING"]
   s.authors = ["Lucas Nussbaum", "Stephan Maka"]
   s.required_rubygems_version = ">= 0"
-  s.version = "0.3.3"
+  s.version = "0.3.2.99"
   s.files = ["CHANGELOG",
  "COPYING",
  "LICENSE",
