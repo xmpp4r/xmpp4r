@@ -118,6 +118,44 @@ module Jabber
     end
 
     ##
+    # Resource binding (RFC3920bis-06 - section 8.)
+    #
+    # XMPP allows to bind to multiple resources
+    def bind(desired_resource=nil)
+      iq = Iq.new(:set)
+      bind = iq.add REXML::Element.new('bind')
+      bind.add_namespace @stream_features['bind']
+      if desired_resource
+        resource = bind.add REXML::Element.new('resource')
+        resource.text = desired_resource
+      end
+
+      jid = nil
+      send_with_id(iq) do |reply|
+        reply_bind = reply.first_element('bind')
+        if reply_bind
+          reported_jid = reply_bind.first_element('jid')
+          if reported_jid and reported_jid.text
+            jid = JID.new(reported_jid.text)
+          end
+        end
+      end
+      jid
+    end
+
+    ##
+    # Resource unbinding (RFC3920bis-06 - section 8.6.3.)
+    def unbind(desired_resource)
+      iq = Iq.new(:set)
+      unbind = iq.add REXML::Element.new('unbind')
+      unbind.add_namespace @stream_features['unbind']
+      resource = unbind.add REXML::Element.new('resource')
+      resource.text = desired_resource
+
+      send_with_id(iq)
+    end
+
+    ##
     # Use a SASL authentication mechanism and bind to a resource
     #
     # If there was no resource given in the jid, the jid/resource
@@ -138,20 +176,7 @@ module Jabber
 
       # Resource binding (RFC3920 - 7)
       if @stream_features.has_key? 'bind'
-        iq = Iq.new(:set)
-        bind = iq.add REXML::Element.new('bind')
-        bind.add_namespace @stream_features['bind']
-        if jid.resource
-          resource = bind.add REXML::Element.new('resource')
-          resource.text = jid.resource
-        end
-
-        send_with_id(iq) do |reply|
-          reported_jid = reply.first_element('jid')
-          if reported_jid and reported_jid.text
-            @jid = JID.new(reported_jid.text)
-          end
-        end
+        @jid = bind(@jid.resource)
       end
 
       # Session starting
