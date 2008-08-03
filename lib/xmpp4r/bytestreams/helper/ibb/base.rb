@@ -135,9 +135,7 @@ module Jabber
           close.add_namespace IBB::NS_IBB
           close.attributes['sid'] = @session_id
 
-          @stream.send_with_id(iq) { |answer|
-            answer.type == :result
-          }
+          @stream.send_with_id(iq)
         end
       end
 

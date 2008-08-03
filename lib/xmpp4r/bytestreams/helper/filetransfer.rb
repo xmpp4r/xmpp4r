@@ -278,10 +278,10 @@ module Jabber
         begin
           stream_method = nil
           response = nil
-          @stream.send_with_id(iq) { |r|
+          @stream.send_with_id(iq) do |r|
             response = r
             si = response.first_element('si')
-            if response.type == :result and si and si.feature and si.feature.x
+            if si and si.feature and si.feature.x
               stream_method = si.feature.x.field('stream-method').values.first
 
               if si.file and si.file.range
@@ -293,8 +293,7 @@ module Jabber
                 end
               end
             end
-            true
-          }
+          end
         rescue ServerError => e
           if e.error.code == 403  # Declined
             return false

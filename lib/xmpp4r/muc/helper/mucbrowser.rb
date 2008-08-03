@@ -78,25 +78,11 @@ module Jabber
         iq.add(Discovery::IqQueryDiscoItems.new)
 
         rooms = {}
-        err = nil
 
         @stream.send_with_id(iq) do |answer|
-
-          if answer.type == :result
-            answer.query.each_element('item') { |item|
-              rooms[item.jid] = item.iname
-            }
-            true
-          elsif answer.type == :error
-            err = answer.error
-            true
-          else
-            false
-          end
-        end
-
-        if err
-          raise "Error getting MUC rooms: #{err.error}, #{err.text}"
+          answer.query.each_element('item') { |item|
+            rooms[item.jid] = item.iname
+          }
         end
 
         rooms

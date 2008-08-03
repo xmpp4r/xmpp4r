@@ -80,7 +80,6 @@ module Jabber
               res << Jabber::PubSub::Subscription.import(subscription)
             }
           end
-          true
         }
 
         res
@@ -101,7 +100,6 @@ module Jabber
           if pubsubanswer.first_element('subscription')
             res = PubSub::Subscription.import(pubsubanswer.first_element('subscription'))
           end
-          true
         end # @stream.send_with_id(iq)
         res
       end
@@ -122,7 +120,6 @@ module Jabber
         ret = false
         @stream.send_with_id(iq) { |reply| 
           ret = reply.kind_of?(Jabber::Iq) and reply.type == :result
-          true
         } # @stream.send_with_id(iq)
         ret
       end
@@ -165,7 +162,7 @@ module Jabber
         if item.kind_of?(Jabber::PubSub::Item)
           item.id = Jabber::IdGenerator.generate_id
           publish.add(item)
-          @stream.send_with_id(iq) { |reply| true }
+          @stream.send_with_id(iq)
         end
       end
 
@@ -187,7 +184,7 @@ module Jabber
         else
           raise "given item is not a proper xml document or Jabber::PubSub::Item"
         end
-        @stream.send_with_id(iq) { |reply| true }
+        @stream.send_with_id(iq)
       end
 
       ##
@@ -199,7 +196,7 @@ module Jabber
         purge = REXML::Element.new('purge')
         purge.attributes['node'] = node
         iq.pubsub.add(purge)
-        @stream.send_with_id(iq) { |reply| true }
+        @stream.send_with_id(iq)
       end
 
       ##
@@ -221,7 +218,6 @@ module Jabber
           if reply.kind_of?(Jabber::Iq) and reply.type == :result
             rnode = node
           end
-          true
         end
 
         rnode
@@ -262,7 +258,7 @@ module Jabber
       def set_config_for(node, config)
         iq = basic_pubsub_query( :set )
         iq.pubsub.add(config.form)
-        @stream.send_with_id(iq) { |reply| true }
+        @stream.send_with_id(iq)
       end
 
       ##
@@ -272,9 +268,7 @@ module Jabber
       def delete_node(node)
         iq = basic_pubsub_query(:set,true)
         iq.pubsub.add(REXML::Element.new('delete')).attributes['node'] = node
-        @stream.send_with_id(iq) { |reply|
-          true
-        }
+        @stream.send_with_id(iq)
       end
 
 
@@ -372,7 +366,6 @@ module Jabber
         ret = false
         @stream.send_with_id(iq) do  |reply|
           ret = ( reply.type == :result )
-          true
         end
 
         ret

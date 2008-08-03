@@ -99,15 +99,12 @@ module Jabber
         iq.from = my_jid
         iq.add(IqQueryBytestreams.new)
         stream.send_with_id(iq) { |reply|
-          if reply.type == :result
-            reply.query.each_element { |e|
-              if e.kind_of?(StreamHost)
-                e.jid = reply.from  # Help misconfigured proxys
-                res = e
-              end
-            }
-          end
-          true
+          reply.query.each_element { |e|
+            if e.kind_of?(StreamHost)
+              e.jid = reply.from  # Help misconfigured proxys
+              res = e
+            end
+          }
         }
 
         if res and res.jid and res.host and res.port

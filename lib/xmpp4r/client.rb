@@ -146,14 +146,12 @@ module Jabber
           resource.text = jid.resource
         end
 
-        send_with_id(iq) { |reply|
+        send_with_id(iq) do |reply|
           reported_jid = reply.first_element('jid')
-          if reply.type == :result and reported_jid and reported_jid.text
+          if reported_jid and reported_jid.text
             @jid = JID.new(reported_jid.text)
           end
-
-          true
-        }
+        end
       end
 
       # Session starting
@@ -162,7 +160,7 @@ module Jabber
         session = iq.add REXML::Element.new('session')
         session.add_namespace @stream_features['session']
 
-        send_with_id(iq) { true }
+        send_with_id(iq)
       end
     end
 
@@ -213,9 +211,7 @@ module Jabber
       else
         authset = Iq.new_authset(@jid, password)
       end
-      send_with_id(authset) do |r|
-        true
-      end
+      send_with_id(authset)
       $defout.flush
 
       true
@@ -284,9 +280,7 @@ module Jabber
         reg.query.add(REXML::Element.new(name)).text = value
       }
 
-      send_with_id(reg) { |answer|
-        true
-      }
+      send_with_id(reg)
     end
 
     ##
@@ -298,10 +292,7 @@ module Jabber
       reg = Iq.new_register
       reg.to = jid.domain
       reg.query.add(REXML::Element.new('remove'))
-      send_with_id(reg) { |answer|
-        p answer.to_s
-        true
-      }
+      send_with_id(reg)
     end
 
     ##
@@ -320,13 +311,7 @@ module Jabber
       iq.query.add(REXML::Element.new('password')).text = new_password
 
       err = nil
-      send_with_id(iq) { |answer|
-        if answer.type == :result
-          true
-        else
-          false
-        end
-      }
+      send_with_id(iq)
     end
   end
 end

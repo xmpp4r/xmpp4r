@@ -326,7 +326,7 @@ module Jabber
         else
           request = Iq.new_rosterset
           request.query.add(Jabber::Roster::RosterItem.new(jid, iname))
-          @stream.send_with_id(request) { true }
+          @stream.send_with_id(request)
           # Adding to list is handled by handle_iq_query_roster
         end
 
@@ -351,7 +351,7 @@ module Jabber
         unless self[jid.strip]
           request = Iq.new_rosterset
           request.query.add(Jabber::Roster::RosterItem.new(jid.strip, iname))
-          @stream.send_with_id(request) { true }
+          @stream.send_with_id(request)
         end
       end
 
@@ -400,7 +400,7 @@ module Jabber
         def remove
           request = Iq.new_rosterset
           request.query.add(Jabber::Roster::RosterItem.new(jid, nil, :remove))
-          @stream.send_with_id(request) { true }
+          @stream.send_with_id(request)
           # Removing from list is handled by Roster#handle_iq_query_roster
         end
 

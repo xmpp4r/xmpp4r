@@ -83,14 +83,11 @@ module Jabber
         rpcquery.typed_add(xmlrpc)
 
         result = nil
-        @stream.send_with_id(iq) { |iqreply|
-          if iqreply.type == :result and iqreply.query.kind_of?(IqQueryRPC)
+        @stream.send_with_id(iq) do |iqreply|
+          if iqreply.query.kind_of?(IqQueryRPC)
             result = iqreply.query.to_s
-            true
-          else
-            false
           end
-        }
+        end
 
         result
       end

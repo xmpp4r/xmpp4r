@@ -26,21 +26,12 @@ module Jabber
         iq.from = @stream.jid
         iq.add(Discovery::IqQueryDiscoItems.new)
         nodes = []
-        err = nil
-        @stream.send_with_id(iq) { |answer|
-          if answer.type == :result
-            answer.query.each_element('item') { |item|
-              nodes.push(item.node)
-            }
-            true
-          elsif answer.type == :error
-            err = answer.error
-            true
-          else
-            false
-          end
-        }
-        return nodes
+        @stream.send_with_id(iq) do |answer|
+          answer.query.each_element('item') { |item|
+            nodes.push(item.node)
+          }
+        end
+        nodes
       end
 
       ##
@@ -54,21 +45,12 @@ module Jabber
         iq.from = @stream.jid
         iq.add(Discovery::IqQueryDiscoItems.new)
         nodes = []
-        err = nil
         @stream.send_with_id(iq) { |answer|
-          if answer.type == :result
-            answer.query.each_element('item') { |item|
-              nodes.push( {'node' => item.node,'name' => item.iname } )
-            }
-            true
-          elsif answer.type == :error
-            err = answer.error
-            true
-          else
-            false
-          end
-        }
-        return nodes
+          answer.query.each_element('item') do |item|
+            nodes.push( {'node' => item.node,'name' => item.iname } )
+          }
+        end
+        nodes
       end
 
 
@@ -87,20 +69,12 @@ module Jabber
         iq.add(discoitems)
         items = []
         err = nil
-        @stream.send_with_id(iq) { |answer|
-          if answer.type == :result
-            answer.query.each_element('item') { |item|
-              items.push( {'jid' => item.jid,'name' => item.iname } )
-            }
-            true
-          elsif answer.type == :error
-            err = answer.error
-            true
-          else
-            false
-          end
-        }
-        return items
+        @stream.send_with_id(iq) do |answer|
+          answer.query.each_element('item') { |item|
+            items.push( {'jid' => item.jid,'name' => item.iname } )
+          }
+        end
+        items
       end
 
       ##
@@ -116,19 +90,17 @@ module Jabber
         discoinfo.node = node
         iq.add(discoinfo)
         info = {}
-        @stream.send_with_id(iq) { |answer|
-          if answer.type == :result
-            identity = answer.query.identity
-            info['type'] = identity.type
-            info['category'] = identity.category
-            info['features'] = answer.query.features
-
-            answer.query.each_element('x') { |x|
-              info['nodeinformation'] = x
-            }
-          end
-        }
-        return info
+        @stream.send_with_id(iq) do |answer|
+          identity = answer.query.identity
+          info['type'] = identity.type
+          info['category'] = identity.category
+          info['features'] = answer.query.features
+          
+          answer.query.each_element('x') { |x|
+            info['nodeinformation'] = x
+          }
+        end
+        info
       end
       # this is only for a xep <-> nodebrowser.rb understanding
       alias get_metadata get_info

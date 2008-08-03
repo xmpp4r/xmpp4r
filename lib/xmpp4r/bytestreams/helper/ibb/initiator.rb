@@ -22,9 +22,7 @@ module Jabber
         open.attributes['sid'] = @session_id
         open.attributes['block-size'] = @block_size.to_s
 
-        @stream.send_with_id(iq) { |answer|
-          answer.type == :result
-        }
+        @stream.send_with_id(iq)
 
         activate
       end

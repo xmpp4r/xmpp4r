@@ -49,12 +49,11 @@ module Jabber
 
         peer_used = nil
         @stream.send_with_id(iq1) { |response|
-          if response.type == :result and response.query.kind_of?(IqQueryBytestreams)
+          if response.query.kind_of?(IqQueryBytestreams)
             peer_used = response.query.streamhost_used
             raise "No streamhost-used" unless peer_used
             raise "Invalid streamhost-used" unless peer_used.jid
           end
-          true
         }
 
         @streamhost_used = nil
@@ -79,9 +78,7 @@ module Jabber
           end
           iq2 = Iq.new(:set, @streamhost_used.jid)
           iq2.add(IqQueryBytestreams.new(@session_id)).activate = @target_jid.to_s
-          @stream.send_with_id(iq2) { |reply|
-            reply.type == :result
-          }
+          @stream.send_with_id(iq2)
         end
       end
     end
