@@ -99,10 +99,9 @@ class StreamParserTest < Test::Unit::TestCase
   end
 
 =begin
-  **********
-  * FIXME! *
-  **********
-
+  ##
+  # FIXME:
+  # http://www.germane-software.com/projects/rexml/ticket/165
   def test_unbound_prefix
     parse_simple_helper("<message><soe:instantMessage/></message>") do |desired|
       assert_equal desired.first_element('*').name, 'instantMessage'
