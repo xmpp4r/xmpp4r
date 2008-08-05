@@ -12,7 +12,7 @@ require "xmpp4r"
 
 PKG_NAME      = 'xmpp4r'
 PKG_VERSION   = Jabber::XMPP4R_VERSION
-AUTHORS       = ['Lucas Nussbaum', 'Stephan Maka']
+AUTHORS       = ['Lucas Nussbaum', 'Stephan Maka', 'Glenn Rempe']
 EMAIL         = "xmpp4r-devel@gna.org"
 HOMEPAGE      = "http://home.gna.org/xmpp4r/"
 SUMMARY       = "XMPP4R is an XMPP/Jabber library for Ruby."
