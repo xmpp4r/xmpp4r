@@ -98,7 +98,7 @@ begin
     t.test_files = ['test/ts_xmpp4r.rb']
     t.output_dir = "coverage"
   end
-rescue Object
+rescue LoadError
 end
 
 # DOT GRAPH
@@ -133,15 +133,8 @@ end
 # What files/dirs should 'rake clean' remove?
 CLEAN.include ["*.gem", "pkg", "rdoc", "coverage", "tools/*.png"]
 
-# Flag for RubyGems installation used to add rake package tasks conditionally.
-# Full gem + tarball on systems with RubyGems.  More limited on systems without.
-@rubygems = nil
-
 begin
   require 'rake/gempackagetask'
-
-  # RubyGems is installed, known since require 'rake/gempackagetask' succeeded.
-  @rubygems = true
 
   spec = Gem::Specification.new do |s|
     s.name = PKG_NAME
@@ -190,12 +183,11 @@ begin
     desc "Update Github Gemspec"
     task :update_gemspec do
       skip_fields = %w(new_platform original_platform date)
-      integer_fields = %w(specification_version)
 
       result = "# WARNING : RAKE AUTO-GENERATED FILE.  DO NOT MANUALLY EDIT!\n"
       result << "# RUN : 'rake gem:update_gemspec'\n\n"
       result << "Gem::Specification.new do |s|\n"
-      spec.instance_variables.each do |ivar|
+      spec.instance_variables.sort.each do |ivar|
         value = spec.instance_variable_get(ivar)
         name  = ivar.split("@").last
         next if skip_fields.include?(name) || value.nil? || value == "" || (value.respond_to?(:empty?) && value.empty?)
@@ -208,8 +200,7 @@ begin
           case value
           when Array
             value =  name != "files" ? value.inspect : value.sort.uniq.inspect.split(",").join(",\n")
-          when String
-            value = value.to_i if integer_fields.include?(name)
+          when String, Fixnum, true, false
             value = value.inspect
           else
             value = value.to_s.inspect
@@ -228,8 +219,7 @@ begin
   task :gem => ['gem:update_gemspec']
 
 rescue LoadError
-  @rubygems = false
-  warning = <<EOF
+  puts <<EOF
 ###
   Packaging Warning : RubyGems is apparently not installed on this
   system and any file add/remove/rename will not
@@ -240,12 +230,11 @@ rescue LoadError
   gemspec will also stay in sync for others.
 ###
 EOF
-  puts warning
 end
 
 # we are apparently on a system that does not have RubyGems installed.
 # Lets try to provide only the basic tarball package tasks as a fallback.
-if @rubygems == false
+unless defined? Gem
   begin
     require 'rake/packagetask'
     Rake::PackageTask.new(PKG_NAME, PKG_VERSION) do |p|
@@ -254,11 +243,10 @@ if @rubygems == false
       p.need_zip = true
     end
   rescue LoadError
-    warning = <<EOF
+    puts <<EOF
 ###
   Warning : Unable to require the 'rake/packagetask'. Is Rake installed?
 ###
 EOF
-    puts warning
   end
 end
