@@ -1,5 +1,5 @@
-XMPP4R 0.3.3 (XX/XX/XXXX)
-=========================
+XMPP4R 0.4 (05/08/2008)
+=======================
 * Initial support for Ruby 1.9 (see README_ruby19.txt)
 * Complete PubSub API Change - more logical and better for 
   childclasses, support for collection node creation
