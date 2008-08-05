@@ -166,6 +166,7 @@ begin
   Rake::GemPackageTask.new(spec) do |pkg|
     pkg.gem_spec = spec
     pkg.need_tar = true
+    pkg.need_zip = true
   end
 
   namespace :gem do
@@ -250,6 +251,7 @@ if @rubygems == false
     Rake::PackageTask.new(PKG_NAME, PKG_VERSION) do |p|
       p.package_files = PKG_FILES
       p.need_tar = true
+      p.need_zip = true
     end
   rescue LoadError
     warning = <<EOF
