@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-$:.unshift '../lib'
+$:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 
 require 'tempfile'
 require 'test/unit'
@@ -103,9 +103,10 @@ class StreamParserTest < Test::Unit::TestCase
   # FIXME:
   # http://www.germane-software.com/projects/rexml/ticket/165
   def test_unbound_prefix
-    parse_simple_helper("<message><soe:instantMessage/></message>") do |desired|
-      assert_equal desired.first_element('*').name, 'instantMessage'
-    end
+    fixture = "<message><soe:instantMessage/></message>"
+    parser = StreamParser.new(STREAM + fixture, @listener)
+
+    assert_nothing_raised { parser.parse }
   end
 =end
 end
