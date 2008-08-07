@@ -109,4 +109,12 @@ class StreamParserTest < Test::Unit::TestCase
     assert_nothing_raised { parser.parse }
   end
 =end
+
+  def test_stream_restart
+    parser = StreamParser.new(STREAM + "<stream:stream xmlns:stream='http://etherx.jabber.org/streams' to='foobar'>", @listener)
+
+    parser.parse
+
+    assert_equal 'foobar', @listener.received.attributes['to']
+  end
 end

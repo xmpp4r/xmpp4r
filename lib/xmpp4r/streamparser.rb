@@ -43,7 +43,11 @@ module Jabber
           e.add_attributes attributes
           @current = @current.nil? ? e : @current.add_element(e)
 
-          if @current.name == 'stream' and !@started
+          # Handling <stream:stream> not only when it is being
+          # received as a top-level tag but also as a child of the
+          # top-level element itself. This way, we handle stream
+          # restarts (ie. after SASL authentication).
+          if @current.name == 'stream' and @current.parent.nil?
             @started = true
             @listener.receive(@current)
             @current = nil
