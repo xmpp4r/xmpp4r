@@ -131,7 +131,7 @@ module Jabber
         true
       }
       if reply.name != 'proceed'
-        raise ServerError(reply.first_element('error'))
+        raise ServerError.new(reply.first_element('error'))
       end
       # Don't be interrupted
       stop
