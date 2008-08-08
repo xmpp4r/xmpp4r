@@ -219,6 +219,8 @@ module Jabber
         end
       end
 
+      return true if @xmlcbs.process(stanza)
+
       # Iterate through blocked threads (= waiting for an answer)
       #
       # We're dup'ping the @threadblocks here, so that we won't end up in an
@@ -246,7 +248,6 @@ module Jabber
       }
 
       Jabber::debuglog("PROCESSING:\n#{stanza.to_s} (#{stanza.class})")
-      return true if @xmlcbs.process(stanza)
       return true if @stanzacbs.process(stanza)
       case stanza
       when Message
@@ -309,7 +310,8 @@ module Jabber
       begin
         # Temporarily remove stanza's namespace to
         # reduce bandwidth consumption
-        if xml.kind_of? XMPPStanza and xml.namespace == 'jabber:client'
+        if xml.kind_of? XMPPStanza and xml.namespace == 'jabber:client' and
+            xml.prefix != 'stream' and xml.name != 'stream'
           xml.delete_namespace
           send_data(xml.to_s)
           xml.add_namespace(@streamns)
@@ -393,7 +395,9 @@ module Jabber
     end
 
     ##
-    # Adds a callback block to process received XML messages
+    # Adds a callback block to process received XML messages, these
+    # will be handled before any blocks given to Stream#send or other
+    # callbacks.
     #
     # priority:: [Integer] The callback's priority, the higher, the sooner
     # ref:: [String] The callback's reference
