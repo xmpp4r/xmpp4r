@@ -75,7 +75,9 @@ module Jabber
     # Close the connection,
     # sends <tt></stream:stream></tt> tag first
     def close
-      send("</stream:stream>")
+      if @status == CONNECTED
+        send("</stream:stream>")
+      end
       super
     end
 
