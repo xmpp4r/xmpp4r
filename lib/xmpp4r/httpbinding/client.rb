@@ -4,6 +4,7 @@
 
 
 require 'xmpp4r/client'
+require 'xmpp4r/semaphore'
 require 'net/http'
 
 module Jabber
@@ -73,7 +74,7 @@ module Jabber
         @stream_features = {}
         @http_rid = IdGenerator.generate_id.to_i
         @pending_rid = @http_rid
-        @pending_rid_lock = Mutex.new
+        @pending_rid_lock = Semaphore.new
 
         req_body = REXML::Element.new('body')
         req_body.attributes['rid'] = @http_rid
@@ -148,7 +149,7 @@ module Jabber
       # result:: [REXML::Element]
       def receive_elements_with_rid(rid, elements)
         while rid > @pending_rid
-          @pending_rid_lock.lock
+          @pending_rid_lock.wait
         end
         @pending_rid = rid + 1
 
@@ -156,7 +157,7 @@ module Jabber
           receive(e)
         }
 
-        @pending_rid_lock.unlock
+        @pending_rid_lock.run
       end
 
       ##
