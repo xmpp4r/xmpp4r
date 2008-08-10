@@ -153,7 +153,7 @@ module Jabber
         end
         res[key] = value unless key == ''
 
-        Jabber::debuglog("SASL DIGEST-MD5 challenge:\n#{text.inspect}\n#{res.inspect}")
+        Jabber::debuglog("SASL DIGEST-MD5 challenge:\n#{text}\n#{res.inspect}")
 
         res
       end
@@ -180,7 +180,7 @@ module Jabber
         }
 
         response_text = response.collect { |k,v| "#{k}=#{v}" }.join(',')
-        Jabber::debuglog("SASL DIGEST-MD5 response:\n#{response_text}")
+        Jabber::debuglog("SASL DIGEST-MD5 response:\n#{response_text}\n#{response.inspect}")
 
         r = REXML::Element.new('response')
         r.add_namespace NS_SASL

@@ -2,6 +2,7 @@
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
 # Website::http://home.gna.org/xmpp4r/
 
+# TODO: eval  <body type='terminate' condition=
 
 require 'xmpp4r/client'
 require 'xmpp4r/semaphore'
@@ -51,6 +52,7 @@ module Jabber
         @last_send = Time.at(0)
         @send_buffer = ''
 
+        @http_requests = 1
         @http_wait = 20
         @http_hold = 1
         @http_content_type = 'text/xml; charset=utf-8'
@@ -83,7 +85,7 @@ module Jabber
         req_body.attributes['wait'] = @http_wait.to_s
         req_body.attributes['to'] = @jid.domain
         if host
-          req_body.attributes['route'] = 'xmpp:#{host}:#{port}'
+          req_body.attributes['route'] = "xmpp:#{host}:#{port}"
         end
         req_body.attributes['secure'] = 'true'
         req_body.attributes['xmlns'] = 'http://jabber.org/protocol/httpbind'
@@ -106,19 +108,6 @@ module Jabber
         receive_elements_with_rid(@http_rid, res_body.children)
 
         @features_sem.run
-      end
-
-      ##
-      # Send a stanza, additionally with block
-      #
-      # This method ensures a 'jabber:client' namespace for
-      # the stanza
-      def send(xml, &block)
-        if xml.kind_of? REXML::Element
-          xml.add_namespace('jabber:client')
-        end
-
-        super
       end
 
       ##
@@ -168,12 +157,12 @@ module Jabber
         request.content_length = body.size
         request.body = body
         request['Content-Type'] = @http_content_type
-        Jabber::debuglog("HTTP REQUEST (#{@pending_requests}/#{@http_requests}):\n#{request.body}")
+        Jabber::debuglog("HTTP REQUEST (#{@pending_requests + 1}/#{@http_requests}):\n#{request.body}")
         response = Net::HTTP.start(@uri.host, @uri.port) { |http|
           http.use_ssl = true if @uri.kind_of? URI::HTTPS
           http.request(request)
         }
-        Jabber::debuglog("HTTP RESPONSE (#{@pending_requests}/#{@http_requests}):\n#{response.body}")
+        Jabber::debuglog("HTTP RESPONSE (#{@pending_requests + 1}/#{@http_requests}): #{response.class}\n#{response.body}")
 
         unless response.kind_of? Net::HTTPSuccess
           # Unfortunately, HTTPResponses aren't exceptions
