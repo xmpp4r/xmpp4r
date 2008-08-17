@@ -155,14 +155,10 @@ module Jabber
         Jabber::debuglog("TLSv1: OpenSSL handshake in progress")
         sslsocket.connect
 
-        if sslsocket.respond_to? :io
-          sslsocket = sslsocket.io
-        else
-          # Make REXML believe it's a real socket
-          class << sslsocket
-            def kind_of?(o)
-              o == IO ? true : super
-            end
+        # Make REXML believe it's a real socket
+        class << sslsocket
+          def kind_of?(o)
+            o == IO ? true : super
           end
         end
 
