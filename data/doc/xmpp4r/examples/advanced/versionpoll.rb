@@ -7,7 +7,8 @@ $:.unshift '../../../../../lib'
 
 require 'optparse'
 require 'xmpp4r/client'
-require 'xmpp4r/version/iq/version'
+require 'xmpp4r/version'
+require 'xmpp4r/discovery'
 include Jabber
 #Jabber::debug = true
 
@@ -15,6 +16,7 @@ include Jabber
 jid = JID.new('bot@localhost/Bot')
 password = 'bot'
 domains = []
+domains_ejabberd = []
 OptionParser.new do |opts|
   opts.banner = 'Usage: versionpoll.rb -j jid -p password -d DOMAINS'
   opts.separator ''
@@ -48,6 +50,18 @@ cl.add_iq_callback do |i|
         cl.send(Iq.new_browseget.set_to(j))
       end
     end
+  elsif i.type == :result and i.query.kind_of? Discovery::IqQueryDiscoItems
+    i.query.items.each do |e|
+      j = e.jid
+      if not queried.include?(j)
+        activity = true
+        queried << j
+        iq = Iq.new(:get)
+        iq.query = Version::IqQueryVersion.new
+        iq.set_to(j)
+        cl.send(iq)
+      end
+    end
   end
 end
 
@@ -79,6 +93,11 @@ end
 cl.send(Presence.new)
 for d in domains do
   cl.send(Iq.new_browseget.set_to("#{d}/admin"))
+end
+for d in domains_ejabberd do
+  iq = Iq.new(:get, d)
+  iq.add(Discovery::IqQueryDiscoItems.new).node = 'online users'
+  cl.send(iq)
 end
 
 activity = true
