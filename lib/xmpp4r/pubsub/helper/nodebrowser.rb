@@ -45,10 +45,10 @@ module Jabber
         iq.from = @stream.jid
         iq.add(Discovery::IqQueryDiscoItems.new)
         nodes = []
-        @stream.send_with_id(iq) { |answer|
+        @stream.send_with_id(iq) do |answer|
           answer.query.each_element('item') do |item|
             nodes.push( {'node' => item.node,'name' => item.iname } )
-          }
+          end
         end
         nodes
       end
