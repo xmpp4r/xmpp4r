@@ -227,9 +227,14 @@ module Jabber
       def response_value(username, realm, digest_uri, passwd, nonce, cnonce, qop)
         a1_h = h("#{username}:#{realm}:#{passwd}")
         a1 = "#{a1_h}:#{nonce}:#{cnonce}"
-        #a2 = "AUTHENTICATE:#{digest_uri}#{(qop == 'auth') ? '' : ':00000000000000000000000000000000'}"
-        a2 = "AUTHENTICATE:#{digest_uri}"
-
+        if authzid
+          a1 += ":#{authzid}"
+        end
+        if qop == 'auth-int' || qop == 'auth-conf'
+          a2 = "AUTHENTICATE:#{digest_uri}:00000000000000000000000000000000"
+        else
+          a2 = "AUTHENTICATE:#{digest_uri}"
+        end
         hh("#{hh(a1)}:#{nonce}:00000001:#{cnonce}:#{qop}:#{hh(a2)}")
       end
     end
