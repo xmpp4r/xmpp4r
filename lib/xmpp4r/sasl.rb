@@ -231,9 +231,9 @@ module Jabber
           a1 += ":#{authzid}"
         end
         if qop == 'auth-int' || qop == 'auth-conf'
-          a2 = "AUTHENTICATE:#{digest_uri}"
-        else
           a2 = "AUTHENTICATE:#{digest_uri}:00000000000000000000000000000000"
+        else
+          a2 = "AUTHENTICATE:#{digest_uri}"
         end
         hh("#{hh(a1)}:#{nonce}:00000001:#{cnonce}:#{qop}:#{hh(a2)}")
       end
