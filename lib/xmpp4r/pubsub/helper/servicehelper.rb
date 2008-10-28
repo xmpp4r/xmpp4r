@@ -188,6 +188,23 @@ module Jabber
       end
 
       ##
+      # deletes an item from a persistent node
+      # node:: [String]
+      # id:: [String]
+      # return:: true
+      def delete_item_from(node, item_id)
+        iq = basic_pubsub_query(:set)
+        retract = iq.pubsub.add(REXML::Element.new('retract'))
+        retract.attributes['node'] = node
+          
+        xmlitem = Jabber::PubSub::Item.new
+        xmlitem.id = item_id
+        retract.add(xmlitem)
+        @stream.send_with_id(iq)
+      end
+
+
+      ##
       # purges all items on a persistent node
       # node:: [String]
       # return:: true
