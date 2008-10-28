@@ -172,7 +172,7 @@ module Jabber
         response['nc'] = '00000001'
         response['qop'] = 'auth'
         response['digest-uri'] = "xmpp/#{@stream.jid.domain}"
-        response['response'] = response_value(@stream.jid.node, @stream.jid.domain, response['digest-uri'], password, @nonce, response['cnonce'], response['qop'])
+        response['response'] = response_value(@stream.jid.node, @stream.jid.domain, response['digest-uri'], password, @nonce, response['cnonce'], response['qop'], response['authzid'])
         response.each { |key,value|
           unless %w(nc qop response charset).include? key
             response[key] = "\"#{value}\""
@@ -224,7 +224,7 @@ module Jabber
 
       ##
       # Calculate the value for the response field
-      def response_value(username, realm, digest_uri, passwd, nonce, cnonce, qop)
+      def response_value(username, realm, digest_uri, passwd, nonce, cnonce, qop, authzid)
         a1_h = h("#{username}:#{realm}:#{passwd}")
         a1 = "#{a1_h}:#{nonce}:#{cnonce}"
         if authzid
@@ -240,3 +240,4 @@ module Jabber
     end
   end
 end
+
