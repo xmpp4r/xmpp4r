@@ -30,7 +30,7 @@ module Jabber
         @jid = jid
         @stream = stream
 
-        if create_if_not_exist and not node_exist?
+        if create_if_not_exist and !node_exist?
           # if no nodename is given a instant node will created
           # (if the service supports instant nodes)
           @nodename = create_node
@@ -87,7 +87,7 @@ module Jabber
       # gets all items from the node
       # get_all_items
       def get_all_items
-        items(@nodename)
+        get_items_from(@nodename)
       end
 
       ##
@@ -95,7 +95,7 @@ module Jabber
       # get_items(count)
       # count:: [Fixnum]
       def get_items(count)
-        items(@nodename,count)
+        get_items_from(@nodename,count)
       end
 
       ##
