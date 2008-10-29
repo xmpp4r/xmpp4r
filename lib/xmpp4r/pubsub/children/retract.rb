@@ -15,9 +15,25 @@ module Jabber
     class Retract < XMPPElement
       name_xmlns 'retract', NS_PUBSUB
       ##
-      # return the node for this publication
+      # get the node for this retraction
       def node
         attributes['node']
+      end
+
+      ##
+      # set the node for this retraction
+      def node=(s)
+        attributes['node'] = s
+      end
+
+      ##
+      # Get <item/> children
+      def items
+        res = []
+        each_element('item') { |item|
+          res << item
+        }
+        res
       end
     end
   end

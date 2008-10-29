@@ -45,6 +45,7 @@ require 'xmpp4r/pubsub/children/subscription'
 require 'xmpp4r/pubsub/children/unsubscribe'
 require 'xmpp4r/pubsub/children/node_config'
 require 'xmpp4r/pubsub/children/subscription_config'
+require 'xmpp4r/pubsub/children/retract'
 require 'xmpp4r/dataforms'
 
 module Jabber
@@ -190,16 +191,25 @@ module Jabber
       ##
       # deletes an item from a persistent node
       # node:: [String]
-      # id:: [String]
+      # item_id:: [String] or [Array] of [String]
       # return:: true
       def delete_item_from(node, item_id)
         iq = basic_pubsub_query(:set)
-        retract = iq.pubsub.add(REXML::Element.new('retract'))
-        retract.attributes['node'] = node
-          
-        xmlitem = Jabber::PubSub::Item.new
-        xmlitem.id = item_id
-        retract.add(xmlitem)
+        retract = iq.pubsub.add(Jabber::PubSub::Retract.new)
+        retract.node = node
+
+        if item_id.kind_of? Array
+          item_id.each { |id|
+            xmlitem = Jabber::PubSub::Item.new
+            xmlitem.id = id
+            retract.add(xmlitem)
+          }
+        else
+          xmlitem = Jabber::PubSub::Item.new
+          xmlitem.id = item_id
+          retract.add(xmlitem)
+        end
+
         @stream.send_with_id(iq)
       end
 

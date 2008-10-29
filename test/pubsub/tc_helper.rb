@@ -655,6 +655,23 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     wait_state
   end
 
+  def test_delete_item
+    pubsub = 'pubsub.example.org'
+    h = PubSub::ServiceHelper.new(@client, pubsub)
+
+    state { |iq|
+      assert_kind_of(Jabber::Iq, iq)
+      assert_kind_of(Jabber::PubSub::IqPubSub, iq.pubsub)
+      assert_kind_of(Jabber::PubSub::Retract, iq.pubsub.first_element('retract'))
+      assert_equal(1, iq.pubsub.first_element('retract').items.size)
+      assert_equal('ae890ac52d0df67ed7cfdf51b644e901', iq.pubsub.first_element('retract').items[0].id)
+      send(iq.answer.set_type(:result))
+    }
+
+    h.delete_item_from('princely_musings', 'ae890ac52d0df67ed7cfdf51b644e901')
+    wait_state
+  end
+
   def test_to_s
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
     assert_equal('pubsub.example.org',h.to_s)
