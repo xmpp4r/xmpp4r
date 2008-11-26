@@ -133,6 +133,7 @@ module Jabber
       def get_items_from(node, count=nil)
         iq = basic_pubsub_query(:get)
         items = Jabber::PubSub::Items.new
+        items.max_items = count
         items.node = node
         iq.pubsub.add(items)
         res = nil
