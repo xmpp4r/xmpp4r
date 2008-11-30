@@ -1,0 +1,1 @@
+require 'xmpp4r/last/iq/last'
