@@ -260,6 +260,36 @@ module Jabber
     end
 
     ##
+    # Get the list of iq callbacks.
+    def iq_callbacks
+      @iqcbs
+    end
+
+    ##
+    # Get the list of message callbacks.
+    def message_callbacks
+      @messagecbs
+    end
+
+    ##
+    # Get the list of presence callbacks.
+    def presence_callbacks
+      @presencecbs
+    end
+
+    ##
+    # Get the list of stanza callbacks.
+    def stanza_callbacks
+      @stanzacbs
+    end
+
+    ##
+    # Get the list of xml callbacks.
+    def xml_callbacks
+      @xmlcbs
+    end
+
+    ##
     # This is used by Jabber::Stream internally to
     # keep track of any blocks which were passed to
     # Stream#send.
