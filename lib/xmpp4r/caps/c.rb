@@ -48,6 +48,20 @@ module Jabber
       def hash
         attributes['hash']
       end
+
+      ##
+      # Get the value of this element's 'ext' attribute,
+      # the list of extensions for legacy clients.
+      def ext
+        attributes['ext']
+      end
+
+      ##
+      # Is this a legacy caps response, as defined by version 1.3 of
+      # the XEP-0115 specification?
+      def legacy?
+        hash.nil? || hash.empty?
+      end
     end
   end
 end
