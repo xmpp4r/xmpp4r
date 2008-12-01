@@ -39,6 +39,7 @@ module Jabber
   # < 100::   all those numbers are normally available for your application.
   #           That's enough, don't you think ?
   class CallbackList
+    include Enumerable
 
     # Create a new list of callbacks
     def initialize
@@ -68,6 +69,10 @@ module Jabber
     def delete(ref)
       @list.delete_if { |item| item.ref == ref }
       self
+    end
+
+    def each(&block)
+      @list.each(&block)
     end
 
     ##
