@@ -1,5 +1,30 @@
 = XMPP4R
 
+== Fork Notes
+
+This fork exists to facilitate the development of Switchboard and
+Dovetail until the next official release of xmpp4r:
+
+* http://github.com/mojodna/switchboard
+* http://github.com/mojodna/dovetail
+
+Install using:
+
+  $ sudo gem install mojodna-xmpp4r -s http://gems.github.com
+
+=== Branch Summary
+
+This fork contains the following branches:
+
+* bug-fixes - bug fixes (suitable for merging)
+* doc-fixes - doc fixes (suitable for merging)
+* enhancements - miscellaneous enhancements (suitable for merging)
+* last-activity - Last Activity (XEP-0012) (suitable for merging)
+* ripta/chat-state-notification - Chat State Notification (XEP-0085)
+  (suitable for merging)
+* oauth - OAuth (XEP-0235), initially supporting PubSub queries (WIP)
+* user-location - User Location (XEP-0080) (suitable for merging)
+
 == Project Home
 
 You can find info about the xmpp4r project and how to contribute
