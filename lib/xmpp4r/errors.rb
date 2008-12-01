@@ -55,6 +55,8 @@ module Jabber
   # TODO : Give this a better name
   class SOCKS5Error < JabberError; end
 
+  class InvalidChatState < JabberError; end
+
   ##
   # A class used to build/parse <error/> elements.
   # Look at XEP-0086 for explanation:

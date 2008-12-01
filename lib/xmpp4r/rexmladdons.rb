@@ -17,6 +17,12 @@ module REXML
   # this class adds a few helper methods to REXML::Element
   class Element
 
+    def each_elements(*els, &block)
+      els.inject([ ]) do |res, e|
+        res + each_element(e, &block)
+      end
+    end
+
     ##
     # Replaces or adds a child element of name <tt>e</tt> with text <tt>t</tt>.
     def replace_element_text(e, t)
