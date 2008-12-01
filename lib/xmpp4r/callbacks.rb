@@ -125,5 +125,9 @@ module Jabber
       @ref = ref
       @block = block
     end
+
+    def to_s
+      "#<#{[self.class, priority, ref].compact * " "}>"
+    end
   end
 end
