@@ -10,6 +10,7 @@ module Jabber
     # Items
     # a collection of Items
     class Items < XMPPElement
+      include Enumerable
       name_xmlns 'items', NS_PUBSUB
 
       def node
@@ -29,6 +30,14 @@ module Jabber
       end
       def max_items=(mymaxitems)
         attributes['max_items'] = mymaxitems
+      end
+
+      def items
+        get_elements("item")
+      end
+
+      def each(&block)
+        items.each(&block)
       end
     end
 
