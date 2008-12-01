@@ -148,10 +148,11 @@ module Jabber
     end
 
     ##
-    # Returns the current chat state, or nil if no chat state is set
+    # Returns the current chat state, or :active if no chat state is set
     def chat_state
       each_elements(*CHAT_STATES) { |el| return el.name.to_sym }
-      return nil
+      set_chat_state(:active)
+      return :active
     end
 
     ##
@@ -166,7 +167,7 @@ module Jabber
     ##
     # Sets the message's chat state
     def set_chat_state(s)
-      self.state = s
+      self.chat_state = s
       self
     end
     
