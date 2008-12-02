@@ -86,11 +86,12 @@ class MessageTest < Test::Unit::TestCase
 
   def test_chat_state
     x = Message.new
-    assert_equal(nil, x.chat_state)
-    chat_state = REXML::Element.new('active')
-    chat_state.add_namespace('http://jabber.org/protocol/chatstates')
-    x.add(chat_state)
     assert_equal(:active, x.chat_state)
+    chat_state = REXML::Element.new('inactive')
+    chat_state.add_namespace('http://jabber.org/protocol/chatstates')
+    x.delete_element('active')
+    x.add(chat_state)
+    assert_equal(:inactive, x.chat_state)
     x.chat_state = :gone
     assert_equal(:gone, x.chat_state)
     assert_raise(InvalidChatState) do
