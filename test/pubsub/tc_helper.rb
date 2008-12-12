@@ -454,6 +454,30 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
   end
 
   ##
+  # retrieve some items
+  # example 76 from
+  # http://xmpp.org/extensions/xep-0060.html#subscriber-retrieve-requestsome
+  def test_items_with_max_items
+    node_name = "mynode"
+    max_items = 2
+    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
+
+    state { |iq|
+      assert_kind_of(Jabber::Iq, iq)
+      assert_equal(:get, iq.type)
+      assert_equal(1, iq.pubsub.children.size)
+      assert_equal('items', iq.pubsub.children.first.name)
+      assert_equal(node_name, iq.pubsub.children.first.attributes['node'])
+      assert_equal(max_items.to_s, iq.pubsub.children.first.attributes['max_items'])
+      # response doesn't matter; was previously tested, so send a simple result
+      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}' />")
+    }
+
+    h.get_items_from(node_name, max_items)
+    wait_state
+  end
+
+  ##
   # get affiliation
   # example 184 and 185 from
   # http://www.xmpp.org/extensions/xep-0060.html#owner-affiliations-retrieve-success1
