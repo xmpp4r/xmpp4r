@@ -23,14 +23,15 @@ module Jabber
         iq.from = @stream.jid
         iq.add(Jabber::LastActivity::IqQueryLastActivity.new)
 
-        res = nil
+        reply = @stream.send_with_id(iq)
 
-        @stream.send_with_id(iq) { |reply|
-          res = reply.query
-        }
-
-        res
+        if reply.query && reply.query.kind_of?(IqQueryLastActivity)
+          reply.query
+        else
+          nil
+        end
       end
+
     end
   end
 end
