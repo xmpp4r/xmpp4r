@@ -512,7 +512,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
   end
 
   # http://xmpp.org/extensions/xep-0060.html#owner-affiliations-modify
-  def test_affiliations
+  def test_set_affiliations
     h = PubSub::ServiceHelper.new(@client,'pubsub.shakespeare.lit')
 
     state { |iq|
