@@ -303,8 +303,8 @@ module Jabber
         affiliations = iq.pubsub.add(REXML::Element.new('affiliations'))
         affiliations.attributes['node'] = node
         affiliation = affiliations.add(REXML::Element.new('affiliation'))
-        affiliation.attributes['jid'] = jid
-        affiliation.attributes['affiliation'] = role
+        affiliation.attributes['jid'] = jid.to_s
+        affiliation.attributes['affiliation'] = role.to_s
         res = nil
         @stream.send_with_id(iq) { |reply|
           true
