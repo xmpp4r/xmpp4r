@@ -4,4 +4,5 @@
 
 require 'xmpp4r/discovery/iq/discoinfo'
 require 'xmpp4r/discovery/iq/discoitems'
+require 'xmpp4r/discovery/helper/helper'
 require 'xmpp4r/discovery/helper/responder'
