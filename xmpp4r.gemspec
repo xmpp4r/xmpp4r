@@ -1,5 +1,6 @@
 # WARNING : RAKE AUTO-GENERATED FILE.  DO NOT MANUALLY EDIT!
 # RUN : 'rake gem:update_gemspec'
+
 Gem::Specification.new do |s|
   s.authors = ["Lucas Nussbaum", "Stephan Maka", "Glenn Rempe"]
   s.bindir = "bin"
