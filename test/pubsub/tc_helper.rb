@@ -511,6 +511,25 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     wait_state
   end
 
+  # http://xmpp.org/extensions/xep-0060.html#owner-affiliations-modify
+  def test_set_affiliations
+    h = PubSub::ServiceHelper.new(@client,'pubsub.shakespeare.lit')
+
+    state { |iq|
+      assert_kind_of(Jabber::Iq, iq)
+      assert_equal(:set, iq.type)
+      assert_equal(1, iq.pubsub.children.size)
+      assert_equal('affiliations', iq.pubsub.children[0].name)
+      assert_equal('affiliation', iq.pubsub.children[0].children[0].name)
+      assert_equal('bard@shakespeare.lit', iq.pubsub.children[0].children[0].attributes['jid'])
+      assert_equal('publisher', iq.pubsub.children[0].children[0].attributes['affiliation'])
+      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
+    }
+
+    a = h.set_affiliations('princely_musings', 'bard@shakespeare.lit', :publisher)
+    wait_state
+  end
+
   ##
   # get_subscriptions_from
   # example 171 and 172 from

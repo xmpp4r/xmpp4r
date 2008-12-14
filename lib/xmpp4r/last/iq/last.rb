@@ -26,13 +26,13 @@ module Jabber
       # With a server, this will return the server or component's uptime in
       # seconds (server / component query).
       def seconds
-        attributes['seconds'].to_i
+        attributes['seconds'] ? attributes['seconds'].to_i : nil
       end
 
       ##
       # Set the number of seconds since last activity
       def seconds=(val)
-        attributes['seconds'] = val
+        attributes['seconds'] = val.to_s
       end
 
       ##

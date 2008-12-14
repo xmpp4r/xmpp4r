@@ -23,13 +23,13 @@ module Jabber
         attributes['subid']
       end
       def subid=(mysubid)
-        attributes['subid'] = mysubid
+        attributes['subid'] = mysubid.to_s
       end
       def max_items
         attributes['max_items']
       end
       def max_items=(mymaxitems)
-        attributes['max_items'] = mymaxitems
+        attributes['max_items'] = mymaxitems.to_s
       end
 
       def items
