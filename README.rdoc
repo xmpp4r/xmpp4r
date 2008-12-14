@@ -16,10 +16,6 @@ Install using:
 
 This fork contains the following branches:
 
-* bug-fixes - bug fixes (suitable for merging)
-* doc-fixes - doc fixes (suitable for merging)
-* enhancements - miscellaneous enhancements (suitable for merging)
-* last-activity - Last Activity (XEP-0012) (suitable for merging)
 * ripta/chat-state-notification - Chat State Notification (XEP-0085)
   (suitable for merging)
 * oauth - OAuth (XEP-0235), initially supporting PubSub queries (WIP)
