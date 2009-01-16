@@ -18,7 +18,7 @@ module Jabber
 
     ##
     # Create presence stanza
-    # show:: [String] Initial Availability Status
+    # show:: [Symbol] Initial Availability Status (see show)
     # status:: [String] Initial status message
     # priority:: [Fixnum] Initial priority value
     def initialize(show=nil, status=nil, priority=nil)
