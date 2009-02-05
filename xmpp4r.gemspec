@@ -300,5 +300,5 @@ Gem::Specification.new do |s|
   s.rubygems_version = "1.3.1"
   s.specification_version = 2
   s.summary = "XMPP4R is an XMPP/Jabber library for Ruby."
-  s.version = "0.4.0.2"
+  s.version = "0.4.0.3"
 end
