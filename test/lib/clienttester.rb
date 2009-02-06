@@ -78,8 +78,8 @@ module Jabber
         if @state < @states.size
           begin
             @states[@state].call(stanza)
-          rescue
-            puts "Exception in state: #{$!.class}: #{$!}\n#{$!.join("\n")}"
+          rescue Exception => e
+            puts "Exception in state: #{e.class}: #{e}\n#{e.backtrace.join("\n")}"
           end
           @state += 1
           @state_wait2.wait

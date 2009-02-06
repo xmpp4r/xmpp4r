@@ -133,6 +133,7 @@ module Jabber
       def get_items_from(node, count=nil)
         iq = basic_pubsub_query(:get)
         items = Jabber::PubSub::Items.new
+        items.max_items = count
         items.node = node
         iq.pubsub.add(items)
         res = nil
@@ -154,14 +155,12 @@ module Jabber
       # node:: [String]
       # item:: [Jabber::PubSub::Item]
       # return:: true
-      # it automatically generates an id for the item 
       def publish_item_to(node,item)
         iq = basic_pubsub_query(:set)
 	      publish = iq.pubsub.add(REXML::Element.new('publish'))
         publish.attributes['node'] = node
         
         if item.kind_of?(Jabber::PubSub::Item)
-          item.id = Jabber::IdGenerator.generate_id
           publish.add(item)
           @stream.send_with_id(iq)
         end
@@ -298,7 +297,20 @@ module Jabber
         @stream.send_with_id(iq)
       end
 
-
+      def set_affiliations(node, jid, role = 'publisher')
+        iq = basic_pubsub_query(:set, true)
+        affiliations = iq.pubsub.add(REXML::Element.new('affiliations'))
+        affiliations.attributes['node'] = node
+        affiliation = affiliations.add(REXML::Element.new('affiliation'))
+        affiliation.attributes['jid'] = jid.to_s
+        affiliation.attributes['affiliation'] = role.to_s
+        res = nil
+        @stream.send_with_id(iq) { |reply|
+          true
+        }
+        res
+      end
+      
       ##
       # shows the affiliations on a pubsub service
       # node:: [String]
