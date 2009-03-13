@@ -5,8 +5,7 @@ $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 require 'tempfile'
 require 'test/unit'
 require 'socket'
-require 'xmpp4r/streamparser'
-require 'xmpp4r/semaphore'
+require 'xmpp4r'
 include Jabber
 
 class MockListener
@@ -34,9 +33,12 @@ class StreamParserTest < Test::Unit::TestCase
 
   def parse_simple_helper(fixture)
     parser = StreamParser.new(STREAM + fixture, @listener)
-
-    parser.parse
-
+    
+    begin
+      parser.parse
+    rescue Jabber::ServerDisconnected => e
+    end
+    
     yield parse_with_rexml(fixture)
   end
 
@@ -113,8 +115,11 @@ class StreamParserTest < Test::Unit::TestCase
   def test_stream_restart
     parser = StreamParser.new(STREAM + "<stream:stream xmlns:stream='http://etherx.jabber.org/streams' to='foobar'>", @listener)
 
-    parser.parse
-
+    begin
+      parser.parse
+    rescue Jabber::ServerDisconnected => e
+    end
+    
     assert_equal 'foobar', @listener.received.attributes['to']
   end
 end

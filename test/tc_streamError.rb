@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-$:.unshift '../lib'
+$:.unshift "#{File.dirname(__FILE__)}/../lib"
 
 require 'test/unit'
 require 'socket'
@@ -95,8 +95,6 @@ class ConnectionErrorTest < Test::Unit::TestCase
       when :disconnected
         assert_equal(nil, exc)
         assert_equal(Jabber::Stream, o.class)
-      else
-        assert(false)
       end
       error += 1
     end
