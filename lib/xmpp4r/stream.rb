@@ -493,9 +493,13 @@ module Jabber
     end
 
     def close!
-      @parser_thread.kill if @parser_thread
+      # Order Matters here! If this method is called from within 
+      # @parser_thread then killing @parser_thread first would 
+      # mean the other parts of the method fail to execute. 
+      # That would be bad. So kill parser_thread last
       @fd.close if @fd and !@fd.closed?
       @status = DISCONNECTED
+      @parser_thread.kill if @parser_thread
     end
   end
 end
