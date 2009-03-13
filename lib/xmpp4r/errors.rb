@@ -12,6 +12,9 @@ module Jabber
   # A client-side only argument error
   class ArgumentError < JabberError; end
 
+  # Server disconnected us
+  class ServerDisconnected < JabberError; end
+  
   ##
   # An error returned from the server
   #

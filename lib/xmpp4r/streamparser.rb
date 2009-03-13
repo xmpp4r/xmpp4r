@@ -64,6 +64,10 @@ module Jabber
           end
         end
 
+        parser.listen( :end_document ) do
+          raise Jabber::ServerDisconnected, "Server Disconnected!"
+        end
+
         parser.listen( :characters ) do | text |
           @current.add(REXML::Text.new(text.to_s, @current.whitespace, nil, true)) if @current
         end
