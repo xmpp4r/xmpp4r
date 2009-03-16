@@ -86,10 +86,11 @@ module Jabber
 
     ##
     # Closing connection:
-    # first kill keepaliveThread, then call Stream#close!
+    # first kill keepaliveThread (but only if it's not me), then call Stream#close!
     def close!
-      @keepaliveThread.kill if @keepaliveThread and @keepaliveThread.alive?
+      @keepaliveThread.kill if @keepaliveThread and @keepaliveThread.alive? and @keepaliveThread != Thread.current
       super
+      @keepaliveThread.kill if @keepaliveThread and @keepaliveThread.alive?
     end
 
     def accept_features
