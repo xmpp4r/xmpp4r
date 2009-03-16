@@ -205,6 +205,9 @@ module Jabber
     # seconds.
     def keepalive_loop
       loop do
+        unless is_connected?
+          Thread.current.kill
+        end
         difference = @last_send + @keepalive_interval - Time.now
         if difference <= 0
           send(' ')

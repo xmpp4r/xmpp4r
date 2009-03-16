@@ -7,6 +7,115 @@ require 'xmpp4r'
 
 # Jabber::debug = true
 
+class ClientDisconnectCleanupTest < Test::Unit::TestCase
+  class ControledClient < Jabber::Client
+    attr_accessor :tcpserver, :socket_override
+    def connect
+      begin
+        @port = 1024 + rand(32768 - 1024)
+        @tcpserver = TCPServer.new("127.0.0.1", @port)
+      rescue Errno::EADDRINUSE, Errno::EACCES
+        @tcpserver.close rescue nil
+        retry
+      end
+      super("127.0.0.1", @port)
+    end
+    def start
+      @socket = socket_override
+      super
+    end
+  end
+
+  def test_regular_stream_end
+    rd, wr = IO.pipe
+    rd.instance_eval do
+      def write(*args)
+      end
+      def flush
+      end
+    end
+    client = ControledClient.new("test@localhost")
+    
+    Thread.new do
+      client.socket_override = rd
+      client.instance_eval{ @keepalive_interval = 0.1 }
+      client.connect
+      client.auth_nonsasl("password", false)
+    end
+    sleep(0.1)
+    assert client.is_connected?
+    
+    wr.write('<stream:stream xmlns:stream="http://etherx.jabber.org/streams">')
+    wr.write("</stream:stream>")
+    sleep(0.2)
+    
+    assert !client.is_connected?
+    assert client.instance_eval{ @parser_thread.nil? || !@parser_thread.alive? }
+    assert client.instance_eval{ @keepaliveThread.nil? || !@keepaliveThread.alive? }
+  end
+
+  def test_error_on_send
+    rd, wr = IO.pipe
+    rd.instance_eval do
+      def write(*args)
+      end
+      def flush
+      end
+    end
+    client = ControledClient.new("test@localhost")
+    
+    Thread.new do
+      client.socket_override = rd
+      client.connect
+      client.auth_nonsasl("password", false)
+    end
+    sleep(0.1)
+    assert client.is_connected?
+
+    rd.instance_eval do
+      def write(*args)
+        raise "No writting for you, you disconnect now"
+      end
+    end
+    wr.write(%Q{<stream:stream from='localhost' id="acecf234be084aecdc16509077573c7d7200912f" version='1.0'  xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client"><stream:features><auth xmlns='http://jabber.org/features/iq-auth'/></stream:features> })
+    sleep(0.1)
+    
+    assert !client.is_connected?
+    assert client.instance_eval{ @parser_thread.nil? || !@parser_thread.alive? }
+    assert client.instance_eval{ @keepaliveThread.nil? || !@keepaliveThread.alive? }   
+  end
+
+  def test_client_disconnect
+    rd, wr = IO.pipe
+    rd.instance_eval do
+      def write(*args)
+      end
+      def flush
+      end
+    end
+    client = ControledClient.new("test@localhost")
+    
+    Thread.new do
+      client.socket_override = rd
+      client.connect
+      client.auth_nonsasl("password", false)
+    end
+    wr.write(%Q{<stream:stream from='localhost' id="acecf234be084aecdc16509077573c7d7200912f" version='1.0'  xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client"><stream:features><auth xmlns='http://jabber.org/features/iq-auth'/></stream:features> })
+    sleep(0.1)
+    assert client.is_connected?
+    assert client.instance_eval{ @parser_thread.alive? }
+    assert client.instance_eval{ @keepaliveThread.alive? }
+
+    wr.close
+    sleep(0.1)
+    
+    assert !client.is_connected?
+    assert client.instance_eval{ @parser_thread.nil? || !@parser_thread.alive? }
+    assert client.instance_eval{ @keepaliveThread.nil? || !@keepaliveThread.alive? }   
+  end
+
+end
+
 class ConnectionDisconnectCleanupTest < Test::Unit::TestCase
   class PipeConnection < Jabber::Connection
     attr_accessor :socket_override
