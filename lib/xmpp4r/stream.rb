@@ -76,7 +76,7 @@ module Jabber
             close!
           end
         rescue Exception => e
-          Jabber::debuglog("EXCEPTION:\n#{e.class}\n#{e.message}\n#{e.backtrace.join("\n")}")
+          Jabber::warnlog("EXCEPTION:\n#{e.class}\n#{e.message}\n#{e.backtrace.join("\n")}")
 
           if @exception_block
             Thread.new do
@@ -85,7 +85,7 @@ module Jabber
               @exception_block.call(e, self, :start)
             end
           else
-            Jabber::debuglog "Exception caught in Parser thread! (#{e.class})\n#{e.backtrace.join("\n")}"
+            Jabber::warnlog "Exception caught in Parser thread! (#{e.class})\n#{e.backtrace.join("\n")}"
             close!
             raise
           end
@@ -116,7 +116,7 @@ module Jabber
     ##
     # This method is called by the parser when a failure occurs
     def parse_failure(e)
-      Jabber::debuglog("EXCEPTION:\n#{e.class}\n#{e.message}\n#{e.backtrace.join("\n")}")
+      Jabber::warnlog("EXCEPTION:\n#{e.class}\n#{e.message}\n#{e.backtrace.join("\n")}")
 
       # A new thread has to be created because close will cause the thread
       # to commit suicide(???)
@@ -128,7 +128,7 @@ module Jabber
           @exception_block.call(e, self, :parser)
         end
       else
-        Jabber::debuglog "Stream#parse_failure was called by XML parser. Dumping " +
+        Jabber::warnlog "Stream#parse_failure was called by XML parser. Dumping " +
           "backtrace...\n" + e.exception + "\n#{e.backtrace.join("\n")}"
         close
         raise
@@ -319,7 +319,7 @@ module Jabber
           send_data(xml.to_s)
         end
       rescue Exception => e
-        Jabber::debuglog("EXCEPTION:\n#{e.class}\n#{e.message}\n#{e.backtrace.join("\n")}")
+        Jabber::warnlog("EXCEPTION:\n#{e.class}\n#{e.message}\n#{e.backtrace.join("\n")}")
 
         if @exception_block
           Thread.new do
@@ -328,7 +328,7 @@ module Jabber
             @exception_block.call(e, self, :sending)
           end
         else
-          Jabber::debuglog "Exception caught while sending! (#{e.class})\n#{e.backtrace.join("\n")}"
+          Jabber::warnlog "Exception caught while sending! (#{e.class})\n#{e.backtrace.join("\n")}"
           close!
           raise
         end
@@ -338,7 +338,7 @@ module Jabber
       if block and Thread.current != @parser_thread
         threadblock.wait
       elsif block
-        Jabber::debuglog("WARNING:\nCannot stop current thread in Jabber::Stream#send because it is the parser thread!")
+        Jabber::warnlog("WARNING:\nCannot stop current thread in Jabber::Stream#send because it is the parser thread!")
       end
     end
 

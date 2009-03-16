@@ -8,13 +8,17 @@ module Jabber
   def Jabber::logger
     @@logger ||= Logger.new($stderr)
   end
-
+  
+  # Set the logger to use for debug and warn (if enabled)
   def Jabber::logger=(logger)
     @@logger = logger
   end
 
   # Is debugging mode enabled ?
   @@debug = false
+
+  # Is warnings mode enabled ?
+  @@warnings = false
 
   # Enable/disable debugging mode. When debug mode is enabled, information
   # can be logged using Jabber::debuglog. When debug mode is disabled, calls
@@ -23,6 +27,16 @@ module Jabber
     @@debug = debug
     if @@debug
       debuglog('Debugging mode enabled.')
+      #if debug is enabled, we should automatically enable warnings too
+      Jabber::warnings = true
+    end
+  end
+
+  # Enable/disable warnings mode.
+  def Jabber::warnings=(warnings)
+    @@warnings = warnings
+    if @@warnings
+      warnlog('Warnings mode enabled.')
     end
   end
 
@@ -39,4 +53,11 @@ module Jabber
     return if not @@debug
     logger.debug string.chomp.gsub("\n", "\n    ")
   end
+  
+  # Outputs a string only if warnings mode is enabled.
+  def Jabber::warnlog(string)
+    return if not @@warnings
+    logger.warn string.chomp.gsub("\n", "\n    ")
+  end
+  
 end

@@ -6,6 +6,7 @@ require 'test/unit'
 require 'xmpp4r'
 
 # Jabber::debug = true
+# Jabber::warnings = true
 
 class ClientDisconnectCleanupTest < Test::Unit::TestCase
   class ControledClient < Jabber::Client

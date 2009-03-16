@@ -18,7 +18,7 @@ class Vcard::HelperTest < Test::Unit::TestCase
   end
 
   def test_callback
-    @server.on_exception{|*e| p e}
+    # @server.on_exception{|*e| p e}
     class << @client
       remove_method(:jid)
       def jid

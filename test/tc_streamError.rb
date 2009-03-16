@@ -117,7 +117,7 @@ class ConnectionErrorTest < Test::Unit::TestCase
     @stream.start(@conn)
     @server.puts(STREAM)
     @server.flush
-    assert_raise(Errno::EPIPE) do
+    assert_raise(IOError) do
       @server.close
      sleep 0.1
       @stream.send('</test>')
