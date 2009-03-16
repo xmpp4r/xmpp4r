@@ -12,6 +12,7 @@ module Jabber
 end
 
 require 'xmpp4r/client'
+require 'xmpp4r/reliable'
 require 'xmpp4r/component'
 require 'xmpp4r/debuglog'
 require 'xmpp4r/errors'
