@@ -1,5 +1,21 @@
 class ListenerMocker
   
+  def self.with_socket_mocked(callback_proc)
+    TCPSocket.class_eval{ @@with_socket_mocked_callback_proc = callback_proc }
+    TCPSocket.class_eval do
+      alias_method :initialize_old, :initialize
+      def initialize(*args)
+        initialize_old(*args) if @@with_socket_mocked_callback_proc.call(args)        
+      end
+    end    
+    yield
+  ensure
+    TCPSocket.class_eval do
+      alias_method :initialize, :initialize_old
+    end    
+  end
+  
+  
   def self.mock_out(listener)
     listener.instance_eval do
       @connection.instance_eval do

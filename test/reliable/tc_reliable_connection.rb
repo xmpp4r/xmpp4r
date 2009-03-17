@@ -4,50 +4,29 @@ $:.unshift "#{File.dirname(__FILE__)}/../../lib"
 
 require 'test/unit'
 require 'xmpp4r'
+require "#{File.dirname(__FILE__)}/listener_mocker"
 
 # Jabber::debug = true
 
 class ReliableConnectionTest < Test::Unit::TestCase
-  
-  def test_streamparser
-    begin
-      @port = 1024 + rand(32768 - 1024)
-      # @tcpserver = TCPServer.new("127.0.0.1", @port)
-    rescue Errno::EADDRINUSE, Errno::EACCES
-      # @tcpserver.close rescue nil
-      retry
+    
+  def test_connection_retry
+    @created_sockets = []
+    callback_proc = Proc.new do |socket_init_args|
+      @created_sockets << socket_init_args[0]
+      raise RuntimeError, "Fail to create socket"
     end
-    
-    rd, wr = IO.pipe
-    
-    conn = Jabber::Reliable::Connection.new("listener1@localhost/hi", {
-        :servers => ["127.0.0.1", "127.1.1.10"], :port => @port})
-    conn.instance_eval{ @socket_override = rd }
-    conn.instance_eval do
-      class << self
-        def start
-          @socket = @socket_override
-          super
-        end
+    ListenerMocker.with_socket_mocked(callback_proc) do
+      conn = Jabber::Reliable::Connection.new("listener1@localhost/hi", {
+          :servers => ["server 1", "server 2", "server 3", "server 4"], 
+          :port => 12345,
+          :max_retry => 3, #3 retries = 4 total tries
+          :retry_sleep => 0.1})
+      assert_raises(RuntimeError) do
+        conn.connect
       end
+      assert_equal(["server 1", "server 2", "server 3", "server 4"], @created_sockets.sort)
     end
-    th = Thread.new do
-      conn.connect
-    end
-    # sleep(0.1)
-    
-    # rd.instance_eval do
-    #   def write(*args)
-    #   end
-    #   def flush
-    #   end
-    # end    
-    
-    # th.join
-    # Thread.stop
-    #TODO: actually test something here...
-    
-    th.kill
   end
   
 end
