@@ -37,8 +37,6 @@ class UserTune::HelperTest < Test::Unit::TestCase
       assert_equal 'Heart of the Sunrise', tune.title
       assert_equal '3', tune.track
       assert_equal 'http://www.yesworld.com/lyrics/Fragile.html#9',tune.uri
-    end
-    @client.add_message_callback do |m|
       query_waiter.run
     end
     @client.send Jabber::Presence.new
