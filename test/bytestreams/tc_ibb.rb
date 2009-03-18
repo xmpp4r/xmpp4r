@@ -30,6 +30,7 @@ class IBBTest < Test::Unit::TestCase
       target.close
     end
 
+    target.accept_wait
 
     initiator.open
 
@@ -50,10 +51,9 @@ class IBBTest < Test::Unit::TestCase
     buffer = create_buffer(9999)
 
     Thread.new do
-      Thread.pass
+      target.accept_wait
       initiator.open
       initiator.write(buffer)
-      Thread.pass
       initiator.close
     end
 
@@ -100,6 +100,7 @@ class IBBTest < Test::Unit::TestCase
     assert_equal(1, ignored_stanzas)
 
 
+    target.accept_wait
     initiator.open
 
 
@@ -147,6 +148,7 @@ class IBBTest < Test::Unit::TestCase
     end
 
 
+    target.accept_wait
     initiator.open
 
     assert_nil(initiator.read)

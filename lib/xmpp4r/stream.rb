@@ -48,6 +48,7 @@ module Jabber
       @send_lock = Mutex.new
       @last_send = Time.now
       @exception_block = nil
+      @tbcbmutex = Mutex.new
       @threadblocks = []
       @wakeup_thread = nil
       @streamid = nil
@@ -227,7 +228,10 @@ module Jabber
       # endless loop if Stream#send is being nested. That means, the nested
       # threadblock won't receive the stanza currently processed, but the next
       # one.
-      threadblocks = @threadblocks.dup
+      threadblocks = nil
+      @tbcbmutex.synchronize do
+        threadblocks = @threadblocks.dup
+      end
       threadblocks.each { |threadblock|
         exception = nil
         r = false
@@ -238,11 +242,15 @@ module Jabber
         end
 
         if r == true
-          @threadblocks.delete(threadblock)
+          @tbcbmutex.synchronize do
+            @threadblocks.delete(threadblock)
+          end
           threadblock.wakeup
           return
         elsif exception
-          @threadblocks.delete(threadblock)
+          @tbcbmutex.synchronize do
+            @threadblocks.delete(threadblock)
+          end
           threadblock.raise(exception)
         end
       }
@@ -306,7 +314,12 @@ module Jabber
     # &block:: [Block] The optional block
     def send(xml, &block)
       Jabber::debuglog("SENDING:\n#{xml}")
-      @threadblocks.unshift(threadblock = ThreadBlock.new(block)) if block
+      if block
+        threadblock = ThreadBlock.new(block)
+        @tbcbmutex.synchronize do
+          @threadblocks.unshift(threadblock)
+        end
+      end
       begin
         # Temporarily remove stanza's namespace to
         # reduce bandwidth consumption
@@ -403,7 +416,9 @@ module Jabber
     # ref:: [String] The callback's reference
     # &block:: [Block] The optional block
     def add_xml_callback(priority = 0, ref = nil, &block)
-      @xmlcbs.add(priority, ref, block)
+      @tbcbmutex.synchronize do
+        @xmlcbs.add(priority, ref, block)
+      end
     end
 
     ##
@@ -411,7 +426,9 @@ module Jabber
     #
     # ref:: [String] The reference of the callback to delete
     def delete_xml_callback(ref)
-      @xmlcbs.delete(ref)
+      @tbcbmutex.synchronize do
+        @xmlcbs.delete(ref)
+      end
     end
 
     ##
@@ -421,7 +438,9 @@ module Jabber
     # ref:: [String] The callback's reference
     # &block:: [Block] The optional block
     def add_message_callback(priority = 0, ref = nil, &block)
-      @messagecbs.add(priority, ref, block)
+      @tbcbmutex.synchronize do
+        @messagecbs.add(priority, ref, block)
+      end
     end
 
     ##
@@ -429,7 +448,9 @@ module Jabber
     #
     # ref:: [String] The reference of the callback to delete
     def delete_message_callback(ref)
-      @messagecbs.delete(ref)
+      @tbcbmutex.synchronize do
+        @messagecbs.delete(ref)
+      end
     end
 
     ##
@@ -439,7 +460,9 @@ module Jabber
     # ref:: [String] The callback's reference
     # &block:: [Block] The optional block
     def add_stanza_callback(priority = 0, ref = nil, &block)
-      @stanzacbs.add(priority, ref, block)
+      @tbcbmutex.synchronize do
+        @stanzacbs.add(priority, ref, block)
+      end
     end
 
     ##
@@ -447,7 +470,9 @@ module Jabber
     #
     # ref:: [String] The reference of the callback to delete
     def delete_stanza_callback(ref)
-      @stanzacbs.delete(ref)
+      @tbcbmutex.synchronize do
+        @stanzacbs.delete(ref)
+      end
     end
 
     ##
@@ -457,7 +482,9 @@ module Jabber
     # ref:: [String] The callback's reference
     # &block:: [Block] The optional block
     def add_presence_callback(priority = 0, ref = nil, &block)
-      @presencecbs.add(priority, ref, block)
+      @tbcbmutex.synchronize do
+        @presencecbs.add(priority, ref, block)
+      end
     end
 
     ##
@@ -465,7 +492,9 @@ module Jabber
     #
     # ref:: [String] The reference of the callback to delete
     def delete_presence_callback(ref)
-      @presencecbs.delete(ref)
+      @tbcbmutex.synchronize do
+        @presencecbs.delete(ref)
+      end
     end
 
     ##
@@ -475,7 +504,9 @@ module Jabber
     # ref:: [String] The callback's reference
     # &block:: [Block] The optional block
     def add_iq_callback(priority = 0, ref = nil, &block)
-      @iqcbs.add(priority, ref, block)
+      @tbcbmutex.synchronize do
+        @iqcbs.add(priority, ref, block)
+      end
     end
 
     ##
@@ -484,7 +515,9 @@ module Jabber
     # ref:: [String] The reference of the callback to delete
     #
     def delete_iq_callback(ref)
-      @iqcbs.delete(ref)
+      @tbcbmutex.synchronize do
+        @iqcbs.delete(ref)
+      end
     end
     ##
     # Closes the connection to the Jabber service

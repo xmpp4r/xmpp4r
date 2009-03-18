@@ -42,6 +42,7 @@ class StreamTest < Test::Unit::TestCase
     assert(!called)
     @server.puts(STREAM)
     @server.flush
+    sleep 0.5
     assert(called)
   end
 
@@ -89,6 +90,7 @@ class StreamTest < Test::Unit::TestCase
         false
       end
     }
+    sleep 0.5
 
     assert_equal(1, called)
   end

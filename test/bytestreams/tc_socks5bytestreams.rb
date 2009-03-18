@@ -44,6 +44,8 @@ class SOCKS5BytestreamsTest < Test::Unit::TestCase
       target2.close
     end
 
+    target1.accept_wait
+    target2.accept_wait
     initiator1.open
     initiator2.open
 
@@ -70,7 +72,6 @@ class SOCKS5BytestreamsTest < Test::Unit::TestCase
     initiator = Bytestreams::SOCKS5BytestreamsInitiator.new(@client, '1', '1@a.com/1', '1@a.com/2')
     initiator.add_streamhost(@@server)
 
-
     Thread.new do
       target.accept
 
@@ -81,7 +82,7 @@ class SOCKS5BytestreamsTest < Test::Unit::TestCase
 
       target.close
     end
-
+    target.accept_wait
 
     initiator.open
 
