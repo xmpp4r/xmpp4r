@@ -315,7 +315,6 @@ module Jabber
         raise @exception if @exception
       end
       def wakeup
-        # TODO: Handle threadblock removal if !alive?
         @waiter.run
       end
       def raise(exception)
