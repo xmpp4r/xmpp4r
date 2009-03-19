@@ -78,7 +78,7 @@ class RPC::HelperTest < Test::Unit::TestCase
     assert_equal(['tseT', 'TEST'], cl.multicall(['reverse', 'Test'], ['upcase', 'Test']))
   end
 
-  def test_100calls
+  def test_10calls
     give_client_jid!
 
     sv = RPC::Server.new(@server)
@@ -86,7 +86,7 @@ class RPC::HelperTest < Test::Unit::TestCase
 
     cl = RPC::Client.new(@client, 'a@b/c')
     correct = true
-    100.times {
+    10.times {
       a, b = rand(1000), rand(1000)
       correct &&= (cl.call('add', a, b) == a + b)
     }
