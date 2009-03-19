@@ -408,7 +408,7 @@ class MUCClientTest < Test::Unit::TestCase
     assert_equal(1, messages_muc_private)
 
     wait_state
-   end
+  end
 
   def test_presence_callbacks
     state { |pres|

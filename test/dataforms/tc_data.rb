@@ -76,6 +76,6 @@ class DataFormsTest < Test::Unit::TestCase
     assert_equal(f, v.field('test'))
     assert_nil(v.field('wrong field'))
     assert_equal([f], v.fields)
-   end
+  end
 
 end
