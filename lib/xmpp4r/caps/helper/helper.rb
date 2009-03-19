@@ -40,10 +40,7 @@ module Jabber
 
         @stream.add_iq_callback(250) do |iq|
           if iq.type == :get and iq.query.kind_of? Jabber::Discovery::IqQueryDiscoInfo
-            Thread.new do
-              Thread.abort_on_exception = true
-              handle_discoinfo_query(iq)
-            end
+            handle_discoinfo_query(iq)
             true
           else
             false
