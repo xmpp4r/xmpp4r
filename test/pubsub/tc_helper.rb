@@ -336,7 +336,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       assert_equal(1, iq.pubsub.children[0].children.size)
       assert_equal('item', iq.pubsub.children[0].children[0].name)
       assert_equal(1, iq.pubsub.children[0].children[0].children.size)
-      assert_equal(item1.children.to_s, iq.pubsub.children[0].children[0].children[0].to_s)
+      assert_equal(item1.children[0].to_s, iq.pubsub.children[0].children[0].children[0].to_s)
       send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
     }
     assert_nothing_raised { h.publish_item_to(node, item1) }
@@ -362,7 +362,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       assert_equal('item', iq.pubsub.children[0].children[0].name)
       assert_equal('blubb', iq.pubsub.children[0].children[0].attributes['id'] )
       assert_equal(1, iq.pubsub.children[0].children[0].children.size)
-      assert_equal(item1.children.to_s, iq.pubsub.children[0].children[0].children[0].to_s)
+      assert_equal(item1.children[0].to_s, iq.pubsub.children[0].children[0].children[0].to_s)
       send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
     }
     assert_nothing_raised { h.publish_item_with_id_to('mynode', item1,"blubb") }
@@ -401,7 +401,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       assert_equal('item', iq.pubsub.children[0].children[0].name)
       assert_equal('blubb', iq.pubsub.children[0].children[0].attributes['id'] )
       assert_equal(1, iq.pubsub.children[0].children[0].children.size)
-      assert_equal(item1.children.to_s, iq.pubsub.children[0].children[0].children[0].to_s)
+      assert_equal(item1.children[0].to_s, iq.pubsub.children[0].children[0].children[0].to_s)
       send("<iq type='error' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>
       <pubsub xmlns='http://jabber.org/protocol/pubsub'>
         <publish node='#{iq.pubsub.children[0].attributes['node']}'>
