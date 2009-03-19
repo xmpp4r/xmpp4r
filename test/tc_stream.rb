@@ -1,36 +1,27 @@
 #!/usr/bin/ruby
 
 $:.unshift '../lib'
+$:.unshift './lib/'
 
 require 'tempfile'
 require 'test/unit'
 require 'socket'
 require 'xmpp4r/stream'
 require 'xmpp4r/semaphore'
+require 'clienttester'
 include Jabber
 
-class StreamTest < Test::Unit::TestCase
-  STREAM = '<stream:stream xmlns:stream="http://etherx.jabber.org/streams">'
+# Jabber::debug = true
 
-  def setup
-    @tmpfile = Tempfile.new("StreamSendTest")
-    @tmpfilepath = @tmpfile.path()
-    @tmpfile.unlink
-    @servlisten = UNIXServer.new(@tmpfilepath)
-    thServer = Thread.new { @server = @servlisten.accept }
-    @iostream = UNIXSocket.new(@tmpfilepath)
+class StreamTest < Test::Unit::TestCase
+  include ClientTester
+
+  def busywait(&block)
     n = 0
-    while not defined? @server and n < 10
-      sleep 0.1
+    while not block.yield and n < 1000
+      Thread::pass
       n += 1
     end
-    @stream = Stream.new
-    @stream.start(@iostream)
-  end
-
-  def teardown
-    @stream.close
-    @server.close
   end
 
   ##
@@ -38,51 +29,43 @@ class StreamTest < Test::Unit::TestCase
   # stanzas to filters
   def test_process
     called = false
-    @stream.add_xml_callback { called = true }
+    @client.add_xml_callback { called = true }
     assert(!called)
-    @server.puts(STREAM)
-    @server.flush
-    sleep 0.5
+    @server.send('<iq/>')
+    busywait { called }
     assert(called)
   end
 
-  def test_process100
-    @server.puts(STREAM)
-    @server.flush
-
+  def test_process20
     done = Semaphore.new
     n = 0
-    @stream.add_message_callback {
+    @client.add_message_callback {
       n += 1
-      done.run if n % 100 == 0
+      done.run if n % 20 == 0
     }
 
-    100.times {
-      @server.puts('<message/>')
-      @server.flush
+    20.times {
+      @server.send('<message/>')
     }
 
     done.wait
-    assert_equal(100, n)
+    assert_equal(20, n)
 
-    @server.puts('<message/>' * 100)
-    @server.flush
+    @server.send('<message/>' * 20)
 
     done.wait
-    assert_equal(200, n)
+    assert_equal(40, n)
   end
 
   def test_send
-    @server.puts(STREAM)
-    @server.flush
-
-    Thread.new {
-      assert_equal(Iq.new(:get).delete_namespace.to_s, @server.gets('>'))
-      @stream.receive(Iq.new(:result))
+    sem = Semaphore::new
+    @server.add_xml_callback { |e|
+      @server.send(Iq.new(:result))
+      sem.run
     }
 
     called = 0
-    @stream.send(Iq.new(:get)) { |reply|
+    @client.send(Iq.new(:get)) { |reply|
       called += 1
       if reply.kind_of? Iq and reply.type == :result
         true
@@ -90,46 +73,44 @@ class StreamTest < Test::Unit::TestCase
         false
       end
     }
-    sleep 0.5
-
+    sem.wait
+    busywait { called }
     assert_equal(1, called)
   end
 
   def test_send_nested
-    @server.puts(STREAM)
-    @server.flush
     finished = Semaphore.new
 
-    Thread.new {
-      assert_equal(Iq.new(:get).delete_namespace.to_s, @server.gets('>'))
-      @server.puts(Iq.new(:result).set_id('1').delete_namespace.to_s)
-      @server.flush
-      assert_equal(Iq.new(:set).delete_namespace.to_s, @server.gets('>'))
-      @server.puts(Iq.new(:result).set_id('2').delete_namespace.to_s)
-      @server.flush
-      assert_equal(Iq.new(:get).delete_namespace.to_s, @server.gets('>'))
-      @server.puts(Iq.new(:result).set_id('3').delete_namespace.to_s)
-      @server.flush
-
-      finished.run
-    }
+    id = 0
+    @server.add_xml_callback do |e|
+      id += 1
+      if id == 1
+        @server.send(Iq.new(:result).set_id('1').delete_namespace)
+      elsif id == 2
+        @server.send(Iq.new(:result).set_id('2').delete_namespace)
+      elsif id == 3
+        @server.send(Iq.new(:result).set_id('3').delete_namespace)
+      else
+        p e
+       end
+    end
 
     called_outer = 0
     called_inner = 0
 
-    @stream.send(Iq.new(:get)) do |reply|
+    @client.send(Iq.new(:get)) do |reply|
       called_outer += 1
       assert_kind_of(Iq, reply)
       assert_equal(:result, reply.type)
 
       if reply.id == '1'
-        @stream.send(Iq.new(:set)) do |reply2|
+        @client.send(Iq.new(:set)) do |reply2|
           called_inner += 1
           assert_kind_of(Iq, reply2)
           assert_equal(:result, reply2.type)
           assert_equal('2', reply2.id)
 
-          @stream.send(Iq.new(:get))
+          @client.send(Iq.new(:get))
 
           true
         end
@@ -143,89 +124,44 @@ class StreamTest < Test::Unit::TestCase
 
     assert_equal(2, called_outer)
     assert_equal(1, called_inner)
-
-    finished.wait
   end
 
   def test_send_in_callback
-    @server.puts(STREAM)
-    @server.flush
     finished = Semaphore.new
 
-    @stream.add_message_callback {
-      @stream.send_with_id(Iq.new(:get)) { |reply|
+    @client.add_message_callback {
+      @client.send_with_id(Iq.new(:get)) { |reply|
         assert_equal(:result, reply.type)
+        finished.run
       }
     }
 
-    Thread.new {
-      @server.gets('>')
-      @server.puts(Iq.new(:result))
-      finished.run
+    @server.add_iq_callback { |iq|
+      @server.send(Iq.new(:result).set_id(iq.id))
     }
 
-    @server.puts(Message.new)
+    @server.send(Message.new)
     finished.wait
-  end
-
-  def test_bidi
-    @server.puts(STREAM)
-    @server.flush
-    finished = Semaphore.new
-    ok = true
-    n = 100
-
-    Thread.new {
-      n.times { |i|
-        ok &&= (Iq.new(:get).set_id(i).delete_namespace.to_s == @server.gets('>'))
-        @server.puts(Iq.new(:result).set_id(i).to_s)
-        @server.flush
-      }
-
-      finished.run
-    }
-
-    n.times { |i|
-      @stream.send(Iq.new(:get).set_id(i)) { |reply|
-        ok &&= reply.kind_of? Iq
-        ok &&= (:result == reply.type)
-        ok &&= (i.to_s == reply.id)
-        true
-      }
-    }
-
-    finished.wait
-    assert(ok)
   end
 
   def test_similar_children
-    delay = 0.1
     n = 0
-    @stream.add_message_callback { n += 1 }
+    @client.add_message_callback { n += 1 }
     assert_equal(0, n)
-    @server.puts("#{STREAM}<message/>")
-    @server.flush
-    sleep delay
+    @server.send("<message/>")
+    busywait { n == 1 }
     assert_equal(1, n)
-    @server.puts('<message>')
-    @server.flush
-    sleep delay
+    @server.send('<message>')
     assert_equal(1, n)
-    @server.puts('<message/>')
-    @server.flush
-    sleep delay
+    @server.send('<message/>')
     assert_equal(1, n)
-    @server.puts('</message>')
-    @server.flush
-    sleep delay
+    @server.send('</message>')
+    busywait { n == 2 }
     assert_equal(2, n)
-    @server.puts("<message>#{STREAM}<message/></stream:stream>")
-    @server.flush
-    sleep delay
+    @server.send("<message><stream:stream><message/></stream:stream>")
     assert_equal(2, n)
-    @server.puts('</message>')
-    @server.flush
-    sleep delay
+    @server.send('</message>')
+    busywait { n == 3 }
     assert_equal(3, n)
   end
 end
