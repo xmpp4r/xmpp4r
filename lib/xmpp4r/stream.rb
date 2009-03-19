@@ -35,6 +35,9 @@ module Jabber
     # connection status
     attr_reader :status
 
+    # number of stanzas currently being processed
+    attr_reader :processing
+
     ##
     # Initialize a new stream
     def initialize
@@ -55,6 +58,7 @@ module Jabber
       @streamns = 'jabber:client'
       @features_sem = Semaphore.new
       @parser_thread = nil
+      @processing = 0
     end
 
     ##
@@ -171,6 +175,7 @@ module Jabber
     #
     # element:: [REXML::Element] The received element
     def receive(element)
+      @tbcbmutex.synchronize { @processing += 1 }
       Jabber::debuglog("RECEIVED:\n#{element.to_s}")
 
       if element.namespace('').to_s == '' # REXML namespaces are always strings
@@ -220,7 +225,10 @@ module Jabber
         end
       end
 
-      return true if @xmlcbs.process(stanza)
+      if @xmlcbs.process(stanza)
+        @tbcbmutex.synchronize { @processing -= 1 }
+        return true
+      end
 
       # Iterate through blocked threads (= waiting for an answer)
       #
@@ -246,7 +254,8 @@ module Jabber
             @threadblocks.delete(threadblock)
           end
           threadblock.wakeup
-          return
+          @tbcbmutex.synchronize { @processing -= 1 }
+          return true
         elsif exception
           @tbcbmutex.synchronize do
             @threadblocks.delete(threadblock)
@@ -256,15 +265,23 @@ module Jabber
       }
 
       Jabber::debuglog("PROCESSING:\n#{stanza.to_s} (#{stanza.class})")
-      return true if @stanzacbs.process(stanza)
+      Jabber::debuglog("TRYING stanzacbs...")
+      if @stanzacbs.process(stanza)
+          @tbcbmutex.synchronize { @processing -= 1 }
+          return true
+      end
+      r = false
+      Jabber::debuglog("TRYING message/iq/presence/cbs...")
       case stanza
       when Message
-        return true if @messagecbs.process(stanza)
+        r = @messagecbs.process(stanza)
       when Iq
-        return true if @iqcbs.process(stanza)
+        r = @iqcbs.process(stanza)
       when Presence
-        return true if @presencecbs.process(stanza)
+        r = @presencecbs.process(stanza)
       end
+      @tbcbmutex.synchronize { @processing -= 1 }
+      return r
     end
 
     ##
@@ -555,6 +572,20 @@ module Jabber
     end
 
     def close!
+      pr = 1
+      n = 0
+      # In some cases, we might lost count of some stanzas
+      # (for example, if the handler raises an exception)
+      # so we can't block forever.
+      while pr > 0 and n <= 1000
+        @tbcbmutex.synchronize { pr = @processing }
+        if pr > 0
+          n += 1
+          Jabber::debuglog("TRYING TO CLOSE, STILL PROCESSING #{pr} STANZAS")
+          #puts("TRYING TO CLOSE, STILL PROCESSING #{pr} STANZAS")
+          Thread::pass
+        end
+      end
       @parser_thread.kill if @parser_thread
       @fd.close if @fd and !@fd.closed?
       @status = DISCONNECTED
