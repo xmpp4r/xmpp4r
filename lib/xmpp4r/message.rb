@@ -169,12 +169,12 @@ module Jabber
       self.state = s
       self
     end
-    
+
     CHAT_STATES.each do |state|
       define_method("#{state}?") do
         chat_state == state.to_sym
       end
     end
-    
+
   end
 end

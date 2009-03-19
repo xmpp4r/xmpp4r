@@ -95,7 +95,6 @@ module Jabber
           info['type'] = identity.type
           info['category'] = identity.category
           info['features'] = answer.query.features
-          
           answer.query.each_element('x') { |x|
             info['nodeinformation'] = x
           }

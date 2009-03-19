@@ -107,7 +107,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
                 <subscription node='#{iq.pubsub.children.first.attributes['node']}' jid='#{iq.from.strip}'
 				          subid='ba49252aaa4f5d320c24d3766f0bdcade78c78d3'
                   subscription='pending'/>
-			
+
               </pubsub>
             </iq>")
     }
@@ -379,7 +379,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
 
     assert_raise RuntimeError do h.publish_item_with_id_to('mynode', item1,"blubb") end
   end
-  
+
   ##
   # publish item and trap server-side error
   # examples 88 from
@@ -419,7 +419,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
   ##
   # retrieve all items
   # examples 70 and 71 from
-  # http://www.xmpp.org/extensions/xep-0060.html#subscriber-retrieve-returnall 
+  # http://www.xmpp.org/extensions/xep-0060.html#subscriber-retrieve-returnall
   def test_items
     item1 = Jabber::PubSub::Item.new("1")
     item1.text = 'foobar'
@@ -427,7 +427,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     item2.text = 'barfoo'
 
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
-    
+
     state { |iq|
       assert_kind_of(Jabber::Iq, iq)
       assert_equal(:get, iq.type)
@@ -639,7 +639,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
   end
 
   ##
-  # get all subscriptions with no subscriptions 
+  # get all subscriptions with no subscriptions
   def test_get_all_subscriptions_with_no_subscriptions
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 

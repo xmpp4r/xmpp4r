@@ -8,10 +8,10 @@ module Jabber
   module PubSub
 
     ##
-    # Retract 
+    # Retract
     #
     # A <retract> XMPP element, see example 103 in
-    # http://xmpp.org/extensions/xep-0060.html#publisher-delete 
+    # http://xmpp.org/extensions/xep-0060.html#publisher-delete
     class Retract < XMPPElement
       name_xmlns 'retract', NS_PUBSUB
       ##
