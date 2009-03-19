@@ -31,10 +31,11 @@ class Roster::HelperTest < Test::Unit::TestCase
     }
 
     query_waiter = Semaphore.new
-    h = Roster::Helper.new(@client)
+    h = Roster::Helper.new(@client, false)
     h.add_query_callback { |iq|
       query_waiter.run
     }
+    h.get_roster
     wait_state
     query_waiter.wait
 
@@ -74,8 +75,9 @@ class Roster::HelperTest < Test::Unit::TestCase
     }
 
     query_waiter = Semaphore.new
-    h = Roster::Helper.new(@client)
+    h = Roster::Helper.new(@client, false)
     h.add_query_callback { |iq| query_waiter.run }
+    h.get_roster
     wait_state
     query_waiter.wait
 
@@ -142,7 +144,7 @@ class Roster::HelperTest < Test::Unit::TestCase
 
     query_waiter = Semaphore.new
     presence_waiter = Semaphore.new
-    h = Roster::Helper.new(@client)
+    h = Roster::Helper.new(@client, false)
     h.add_query_callback { |iq|
       query_waiter.run
     }
@@ -156,7 +158,7 @@ class Roster::HelperTest < Test::Unit::TestCase
       cb_item, cb_op, cb_p = item, oldpres, pres
       presence_waiter.run
     }
-
+    h.get_roster
     wait_state
     query_waiter.wait
 
@@ -289,8 +291,9 @@ class Roster::HelperTest < Test::Unit::TestCase
     }
 
     query_waiter = Semaphore.new
-    h = Roster::Helper.new(@client)
+    h = Roster::Helper.new(@client, false)
     h.add_query_callback { |iq| query_waiter.run }
+    h.get_roster
     wait_state
     query_waiter.wait
 
@@ -326,8 +329,9 @@ class Roster::HelperTest < Test::Unit::TestCase
     }
 
     query_waiter = Semaphore.new
-    h = Roster::Helper.new(@client)
+    h = Roster::Helper.new(@client, false)
     h.add_query_callback { |iq| query_waiter.run }
+    h.get_roster
     wait_state
     query_waiter.wait
 
@@ -362,15 +366,18 @@ class Roster::HelperTest < Test::Unit::TestCase
   end
 
   def test_decline_subscription
+    query_waiter = Semaphore.new
+
     state { |iq|
       send("<iq type='result' id='#{iq.id}'>
               <query xmlns='jabber:iq:roster'/>
             </iq>")
     }
 
-    query_waiter = Semaphore.new
-    h = Roster::Helper.new(@client)
+    h = Roster::Helper.new(@client, false)
     h.add_query_callback { |iq| query_waiter.run }
+    h.get_roster
+
     wait_state
     query_waiter.wait
 
@@ -406,8 +413,9 @@ class Roster::HelperTest < Test::Unit::TestCase
     }
 
     query_waiter = Semaphore.new
-    h = Roster::Helper.new(@client)
+    h = Roster::Helper.new(@client, false)
     h.add_query_callback { query_waiter.run }
+    h.get_roster
     wait_state
     query_waiter.wait
 
@@ -434,8 +442,9 @@ class Roster::HelperTest < Test::Unit::TestCase
     }
 
     query_waiter = Semaphore.new
-    h = Roster::Helper.new(@client)
+    h = Roster::Helper.new(@client, false)
     h.add_query_callback { query_waiter.run }
+    h.get_roster
     wait_state
     query_waiter.wait
 
@@ -474,11 +483,12 @@ class Roster::HelperTest < Test::Unit::TestCase
     update_args = nil
     update_waiter = Semaphore.new
 
-    h = Roster::Helper.new(@client)
+    h = Roster::Helper.new(@client, false)
     h.add_update_callback { |*a|
       update_args = a
       update_waiter.run
     }
+    h.get_roster
 
     send("<iq type='set'>
             <query xmlns='jabber:iq:roster'>

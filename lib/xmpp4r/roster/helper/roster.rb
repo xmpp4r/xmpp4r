@@ -36,7 +36,7 @@ module Jabber
       # <b>Attention:</b> If you send presence and receive presences
       # before the roster has arrived, the Roster helper will let them
       # pass through and does *not* keep them!
-      def initialize(stream)
+      def initialize(stream, startnow = true)
         @stream = stream
         @items = {}
         @items_lock = Mutex.new
@@ -66,10 +66,13 @@ module Jabber
             handle_presence(pres)
           end
         }
+        get_roster if startnow
+      end
 
+      def get_roster
         # Request the roster
         rosterget = Iq.new_rosterget
-        stream.send(rosterget)
+        @stream.send(rosterget)
       end
 
       ##
