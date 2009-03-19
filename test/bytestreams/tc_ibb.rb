@@ -117,8 +117,8 @@ class IBBTest < Test::Unit::TestCase
     assert_equal(3, ignored_stanzas)
 
 
-    10.times do
-      buf = create_buffer(9999)
+    5.times do
+      buf = create_buffer(100)
       initiator.write(buf)
       initiator.flush
 
