@@ -4,7 +4,6 @@ $:.unshift "#{File.dirname(__FILE__)}/../../lib"
 
 require 'test/unit'
 require 'xmpp4r'
-require "#{File.dirname(__FILE__)}/listener_mocker"
 
 # Jabber::debug = true
 
@@ -16,7 +15,7 @@ class ReliableConnectionTest < Test::Unit::TestCase
       @created_sockets << socket_init_args[0]
       raise RuntimeError, "Fail to create socket"
     end
-    ListenerMocker.with_socket_mocked(callback_proc) do
+    Jabber::Test::ListenerMocker.with_socket_mocked(callback_proc) do
       conn = Jabber::Reliable::Connection.new("listener1@localhost/hi", {
           :servers => ["server 1", "server 2", "server 3", "server 4"], 
           :port => 12345,

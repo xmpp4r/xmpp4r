@@ -4,7 +4,6 @@ $:.unshift "#{File.dirname(__FILE__)}/../../lib"
 
 require 'test/unit'
 require 'xmpp4r'
-require "#{File.dirname(__FILE__)}/listener_mocker"
 
 # Jabber::debug = true
 
@@ -22,7 +21,7 @@ class ReliableListenerTest < Test::Unit::TestCase
   
   def test_listener
     listener = TestListener.new("listener1@localhost/hi", "test", {:servers => "127.0.0.1", :presence_message => "hi"})
-    ListenerMocker.mock_out(listener)
+    Jabber::Test::ListenerMocker.mock_out(listener)
     listener.start
     
     message_to_send = Jabber::Message.new

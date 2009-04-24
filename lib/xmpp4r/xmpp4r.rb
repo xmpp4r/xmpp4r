@@ -17,3 +17,4 @@ require 'xmpp4r/component'
 require 'xmpp4r/debuglog'
 require 'xmpp4r/errors'
 
+require 'xmpp4r/test/listener_mocker'
