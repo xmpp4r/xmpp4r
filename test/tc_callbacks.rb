@@ -55,7 +55,7 @@ class CallbacksTest < Test::Unit::TestCase
     cbl.add(7, "ref1") { false }
     o = "o"
     assert(!cbl.process(o))
-   end
+  end
 
   def test_callbacklist5
     cbl = CallbackList.new
@@ -63,7 +63,7 @@ class CallbacksTest < Test::Unit::TestCase
     cbl.add(7, "ref1") { false }
     o = "o"
     assert(cbl.process(o))
-   end
+  end
 
   def test_callbacklist6
     cbl = CallbackList.new
@@ -78,7 +78,7 @@ class CallbacksTest < Test::Unit::TestCase
     }
     assert(!cbl.process(c, d))
     assert(ok)
-   end
+  end
 
   def test_callbacklist7
     cbl = CallbackList.new

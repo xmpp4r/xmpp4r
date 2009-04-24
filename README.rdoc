@@ -37,6 +37,8 @@ which can be enabled in your code with:
   Tim Carey-Smith
   Scott Lillibridge
   Joshua Sierles
+  Ripta Pasay <github@r8y.org>
+  Seth Fitzsimmons
 
 
 == Source Code

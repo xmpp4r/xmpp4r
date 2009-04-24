@@ -29,14 +29,14 @@ module Jabber
       end
 
       ##
-      # Get the queried Service Discovery node or nil
+      # Set the queried Service Discovery node or nil
       # val:: [String]
       def node=(val)
         attributes['node'] = val
       end
 
       ##
-      # Get the queried Service Discovery node or nil
+      # Set the queried Service Discovery node or nil
       # (chaining-friendly)
       # val:: [String]
       def set_node(val)

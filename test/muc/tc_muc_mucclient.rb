@@ -86,7 +86,11 @@ class MUCClientTest < Test::Unit::TestCase
     send("<presence from='darkcave@macbeth.shakespeare.lit/thirdwitch' to='crone1@shakespeare.lit/desktop'>" +
          "<x xmlns='http://jabber.org/protocol/muc#user'><item affiliation='none' jid='hag66@shakespeare.lit/pda' role='participant'/></x>" +
          "</presence>")
-    sleep 0.1
+    n = 0
+    while m.roster.size != 3 and n < 1000
+      Thread::pass
+      n += 1
+    end
     assert_equal(3, m.roster.size)
     assert_equal(:none, m.roster['thirdwitch'].x.items[0].affiliation)
     assert_equal(:participant, m.roster['thirdwitch'].x.items[0].role)
@@ -408,7 +412,7 @@ class MUCClientTest < Test::Unit::TestCase
     assert_equal(1, messages_muc_private)
 
     wait_state
-   end
+  end
 
   def test_presence_callbacks
     state { |pres|

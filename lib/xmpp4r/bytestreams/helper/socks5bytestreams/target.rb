@@ -11,8 +11,14 @@ module Jabber
       # See SOCKS5Bytestreams#initialize
       def initialize(stream, session_id, initiator_jid, target_jid)
         @connect_timeout = 60
+        @accept_ready = Semaphore::new
         super
       end
+
+      def accept_wait
+        @accept_ready.wait
+      end
+
       ##
       # Wait until the stream has been established
       #
@@ -58,7 +64,7 @@ module Jabber
             false
           end
         }
-
+        @accept_ready.run
         begin
           Timeout::timeout(@connect_timeout) { connect_sem.wait }
         rescue Timeout::Error

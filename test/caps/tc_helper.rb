@@ -1,3 +1,4 @@
+# coding: utf-8
 
 $:.unshift File::dirname(__FILE__) + '/../../lib'
 
@@ -17,6 +18,7 @@ class Caps::HelperTest < Test::Unit::TestCase
   # in http://www.xmpp.org/extensions/xep-0115.html#usecases
   # and assert conformance.
   def test_caps_reply
+
     # This will be invoked by 'wait_state' below...
     state { |presence|
       assert_kind_of(Jabber::Presence, presence)
@@ -30,8 +32,6 @@ class Caps::HelperTest < Test::Unit::TestCase
       assert_equal('sha-1', c.hash)
 
       assert_equal("http://home.gna.org/xmpp4r/##{Jabber::XMPP4R_VERSION}", c.node)
-
-      send(iq_discovering_capabilities)
     }
 
     # Construct Caps::Helper which will send a <presence>
@@ -63,6 +63,8 @@ class Caps::HelperTest < Test::Unit::TestCase
       get_var = lambda { |f| f.var }
       assert_equal(iq.query.features.sort, features.map(&get_var).sort)
     }
+
+    send(iq_discovering_capabilities)
 
     # The 'server' will receive the <iq> result from the
     # 'client' and yield it to the block above. Wait here

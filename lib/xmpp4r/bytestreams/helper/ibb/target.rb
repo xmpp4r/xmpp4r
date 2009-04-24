@@ -13,6 +13,11 @@ module Jabber
       def initialize(stream, session_id, initiator_jid, target_jid)
         # Target and Initiator are swapped here, because we're the target
         super(stream, session_id, target_jid, initiator_jid)
+        @accept_ready = Semaphore::new
+      end
+
+      def accept_wait
+        @accept_ready.wait
       end
 
       ##
@@ -38,6 +43,8 @@ module Jabber
             false
           end
         }
+
+        @accept_ready.run
 
         connect_sem.wait
         true

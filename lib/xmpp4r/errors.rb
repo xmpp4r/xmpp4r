@@ -48,15 +48,15 @@ module Jabber
 
   class ComponentAuthenticationFailure < JabberError; end
 
-  # TODO : Give this a better name
   class NoNameXmlnsRegistered < JabberError
     def initialize(klass)
       super "Class #{klass} has not set name and xmlns"
     end
   end
 
-  # TODO : Give this a better name
   class SOCKS5Error < JabberError; end
+
+  class InvalidChatState < JabberError; end
 
   ##
   # A class used to build/parse <error/> elements.

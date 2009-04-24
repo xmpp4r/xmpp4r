@@ -107,7 +107,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
                 <subscription node='#{iq.pubsub.children.first.attributes['node']}' jid='#{iq.from.strip}'
 				          subid='ba49252aaa4f5d320c24d3766f0bdcade78c78d3'
                   subscription='pending'/>
-			
+
               </pubsub>
             </iq>")
     }
@@ -336,7 +336,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       assert_equal(1, iq.pubsub.children[0].children.size)
       assert_equal('item', iq.pubsub.children[0].children[0].name)
       assert_equal(1, iq.pubsub.children[0].children[0].children.size)
-      assert_equal(item1.children.to_s, iq.pubsub.children[0].children[0].children[0].to_s)
+      assert_equal(item1.children[0].to_s, iq.pubsub.children[0].children[0].children[0].to_s)
       send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
     }
     assert_nothing_raised { h.publish_item_to(node, item1) }
@@ -362,7 +362,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       assert_equal('item', iq.pubsub.children[0].children[0].name)
       assert_equal('blubb', iq.pubsub.children[0].children[0].attributes['id'] )
       assert_equal(1, iq.pubsub.children[0].children[0].children.size)
-      assert_equal(item1.children.to_s, iq.pubsub.children[0].children[0].children[0].to_s)
+      assert_equal(item1.children[0].to_s, iq.pubsub.children[0].children[0].children[0].to_s)
       send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
     }
     assert_nothing_raised { h.publish_item_with_id_to('mynode', item1,"blubb") }
@@ -379,7 +379,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
 
     assert_raise RuntimeError do h.publish_item_with_id_to('mynode', item1,"blubb") end
   end
-  
+
   ##
   # publish item and trap server-side error
   # examples 88 from
@@ -401,7 +401,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
       assert_equal('item', iq.pubsub.children[0].children[0].name)
       assert_equal('blubb', iq.pubsub.children[0].children[0].attributes['id'] )
       assert_equal(1, iq.pubsub.children[0].children[0].children.size)
-      assert_equal(item1.children.to_s, iq.pubsub.children[0].children[0].children[0].to_s)
+      assert_equal(item1.children[0].to_s, iq.pubsub.children[0].children[0].children[0].to_s)
       send("<iq type='error' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>
       <pubsub xmlns='http://jabber.org/protocol/pubsub'>
         <publish node='#{iq.pubsub.children[0].attributes['node']}'>
@@ -419,7 +419,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
   ##
   # retrieve all items
   # examples 70 and 71 from
-  # http://www.xmpp.org/extensions/xep-0060.html#subscriber-retrieve-returnall 
+  # http://www.xmpp.org/extensions/xep-0060.html#subscriber-retrieve-returnall
   def test_items
     item1 = Jabber::PubSub::Item.new("1")
     item1.text = 'foobar'
@@ -427,7 +427,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     item2.text = 'barfoo'
 
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
-    
+
     state { |iq|
       assert_kind_of(Jabber::Iq, iq)
       assert_equal(:get, iq.type)
@@ -450,6 +450,30 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     assert_kind_of(REXML::Text, items['2'])
     assert_equal(item1.children.join, items['1'].to_s)
     assert_equal(item2.children.join, items['2'].to_s)
+    wait_state
+  end
+
+  ##
+  # retrieve some items
+  # example 76 from
+  # http://xmpp.org/extensions/xep-0060.html#subscriber-retrieve-requestsome
+  def test_items_with_max_items
+    node_name = "mynode"
+    max_items = 2
+    h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
+
+    state { |iq|
+      assert_kind_of(Jabber::Iq, iq)
+      assert_equal(:get, iq.type)
+      assert_equal(1, iq.pubsub.children.size)
+      assert_equal('items', iq.pubsub.children.first.name)
+      assert_equal(node_name, iq.pubsub.children.first.attributes['node'])
+      assert_equal(max_items.to_s, iq.pubsub.children.first.attributes['max_items'])
+      # response doesn't matter; was previously tested, so send a simple result
+      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}' />")
+    }
+
+    h.get_items_from(node_name, max_items)
     wait_state
   end
 
@@ -484,6 +508,25 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     assert_equal(:publisher, a['node2'])
     assert_equal(:outcast, a['node5'])
     assert_equal(:owner, a['node6'])
+    wait_state
+  end
+
+  # http://xmpp.org/extensions/xep-0060.html#owner-affiliations-modify
+  def test_set_affiliations
+    h = PubSub::ServiceHelper.new(@client,'pubsub.shakespeare.lit')
+
+    state { |iq|
+      assert_kind_of(Jabber::Iq, iq)
+      assert_equal(:set, iq.type)
+      assert_equal(1, iq.pubsub.children.size)
+      assert_equal('affiliations', iq.pubsub.children[0].name)
+      assert_equal('affiliation', iq.pubsub.children[0].children[0].name)
+      assert_equal('bard@shakespeare.lit', iq.pubsub.children[0].children[0].attributes['jid'])
+      assert_equal('publisher', iq.pubsub.children[0].children[0].attributes['affiliation'])
+      send("<iq type='result' to='#{iq.from}' from='#{iq.to}' id='#{iq.id}'/>")
+    }
+
+    a = h.set_affiliations('princely_musings', 'bard@shakespeare.lit', :publisher)
     wait_state
   end
 
@@ -596,7 +639,7 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
   end
 
   ##
-  # get all subscriptions with no subscriptions 
+  # get all subscriptions with no subscriptions
   def test_get_all_subscriptions_with_no_subscriptions
     h = PubSub::ServiceHelper.new(@client,'pubsub.example.org')
 

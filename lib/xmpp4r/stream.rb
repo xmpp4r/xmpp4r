@@ -35,6 +35,9 @@ module Jabber
     # connection status
     attr_reader :status
 
+    # number of stanzas currently being processed
+    attr_reader :processing
+
     ##
     # Initialize a new stream
     def initialize
@@ -48,12 +51,14 @@ module Jabber
       @send_lock = Mutex.new
       @last_send = Time.now
       @exception_block = nil
+      @tbcbmutex = Mutex.new
       @threadblocks = []
       @wakeup_thread = nil
       @streamid = nil
       @streamns = 'jabber:client'
       @features_sem = Semaphore.new
       @parser_thread = nil
+      @processing = 0
     end
 
     ##
@@ -170,6 +175,7 @@ module Jabber
     #
     # element:: [REXML::Element] The received element
     def receive(element)
+      @tbcbmutex.synchronize { @processing += 1 }
       Jabber::debuglog("RECEIVED:\n#{element.to_s}")
 
       if element.namespace('').to_s == '' # REXML namespaces are always strings
@@ -219,7 +225,10 @@ module Jabber
         end
       end
 
-      return true if @xmlcbs.process(stanza)
+      if @xmlcbs.process(stanza)
+        @tbcbmutex.synchronize { @processing -= 1 }
+        return true
+      end
 
       # Iterate through blocked threads (= waiting for an answer)
       #
@@ -227,7 +236,10 @@ module Jabber
       # endless loop if Stream#send is being nested. That means, the nested
       # threadblock won't receive the stanza currently processed, but the next
       # one.
-      threadblocks = @threadblocks.dup
+      threadblocks = nil
+      @tbcbmutex.synchronize do
+        threadblocks = @threadblocks.dup
+      end
       threadblocks.each { |threadblock|
         exception = nil
         r = false
@@ -238,25 +250,68 @@ module Jabber
         end
 
         if r == true
-          @threadblocks.delete(threadblock)
+          @tbcbmutex.synchronize do
+            @threadblocks.delete(threadblock)
+          end
           threadblock.wakeup
-          return
+          @tbcbmutex.synchronize { @processing -= 1 }
+          return true
         elsif exception
-          @threadblocks.delete(threadblock)
+          @tbcbmutex.synchronize do
+            @threadblocks.delete(threadblock)
+          end
           threadblock.raise(exception)
         end
       }
 
       Jabber::debuglog("PROCESSING:\n#{stanza.to_s} (#{stanza.class})")
-      return true if @stanzacbs.process(stanza)
+      Jabber::debuglog("TRYING stanzacbs...")
+      if @stanzacbs.process(stanza)
+          @tbcbmutex.synchronize { @processing -= 1 }
+          return true
+      end
+      r = false
+      Jabber::debuglog("TRYING message/iq/presence/cbs...")
       case stanza
       when Message
-        return true if @messagecbs.process(stanza)
+        r = @messagecbs.process(stanza)
       when Iq
-        return true if @iqcbs.process(stanza)
+        r = @iqcbs.process(stanza)
       when Presence
-        return true if @presencecbs.process(stanza)
+        r = @presencecbs.process(stanza)
       end
+      @tbcbmutex.synchronize { @processing -= 1 }
+      return r
+    end
+
+    ##
+    # Get the list of iq callbacks.
+    def iq_callbacks
+      @iqcbs
+    end
+
+    ##
+    # Get the list of message callbacks.
+    def message_callbacks
+      @messagecbs
+    end
+
+    ##
+    # Get the list of presence callbacks.
+    def presence_callbacks
+      @presencecbs
+    end
+
+    ##
+    # Get the list of stanza callbacks.
+    def stanza_callbacks
+      @stanzacbs
+    end
+
+    ##
+    # Get the list of xml callbacks.
+    def xml_callbacks
+      @xmlcbs
     end
 
     ##
@@ -277,7 +332,6 @@ module Jabber
         raise @exception if @exception
       end
       def wakeup
-        # TODO: Handle threadblock removal if !alive?
         @waiter.run
       end
       def raise(exception)
@@ -306,7 +360,12 @@ module Jabber
     # &block:: [Block] The optional block
     def send(xml, &block)
       Jabber::debuglog("SENDING:\n#{xml}")
-      @threadblocks.unshift(threadblock = ThreadBlock.new(block)) if block
+      if block
+        threadblock = ThreadBlock.new(block)
+        @tbcbmutex.synchronize do
+          @threadblocks.unshift(threadblock)
+        end
+      end
       begin
         # Temporarily remove stanza's namespace to
         # reduce bandwidth consumption
@@ -403,7 +462,9 @@ module Jabber
     # ref:: [String] The callback's reference
     # &block:: [Block] The optional block
     def add_xml_callback(priority = 0, ref = nil, &block)
-      @xmlcbs.add(priority, ref, block)
+      @tbcbmutex.synchronize do
+        @xmlcbs.add(priority, ref, block)
+      end
     end
 
     ##
@@ -411,7 +472,9 @@ module Jabber
     #
     # ref:: [String] The reference of the callback to delete
     def delete_xml_callback(ref)
-      @xmlcbs.delete(ref)
+      @tbcbmutex.synchronize do
+        @xmlcbs.delete(ref)
+      end
     end
 
     ##
@@ -421,7 +484,9 @@ module Jabber
     # ref:: [String] The callback's reference
     # &block:: [Block] The optional block
     def add_message_callback(priority = 0, ref = nil, &block)
-      @messagecbs.add(priority, ref, block)
+      @tbcbmutex.synchronize do
+        @messagecbs.add(priority, ref, block)
+      end
     end
 
     ##
@@ -429,7 +494,9 @@ module Jabber
     #
     # ref:: [String] The reference of the callback to delete
     def delete_message_callback(ref)
-      @messagecbs.delete(ref)
+      @tbcbmutex.synchronize do
+        @messagecbs.delete(ref)
+      end
     end
 
     ##
@@ -439,7 +506,9 @@ module Jabber
     # ref:: [String] The callback's reference
     # &block:: [Block] The optional block
     def add_stanza_callback(priority = 0, ref = nil, &block)
-      @stanzacbs.add(priority, ref, block)
+      @tbcbmutex.synchronize do
+        @stanzacbs.add(priority, ref, block)
+      end
     end
 
     ##
@@ -447,7 +516,9 @@ module Jabber
     #
     # ref:: [String] The reference of the callback to delete
     def delete_stanza_callback(ref)
-      @stanzacbs.delete(ref)
+      @tbcbmutex.synchronize do
+        @stanzacbs.delete(ref)
+      end
     end
 
     ##
@@ -457,7 +528,9 @@ module Jabber
     # ref:: [String] The callback's reference
     # &block:: [Block] The optional block
     def add_presence_callback(priority = 0, ref = nil, &block)
-      @presencecbs.add(priority, ref, block)
+      @tbcbmutex.synchronize do
+        @presencecbs.add(priority, ref, block)
+      end
     end
 
     ##
@@ -465,7 +538,9 @@ module Jabber
     #
     # ref:: [String] The reference of the callback to delete
     def delete_presence_callback(ref)
-      @presencecbs.delete(ref)
+      @tbcbmutex.synchronize do
+        @presencecbs.delete(ref)
+      end
     end
 
     ##
@@ -475,7 +550,9 @@ module Jabber
     # ref:: [String] The callback's reference
     # &block:: [Block] The optional block
     def add_iq_callback(priority = 0, ref = nil, &block)
-      @iqcbs.add(priority, ref, block)
+      @tbcbmutex.synchronize do
+        @iqcbs.add(priority, ref, block)
+      end
     end
 
     ##
@@ -484,7 +561,9 @@ module Jabber
     # ref:: [String] The reference of the callback to delete
     #
     def delete_iq_callback(ref)
-      @iqcbs.delete(ref)
+      @tbcbmutex.synchronize do
+        @iqcbs.delete(ref)
+      end
     end
     ##
     # Closes the connection to the Jabber service
@@ -493,6 +572,21 @@ module Jabber
     end
 
     def close!
+      pr = 1
+      n = 0
+      # In some cases, we might lost count of some stanzas
+      # (for example, if the handler raises an exception)
+      # so we can't block forever.
+      while pr > 0 and n <= 1000
+        @tbcbmutex.synchronize { pr = @processing }
+        if pr > 0
+          n += 1
+          Jabber::debuglog("TRYING TO CLOSE, STILL PROCESSING #{pr} STANZAS")
+          #puts("TRYING TO CLOSE, STILL PROCESSING #{pr} STANZAS")
+          Thread::pass
+        end
+      end
+
       # Order Matters here! If this method is called from within 
       # @parser_thread then killing @parser_thread first would 
       # mean the other parts of the method fail to execute. 

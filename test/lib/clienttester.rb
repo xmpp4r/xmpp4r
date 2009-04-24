@@ -8,6 +8,10 @@ require 'test/unit'
 require 'socket'
 require 'xmpp4r/semaphore'
 
+# Jabber::debug = true
+CTDebug = false
+# CTDebug = true
+
 # This is sane for tests:
 Thread::abort_on_exception = true
 
@@ -32,6 +36,9 @@ module Jabber
       servlisten = TCPServer.new(@@SOCKET_PORT)
       serverwait = Semaphore.new
       stream = '<stream:stream xmlns:stream="http://etherx.jabber.org/streams">'
+
+      @state = 0
+      @states = []
 
       Thread.new do
         Thread.current.abort_on_exception = true
@@ -68,31 +75,53 @@ module Jabber
       end
 #=end
       @client.start(clientsock)
-      @client.send(stream) { |reply| true }
 
-      @state = 0
-      @states = []
-      @state_wait = Semaphore.new
-      @state_wait2 = Semaphore.new
+      @processdone_wait = Semaphore.new
+      @nextstate_wait = Semaphore.new
+      serverwait.wait
       @server.add_stanza_callback { |stanza|
-        if @state < @states.size
+        # Client prepares everything, then calls wait_state. Problem: because
+        # of a race condition, it is possible that we receive the stanza before
+        # what to do with it is defined. We busy-wait on @states here.
+        n = 0
+        while @state >= @states.size and n < 1000
+          Thread.pass
+          n += 1
+        end
+        if n == 1000
+          puts "Unmanaged stanza in state. Maybe processed by helper?" if CTDebug
+        else
           begin
+            puts "Calling #{@states[@state]} for #{stanza.to_s}" if CTDebug
             @states[@state].call(stanza)
-          rescue
-            puts "Exception in state: #{$!.class}: #{$!}\n#{$!.join("\n")}"
+          rescue Exception => e
+            puts "Exception in state: #{e.class}: #{e}\n#{e.backtrace.join("\n")}"
           end
           @state += 1
-          @state_wait2.wait
-          @state_wait.run
+          @nextstate_wait.wait
+          @processdone_wait.run
         end
 
         false
       }
+      @client.send(stream) { |reply| true }
 
-      serverwait.wait
     end
 
     def teardown
+      # In some cases, we might lost count of some stanzas
+      # (for example, if the handler raises an exception)
+      # so we can't block forever.
+      n = 0
+      while @client.processing > 0 and n < 1000
+        Thread::pass
+        n += 1
+      end
+      n = 0
+      while @server.processing > 0 and n < 1000
+        Thread::pass
+        n += 1
+      end
       @client.close
       @server.close
     end
@@ -106,12 +135,12 @@ module Jabber
     end
 
     def wait_state
-      @state_wait2.run
-      @state_wait.wait
+      @nextstate_wait.run
+      @processdone_wait.wait
     end
 
     def skip_state
-      @state_wait2.run
+      @nextstate_wait.run
     end
   end
 end
