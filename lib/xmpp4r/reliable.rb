@@ -42,16 +42,21 @@ module Jabber
           retry
         end
       end
-      
+            
     end
     
     class Listener
-      def initialize(full_jid, password, config)
+      def initialize(full_jid, password, config, &block)
         @config = config
         @password = password
+        @max_retry = config[:max_retry] || 30
         @connection = Connection.new(full_jid, config)
-        @connection.add_message_callback do |msg|
-          self.on_message(msg)
+        if block_given?
+          @connection.add_message_callback(&block)
+        else
+          @connection.add_message_callback do |msg|
+            self.on_message(msg)
+          end
         end
         
         #We could just reconnect in @connection.on_exception, 
@@ -66,17 +71,42 @@ module Jabber
             retry
           end
         end
+        @exception_handlers = []
         @connection.on_exception do |e, connection, where_failed|
-          unless @connection.is_connected?
-            @reconnection_thread.raise(e)
-          end
+          self.run_exception_handlers(e, connection, where_failed)
         end
+      end
+      
+      def run_exception_handlers(e, connection, where_failed)
+        @exception_handlers.each do |ex_handler|
+          ex_handler.call(e, connection, where_failed)
+        end
+        if where_failed == :sending
+          @message_to_send_on_reconnect = @message_now_sending
+        end
+        if where_failed != :close && !@connection.is_connected?
+          @reconnection_thread.raise(e)
+        end
+      end
+      
+      def add_exception_handler(&block)
+        @exception_handlers << block
       end
       
       def start
         connect
         auth
         send_presence
+        if @message_to_send_on_reconnect
+          send_message(@message_to_send_on_reconnect)
+        end
+        @message_to_send_on_reconnect = nil
+      end
+      
+      #Stop the listener. (close the connection)
+      def stop
+        @connection.close if @connection and @connection.is_connected?
+        @connection = nil
       end
       
       def connect
@@ -95,10 +125,31 @@ module Jabber
       end
       
       #TODO: test and fix situation where we get disconnected while sending but then successfully reconnect 
-      # (and make sure in such cases we resent)
+      # (and make sure in such cases we resent)      
       def send_message(message)
-        @connection.send(message)
+        retry_count = 0
+        begin
+          while(not @connection.is_connected?)
+            #wait
+            Thread.pass
+          end
+          @message_now_sending = message
+          @connection.send(message)
+          return true #true, message was sent
+        rescue => e
+          if e.is_a?(Interrupt)
+            raise e
+          end
+          if(retry_count > @max_retry.to_i)
+            Jabber::debuglog "reached max retry count on message re-send, failing"
+            raise e
+          end
+          retry_count += 1
+          Jabber::debuglog "retrying message send.." + e.inspect
+          retry
+        end
       end
+      
     end
     
   end
