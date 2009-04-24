@@ -81,7 +81,6 @@ Gem::Specification.new do |s|
  "lib/xmpp4r/bytestreams/helper/socks5bytestreams/server.rb",
  "lib/xmpp4r/bytestreams/helper/socks5bytestreams/socks5.rb",
  "lib/xmpp4r/bytestreams/helper/socks5bytestreams/target.rb",
- "lib/xmpp4r/bytestreams/helper/socks5bytestreams/target.rb.orig",
  "lib/xmpp4r/bytestreams/iq",
  "lib/xmpp4r/bytestreams/iq/bytestreams.rb",
  "lib/xmpp4r/bytestreams/iq/si.rb",
@@ -112,6 +111,7 @@ Gem::Specification.new do |s|
  "lib/xmpp4r/discovery",
  "lib/xmpp4r/discovery.rb",
  "lib/xmpp4r/discovery/helper",
+ "lib/xmpp4r/discovery/helper/helper.rb",
  "lib/xmpp4r/discovery/helper/responder.rb",
  "lib/xmpp4r/discovery/iq",
  "lib/xmpp4r/discovery/iq/discoinfo.rb",
@@ -130,6 +130,12 @@ Gem::Specification.new do |s|
  "lib/xmpp4r/idgenerator.rb",
  "lib/xmpp4r/iq.rb",
  "lib/xmpp4r/jid.rb",
+ "lib/xmpp4r/last",
+ "lib/xmpp4r/last.rb",
+ "lib/xmpp4r/last/helper",
+ "lib/xmpp4r/last/helper/helper.rb",
+ "lib/xmpp4r/last/iq",
+ "lib/xmpp4r/last/iq/last.rb",
  "lib/xmpp4r/message.rb",
  "lib/xmpp4r/muc",
  "lib/xmpp4r/muc.rb",
@@ -156,6 +162,7 @@ Gem::Specification.new do |s|
  "lib/xmpp4r/pubsub/children/items.rb",
  "lib/xmpp4r/pubsub/children/node_config.rb",
  "lib/xmpp4r/pubsub/children/publish.rb",
+ "lib/xmpp4r/pubsub/children/retract.rb",
  "lib/xmpp4r/pubsub/children/subscription.rb",
  "lib/xmpp4r/pubsub/children/subscription_config.rb",
  "lib/xmpp4r/pubsub/children/unsubscribe.rb",
@@ -166,6 +173,7 @@ Gem::Specification.new do |s|
  "lib/xmpp4r/pubsub/iq",
  "lib/xmpp4r/pubsub/iq/pubsub.rb",
  "lib/xmpp4r/query.rb",
+ "lib/xmpp4r/reliable.rb",
  "lib/xmpp4r/rexmladdons.rb",
  "lib/xmpp4r/roster",
  "lib/xmpp4r/roster.rb",
@@ -224,6 +232,8 @@ Gem::Specification.new do |s|
  "test/delay/tc_xdelay.rb",
  "test/discovery",
  "test/discovery/tc_responder.rb",
+ "test/last",
+ "test/last/tc_helper.rb",
  "test/lib",
  "test/lib/assert_equal_xml.rb",
  "test/lib/clienttester.rb",
@@ -235,6 +245,12 @@ Gem::Specification.new do |s|
  "test/pubsub/tc_helper.rb",
  "test/pubsub/tc_nodeconfig.rb",
  "test/pubsub/tc_subscriptionconfig.rb",
+ "test/reliable",
+ "test/reliable/listener_mocker.rb",
+ "test/reliable/tc_disconnect_cleanup.rb",
+ "test/reliable/tc_disconnect_exception.rb",
+ "test/reliable/tc_listener_mocked_test.rb",
+ "test/reliable/tc_reliable_connection.rb",
  "test/roster",
  "test/roster/tc_helper.rb",
  "test/roster/tc_iqqueryroster.rb",
@@ -284,7 +300,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = ">= 1.8.4"
   s.required_rubygems_version = ">= 0"
   s.rubyforge_project = "xmpp4r"
-  s.rubygems_version = "1.2.0"
+  s.rubygems_version = "1.3.1"
   s.specification_version = 2
   s.summary = "XMPP4R is an XMPP/Jabber library for Ruby."
   s.version = "0.4"
