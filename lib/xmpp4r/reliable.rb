@@ -47,12 +47,17 @@ module Jabber
     
     class Listener
       def initialize(full_jid, password, config, &block)
+        @on_message_block = block
+        @full_jid = full_jid
         @config = config
         @password = password
         @max_retry = config[:max_retry] || 30
-        @connection = Connection.new(full_jid, config)
-        if block_given?
-          @connection.add_message_callback(&block)
+      end
+      
+      def setup_connection
+        @connection = Connection.new(@full_jid, @config)
+        if @on_message_block
+          @connection.add_message_callback(&@on_message_block)
         else
           @connection.add_message_callback do |msg|
             self.on_message(msg)
@@ -94,6 +99,7 @@ module Jabber
       end
       
       def start
+        setup_connection unless @connection
         connect
         auth
         send_presence
@@ -127,6 +133,9 @@ module Jabber
       #TODO: test and fix situation where we get disconnected while sending but then successfully reconnect 
       # (and make sure in such cases we resent)      
       def send_message(message)
+        unless @connection
+          raise ::ArgumentError, "Can't send messages while listener is stopped.  Plase 'start' the listener first."
+        end
         retry_count = 0
         begin
           while(not @connection.is_connected?)

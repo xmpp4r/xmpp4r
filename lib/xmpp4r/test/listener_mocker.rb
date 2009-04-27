@@ -92,9 +92,14 @@ module Jabber
   
       def self.mock_out(listener)
         listener.instance_eval do
-          @connection.instance_eval do
-            class << self
-              self.class_eval(&Jabber::Test::ListenerMocker.mocker_proc)
+          class << self
+            def setup_connection
+              super
+              @connection.instance_eval do
+                class << self
+                  self.class_eval(&Jabber::Test::ListenerMocker.mocker_proc)
+                end
+              end
             end
           end
         end
