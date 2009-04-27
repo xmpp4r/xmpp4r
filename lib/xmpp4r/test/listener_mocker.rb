@@ -1,7 +1,11 @@
 module Jabber
   module Test
     class ListenerMocker
-  
+      
+      class << self
+        attr_accessor :with_socket_mocked_callback_proc
+      end
+      
       def self.with_socket_mocked(callback_proc)
         TCPSocket.class_eval{ ListenerMocker.with_socket_mocked_callback_proc = callback_proc }
         TCPSocket.class_eval do
@@ -13,7 +17,9 @@ module Jabber
         yield
       ensure
         TCPSocket.class_eval do
-          alias_method :initialize, :initialize_old
+          if method_defined?(:initialize_old)
+            alias_method :initialize, :initialize_old
+          end
         end
       end
       
