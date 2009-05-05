@@ -33,15 +33,6 @@ end
 tc_subdirs.each do |dir|
   Find.find(dir) do |f|
     if File::file?(f) and File::basename(f) =~ /^tc.*\.rb$/
-
-      if (RUBY_VERSION.split('.').collect {|n| n.to_i} <=> [1,9,0]) >= 0
-        # TODO: at the moment, these two test cases have timing dependencies
-        # on threaded code.  While they may pass with the green thread
-        # implementation in Ruby 1.8, they often fail with real threads.
-        next if f =~ /tc_helper.rb/
-        next if f =~ /tc_stream.rb/
-      end
-
       tc_files << f
     end
   end
