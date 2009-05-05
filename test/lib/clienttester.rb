@@ -9,8 +9,8 @@ require 'socket'
 require 'xmpp4r/semaphore'
 
 # Jabber::debug = true
-CTDebug = false
-# CTDebug = true
+$ctdebug = false
+# $ctdebug = true
 
 # This is sane for tests:
 Thread::abort_on_exception = true
@@ -89,10 +89,10 @@ module Jabber
           n += 1
         end
         if n == 1000
-          puts "Unmanaged stanza in state. Maybe processed by helper?" if CTDebug
+          puts "Unmanaged stanza in state. Maybe processed by helper?" if $ctdebug
         else
           begin
-            puts "Calling #{@states[@state]} for #{stanza.to_s}" if CTDebug
+            puts "Calling #{@states[@state]} for #{stanza.to_s}" if $ctdebug
             @states[@state].call(stanza)
           rescue Exception => e
             puts "Exception in state: #{e.class}: #{e}\n#{e.backtrace.join("\n")}"
