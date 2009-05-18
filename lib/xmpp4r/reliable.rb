@@ -70,7 +70,10 @@ module Jabber
           first_run = true
           begin
             self.start unless first_run
-            loop{ Thread.pass }
+            loop do 
+              sleep(1)
+              Thread.pass
+            end
           rescue => e
             first_run = false
             retry
