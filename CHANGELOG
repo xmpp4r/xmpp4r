@@ -1,3 +1,11 @@
+XMPP4R 0.5 (XX/XX/2009)
+=======================
+* Many bugs fixed and tests cleanups (better Ruby 1.9 support, in
+  particular)
+* Support for reliable connections (that auto-reconnect when being
+  disconnected, without losing messages)
+* Better notification of server disconnects
+
 XMPP4R 0.4 (05/08/2008)
 =======================
 * Initial support for Ruby 1.9 (see README_ruby19.txt)

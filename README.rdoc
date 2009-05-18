@@ -25,6 +25,8 @@ which can be enabled in your code with:
   Lucas Nussbaum <lucas@lucas-nussbaum.net>
   Stephan Maka <stephan@spaceboyz.net>
   Kirill A. Shutemov <k.shutemov@gmail.com>
+  Glenn Rempe <glenn@rempe.us>
+  Jacob Burkhart <jacob@brontes3d.com>
   Yuki Mitsui
   Peter Schrammel
   Olli
@@ -33,7 +35,6 @@ which can be enabled in your code with:
   Chris Zelenak
   Matthew Wood
   Sam Ruby
-  Glenn Rempe <glenn@rempe.us>
   Tim Carey-Smith
   Scott Lillibridge
   Joshua Sierles
