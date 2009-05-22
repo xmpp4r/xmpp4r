@@ -122,7 +122,6 @@ module Jabber
         state = :key
         key = ''
         value = ''
-
         text.scan(/./) do |ch|
           if state == :key
             if ch == '='
@@ -133,6 +132,9 @@ module Jabber
 
           elsif state == :value
             if ch == ','
+              # due to our home-made parsing of the challenge, the key could have
+              # leading whitespace. strip it, or that would break jabberd2 support.
+              key = key.strip
               res[key] = value
               key = ''
               value = ''
@@ -151,6 +153,9 @@ module Jabber
             end
           end
         end
+        # due to our home-made parsing of the challenge, the key could have
+        # leading whitespace. strip it, or that would break jabberd2 support.
+        key = key.strip
         res[key] = value unless key == ''
 
         Jabber::debuglog("SASL DIGEST-MD5 challenge:\n#{text}\n#{res.inspect}")
