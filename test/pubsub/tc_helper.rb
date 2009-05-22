@@ -698,6 +698,69 @@ class PubSub::ServiceHelperTest < Test::Unit::TestCase
     wait_state
   end
 
+  ##
+  # owner set configuration for a node
+  # example 133
+  # http://xmpp.org/extensions/xep-0060.html#owner-configure
+  def test_set_node_config
+    node = 'princely_musings'
+    pubsub = 'pubsub.shakespeare.lit'
+    h = PubSub::ServiceHelper.new(@client,pubsub)
+    
+    state { |iq|
+      assert_kind_of(Jabber::Iq,iq)
+      assert_equal(:set, iq.type)
+      assert_equal(pubsub, iq.to.to_s)
+
+      config = iq.pubsub.first_element('configure')
+      assert_kind_of(Jabber::PubSub::OwnerNodeConfig, config)
+      assert_kind_of(Jabber::Dataforms::XData, config.form)
+
+      assert_equal(config.options["pubsub#title"], "Princely Musings (Atom)")
+      assert_equal(config.options["pubsub#deliver_notifications"], "1")
+      assert_equal(config.options["pubsub#deliver_payloads"], "1")
+      assert_equal(config.options["pubsub#persist_items"], "1")
+      assert_equal(config.options["pubsub#max_items"], "10")
+      assert_equal(config.options["pubsub#access_model"], "open")
+      assert_equal(config.options["pubsub#publish_model"], "publishers")
+      assert_equal(config.options["pubsub#send_last_published_item"], "never")
+      assert_equal(config.options["pubsub#presence_based_delivery"], "false")
+      assert_equal(config.options["pubsub#notify_config"], "0")
+      assert_equal(config.options["pubsub#notify_delete"], "0")
+      assert_equal(config.options["pubsub#notify_retract"], "0")
+      assert_equal(config.options["pubsub#notify_sub"], "0")
+      assert_equal(config.options["pubsub#max_payload_size"], "1028")
+      assert_equal(config.options["pubsub#type"], "http://www.w3.org/2005/Atom")
+      assert_equal(config.options["pubsub#body_xslt"], "http://jabxslt.jabberstudio.org/atom_body.xslt")
+
+      send("<iq type='result' from='#{iq.to}' to='#{iq.from}' id='#{iq.id}'/>")
+    }
+
+    config = Jabber::PubSub::OwnerNodeConfig.new(node)
+    config.options = {
+      "pubsub#title" => "Princely Musings (Atom)",
+      "pubsub#deliver_notifications" => "1",
+      "pubsub#deliver_payloads" => "1",
+      "pubsub#persist_items" => "1",
+      "pubsub#max_items" => "10",
+      "pubsub#access_model" => "open",
+      "pubsub#publish_model" => "publishers",
+      "pubsub#send_last_published_item" => "never",
+      "pubsub#presence_based_delivery" => "false",
+      "pubsub#notify_config" => "0",
+      "pubsub#notify_delete" => "0",
+      "pubsub#notify_retract" => "0",
+      "pubsub#notify_sub" => "0",
+      "pubsub#max_payload_size" => "1028",
+      "pubsub#type" => "http://www.w3.org/2005/Atom",
+      "pubsub#body_xslt" => "http://jabxslt.jabberstudio.org/atom_body.xslt"
+    }
+
+    assert_kind_of(Jabber::PubSub::OwnerNodeConfig, config)
+    h.set_config_for(node, config)
+    wait_state
+  end
+
   def test_delete_item
     pubsub = 'pubsub.example.org'
     h = PubSub::ServiceHelper.new(@client, pubsub)

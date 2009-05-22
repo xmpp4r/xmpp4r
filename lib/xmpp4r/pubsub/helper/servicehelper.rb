@@ -282,8 +282,8 @@ module Jabber
       # options:: [Jabber::PubSub::NodeConfig]
       # return:: true on success
       def set_config_for(node, config)
-        iq = basic_pubsub_query( :set )
-        iq.pubsub.add(config.form)
+        iq = basic_pubsub_query(:set, true)
+        iq.pubsub.add(config)
         @stream.send_with_id(iq)
       end
 

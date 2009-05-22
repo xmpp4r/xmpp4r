@@ -51,4 +51,11 @@ class PubSub::NodeConfigTest < Test::Unit::TestCase
     assert_kind_of(Jabber::Dataforms::XData, config.form)
     assert_equal(options, config.options)
   end
+
+  def test_create_with_array_in_options
+    options = {'pubsub#collection'=>['parent1','parent2']}
+    config = PubSub::OwnerNodeConfig.new(nil, options)
+
+    assert_equal(options, config.options)
+  end
 end

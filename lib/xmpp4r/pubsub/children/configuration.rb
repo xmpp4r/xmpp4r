@@ -75,7 +75,7 @@ module Jabber
         form.add(pubsub_config)
         options.each_pair do |key, value|
           f = Jabber::Dataforms::XDataField.new(key)
-          f.values = [value]
+          f.values = value.is_a?(Array) ? value : [value]
           form.add(f)
         end
 
