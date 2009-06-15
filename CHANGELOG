@@ -1,4 +1,4 @@
-XMPP4R 0.5 (XX/XX/2009)
+XMPP4R 0.5 (15/06/2009)
 =======================
 * Many bugs fixed and tests cleanups (better Ruby 1.9 support, in
   particular)
