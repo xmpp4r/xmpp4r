@@ -19,8 +19,9 @@ module Jabber
     # before proceeding
     attr_accessor :features_timeout
 
-    # Keep-alive interval in seconds, defaults to 60
-    # (see private method keepalive_loop for implementation details)
+    # Keep-alive interval in seconds, or nil to disable keepalive,
+    # defaults to 60 (see private method keepalive_loop for
+    # implementation details)
     attr_accessor :keepalive_interval
 
     # Allow TLS negotiation? Defaults to true
@@ -78,9 +79,11 @@ module Jabber
 
       accept_features
 
-      @keepaliveThread = Thread.new do
-        Thread.current.abort_on_exception = true
-        keepalive_loop
+      unless @keepalive_interval.nil?
+        @keepaliveThread = Thread.new do
+          Thread.current.abort_on_exception = true
+          keepalive_loop
+        end
       end
     end
 
