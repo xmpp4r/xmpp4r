@@ -52,7 +52,14 @@ class EntityTime::ResponderTest < Test::Unit::TestCase
     assert_equal('urn:xmpp:time', reply[0].namespace)
 
     assert(reply[0].elements["utc"].has_text?, "element must have a utc time (actual time should be check here)")
-    assert_equal('-04:00', reply[0].elements["tzo"].text, "element should have a tzo of -04:00 (if you're testing in EST)")
+
+    tmp = Time.now
+    local_offset = Time.now.utc_offset
+    hour_offset = local_offset / 3600
+    min_offset = local_offset % 60
+    offset = "%+03d:%02d"%[hour_offset, min_offset]
+
+    assert_equal(offset, reply[0].elements["tzo"].text, "element should has an incorrect time zone offset")
   end
 
 end
