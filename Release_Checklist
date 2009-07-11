@@ -1,0 +1,5 @@
+- update changelog
+- push to github
+- upload files to gna
+- upload files to rubyforge, so gem works
+  (using the web interface: files -> admin)
