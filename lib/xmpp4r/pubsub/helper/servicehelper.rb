@@ -218,7 +218,7 @@ module Jabber
       # node:: [String]
       # return:: true
       def purge_items_from(node)
-        iq = basic_pubsub_query(:set)
+        iq = basic_pubsub_query(:set, true)
         purge = REXML::Element.new('purge')
         purge.attributes['node'] = node
         iq.pubsub.add(purge)
