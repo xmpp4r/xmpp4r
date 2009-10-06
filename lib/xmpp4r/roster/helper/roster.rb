@@ -229,9 +229,9 @@ module Jabber
             @presence_cbs.process(item, oldpres, pres)
           }
         else
-          oldpres = item.presence(pres.from).nil? ?
+          oldpres = item.presence_of(pres.from).nil? ?
             nil :
-            Presence.new.import(item.presence(pres.from))
+            Presence.new.import(item.presence_of(pres.from))
 
           item.add_presence(pres)
           @presence_cbs.process(item, oldpres, pres)
@@ -431,14 +431,26 @@ module Jabber
 
         ##
         # Get specific presence
-        # jid:: [JID] Full JID
-        def presence(jid)
+        # jid:: [JID] Full JID with resource
+        def presence_of(jid)
           @presences_lock.synchronize {
             @presences.each { |pres|
               return(pres) if pres.from == jid
             }
           }
           nil
+        end
+
+        ##
+        # Get presence of highest-priority available resource of this person
+        #
+        # Returns <tt>nil</tt> if contact is offline
+        def presence
+          @presences_lock.synchronize {
+            @presences.select { |pres|
+              pres.type.nil?
+            }.max { |pres1, pres2| pres1.priority <=> pres2.priority }
+          }
         end
 
         ##
