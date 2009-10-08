@@ -449,7 +449,7 @@ module Jabber
           @presences_lock.synchronize {
             @presences.select { |pres|
               pres.type.nil?
-            }.max { |pres1, pres2| pres1.priority <=> pres2.priority }
+            }.max { |pres1, pres2| (pres1.priority || 0) <=> (pres2.priority || 0) }
           }
         end
 
