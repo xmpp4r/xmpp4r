@@ -10,10 +10,11 @@ module Jabber
     # Unsubscribe
     class Unsubscribe < XMPPElement
       name_xmlns 'unsubscribe'
-      def initialize(myjid=nil,mynode=nil)
+      def initialize(myjid=nil,mynode=nil,mysubid=nil)
         super()
         jid = myjid
         node =  mynode
+        subid = mysubid
       end
 
       ##
@@ -42,6 +43,20 @@ module Jabber
       # =:: [String]
       def node=(mynode)
         attributes['node'] = mynode
+      end
+
+      ##
+      # shows the subid
+      # return:: [String]
+      def subid
+        attributes['subid']
+      end
+
+      ##
+      # sets the subid
+      # =:: [String]
+      def subid=(mysubid)
+        attributes['subid'] = mysubid
       end
     end
   end
