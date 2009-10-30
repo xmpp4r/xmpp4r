@@ -6,7 +6,7 @@
 #
 # This was based on Observable module from Ruby.
 module ObservableThing
-  require 'thread_store'
+  require 'xmpp4r/observable/thread_store'
 
   # Adds an observer for some "thing".
   #
