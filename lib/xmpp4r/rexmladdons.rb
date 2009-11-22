@@ -39,17 +39,21 @@ module REXML
 
     ##
     # Returns first element of name <tt>e</tt>
-    def first_element(e)
-      each_element(e) { |el| return el }
+    def first_element(e, namespace = nil)
+      if namespace
+        each_element_with_attribute("xmlns", namespace, 0, e) { |el| return el }
+      else
+        each_element(e) { |el| return el }
+      end
       return nil
     end
 
     ##
     # Returns text of first element of name <tt>e</tt>
-    def first_element_text(e)
-      el = first_element(e)
+    def first_element_text(e, namespace = nil)
+      el = first_element(e, namespace)
       if el
-        return el.text
+        return el.children.to_s
       else
         return nil
       end

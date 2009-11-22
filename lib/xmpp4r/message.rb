@@ -101,6 +101,13 @@ module Jabber
     end
 
     ##
+    # Returns the message's xhtml body, or nil.
+    # This is the message's xhtml-text content.
+    def xhtml_body
+      first_element_text('body', 'http://www.w3.org/1999/xhtml')
+    end
+
+    ##
     # sets the message's subject
     #
     # s:: [String] subject to set
