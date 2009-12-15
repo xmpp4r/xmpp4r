@@ -41,7 +41,7 @@ module REXML
     # Returns first element of name <tt>e</tt>
     def first_element(e, namespace = nil)
       if namespace
-        each_element_with_attribute("xmlns", namespace, 0, e) { |el| return el }
+        each_element_with_attribute("xmlns", namespace, 1, e) { |el| return el }
       else
         each_element(e) { |el| return el }
       end

@@ -104,7 +104,13 @@ module Jabber
     # Returns the message's xhtml body, or nil.
     # This is the message's xhtml-text content.
     def xhtml_body
-      first_element_text('body', 'http://www.w3.org/1999/xhtml')
+      html = first_element('html', 'http://jabber.org/protocol/xhtml-im')
+
+      if html
+        html.first_element_text('body', 'http://www.w3.org/1999/xhtml')
+      else
+        first_element_text('body', 'http://www.w3.org/1999/xhtml')
+      end
     end
 
     ##
