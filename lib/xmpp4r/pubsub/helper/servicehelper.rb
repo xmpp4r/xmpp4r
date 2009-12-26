@@ -85,6 +85,20 @@ module Jabber
 
         res
       end
+
+      ##
+      # get subids for a passed node
+      # return:: [Array] of subids
+      def get_subids_for(node)
+        ret = []
+        get_subscriptions_from_all_nodes.each do |subscription|
+          if subscription.node == node
+            ret << subscription.subid
+          end
+        end
+        return ret
+      end
+
       ##
       # subscribe to a node
       # node:: [String]
@@ -113,15 +127,26 @@ module Jabber
       # subid:: [String] or nil (not supported)
       # return:: true
       def unsubscribe_from(node, subid=nil)
-        iq = basic_pubsub_query(:set)
-        unsub = PubSub::Unsubscribe.new
-        unsub.node = node
-        unsub.jid = @stream.jid.strip
-        iq.pubsub.add(unsub)
-        ret = false
-        @stream.send_with_id(iq) { |reply|
-          ret = reply.kind_of?(Jabber::Iq) and reply.type == :result
-        } # @stream.send_with_id(iq)
+        ret = []
+        if subid.nil?
+          subids = get_subids_for(node)
+        else
+          subids = [ subid ]
+        end
+        subids << nil if subids.empty?
+        subids.each do |sid|
+          iq = basic_pubsub_query(:set)
+          unsub = PubSub::Unsubscribe.new
+          unsub.node = node
+          unsub.jid = @stream.jid.strip
+          unsub.subid = sid
+          iq.pubsub.add(unsub)
+          res = false
+          @stream.send_with_id(iq) { |reply|
+            res = reply.kind_of?(Jabber::Iq) and reply.type == :result
+          } # @stream.send_with_id(iq)
+          ret << res
+        end
         ret
       end
 
@@ -129,11 +154,21 @@ module Jabber
       # gets all items from a pubsub node
       # node:: [String]
       # count:: [Fixnum]
+      # subid:: [String]
       # return:: [Hash] { id => [Jabber::PubSub::Item] }
-      def get_items_from(node, count=nil)
+      def get_items_from(node, count=nil, subid=nil)
+        if subid.nil?
+          # Hm... no subid passed. Let's see if we can provide one.
+          subids = get_subids_for(node)
+          if ! subids.empty?
+            # If more than one, sorry. We'll just respect the first.
+            subid = subids[0]
+          end
+        end
         iq = basic_pubsub_query(:get)
         items = Jabber::PubSub::Items.new
         items.max_items = count
+        items.subid = subid unless subid.nil?  # if subid is still nil, we haven't any... why bother?
         items.node = node
         iq.pubsub.add(items)
         res = nil
@@ -157,7 +192,7 @@ module Jabber
       # return:: true
       def publish_item_to(node,item)
         iq = basic_pubsub_query(:set)
-	      publish = iq.pubsub.add(REXML::Element.new('publish'))
+        publish = iq.pubsub.add(REXML::Element.new('publish'))
         publish.attributes['node'] = node
 
         if item.kind_of?(Jabber::PubSub::Item)
@@ -211,7 +246,6 @@ module Jabber
 
         @stream.send_with_id(iq)
       end
-
 
       ##
       # purges all items on a persistent node
@@ -354,7 +388,7 @@ module Jabber
             res = []
             if reply.pubsub.first_element('subscriptions').attributes['node'] == node
               reply.pubsub.first_element('subscriptions').each_element('subscription') { |subscription|
-    	        res << PubSub::Subscription.import(subscription)
+              res << PubSub::Subscription.import(subscription)
               }
             end
           end
