@@ -44,7 +44,17 @@ class StreamComponentTest < Test::Unit::TestCase
   end
 
   def teardown
-    @stream.close
+    n = 0
+    while @stream.processing > 0 and n < 1000
+      Thread::pass
+      n += 1
+    end
+    n = 0
+    while @server.processing > 0 and n < 1000
+      Thread::pass
+      n += 1
+    end
+    #@stream.close
     @server.close
   end
 

@@ -18,7 +18,7 @@ class StreamTest < Test::Unit::TestCase
 
   def busywait(&block)
     n = 0
-    while not block.yield and n < 1000
+    while not block.call and n < 10000
       Thread::pass
       n += 1
     end
@@ -92,7 +92,7 @@ class StreamTest < Test::Unit::TestCase
         @server.send(Iq.new(:result).set_id('3').delete_namespace)
       else
         p e
-       end
+      end
     end
 
     called_outer = 0
