@@ -105,8 +105,8 @@ class SOCKS5BytestreamsTest < Test::Unit::TestCase
     target = Bytestreams::SOCKS5BytestreamsTarget.new(@server, '1', '1@a.com/1', '1@a.com/2')
 
     assert_nothing_raised do
-      Timeout::timeout(2) do
-        target.connect_timeout = 1
+      Timeout::timeout(1) do
+        target.connect_timeout = 0.5
         assert target.accept == false
       end
     end
