@@ -43,7 +43,7 @@ module Jabber
           identity.send(field).to_s
         end.join('/') + '<'
       end.join
-
+      
       # 4. Sort the supported service discovery features. [15]
       features.sort! do |feature1,feature2|
         feature1.var <=> feature2.var
@@ -71,7 +71,7 @@ module Jabber
         # 7.1. Append the XML character data of the FORM_TYPE field's
         # <value/> element, followed by the '<' character.
         fform_type = form.field('FORM_TYPE')
-        form_type = fform_type ? fform_type.values.to_s : nil
+        form_type = fform_type ? fform_type.first_element_text('value') : nil
         s += "#{form_type}<"
 
         # 7.2. Sort the fields by the value of the "var" attribute.
