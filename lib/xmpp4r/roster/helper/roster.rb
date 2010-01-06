@@ -469,7 +469,7 @@ module Jabber
           @presences_lock.synchronize {
             # Delete old presences with the same JID
             @presences.delete_if do |pres|
-              pres.from == newpres.from or pres.from.resource.nil?
+              pres.from == newpres.from or pres.from.resource.nil? or pres.type == :unavailable
             end
 
             if newpres.type == :error and newpres.from.resource.nil?
