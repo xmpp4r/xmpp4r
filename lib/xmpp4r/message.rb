@@ -114,6 +114,37 @@ module Jabber
     end
 
     ##
+    # Sets the message's xhtml body
+    #
+    # b:: [String] xhtml body to set
+    def xhtml_body=(b)
+      if b.kind_of? String
+        b = REXML::Text.new(b, false, nil, true, nil, %r/.^/)
+      end
+      
+      html = first_element('html', 'http://jabber.org/protocol/xhtml-im')
+      
+      if html
+        html.replace_element_text('body', b, 'http://www.w3.org/1999/xhtml')
+      else
+        el = REXML::Element.new('html')
+        el.add_namespace('http://jabber.org/protocol/xhtml-im')
+        el.replace_element_text('body', b, 'http://www.w3.org/1999/xhtml')
+        add_element(el)
+      end
+    end
+
+    ##
+    # Sets the message's xhtml body
+    #
+    # b:: [String] xhtml body to set
+    # return:: [REXML::Element] self for chaining
+    def set_xhtml_body(b)
+      self.xhtml_body = b
+      self
+    end
+
+    ##
     # sets the message's subject
     #
     # s:: [String] subject to set

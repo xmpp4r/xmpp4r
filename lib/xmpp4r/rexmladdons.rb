@@ -25,13 +25,14 @@ module REXML
 
     ##
     # Replaces or adds a child element of name <tt>e</tt> with text <tt>t</tt>.
-    def replace_element_text(e, t)
-      el = first_element(e)
+    def replace_element_text(e, t, namespace = nil)
+      el = first_element(e, namespace)
       if el.nil?
         el = REXML::Element.new(e)
+        el.add_namespace(namespace)
+        el.add_text(t)
         add_element(el)
-      end
-      if t
+      else
         el.text = t
       end
       self
