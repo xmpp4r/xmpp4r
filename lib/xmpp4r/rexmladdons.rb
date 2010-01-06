@@ -54,7 +54,7 @@ module REXML
     def first_element_text(e, namespace = nil)
       el = first_element(e, namespace)
       if el
-        return el.text
+        return el.children.to_s
       else
         return nil
       end
