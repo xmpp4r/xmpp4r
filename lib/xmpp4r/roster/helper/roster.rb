@@ -458,10 +458,8 @@ module Jabber
         # (unless type is :unavailable or :error)
         #
         # This overwrites previous stanzas with the same destination
-        # JID to keep track of resources. Presence stanzas with
-        # <tt>type == :unavailable</tt> or <tt>type == :error</tt> will
-        # be deleted as this indicates that this resource has gone
-        # offline.
+        # JID to keep track of resources. Old presence stanzas with
+        # <tt>type == :unavailable</tt> will be deleted.
         #
         # If <tt>type == :error</tt> and the presence's origin has no
         # specific resource the contact is treated completely offline.

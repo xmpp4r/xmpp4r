@@ -241,14 +241,13 @@ class Roster::HelperTest < Test::Unit::TestCase
     assert_equal(true, h['a@b.c'].online?)
     presences = 0
     h['a@b.c'].each_presence { presences += 1 }
-    assert_equal(2, presences)
+    assert_equal(1, presences)
 
     send("<presence from='a@b.c/r2'/>")
     presence_waiter.wait
 
     assert_kind_of(Roster::Helper::RosterItem, cb_item)
-    assert_kind_of(Presence, cb_op)
-    assert_equal(:unavailable, cb_op.type)
+    assert_nil(cb_op)
     assert_kind_of(Presence, cb_p)
     assert_nil(cb_p.type)
     assert_equal(true, h['a@b.c'].online?)
