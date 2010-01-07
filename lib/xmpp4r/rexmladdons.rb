@@ -30,9 +30,9 @@ module REXML
       if el.nil?
         el = REXML::Element.new(e)
         el.add_namespace(namespace)
-        el.add_text(t)
         add_element(el)
-      else
+      end
+      if t
         el.text = t
       end
       self
