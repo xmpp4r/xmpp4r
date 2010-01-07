@@ -37,6 +37,26 @@ module REXML
       end
       self
     end
+    
+    ##
+    # Replaces or adds a child element of name <tt>e</tt> with content of <tt>t</tt>.
+    def replace_element_content(e, c, namespace = nil)
+      el = first_element(e, namespace)
+      if el.nil?
+        el = REXML::Element.new(e)
+        el.add_namespace(namespace)
+        add_element(el)
+      end
+      if c
+        el.children.each do |ch|
+          ch.remove
+        end
+        c.root.children.each do |ch|
+          el.add ch
+        end
+      end
+      self
+    end
 
     ##
     # Returns first element of name <tt>e</tt>
@@ -69,7 +89,7 @@ module REXML
     def first_element_content(e, namespace = nil)
       el = first_element(e, namespace)
       if el
-        return el.children.to_s
+        return el.children.join
       else
         return nil
       end
