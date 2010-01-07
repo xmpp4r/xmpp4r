@@ -69,7 +69,7 @@ class MessageTest < Test::Unit::TestCase
     x = Message.new()
 
     x.set_body("check this link <domain.com> out")
-    assert_equal("check this link &lt;domain.com&gt; out", x.body)
+    assert_equal("check this link <domain.com> out", x.body)
     
     x.set_xhtml_body("<span style='font-weight: bold'>check <i>this</i> <a href='domain.com'>link</a> out</span>")
     assert_equal("<span style='font-weight: bold'>check <i>this</i> <a href='domain.com'>link</a> out</span>", x.xhtml_body)

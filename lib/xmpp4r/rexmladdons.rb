@@ -60,6 +60,21 @@ module REXML
       end
     end
 
+    ##
+    # This method works like <tt>first_element_text</tt> except that it
+    # returns content of all children, not just the value of the first
+    # child text element.
+    #
+    # Returns content of first element of name <tt>e</tt>
+    def first_element_content(e, namespace = nil)
+      el = first_element(e, namespace)
+      if el
+        return el.children.to_s
+      else
+        return nil
+      end
+    end
+
     # This method does exactly the same thing as add(), but it can be
     # overriden by subclasses to provide on-the-fly object creations.
     # For example, if you import a REXML::Element of name 'plop', and you
