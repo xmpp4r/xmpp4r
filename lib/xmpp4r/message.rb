@@ -121,7 +121,7 @@ module Jabber
       begin
         b = REXML::Document.new("<root>#{b}</root>")
       rescue REXML::ParseException
-        raise "Body is not a valid xhtml. Have you forgot to close some tag?"
+        raise ArgumentError, "Body is not a valid xhtml. Have you forgot to close some tag?"
       end
       
       html = first_element('html', 'http://jabber.org/protocol/xhtml-im')

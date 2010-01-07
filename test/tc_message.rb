@@ -99,6 +99,14 @@ class MessageTest < Test::Unit::TestCase
     assert_equal("check <i>this</i> <a href='domain.com'>link</a> out", x2.xhtml_body)
   end
   
+  def test_should_raise_exception_with_invalid_xhtml_body
+    x = Message.new()
+    
+    assert_raise Jabber::ArgumentError do 
+      x.set_xhtml_body("check <i>this <a href='domain.com'>link</a> out")
+    end
+  end
+  
   def test_subject
     x = Message.new
     assert_equal(nil, x.subject)
