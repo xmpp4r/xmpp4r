@@ -177,7 +177,7 @@ module Jabber
         response['nc'] = '00000001'
         response['qop'] = 'auth'
         response['digest-uri'] = "xmpp/#{@stream.jid.domain}"
-        response['response'] = response_value(@stream.jid.node, @stream.jid.domain, response['digest-uri'], password, @nonce, response['cnonce'], response['qop'], response['authzid'])
+        response['response'] = response_value(@stream.jid.node, response['realm'], response['digest-uri'], password, @nonce, response['cnonce'], response['qop'], response['authzid'])
         response.each { |key,value|
           unless %w(nc qop response charset).include? key
             response[key] = "\"#{value}\""
