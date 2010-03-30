@@ -4,9 +4,11 @@
 
 require 'xmpp4r/callbacks'
 require 'xmpp4r/bytestreams/iq/si'
+require 'xmpp4r/bytestreams/iq/bytestreams'
 require 'xmpp4r/dataforms/x/data'
 require 'xmpp4r/bytestreams/helper/ibb/base'
 require 'xmpp4r/bytestreams/helper/socks5bytestreams/base'
+require 'xmpp4r/bytestreams/helper/socks5bytestreams/target'
 
 module Jabber
   module FileTransfer

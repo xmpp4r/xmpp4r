@@ -1,8 +1,9 @@
 #!/usr/bin/env ruby
 
 require 'xmpp4r'
-require 'xmpp4r/helpers/filetransfer'
+require 'xmpp4r/bytestreams/helper/filetransfer'
 
+Jabber::debug = true
 
 if ARGV.size != 3
   puts "Usage: #{$0} <jid> <password> <incoming-directory>"
@@ -18,7 +19,7 @@ cl.connect
 puts "Authenticating..."
 cl.auth ARGV[1]
 
-ft = Jabber::Helpers::FileTransfer.new(cl)
+ft = Jabber::FileTransfer::Helper.new(cl)
 ft.add_incoming_callback { |iq,file|
   puts "Incoming file transfer from #{iq.from}: #{file.fname} (#{file.size / 1024} KB)"
 
@@ -40,7 +41,7 @@ ft.add_incoming_callback { |iq,file|
     begin
       puts "Accepting #{file.fname}"
       stream = ft.accept(iq, offset)
-      if stream.kind_of?(Jabber::Helpers::SOCKS5Bytestreams)
+      if stream.kind_of?(Jabber::Bytestreams::SOCKS5Bytestreams)
         stream.connect_timeout = 5
         stream.add_streamhost_callback { |streamhost,state,e|
           case state
@@ -58,7 +59,7 @@ ft.add_incoming_callback { |iq,file|
       if stream.accept
         puts "Stream established"
         outfile = File.new(filename, (offset ? 'a' : 'w'))
-        while buf = stream.read
+        while buf = stream.read(65536)
           outfile.write(buf)
           print '.'
           $stdout.flush

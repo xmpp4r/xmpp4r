@@ -31,7 +31,7 @@ module Jabber
         elsif streamhost.kind_of?(String) or streamhost.kind_of?(JID)
           @streamhosts << SOCKS5Bytestreams::query_streamhost(@stream, streamhost, @initiator_jid)
         else
-          raise "Unknwon streamhost type: #{streamhost.class}"
+          raise "Unknown streamhost type: #{streamhost.class}"
         end
       end
 

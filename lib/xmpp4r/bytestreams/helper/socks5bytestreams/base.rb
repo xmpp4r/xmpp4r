@@ -8,6 +8,7 @@ require 'timeout'
 require 'digest/sha1'
 
 require 'xmpp4r/callbacks'
+require 'xmpp4r/bytestreams/helper/socks5bytestreams/socks5'
 
 module Jabber
   module Bytestreams
