@@ -66,7 +66,8 @@ module Jabber
         }
         @accept_ready.run
         begin
-          Timeout::timeout(@connect_timeout) { connect_sem.wait }
+          # Note: timeout must be long enough to try multiple streamhosts
+          Timeout::timeout(60) { connect_sem.wait }
         rescue Timeout::Error
           @stream.delete_iq_callback(self)
         end
