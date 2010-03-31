@@ -577,13 +577,13 @@ module Jabber
       # In some cases, we might lost count of some stanzas
       # (for example, if the handler raises an exception)
       # so we can't block forever.
-      while pr > 0 and n <= 1000
+      while pr > 0 and n <= 20
         @tbcbmutex.synchronize { pr = @processing }
         if pr > 0
           n += 1
           Jabber::debuglog("TRYING TO CLOSE, STILL PROCESSING #{pr} STANZAS")
           #puts("TRYING TO CLOSE, STILL PROCESSING #{pr} STANZAS")
-          Thread::pass
+          sleep 0.1
         end
       end
 
