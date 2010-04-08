@@ -43,7 +43,7 @@ module Jabber
           begin
             # Actually this should be Time.xmlschema,
             # but "unfortunately, the 'jabber:x:delay' namespace predates" JEP 0082
-            Time.parse(attributes['stamp'])
+            Time.parse("#{attributes['stamp']}Z")
           rescue ArgumentError
             nil
           end
