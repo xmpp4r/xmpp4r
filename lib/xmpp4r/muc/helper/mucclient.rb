@@ -68,8 +68,9 @@ module Jabber
       # fails.
       # jid:: [JID] room@component/nick
       # password:: [String] Optional password
+      # opts:: [Hash] If the parameter :history => false is passed then you will receive no history messages after initial presence
       # return:: [MUCClient] self (chain-able)
-      def join(jid, password=nil)
+      def join(jid, password=nil, opts={})
         if active?
           raise "MUCClient already active"
         end
@@ -83,6 +84,12 @@ module Jabber
         pres.from = @my_jid
         xmuc = XMUC.new
         xmuc.password = password
+
+        if !opts[:history]
+          history = REXML::Element.new( 'history').tap {|h| h.add_attribute('maxstanzas','0') }
+          xmuc.add_element history
+        end
+
         pres.add(xmuc)
 
         # We don't use Stream#send_with_id here as it's unknown
