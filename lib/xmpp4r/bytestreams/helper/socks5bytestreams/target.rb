@@ -26,10 +26,12 @@ module Jabber
       def accept
         error = nil
         connect_sem = Semaphore.new
+        iq_received_sem = Semaphore.new
 
         @stream.add_iq_callback(200, self) { |iq|
           if iq.type == :set and iq.from == @initiator_jid and iq.to == @target_jid and iq.query.kind_of?(IqQueryBytestreams)
             begin
+              iq_received_sem.run
               @stream.delete_iq_callback(self)
 
               iq.query.each_element('streamhost') { |streamhost|
@@ -66,8 +68,8 @@ module Jabber
         }
         @accept_ready.run
         begin
-          # Note: timeout must be long enough to try multiple streamhosts
-          Timeout::timeout(60) { connect_sem.wait }
+          Timeout::timeout(@connect_timeout) { iq_received_sem.wait }
+		  connect_sem.wait
         rescue Timeout::Error
           @stream.delete_iq_callback(self)
         end
