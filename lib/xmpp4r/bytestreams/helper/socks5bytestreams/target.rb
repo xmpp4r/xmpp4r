@@ -69,7 +69,7 @@ module Jabber
         @accept_ready.run
         begin
           Timeout::timeout(@connect_timeout) { iq_received_sem.wait }
-		  connect_sem.wait
+          connect_sem.wait
         rescue Timeout::Error
           @stream.delete_iq_callback(self)
         end
