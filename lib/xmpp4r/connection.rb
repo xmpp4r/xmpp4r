@@ -135,7 +135,11 @@ module Jabber
         true
       }
       if reply.name != 'proceed'
-        raise ServerError.new(reply.first_element('error'))
+        # ppg - 8-1-09: The XMPP Core spec (http://xmpp.org/rfcs/rfc3920.html)
+        # says that the server reply will be 'failure'
+        error = reply.first_element('failure')
+        raise ServerError.new(error) unless error.nil?
+        raise JabberError.new("Unhandled reply type: #{reply.name}")
       end
       # Don't be interrupted
       stop
