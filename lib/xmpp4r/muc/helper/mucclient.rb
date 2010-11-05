@@ -102,7 +102,7 @@ module Jabber
             true
           # type='unavailable' may occur when the MUC kills our previous instance,
           # but all join-failures should be type='error'
-          elsif r.from == jid and r.kind_of?(Presence) and r.type != :unavailable
+          elsif r.from == @jid and r.kind_of?(Presence) and r.type != :unavailable
             # Our own presence reflected back - success
             if r.x(XMUCUser) and (i = r.x(XMUCUser).items.first)
               @affiliation = i.affiliation  # we're interested in if it's :owner
