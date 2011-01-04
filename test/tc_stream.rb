@@ -78,6 +78,31 @@ class StreamTest < Test::Unit::TestCase
     assert_equal(1, called)
   end
 
+  def test_send_with_callback_timeout_from_block
+    sem = Semaphore::new
+    @server.add_xml_callback { |e|
+      @server.send(Iq.new(:result))
+      sem.run
+    }
+
+    assert_raise Timeout::Error do
+      @client.send(Iq.new(:get), 1) { |reply|
+        sleep(2)
+        true
+      }
+    end
+
+    sem.wait
+  end
+
+  def test_send_with_callback_timeout_from_no_stanza
+    assert_raise Timeout::Error do
+      @client.send(Iq.new(:get), 1) { |reply|
+        true
+      }
+    end
+  end
+
   def test_send_nested
     finished = Semaphore.new
 

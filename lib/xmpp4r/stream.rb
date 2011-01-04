@@ -356,9 +356,14 @@ module Jabber
     # because we may not suspend the parser-thread (in whose
     # context callbacks are executed).
     #
+    # Pass in a callback_timeout to force a Timeout::Error
+    # if the callback is not completed within that time (in seconds).
+    # By default there is not timeout on the callback.
+    # TODO Would like to set a default here, but will require lots of testing
+    #
     # xml:: [String] The xml data to send
     # &block:: [Block] The optional block
-    def send(xml, &block)
+    def send(xml, callback_timeout=nil, &block)
       Jabber::debuglog("SENDING:\n#{xml}")
       if block
         threadblock = ThreadBlock.new(block)
@@ -395,7 +400,7 @@ module Jabber
       # The parser thread might be running this (think of a callback running send())
       # If this is the case, we mustn't stop (or we would cause a deadlock)
       if block and Thread.current != @parser_thread
-        threadblock.wait
+        Timeout.timeout(callback_timeout) {threadblock.wait}
       elsif block
         Jabber::warnlog("WARNING:\nCannot stop current thread in Jabber::Stream#send because it is the parser thread!")
       end

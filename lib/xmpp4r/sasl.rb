@@ -193,14 +193,26 @@ module Jabber
 
         success_already = false
         error = nil
-        @stream.send(r) { |reply|
-          if reply.name == 'success'
-            success_already = true
-          elsif reply.name != 'challenge'
-            error = reply.first_element(nil).name
-          end
-          true
-        }
+        # This send hangs sometimes waiting in Stream#send on threadblock.wait (with Openfire 3.6.4 at least);
+        #  since the calback here is pretty simple, that likely means it never receives a response stanza
+        #  therefore we should put in a timeout on send, and do some retries here (okay since its the first message)
+        # TODO Verify if 1 second timeout, and 3 tries are good settings
+        # TODO Add test/spec when/if they are created
+        tries = 3
+        begin
+          @stream.send(r, 1) { |reply|
+            if reply.name == 'success'
+              success_already = true
+            elsif reply.name != 'challenge'
+              error = reply.first_element(nil).name
+            end
+            true
+          }
+        rescue Timeout::Error
+          retry if (tries -= 1) > 0
+          # TODO create a SASL::AuthError to handle this and other direct raise calls
+          raise "Failed to send SASL::DigestMD5 response"
+        end
 
         return if success_already
         raise error if error
