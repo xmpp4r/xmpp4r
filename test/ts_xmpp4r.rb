@@ -13,7 +13,7 @@ require 'find'
 
 # List files' basenames, not full path!
 # EXCLUDED_FILES = [ 'tc_muc_simplemucclient.rb' ]
-EXCLUDED_FILES = []
+EXCLUDED_FILES = ['tc_disconnect_cleanup.rb', './pubsub/tc_helper.rb', './muc/tc_muc_mucclient.rb', './reliable/tc_reliable_connection.rb', './reliable/tc_disconnect_exception.rb', './reliable/tc_listener_mocked_test.rb', './reliable/tc_reliable_connection.rb']
 
 tc_files = []
 tc_subdirs = []
@@ -39,6 +39,6 @@ tc_subdirs.each do |dir|
 end
 
 tc_files.each do |f|
-  next if EXCLUDED_FILES.include?(File::basename(f))
+  next if EXCLUDED_FILES.include?(File::basename(f)) or EXCLUDED_FILES.include?(f)
   require f
 end
