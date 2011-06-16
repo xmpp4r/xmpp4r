@@ -457,7 +457,7 @@ module Jabber
         iq.from = my_jid
         iq.add(IqQueryMUCAdmin.new)
 
-        items = [item] unless items.kind_of? Array
+        items = [items] unless items.kind_of? Array
         items.each { |item|
           iq.query.add(item)
         }
