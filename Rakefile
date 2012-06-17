@@ -35,7 +35,7 @@ RDOC_OPTIONS  = [
 RDOC_FILES    = (%w( README.rdoc README_ruby19.txt CHANGELOG LICENSE COPYING )).sort
 
 # The full file list used for rdocs, tarballs, gems, and for generating the xmpp4r.gemspec.
-PKG_FILES     = (%w( Rakefile setup.rb xmpp4r.gemspec ) + RDOC_FILES + Dir["{lib,test,data,tools}/**/*"]).sort
+PKG_FILES     = (%w( Rakefile setup.rb mad-p-xmpp4r.gemspec ) + RDOC_FILES + Dir["{lib,test,data,tools}/**/*"]).sort
 
 ##############################################################################
 # DEFAULT TASK
@@ -182,7 +182,7 @@ begin
     # Thanks to the Merb project for this code.
     desc "Update Github Gemspec"
     task :update_gemspec do
-      skip_fields = %w(new_platform original_platform date)
+      skip_fields = %w(new_platform original_platform date cache_dir cache_file loaded)
 
       result = "# WARNING : RAKE AUTO-GENERATED FILE.  DO NOT MANUALLY EDIT!\n"
       result << "# RUN : 'rake gem:update_gemspec'\n\n"
