@@ -27,6 +27,7 @@ module Jabber
     def initialize(jid)
       super()
       @jid = (jid.kind_of?(JID) ? jid : JID.new(jid.to_s))
+      @authenticated = false
     end
 
     ##
@@ -113,6 +114,7 @@ module Jabber
         else
           auth_nonsasl(password)
         end
+        @authenticated = true
       rescue
         Jabber::debuglog("#{$!.class}: #{$!}\n#{$!.backtrace.join("\n")}")
         raise ClientAuthenticationFailure.new, $!.to_s
@@ -133,6 +135,7 @@ module Jabber
       end
 
       jid = nil
+      semaphore = Semaphore.new
       send_with_id(iq) do |reply|
         reply_bind = reply.first_element('bind')
         if reply_bind
@@ -141,7 +144,9 @@ module Jabber
             jid = JID.new(reported_jid.text)
           end
         end
+        semaphore.run
       end
+      semaphore.wait
       jid
     end
 
@@ -171,13 +176,13 @@ module Jabber
       sasl.auth(password)
 
       # Restart stream after SASL auth
-      stop
-      start
+      restart
       # And wait for features - again
       @features_sem.wait
 
       # Resource binding (RFC3920 - 7)
       if @stream_features.has_key? 'bind'
+        Jabber::debuglog("**********Handling bind")
         @jid = bind(@jid.resource)
       end
 
@@ -187,8 +192,17 @@ module Jabber
         session = iq.add REXML::Element.new('session')
         session.add_namespace @stream_features['session']
 
-        send_with_id(iq)
+        semaphore = Semaphore.new
+        send_with_id(iq) {
+          semaphore.run
+        }
+        semaphore.wait
       end
+    end
+
+    def restart
+      stop
+      start
     end
 
     ##

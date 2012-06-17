@@ -40,6 +40,8 @@ module Jabber
       # The server may hold this amount of stanzas
       # to reduce number of HTTP requests
       attr_accessor :http_hold
+      # Hook to initialize SSL parameters on Net::HTTP
+      attr_accessor :http_ssl_setup
 
       ##
       # Initialize
@@ -157,12 +159,18 @@ module Jabber
         request.content_length = body.size
         request.body = body
         request['Content-Type'] = @http_content_type
-        Jabber::debuglog("HTTP REQUEST (#{@pending_requests + 1}/#{@http_requests}):\n#{request.body}")
-        response = Net::HTTP.start(@uri.host, @uri.port) { |http|
-          http.use_ssl = true if @uri.kind_of? URI::HTTPS
+        Jabber::debuglog("HTTP REQUEST (#{@pending_requests}/#{@http_requests}):\n#{request.body}")
+        http = Net::HTTP.new(@uri.host, @uri.port)
+        if @uri.kind_of? URI::HTTPS
+          http.use_ssl = true
+          @http_ssl_setup and @http_ssl_setup.call(http)
+        end
+        http.read_timeout = @http_wait * 1.1
+
+        response = http.start { |http|
           http.request(request)
         }
-        Jabber::debuglog("HTTP RESPONSE (#{@pending_requests + 1}/#{@http_requests}): #{response.class}\n#{response.body}")
+        Jabber::debuglog("HTTP RESPONSE (#{@pending_requests}/#{@http_requests}): #{response.class}\n#{response.body}")
 
         unless response.kind_of? Net::HTTPSuccess
           # Unfortunately, HTTPResponses aren't exceptions
@@ -180,7 +188,7 @@ module Jabber
       ##
       # Prepare data to POST and
       # handle the result
-      def post_data(data)
+      def post_data(data, restart = false)
         req_body = nil
         current_rid = nil
 
@@ -188,7 +196,7 @@ module Jabber
           begin
             @lock.synchronize {
               # Do not send unneeded requests
-              if data.size < 1 and @pending_requests > 0
+              if data.size < 1 and @pending_requests > 0 and !restart
                 return
               end
 
@@ -196,23 +204,32 @@ module Jabber
               req_body += " rid='#{@http_rid += 1}'"
               req_body += " sid='#{@http_sid}'"
               req_body += " xmlns='http://jabber.org/protocol/httpbind'"
+              req_body += " xml:lang='en' xmpp:restart='true' xmlns:xmpp='urn:xmpp:xbosh'" if restart
               req_body += ">"
-              req_body += data
+              req_body += data unless restart
               req_body += "</body>"
               current_rid = @http_rid
 
               @pending_requests += 1
+              Jabber::debuglog("Before request: pending_requests = #{@pending_requests}")
+              Jabber::debuglog("backtrace #{caller.inspect}")
               @last_send = Time.now
             }
 
             res_body = post(req_body)
 
           ensure
-            @lock.synchronize { @pending_requests -= 1 }
+            @lock.synchronize {
+              @pending_requests -= 1
+              if @pending_requests < 0
+                Jabber::debuglog("pending_requests got < 0!!! ***********")
+              end
+            }
+            Jabber::debuglog("After response: pending_requests = #{@pending_requests}")
           end
 
           receive_elements_with_rid(current_rid, res_body.children)
-          ensure_one_pending_request
+          ensure_one_pending_request if @authenticated
 
         rescue REXML::ParseException
           if @exception_block
@@ -238,33 +255,51 @@ module Jabber
       end
 
       ##
+      # Restart stream after SASL authentication
+      def restart
+        Jabber::debuglog(" ********** Restarting after SASL")
+        @stream_mechanisms = []
+        @stream_features = {}
+        @features_sem = Semaphore.new
+        send_data('', true) # restart
+        Jabber::debuglog("Semaphore tickets = #{@features_sem.instance_eval { @tickets }}")
+      end
+
+      ##
       # Send data,
       # buffered and obeying 'polling' and 'requests' limits
-      def send_data(data)
+      def send_data(data, restart = false)
         @lock.synchronize do
+          Jabber::debuglog("send_data")
 
           @send_buffer += data
-          limited_by_polling = (@last_send + @http_polling >= Time.now)
+          limited_by_polling = false
+          if @pending_requests + 1 == @http_requests
+            limited_by_polling = (@last_send + @http_polling >= Time.now)
+          end
           limited_by_requests = (@pending_requests + 1 > @http_requests)
 
           # Can we send?
-          if !limited_by_polling and !limited_by_requests
+          if !limited_by_polling and !limited_by_requests or !@authenticated
+            Jabber::debuglog("send_data non_limited")
             data = @send_buffer
             @send_buffer = ''
 
             Thread.new do
               Thread.current.abort_on_exception = true
-              post_data(data)
+              sleep(0.05)
+              post_data(data, restart)
             end
 
           elsif !limited_by_requests
+            Jabber::debuglog("send_data limited")
             Thread.new do
               Thread.current.abort_on_exception = true
               # Defer until @http_polling has expired
               wait = @last_send + @http_polling - Time.now
               sleep(wait) if wait > 0
               # Ignore locking, it's already threaded ;-)
-              send_data('')
+              send_data('', restart)
             end
           end
 
