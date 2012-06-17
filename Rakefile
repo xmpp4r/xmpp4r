@@ -1,7 +1,7 @@
 require 'rake'
 require "rake/clean"
 require 'rake/testtask'
-require 'rake/rdoctask'
+require 'rdoc/task'
 
 $:.unshift 'lib'
 require "xmpp4r"
@@ -10,18 +10,18 @@ require "xmpp4r"
 # OPTIONS
 ##############################################################################
 
-PKG_NAME      = 'xmpp4r'
+PKG_NAME      = 'mad-p-xmpp4r'
 PKG_VERSION   = Jabber::XMPP4R_VERSION
-AUTHORS       = ['Lucas Nussbaum', 'Stephan Maka', 'Glenn Rempe']
-EMAIL         = "xmpp4r-devel@gna.org"
-HOMEPAGE      = "http://home.gna.org/xmpp4r/"
-SUMMARY       = "XMPP4R is an XMPP/Jabber library for Ruby."
+AUTHORS       = ['Lucas Nussbaum', 'Stephan Maka', 'Glenn Rempe', 'Kaoru Maeda']
+EMAIL         = "kaoru.maeda@gmail.com"
+HOMEPAGE      = "https://github.com/mad-p/xmpp4r"
+SUMMARY       = "This is a fork from XMPP4R (https://github.com/ln/xmpp4r), fixing BOSH"
 
 # These are the common rdoc options that are shared between generation of
 # rdoc files using BOTH 'rake rdoc' and the installation by users of a
 # RubyGem version which builds rdoc's along with its installation.  Any
 # rdoc options that are ONLY for developers running 'rake rdoc' should be
-# added in the 'Rake::RDocTask' block below.
+# added in the 'RDoc::Task' block below.
 RDOC_OPTIONS  = [
                 "--quiet",
                 "--title", SUMMARY,
@@ -61,7 +61,7 @@ end
 
 # RDOC
 #######
-Rake::RDocTask.new do |rd|
+RDoc::Task.new do |rd|
 
   # which dir should rdoc files be installed in?
   rd.rdoc_dir = 'rdoc'
@@ -134,7 +134,7 @@ end
 CLEAN.include ["*.gem", "pkg", "rdoc", "coverage", "tools/*.png"]
 
 begin
-  require 'rake/gempackagetask'
+  require 'rubygems/package_task'
 
   spec = Gem::Specification.new do |s|
     s.name = PKG_NAME
@@ -156,7 +156,7 @@ begin
     s.required_ruby_version = ">= 1.8.4"
   end
 
-  Rake::GemPackageTask.new(spec) do |pkg|
+  Gem::PackageTask.new(spec) do |pkg|
     pkg.gem_spec = spec
     pkg.need_tar = true
     pkg.need_zip = true
@@ -189,7 +189,7 @@ begin
       result << "Gem::Specification.new do |s|\n"
       spec.instance_variables.sort.each do |ivar|
         value = spec.instance_variable_get(ivar)
-        name  = ivar.split("@").last
+        name  = ivar.to_s.split("@").last
         next if skip_fields.include?(name) || value.nil? || value == "" || (value.respond_to?(:empty?) && value.empty?)
         if name == "dependencies"
           value.each do |d|
