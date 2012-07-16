@@ -127,10 +127,26 @@ module Jabber
 
       ##
       # Close the session by sending
-      # <presence type='unavailable'/>
+      # <body type='terminate'/>
       def close
         @status = DISCONNECTED
-        send(Jabber::Presence.new.set_type(:unavailable))
+        req_body = nil
+        @lock.synchronize {
+          req_body = "<body"
+          req_body += " rid='#{@http_rid += 1}'"
+          req_body += " sid='#{@http_sid}'"
+          req_body += " type='terminate'"
+          req_body += " xmlns='http://jabber.org/protocol/httpbind'"
+          req_body += ">"
+          req_body += "<presence type='unavailable' xmlns='jabber:client'/>"
+          req_body += "</body>"
+          current_rid = @http_rid
+          @pending_requests += 1
+          @last_send = Time.now
+        }
+        res_body = post(req_body)
+        sleep(3)
+        Jabber::debuglog("Connection closed")
       end
 
       private
@@ -211,8 +227,8 @@ module Jabber
               current_rid = @http_rid
 
               @pending_requests += 1
-              Jabber::debuglog("Before request: pending_requests = #{@pending_requests}")
-              Jabber::debuglog("backtrace #{caller.inspect}")
+              # Jabber::debuglog("Before request: pending_requests = #{@pending_requests}")
+              # Jabber::debuglog("backtrace #{caller.inspect}")
               @last_send = Time.now
             }
 
