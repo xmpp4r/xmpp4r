@@ -85,10 +85,10 @@ module Jabber
         xmuc = XMUC.new
         xmuc.password = password
 
-        if !opts[:history]
-          history = REXML::Element.new( 'history').tap {|h| h.add_attribute('maxstanzas','0') }
-          xmuc.add_element history
-        end
+        # Add history/maxstanzas as requested. false=0
+        xmuc.add_element REXML::Element.new('history').tap { |hist|
+          hist.add_attribute 'maxstanzas', (opts[:history]||0).to_i.to_s
+        } unless opts[:history].nil?
 
         pres.add(xmuc)
 
