@@ -8,6 +8,7 @@ require 'xmpp4r/client'
 require 'xmpp4r/semaphore'
 require 'net/http'
 require 'uri'
+require 'cgi' # for escaping
 
 module Jabber
   module HTTPBinding
@@ -96,8 +97,8 @@ module Jabber
 
         uri = URI.parse env_proxy
         unless uri.user or uri.password then
-          uri.user     = escape ENV['http_proxy_user'] || ENV['HTTP_PROXY_USER']
-          uri.password = escape ENV['http_proxy_pass'] || ENV['HTTP_PROXY_PASS']
+          uri.user     = CGI.escape ENV['http_proxy_user'] || ENV['HTTP_PROXY_USER']
+          uri.password = CGI.escape ENV['http_proxy_pass'] || ENV['HTTP_PROXY_PASS']
         end
 
         http_proxy_uri = uri
@@ -225,7 +226,7 @@ module Jabber
         net_http_args = [@uri.host, @uri.port]
         unless @proxy_args.empty?
           unless no_proxy?(@uri)
-            net_http_args.concat @proxy_args
+            net_http_args.concat *@proxy_args
           end
         end
 
