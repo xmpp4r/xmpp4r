@@ -7,6 +7,7 @@
 require 'xmpp4r/client'
 require 'xmpp4r/semaphore'
 require 'net/http'
+require 'uri'
 
 module Jabber
   module HTTPBinding
@@ -58,6 +59,50 @@ module Jabber
         @http_wait = 20
         @http_hold = 1
         @http_content_type = 'text/xml; charset=utf-8'
+
+        @no_proxy = []
+        @proxy_args = []
+      end
+
+      ##
+      # Set up proxy from the given url
+
+      # url:: [URI::Generic or String] of the form:
+      # when without proxy authentication
+      #   http://proxy_host:proxy_port/
+      # when with proxy authentication
+      #   http://proxy_user:proxy_password@proxy_host:proxy_port/
+      def http_proxy_uri=(proxy_uri)
+        uri = URI.parse(proxy_uri) unless uri.kind_of? URI::Generic
+        @proxy_args = [
+                       @proxy_uri.host,
+                       @proxy_uri.port,
+                       @proxy_uri.user,
+                       @proxy_uri.password,
+                      ]
+      end
+
+      ##
+      # Set up proxy from the environment variables
+      #
+      # Following environment variables are considered
+      # HTTP_PROXY, http_proxy
+      # NO_PROXY, no_proxy
+      # PROXY_USER, PROXY_PASSWORD
+      def http_proxy_env
+        @proxy_args = []
+        env_proxy = ENV['http_proxy'] || ENV['HTTP_PROXY']
+        return if env_proxy.nil? or env_proxy.empty?
+
+        uri = URI.parse env_proxy
+        unless uri.user or uri.password then
+          uri.user     = escape ENV['http_proxy_user'] || ENV['HTTP_PROXY_USER']
+          uri.password = escape ENV['http_proxy_pass'] || ENV['HTTP_PROXY_PASS']
+        end
+
+        http_proxy_uri = uri
+
+        @no_proxy = (ENV['NO_PROXY'] || ENV['no_proxy'] || 'localhost, 127.0.0.1').split(/\s*,\s*/)
       end
 
       ##
@@ -176,7 +221,15 @@ module Jabber
         request.body = body
         request['Content-Type'] = @http_content_type
         Jabber::debuglog("HTTP REQUEST (#{@pending_requests}/#{@http_requests}):\n#{request.body}")
-        http = Net::HTTP.new(@uri.host, @uri.port)
+
+        net_http_args = [@uri.host, @uri.port]
+        unless @proxy_args.empty?
+          unless no_proxy?(@uri)
+            net_http_args.concat @proxy_args
+          end
+        end
+
+        http = Net::HTTP.new(net_http_args)
         if @uri.kind_of? URI::HTTPS
           http.use_ssl = true
           @http_ssl_setup and @http_ssl_setup.call(http)
@@ -199,6 +252,15 @@ module Jabber
           raise REXML::ParseException.new('Malformed body')
         end
         body
+      end
+
+      ##
+      # Check whether uri should be accessed without proxy
+      def no_proxy?(uri)
+        @no_proxy.each do |host_addr|
+          return true if uri.host.match(Regexp.quote(host_addr) + '$')
+        end
+        return false
       end
 
       ##
