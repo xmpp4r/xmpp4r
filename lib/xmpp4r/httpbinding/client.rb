@@ -9,6 +9,7 @@ require 'xmpp4r/semaphore'
 require 'net/http'
 require 'uri'
 require 'cgi' # for escaping
+require 'pry'
 
 module Jabber
   module HTTPBinding
@@ -73,13 +74,13 @@ module Jabber
       #   http://proxy_host:proxy_port/
       # when with proxy authentication
       #   http://proxy_user:proxy_password@proxy_host:proxy_port/
-      def http_proxy_uri=(proxy_uri)
-        uri = URI.parse(proxy_uri) unless uri.kind_of? URI::Generic
+      def http_proxy_uri=(uri)
+        uri = URI.parse(uri) unless uri.respond_to?(:host)
         @proxy_args = [
-                       @proxy_uri.host,
-                       @proxy_uri.port,
-                       @proxy_uri.user,
-                       @proxy_uri.password,
+                       uri.host,
+                       uri.port,
+                       uri.user,
+                       uri.password,
                       ]
       end
 
@@ -101,7 +102,7 @@ module Jabber
           uri.password = CGI.escape (ENV['http_proxy_pass'] || ENV['HTTP_PROXY_PASS']) rescue nil
         end
 
-        http_proxy_uri = uri
+        self.http_proxy_uri = uri
 
         @no_proxy = (ENV['NO_PROXY'] || ENV['no_proxy'] || 'localhost, 127.0.0.1').split(/\s*,\s*/)
       end
@@ -226,11 +227,11 @@ module Jabber
         net_http_args = [@uri.host, @uri.port]
         unless @proxy_args.empty?
           unless no_proxy?(@uri)
-            net_http_args.concat *@proxy_args
+            net_http_args.concat @proxy_args
           end
         end
 
-        http = Net::HTTP.new(net_http_args)
+        http = Net::HTTP.new(*net_http_args)
         if @uri.kind_of? URI::HTTPS
           http.use_ssl = true
           @http_ssl_setup and @http_ssl_setup.call(http)
