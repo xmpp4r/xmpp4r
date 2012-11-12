@@ -89,7 +89,7 @@ module Jabber
       # Following environment variables are considered
       # HTTP_PROXY, http_proxy
       # NO_PROXY, no_proxy
-      # PROXY_USER, PROXY_PASSWORD
+      # HTTP_PROXY_USER, HTTP_PROXY_PASSWORD
       def http_proxy_env
         @proxy_args = []
         env_proxy = ENV['http_proxy'] || ENV['HTTP_PROXY']
@@ -97,8 +97,8 @@ module Jabber
 
         uri = URI.parse env_proxy
         unless uri.user or uri.password then
-          uri.user     = CGI.escape ENV['http_proxy_user'] || ENV['HTTP_PROXY_USER']
-          uri.password = CGI.escape ENV['http_proxy_pass'] || ENV['HTTP_PROXY_PASS']
+          uri.user     = CGI.escape (ENV['http_proxy_user'] || ENV['HTTP_PROXY_USER']) rescue nil
+          uri.password = CGI.escape (ENV['http_proxy_pass'] || ENV['HTTP_PROXY_PASS']) rescue nil
         end
 
         http_proxy_uri = uri
