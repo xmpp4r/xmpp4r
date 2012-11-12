@@ -242,7 +242,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = ">= 1.8.4"
   s.required_rubygems_version = ">= 0"
   s.rubyforge_project = "xmpp4r"
-  s.rubygems_version = "1.8.10"
+  s.rubygems_version = "1.8.24"
   s.specification_version = 3
   s.summary = "This is a fork from XMPP4R (https://github.com/ln/xmpp4r), fixing BOSH"
   s.version = "0.5.2"
