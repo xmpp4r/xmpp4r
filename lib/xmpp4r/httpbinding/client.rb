@@ -277,6 +277,7 @@ module Jabber
             @lock.synchronize {
               # Do not send unneeded requests
               if data.size < 1 and @pending_requests > 0 and !restart
+		@pending_requests += 1
                 return
               end
 
