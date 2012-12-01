@@ -277,7 +277,7 @@ module Jabber
             @lock.synchronize {
               # Do not send unneeded requests
               if data.size < 1 and @pending_requests > 0 and !restart
-		@pending_requests += 1
+		@pending_requests += 1 # compensate for decrement in ensure clause
                 return
               end
 
@@ -292,8 +292,6 @@ module Jabber
               current_rid = @http_rid
 
               @pending_requests += 1
-              # Jabber::debuglog("Before request: pending_requests = #{@pending_requests}")
-              # Jabber::debuglog("backtrace #{caller.inspect}")
               @last_send = Time.now
             }
 
@@ -302,11 +300,7 @@ module Jabber
           ensure
             @lock.synchronize {
               @pending_requests -= 1
-              if @pending_requests < 0
-                Jabber::debuglog("pending_requests got < 0!!! ***********")
-              end
             }
-            Jabber::debuglog("After response: pending_requests = #{@pending_requests}")
           end
 
           receive_elements_with_rid(current_rid, res_body.children)
@@ -338,12 +332,11 @@ module Jabber
       ##
       # Restart stream after SASL authentication
       def restart
-        Jabber::debuglog(" ********** Restarting after SASL")
+        Jabber::debuglog("Restarting after SASL")
         @stream_mechanisms = []
         @stream_features = {}
         @features_sem = Semaphore.new
         send_data('', true) # restart
-        Jabber::debuglog("Semaphore tickets = #{@features_sem.instance_eval { @tickets }}")
       end
 
       ##
