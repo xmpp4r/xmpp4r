@@ -235,15 +235,15 @@ Gem::Specification.new do |s|
  "xmpp4r.gemspec"]
   s.has_rdoc = true
   s.homepage = "https://github.com/mad-p/xmpp4r"
-  s.name = "xmpp4r"
+  s.name = "mad-p-xmpp4r"
   s.platform = "ruby"
   s.rdoc_options = ["--quiet", "--title", "This is a fork from XMPP4R (https://github.com/ln/xmpp4r), fixing BOSH", "--opname", "index.html", "--main", "lib/xmpp4r.rb", "--line-numbers", "--inline-source"]
   s.require_paths = ["lib"]
   s.required_ruby_version = ">= 1.8.4"
   s.required_rubygems_version = ">= 0"
-  s.rubyforge_project = "xmpp4r"
-  s.rubygems_version = "1.8.24"
+  s.rubyforge_project = "mad-p-xmpp4r"
+  s.rubygems_version = "1.8.10"
   s.specification_version = 3
   s.summary = "This is a fork from XMPP4R (https://github.com/ln/xmpp4r), fixing BOSH"
-  s.version = "0.5.2"
+  s.version = "0.6.0"
 end

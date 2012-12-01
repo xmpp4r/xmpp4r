@@ -10,7 +10,7 @@ require "xmpp4r"
 # OPTIONS
 ##############################################################################
 
-PKG_NAME      = 'xmpp4r'
+PKG_NAME      = 'mad-p-xmpp4r'
 PKG_VERSION   = Jabber::XMPP4R_VERSION
 AUTHORS       = ['Lucas Nussbaum', 'Stephan Maka', 'Glenn Rempe', 'Kaoru Maeda']
 EMAIL         = "kaoru.maeda@gmail.com"
