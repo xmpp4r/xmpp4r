@@ -278,6 +278,7 @@ module Jabber
               # Do not send unneeded requests
               if data.size < 1 and @pending_requests > 0 and !restart
 		@pending_requests += 1 # compensate for decrement in ensure clause
+                Jabber::debuglog "post_data: not sending excessive poll"
                 return
               end
 
@@ -343,40 +344,47 @@ module Jabber
       # Send data,
       # buffered and obeying 'polling' and 'requests' limits
       def send_data(data, restart = false)
-        @lock.synchronize do
-          Jabber::debuglog("send_data")
+        Jabber::debuglog("send_data")
 
-          @send_buffer += data
-          limited_by_polling = false
-          if @pending_requests + 1 == @http_requests
-            limited_by_polling = (@last_send + @http_polling >= Time.now)
-          end
-          limited_by_requests = (@pending_requests + 1 > @http_requests)
-
-          # Can we send?
-          if !limited_by_polling and !limited_by_requests or !@authenticated
-            Jabber::debuglog("send_data non_limited")
-            data = @send_buffer
-            @send_buffer = ''
-
-            Thread.new do
-              Thread.current.abort_on_exception = true
-              sleep(0.05)
-              post_data(data, restart)
+        while true do # exit by return
+          @lock.synchronize do
+            if @last_send + 0.05 >= Time.now
+              Jabber::debuglog("send_data too fast: waiting 0.05sec")
+              next
             end
 
-          elsif !limited_by_requests
-            Jabber::debuglog("send_data limited")
-            Thread.new do
-              Thread.current.abort_on_exception = true
-              # Defer until @http_polling has expired
-              wait = @last_send + @http_polling - Time.now
-              sleep(wait) if wait > 0
-              # Ignore locking, it's already threaded ;-)
-              send_data('', restart)
+            @send_buffer += data
+            limited_by_polling = false
+            if @pending_requests + 1 == @http_requests && @send_buffer.size == 0
+              limited_by_polling = (@last_send + @http_polling >= Time.now)
+            end
+            limited_by_requests = (@pending_requests + 1 > @http_requests)
+
+            # Can we send?
+            if !limited_by_polling and !limited_by_requests or !@authenticated
+              Jabber::debuglog("send_data non_limited")
+              data = @send_buffer
+              @send_buffer = ''
+
+              Thread.new do
+                Thread.current.abort_on_exception = true
+                post_data(data, restart)
+              end
+              return
+            elsif limited_by_requests
+              Jabber::debuglog("send_data limited by requests")
+              # Do nothing.
+              # When a pending request gets an response, it calls send_data('')
+              return
+            elsif # limited_by_polling && @authenticated
+              # Wait until we get some data to send, or @http_polling expires
+              Jabber::debuglog("send_data limited by polling: #{@http_polling}")
+            else
+              Jabber::errorlog("send_data: can't happen: pending_requests=#{@pending_requests} http_requests=#{@http_requests} send_buffer.size=#{@send_buffer.size} limited_by_polling=#{limited_by_polling} limited_by_requests=#{limited_by_requests}")
+              return
             end
           end
-
+          sleep(0.1)
         end
       end
     end
