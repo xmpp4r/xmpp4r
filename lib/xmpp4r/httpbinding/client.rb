@@ -125,7 +125,8 @@ module Jabber
         @stream_features = {}
         @http_rid = IdGenerator.generate_id.to_i
         @pending_rid = @http_rid
-        @pending_rid_lock = Semaphore.new
+        @pending_rid_lock = Mutex.new
+        @pending_rid_cv = [] # [ [rid, cv], [rid, cv], ... ]
 
         req_body = REXML::Element.new('body')
         req_body.attributes['rid'] = @http_rid
@@ -202,16 +203,30 @@ module Jabber
       # Receive stanzas ensuring that the 'rid' order is kept
       # result:: [REXML::Element]
       def receive_elements_with_rid(rid, elements)
-        while rid > @pending_rid
-          @pending_rid_lock.wait
+        @pending_rid_lock.synchronize do
+          # Wait until rid == @pending_rid
+          if rid > @pending_rid
+            cv = ConditionVariable.new
+            @pending_rid_cv << [rid, cv]
+            @pending_rid_cv.sort!
+            while rid > @pending_rid
+              cv.wait(@pending_rid_lock)
+            end
+          end
         end
-        @pending_rid = rid + 1
 
         elements.each { |e|
           receive(e)
         }
 
-        @pending_rid_lock.run
+        # Signal waiting elements
+        @pending_rid_lock.synchronize do
+          @pending_rid = rid + 1 # Ensure @pending_rid is modified atomically
+          if @pending_rid_cv.size > 0 && @pending_rid_cv.first.first == @pending_rid
+            next_rid, cv = @pending_rid_cv.shift
+            cv.signal
+          end
+        end
       end
 
       ##
