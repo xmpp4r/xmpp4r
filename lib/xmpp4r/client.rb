@@ -253,7 +253,7 @@ module Jabber
         authset = Iq.new_authset(@jid, password)
       end
       send_with_id(authset)
-      $defout.flush
+      $>.flush
 
       true
     end
