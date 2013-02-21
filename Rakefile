@@ -35,7 +35,7 @@ RDOC_OPTIONS  = [
 RDOC_FILES    = (%w( README.rdoc README_ruby19.txt CHANGELOG LICENSE COPYING )).sort
 
 # The full file list used for rdocs, tarballs, gems, and for generating the xmpp4r.gemspec.
-PKG_FILES     = (%w( Rakefile setup.rb xmpp4r.gemspec ) + RDOC_FILES + Dir["{lib,test,data,tools}/**/*"]).sort
+PKG_FILES     = (%w( Rakefile setup.rb mad-p-xmpp4r.gemspec ) + RDOC_FILES + Dir["{lib,test,data,tools}/**/*"]).sort
 
 ##############################################################################
 # DEFAULT TASK

@@ -179,6 +179,7 @@ Gem::Specification.new do |s|
  "lib/xmpp4r/xmpp4r.rb",
  "lib/xmpp4r/xmppelement.rb",
  "lib/xmpp4r/xmppstanza.rb",
+ "mad-p-xmpp4r.gemspec",
  "setup.rb",
  "test/bytestreams/tc_ibb.rb",
  "test/bytestreams/tc_socks5bytestreams.rb",
@@ -231,8 +232,7 @@ Gem::Specification.new do |s|
  "test/version/tc_iqqueryversion.rb",
  "test/xhtml/tc_html.rb",
  "tools/gen_requires.bash",
- "tools/xmpp4r-gemspec-test.rb",
- "xmpp4r.gemspec"]
+ "tools/xmpp4r-gemspec-test.rb"]
   s.has_rdoc = true
   s.homepage = "https://github.com/mad-p/xmpp4r"
   s.name = "mad-p-xmpp4r"
@@ -242,8 +242,8 @@ Gem::Specification.new do |s|
   s.required_ruby_version = ">= 1.8.4"
   s.required_rubygems_version = ">= 0"
   s.rubyforge_project = "mad-p-xmpp4r"
-  s.rubygems_version = "1.8.10"
+  s.rubygems_version = "1.8.24"
   s.specification_version = 3
   s.summary = "This is a fork from XMPP4R (https://github.com/ln/xmpp4r), fixing BOSH"
-  s.version = "0.6.0"
+  s.version = "0.6.1"
 end

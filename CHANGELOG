@@ -1,3 +1,14 @@
+mad-p-xmpp4r 0.6.1 (21/02/2013)
+===============================
+* Modified to work with BOSH with HTTPBinding::Client
+  - Support stream restart with urn:xmpp:xbosh way.
+  - Removed unnecessary wait until authenticated.
+  - Added Semaphore to wait for auth and bind response.
+  - Hook to setup SSL flags (certificate, etc.)
+  - Adjusted HTTP::Net read_timeout according to http_wait.
+  - Proxy handling.
+  - Respect poll/request BOSH parameters to avoid overactivity.
+
 XMPP4R 0.5 (15/06/2009)
 =======================
 * Many bugs fixed and tests cleanups (better Ruby 1.9 support, in
