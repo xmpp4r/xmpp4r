@@ -13,7 +13,16 @@ require 'find'
 
 # List files' basenames, not full path!
 # EXCLUDED_FILES = [ 'tc_muc_simplemucclient.rb' ]
-EXCLUDED_FILES = ['tc_disconnect_cleanup.rb', './pubsub/tc_helper.rb', './muc/tc_muc_mucclient.rb', './reliable/tc_reliable_connection.rb', './reliable/tc_disconnect_exception.rb', './reliable/tc_listener_mocked_test.rb', './reliable/tc_reliable_connection.rb']
+EXCLUDED_FILES = %w[
+  tc_disconnect_cleanup.rb
+  ./pubsub/tc_helper.rb
+  ./muc/tc_muc_mucclient.rb
+  ./reliable/tc_reliable_connection.rb
+  ./reliable/tc_disconnect_exception.rb
+  ./reliable/tc_listener_mocked_test.rb
+  ./reliable/tc_reliable_connection.rb
+  ./bytestreams/tc_socks5bytestreams.rb
+].map {|f| f.gsub(%r[^\.], File.dirname(__FILE__)) }
 
 tc_files = []
 tc_subdirs = []
