@@ -139,7 +139,7 @@ module Jabber
         end
         req_body.attributes['secure'] = 'true'
         req_body.attributes['xmlns'] = 'http://jabber.org/protocol/httpbind'
-        res_body = post(req_body)
+        res_body = post(req_body, "sid=new rid=#{@http_rid}")
         unless res_body.name == 'body'
           raise 'Response body is no <body/> element'
         end
@@ -192,7 +192,7 @@ module Jabber
           @pending_requests += 1
           @last_send = Time.now
         }
-        res_body = post(req_body)
+        res_body = post(req_body, "terminate sid=#{@http_sid} rid=#{@http_rid}")
         sleep(3)
         Jabber::debuglog("Connection closed")
       end
@@ -231,13 +231,13 @@ module Jabber
 
       ##
       # Do a POST request
-      def post(body)
+      def post(body, debug_info)
         body = body.to_s
         request = Net::HTTP::Post.new(@uri.path)
         request.content_length = body.size
         request.body = body
         request['Content-Type'] = @http_content_type
-        Jabber::debuglog("HTTP REQUEST (#{@pending_requests}/#{@http_requests}):\n#{request.body}")
+        Jabber::debuglog("HTTP REQUEST (#{@pending_requests}/#{@http_requests}) #{debug_info}:\n#{request.body}")
 
         net_http_args = [@uri.host, @uri.port]
         unless @proxy_args.empty?
@@ -256,7 +256,7 @@ module Jabber
         response = http.start { |http|
           http.request(request)
         }
-        Jabber::debuglog("HTTP RESPONSE (#{@pending_requests}/#{@http_requests}): #{response.class}\n#{response.body}")
+        Jabber::debuglog("HTTP RESPONSE (#{@pending_requests}/#{@http_requests}) #{debug_info}: #{response.class}\n#{response.body}")
 
         unless response.kind_of? Net::HTTPSuccess
           # Unfortunately, HTTPResponses aren't exceptions
@@ -286,6 +286,7 @@ module Jabber
       def post_data(data, restart = false)
         req_body = nil
         current_rid = nil
+        debug_info = ''
 
         begin
           begin
@@ -306,12 +307,13 @@ module Jabber
               req_body += data unless restart
               req_body += "</body>"
               current_rid = @http_rid
+              debug_info = "sid=#{@http_sid} rid=#{current_rid}"
 
               @pending_requests += 1
               @last_send = Time.now
             }
 
-            res_body = post(req_body)
+            res_body = post(req_body, debug_info)
 
           ensure
             @lock.synchronize {
@@ -329,18 +331,19 @@ module Jabber
               close; @exception_block.call(e, self, :parser)
             end
           else
-            Jabber::debuglog "Exception caught when parsing HTTP response!"
+            Jabber::debuglog "Exception caught when parsing HTTP response! (#{debug_info})"
             close
             raise
           end
 
         rescue StandardError => e
-          Jabber::debuglog("POST error (will retry): #{e.class}: #{e}")
+          Jabber::debuglog("POST error (will retry) #{debug_info}: #{e.class}: #{e}, #{e.backtrace}")
           receive_elements_with_rid(current_rid, [])
           # It's not good to resend on *any* exception,
           # but there are too many cases (Timeout, 404, 502)
           # where resending is appropriate
           # TODO: recognize these conditions and act appropriate
+          # FIXME: resending the same data with a new rid is wrong.  should resend with the same rid
           send_data(data)
         end
       end
