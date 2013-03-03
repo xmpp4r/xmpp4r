@@ -1,3 +1,7 @@
+mad-p-xmpp4r 0.6.3 (02/03/2013)
+===============================
+* Removed unnecessary dependency on pry.
+
 mad-p-xmpp4r 0.6.2 (26/02/2013)
 ===============================
 * Merge pull request #1 from Strech/patch-1
