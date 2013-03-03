@@ -9,7 +9,6 @@ require 'xmpp4r/semaphore'
 require 'net/http'
 require 'uri'
 require 'cgi' # for escaping
-require 'pry'
 
 module Jabber
   module HTTPBinding
