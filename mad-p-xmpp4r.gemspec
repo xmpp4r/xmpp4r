@@ -2,10 +2,11 @@
 # RUN : 'rake gem:update_gemspec'
 
 Gem::Specification.new do |s|
-  s.authors = ["Lucas Nussbaum", "Stephan Maka", "Glenn Rempe"]
+  s.activated = false
+  s.authors = ["Lucas Nussbaum", "Stephan Maka", "Glenn Rempe", "Kaoru Maeda"]
   s.bindir = "bin"
-  s.description = "XMPP4R is an XMPP/Jabber library for Ruby."
-  s.email = "xmpp4r-devel@gna.org"
+  s.description = "This is a fork from XMPP4R (https://github.com/ln/xmpp4r), fixing BOSH"
+  s.email = "kaoru.maeda@gmail.com"
   s.extra_rdoc_files = ["CHANGELOG", "COPYING", "LICENSE", "README.rdoc", "README_ruby19.txt"]
   s.files = ["CHANGELOG",
  "COPYING",
@@ -121,6 +122,13 @@ Gem::Specification.new do |s|
  "lib/xmpp4r/muc/x/muc.rb",
  "lib/xmpp4r/muc/x/mucuserinvite.rb",
  "lib/xmpp4r/muc/x/mucuseritem.rb",
+ "lib/xmpp4r/observable.rb",
+ "lib/xmpp4r/observable/contact.rb",
+ "lib/xmpp4r/observable/helper.rb",
+ "lib/xmpp4r/observable/observable_thing.rb",
+ "lib/xmpp4r/observable/pubsub.rb",
+ "lib/xmpp4r/observable/subscription.rb",
+ "lib/xmpp4r/observable/thread_store.rb",
  "lib/xmpp4r/presence.rb",
  "lib/xmpp4r/pubsub.rb",
  "lib/xmpp4r/pubsub/children/configuration.rb",
@@ -171,6 +179,7 @@ Gem::Specification.new do |s|
  "lib/xmpp4r/xmpp4r.rb",
  "lib/xmpp4r/xmppelement.rb",
  "lib/xmpp4r/xmppstanza.rb",
+ "mad-p-xmpp4r.gemspec",
  "setup.rb",
  "test/bytestreams/tc_ibb.rb",
  "test/bytestreams/tc_socks5bytestreams.rb",
@@ -223,20 +232,18 @@ Gem::Specification.new do |s|
  "test/version/tc_iqqueryversion.rb",
  "test/xhtml/tc_html.rb",
  "tools/gen_requires.bash",
- "tools/xmpp4r-gemspec-test.rb",
- "xmpp4r.gemspec"]
+ "tools/xmpp4r-gemspec-test.rb"]
   s.has_rdoc = true
-  s.homepage = "http://home.gna.org/xmpp4r/"
-  s.loaded = false
-  s.name = "xmpp4r"
+  s.homepage = "https://github.com/mad-p/xmpp4r"
+  s.name = "mad-p-xmpp4r"
   s.platform = "ruby"
-  s.rdoc_options = ["--quiet", "--title", "XMPP4R is an XMPP/Jabber library for Ruby.", "--opname", "index.html", "--main", "lib/xmpp4r.rb", "--line-numbers", "--inline-source"]
+  s.rdoc_options = ["--quiet", "--title", "This is a fork from XMPP4R (https://github.com/ln/xmpp4r), fixing BOSH", "--opname", "index.html", "--main", "lib/xmpp4r.rb", "--line-numbers", "--inline-source"]
   s.require_paths = ["lib"]
   s.required_ruby_version = ">= 1.8.4"
   s.required_rubygems_version = ">= 0"
-  s.rubyforge_project = "xmpp4r"
-  s.rubygems_version = "1.3.4"
+  s.rubyforge_project = "mad-p-xmpp4r"
+  s.rubygems_version = "1.8.24"
   s.specification_version = 3
-  s.summary = "XMPP4R is an XMPP/Jabber library for Ruby."
-  s.version = "0.5"
+  s.summary = "This is a fork from XMPP4R (https://github.com/ln/xmpp4r), fixing BOSH"
+  s.version = "0.6.3"
 end
