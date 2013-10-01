@@ -10,12 +10,12 @@ require "xmpp4r"
 # OPTIONS
 ##############################################################################
 
-PKG_NAME      = 'mad-p-xmpp4r'
+PKG_NAME      = 'xmpp4r'
 PKG_VERSION   = Jabber::XMPP4R_VERSION
-AUTHORS       = ['Lucas Nussbaum', 'Stephan Maka', 'Glenn Rempe', 'Kaoru Maeda']
-EMAIL         = "kaoru.maeda@gmail.com"
-HOMEPAGE      = "https://github.com/mad-p/xmpp4r"
-SUMMARY       = "This is a fork from XMPP4R (https://github.com/ln/xmpp4r), fixing BOSH"
+AUTHORS       = ['Lucas Nussbaum', 'Stephan Maka', 'Glenn Rempe', 'Kaoru Maeda', 'Harisankar P S']
+EMAIL         = "mailme@hsps.in"
+HOMEPAGE      = "https://xmpp4r.github.io"
+SUMMARY       = "XMPP/Jabber library for ruby"
 
 # These are the common rdoc options that are shared between generation of
 # rdoc files using BOTH 'rake rdoc' and the installation by users of a
