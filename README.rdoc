@@ -1,6 +1,9 @@
+[![Gem Version](https://badge.fury.io/rb/xmpp4r.png)](http://badge.fury.io/rb/xmpp4r)
+
 = XMPP4R
 
-[![Gem Version](https://badge.fury.io/rb/xmpp4r.png)](http://badge.fury.io/rb/xmpp4r)
+A XMPP/Jabber library for ruby
+
 
 == Project Home
 
@@ -30,7 +33,7 @@ which can be enabled in your code with:
 
 === List of Contributors
   
-  https://github.com/xmpp4r/xmpp4r/contributors
+http://github.com/xmpp4r/xmpp4r/contributors
 
 
 == Source Code
@@ -48,8 +51,7 @@ on your needs and the methods you prefer.
 
 === Install over the network using RubyGems
 
-You can install the current release of the xmpp4r library from a stable
-release gem on RubyForge using RubyGems:
+You can install the current release of the xmpp4r library via rubygems:
 
   sudo gem install xmpp4r
 
@@ -62,7 +64,7 @@ need to get a local copy.
 
 Clone the Git repository (recommended):
 
-  git clone git://github.com/ln/xmpp4r.git
+  git clone git://github.com/xmpp4r/xmpp4r.git
 
 OR download a snapshot of the latest source in .tar.gz format from:
 
@@ -86,7 +88,7 @@ require RubyGems to be installed.
   ./setup.rb
 
 
-## Contributing
+== Contributing
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
