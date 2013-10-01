@@ -1,5 +1,3 @@
-[![Gem Version](https://badge.fury.io/rb/xmpp4r.png)](http://badge.fury.io/rb/xmpp4r)
-
 = XMPP4R
 
 A XMPP/Jabber library for ruby
@@ -13,7 +11,7 @@ at the project home page:
 http://xmpp4r.github.io
 
 If you need to ask questions, or want feedback on proposed changes
-please feel free to ask them on the git hub issues tracker. 
+please feel free to ask them on the github issues tracker. 
 
 https://github.com/xmpp4r/xmpp4r/issues
 
