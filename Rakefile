@@ -108,13 +108,6 @@ task :gen_requires_graph do
   sh %{cd tools; ./gen_requires.bash}
 end
 
-# UPDATE WEBSITE (for Lucas only)
-#################################
-desc "Update website (for Lucas only)"
-task :update_website do
-  sh %{cp website/* ~/dev/xmpp4r/website/ && cd ~/dev/xmpp4r/website/ && svn commit -m "website update"}
-end
-
 
 ##############################################################################
 # SYNTAX CHECKING
