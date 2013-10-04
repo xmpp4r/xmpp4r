@@ -241,7 +241,6 @@ Gem::Specification.new do |s|
  "lib/xmpp4r/xmpp4r.rb",
  "lib/xmpp4r/xmppelement.rb",
  "lib/xmpp4r/xmppstanza.rb",
- "mad-p-xmpp4r.gemspec",
  "setup.rb",
  "test/bytestreams",
  "test/bytestreams/tc_ibb.rb",
@@ -311,7 +310,8 @@ Gem::Specification.new do |s|
  "test/xhtml",
  "test/xhtml/tc_html.rb",
  "tools/gen_requires.bash",
- "tools/xmpp4r-gemspec-test.rb"]
+ "tools/xmpp4r-gemspec-test.rb",
+ "xmpp4r.gemspec"]
   s.has_rdoc = true
   s.homepage = "https://xmpp4r.github.io"
   s.name = "xmpp4r"
