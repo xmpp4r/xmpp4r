@@ -19,7 +19,7 @@ class BasicClient
     # main loop
     while not quit do
       print "> "
-      $defout.flush
+      $>.flush
       line = gets
       quit = true if line.nil?
       if not quit
