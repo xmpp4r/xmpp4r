@@ -234,7 +234,7 @@ Gem::Specification.new do |s|
  "tools/xmpp4r-gemspec-test.rb",
  "xmpp4r.gemspec"]
   s.has_rdoc = true
-  s.homepage = "https://xmpp4r.github.io"
+  s.homepage = "http://xmpp4r.github.io"
   s.name = "xmpp4r"
   s.platform = "ruby"
   s.rdoc_options = ["--quiet", "--title", "XMPP/Jabber library for ruby", "--opname", "index.html", "--main", "lib/xmpp4r.rb", "--line-numbers", "--inline-source"]

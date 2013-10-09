@@ -14,7 +14,7 @@ PKG_NAME      = 'xmpp4r'
 PKG_VERSION   = Jabber::XMPP4R_VERSION
 AUTHORS       = ['Lucas Nussbaum', 'Stephan Maka', 'Glenn Rempe', 'Kaoru Maeda', 'Harisankar P S']
 EMAIL         = "mailme@hsps.in"
-HOMEPAGE      = "https://xmpp4r.github.io"
+HOMEPAGE      = "http://xmpp4r.github.io"
 SUMMARY       = "XMPP/Jabber library for ruby"
 
 # These are the common rdoc options that are shared between generation of
