@@ -1,6 +1,6 @@
 # =XMPP4R - XMPP Library for Ruby
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
-# Website::http://home.gna.org/xmpp4r/
+# Website::http://xmpp4r.github.io
 #
 # It's recommented to read the XEP-0060 before you use this Helper. (Maybe its
 # better not use the helper for now ) ;)

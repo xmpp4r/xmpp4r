@@ -1,6 +1,6 @@
 # =XMPP4R - XMPP Library for Ruby
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
-# Website::http://home.gna.org/xmpp4r/
+# Website::http://xmpp4r.github.io
 #
 # For documentation of the return values please see [Jabber::PubSub::ServiceHelper]
 # This class is only a wrapper around [Jabber::PubSub::ServiceHelper]

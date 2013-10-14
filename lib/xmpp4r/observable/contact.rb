@@ -2,7 +2,7 @@
 #
 # This file's copyright (c) 2009 by Pablo Lorenzzoni <pablo@propus.com.br>
 # License:: Ruby's license (see the LICENSE file) or GNU GPL, at your option.
-# Website::http://home.gna.org/xmpp4r/
+# Website::http://xmpp4r.github.io
 #
 module Jabber
 class Observable
