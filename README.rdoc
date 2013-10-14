@@ -34,14 +34,6 @@ which can be enabled in your code with:
 http://github.com/xmpp4r/xmpp4r/contributors
 
 
-== Source Code
-
-The source for xmpp4r is managed using the Git SCM and can be
-found in our GitHub.com project page:
-
-http://github.com/xmpp4r/xmpp4r/tree/master
-
-
 == Installation
 
 There are a number of ways that you can install xmpp4r depending
