@@ -40,7 +40,19 @@ module Jabber
 
         parser.listen( :start_element ) do |uri, localname, qname, attributes|
           e = REXML::Element.new(qname)
-          e.add_attributes attributes
+          if attributes.kind_of? Hash
+            unnormalized_attributes = {}
+            attributes.each_pair do |key, value|
+              unnormalized_attributes[key] = REXML::Text::unnormalize(value)
+            end
+          elsif attributes.kind_of? Array
+            unnormalized_attributes = []
+            attributes.each do |value|
+              unnormalized_attributes << [value[0], REXML::Text::unnormalize(value[1])]
+            end
+          end
+          
+          e.add_attributes unnormalized_attributes
           @current = @current.nil? ? e : @current.add_element(e)
 
           # Handling <stream:stream> not only when it is being

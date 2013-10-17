@@ -58,7 +58,7 @@ ft.add_incoming_callback { |iq,file|
       puts "Waiting for stream configuration"
       if stream.accept
         puts "Stream established"
-        outfile = File.new(filename, (offset ? 'a' : 'w'))
+        outfile = File.new(filename, (offset ? 'ab' : 'wb'))
         while buf = stream.read(65536)
           outfile.write(buf)
           print '.'
