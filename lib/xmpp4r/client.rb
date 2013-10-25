@@ -38,7 +38,7 @@ module Jabber
     # be resolved. If none works, fallback is connecting to the domain part
     # of the jid.
     # host:: [String] Optional c2s host, will be extracted from jid if nil
-    # use_ssl:: [Boolean] Optional. Use (old, deprecated) SSL when connecting.
+    # port:: [Fixnum] The server port (default: 5222)
     # return:: self
     def connect(host = nil, port = 5222)
       if host.nil?
