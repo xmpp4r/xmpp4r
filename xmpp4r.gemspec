@@ -6,6 +6,7 @@ Gem::Specification.new do |s|
   s.authors = ["Lucas Nussbaum", "Stephan Maka", "Glenn Rempe", "Kaoru Maeda", "Harisankar P S"]
   s.bindir = "bin"
   s.description = "XMPP/Jabber library for ruby"
+  s.licenses = ["Ruby", "GPL"]
   s.email = "mailme@hsps.in"
   s.extra_rdoc_files = ["CHANGELOG", "COPYING", "LICENSE", "README.rdoc", "README_ruby19.txt"]
   s.files = ["CHANGELOG",
