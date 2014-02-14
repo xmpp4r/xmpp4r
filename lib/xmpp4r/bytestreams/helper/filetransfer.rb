@@ -70,7 +70,7 @@ module Jabber
       include TransferSource
 
       def initialize(filename)
-        @file = File.new(filename)
+        @file = File.new(filename, "rb")
         @filename = filename
         @bytes_read = 0
         @length = nil

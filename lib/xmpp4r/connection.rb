@@ -37,6 +37,15 @@ module Jabber
     #Defaults to false
     attr_accessor :use_ssl
 
+    class SSLSocketUTF8 < OpenSSL::SSL::SSLSocket
+      # #readline returns incorrect encodings for UTF8 strings
+      # because SSLSocket does not support encoding conversions
+      # This forces a correct encoding, and pervents REXML exceptions
+      def sysread *args
+        super.force_encoding ::Encoding::UTF_8
+      end
+    end
+
     ##
     # Create a new connection to the given host and port
     def initialize
@@ -68,7 +77,7 @@ module Jabber
 
       # We want to use the old and deprecated SSL protocol (usually on port 5223)
       if @use_ssl
-        ssl = OpenSSL::SSL::SSLSocket.new(@socket)
+        ssl = SSLSocketUTF8.new(@socket)
         ssl.connect # start SSL session
         ssl.sync_close = true
         Jabber::debuglog("SSL connection established.")
@@ -154,7 +163,7 @@ module Jabber
         ctx.verify_callback = @ssl_verifycb
 
         # SSL connection establishing
-        sslsocket = OpenSSL::SSL::SSLSocket.new(@socket, ctx)
+        sslsocket = SSLSocketUTF8.new(@socket, ctx)
         sslsocket.sync_close = true
         Jabber::debuglog("TLSv1: OpenSSL handshake in progress")
         sslsocket.connect
