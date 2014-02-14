@@ -24,10 +24,9 @@ which can be enabled in your code with:
 
 == Contributors
 
-=== Present Maintainers
+=== Present Maintainer
 
   Harisankar P S (hsps@rubykitchen.org)
-  Manu S Ajith (manu@rubykitchen.org)
 
 === List of Contributors
   
@@ -45,6 +44,7 @@ You can install the current release of the xmpp4r library via rubygems:
 
   sudo gem install xmpp4r
 
+The latest stable version is 0.5.6
 
 === Install from local source code (Developers Only)
 

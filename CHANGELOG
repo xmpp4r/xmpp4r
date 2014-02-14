@@ -1,4 +1,16 @@
-xmpp4r 0.5.5 (02/03/2013)
+
+xmpp4r 0.5.6 (February 14th, 2013)
+====================================
+
+* [DOC] Wrong inline documentation in `client.rb`; details of port number parameter and removal of un-used 'use_ssl parameter'
+* Prevent REXML exceptions on UTF-8 messages
+* Fixed broken parse method
+* Make sure to open files in binary mode, in order to correctly transfer files on Windows
+* Prevent REXML exceptions on UTF-8 messages
+* Better control of history on muc.join
+
+
+xmpp4r 0.5.5 (October 6th, 2013)
 ===============================
 * Removed unnecessary dependency on pry.
 
