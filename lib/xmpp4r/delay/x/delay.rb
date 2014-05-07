@@ -41,14 +41,11 @@ module Jabber
       def stamp
         if attributes['stamp']
           begin
-            # Actually this should be Time.xmlschema,
-            # but "unfortunately, the 'jabber:x:delay' namespace predates" JEP 0082
-            Time.parse("#{attributes['stamp']}Z")
+            # XEP-0091 has been marked obsolete; replaced by XEP-0203
+            Time.xmlschema("#{attributes['stamp']}")
           rescue ArgumentError
             nil
           end
-        else
-          nil
         end
       end
 
@@ -59,7 +56,7 @@ module Jabber
         if t.nil?
           attributes['stamp'] = nil
         else
-          attributes['stamp'] = t.strftime("%Y%m%dT%H:%M:%S")
+          attributes['stamp'] = t.getutc.strftime("%Y-%m-%dT%H:%M:%SZ")
         end
       end
 
