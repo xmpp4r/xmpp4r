@@ -25,6 +25,7 @@ class IBBTest < Test::Unit::TestCase
 
     Thread.new do
       target.accept
+      sleep 0.1
       target.write(buffer)
       Thread.pass
       target.close
@@ -50,15 +51,17 @@ class IBBTest < Test::Unit::TestCase
 
     buffer = create_buffer(9999)
 
-    Thread.new do
+    t = Thread.new do
       target.accept_wait
       initiator.open
+      Thread.pass
       initiator.write(buffer)
       initiator.close
     end
 
-
     target.accept
+
+    t.join
 
     received = ''
     while buf = target.read
@@ -139,8 +142,9 @@ class IBBTest < Test::Unit::TestCase
     target = Bytestreams::IBBTarget.new(@server, '1', nil, '1@a.com/1')
     initiator = Bytestreams::IBBInitiator.new(@client, '1', nil, '1@a.com/1')
 
-    Thread.new do
+    t = Thread.new do
       target.accept
+      sleep 0.1
 
       @server.send("<message from='1@a.com/1' type='error'>
                       <data xmlns='http://jabber.org/protocol/ibb' sid='#{target.instance_variable_get(:@session_id)}' seq='0'/>
@@ -150,6 +154,8 @@ class IBBTest < Test::Unit::TestCase
 
     target.accept_wait
     initiator.open
+
+    t.join
 
     assert_nil(initiator.read)
 
