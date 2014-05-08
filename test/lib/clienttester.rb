@@ -124,6 +124,9 @@ module Jabber
       end
       @client.close
       @server.close
+    rescue IOError
+      # rarely an IOError is thrown. I don't know why. Threading. Retry fixes it.
+      retry
     end
 
     def send(xml)
