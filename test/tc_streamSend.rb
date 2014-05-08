@@ -11,9 +11,9 @@ include Jabber
 
 class StreamSendTest < Test::Unit::TestCase
   def setup
-    @tmpfile = Tempfile.new("StreamSendTest")
-    @tmpfilepath = @tmpfile.path()
-    @tmpfile.unlink
+    tmpfile = Tempfile.new("StreamSendTest")
+    @tmpfilepath = tmpfile.path()
+    tmpfile.close!
     @servlisten = UNIXServer.new(@tmpfilepath)
     thServer = Thread.new { @server = @servlisten.accept }
     @iostream = UNIXSocket.new(@tmpfilepath)
