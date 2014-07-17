@@ -160,7 +160,7 @@ module Jabber
         recipients.each { |jid,reason|
           x.add(XMUCUserInvite.new(jid, reason))
         }
-        send(msg)
+        send(msg, nil, true)
       end
 
       ##
