@@ -252,13 +252,13 @@ module Jabber
       # if directed to participant.
       # stanza:: [XMPPStanza] to send
       # to:: [String] Stanza destination recipient, or room if +nil+
-      def send(stanza, to=nil, invite=false)
+      def send(stanza, to = nil, invite = false)
         if stanza.kind_of? Message
-            if invite
-                stanza.type = :normal
-            else
-                stanza.type = to ? :chat : :groupchat
-            end
+          if invite
+            stanza.type = :normal
+          else
+            stanza.type = to ? :chat : :groupchat
+          end
         end
         stanza.from = @my_jid
         stanza.to = JID.new(jid.node, jid.domain, to)
