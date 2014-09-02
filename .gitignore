@@ -3,6 +3,5 @@ pkg/*
 coverage/*
 rdoc/*
 tools/*.png
-Gemfile.lock
 *~
 *#

@@ -1,0 +1,20 @@
+PATH
+  remote: .
+  specs:
+    xmpp4r (0.5.6)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    json (1.8.1)
+    rake (10.3.2)
+    rdoc (3.12.2)
+      json (~> 1.4)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  rake (>= 10.0)
+  rdoc (~> 3.0)
+  xmpp4r!
