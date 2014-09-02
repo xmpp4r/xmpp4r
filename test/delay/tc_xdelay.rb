@@ -18,7 +18,7 @@ class XDelayTest < Test::Unit::TestCase
   def test_create2
     d = Delay::XDelay.new
     # Hopefully the seconds don't change here...
-    assert_equal(Time.now.to_s, d.stamp.to_s)
+    assert_equal(Time.now.getutc.to_s, d.stamp.to_s)
     assert_equal(nil, d.from)
     assert_equal('jabber:x:delay', d.namespace)
   end
@@ -37,9 +37,24 @@ class XDelayTest < Test::Unit::TestCase
     assert_equal(nil, d.stamp)
     now = Time.now
     d.stamp = now
-    assert_equal(now.to_s, d.stamp.to_s)
+    assert_equal(now.getutc.to_s, d.stamp.to_s)
     assert_equal(d, d.set_stamp(nil))
     assert_equal(nil, d.stamp)
+  end
+
+  # http://xmpp.org/extensions/xep-0091.html has been obsoleted by the XMPP Standards Foundation
+  # http://xmpp.org/extensions/xep-0203.html replaces it, and modifies the stamp to be
+  # the dateTime format specified in XEP-0082 and MUST be expressed in UTC.
+  def test_stamp_format
+    d = Delay::XDelay.new(false)
+    now = Time.now
+    xep0203_stamp = now.getutc.strftime "%Y-%m-%dT%H:%M:%SZ"
+
+    d.stamp = now.getlocal
+    assert_equal(xep0203_stamp, d.attributes['stamp'])
+
+    d.stamp = now.getutc
+    assert_equal(xep0203_stamp, d.attributes['stamp'])
   end
 
   def test_import

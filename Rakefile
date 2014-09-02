@@ -1,5 +1,5 @@
 require 'rake'
-require "rake/clean"
+require 'rake/clean'
 require 'rake/testtask'
 require 'rdoc/task'
 
@@ -35,7 +35,8 @@ RDOC_OPTIONS  = [
 RDOC_FILES    = (%w( README.rdoc README_ruby19.txt CHANGELOG LICENSE COPYING )).sort
 
 # The full file list used for rdocs, tarballs, gems, and for generating the xmpp4r.gemspec.
-PKG_FILES     = (%w( Rakefile setup.rb xmpp4r.gemspec ) + RDOC_FILES + Dir["{lib,test,data,tools}/**/*"]).sort
+PKG_FILES     = (%w( Rakefile setup.rb xmpp4r.gemspec ) + RDOC_FILES + Dir["{lib,test,data,tools}/**/*"]).
+                reject { |file| File.directory? file } .sort
 
 ##############################################################################
 # DEFAULT TASK
@@ -146,7 +147,7 @@ begin
     s.has_rdoc = true
     s.extra_rdoc_files = RDOC_FILES
     s.rdoc_options = RDOC_OPTIONS
-    s.required_ruby_version = ">= 1.8.4"
+    s.required_ruby_version = ">= 1.8.7"
   end
 
   Gem::PackageTask.new(spec) do |pkg|

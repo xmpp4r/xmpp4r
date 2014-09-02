@@ -38,15 +38,15 @@ class CallbacksTest < Test::Unit::TestCase
 
   def test_callbacklist2
     cbl = CallbackList.new
-    assert(0, cbl.length)
+    assert_equal(0, cbl.length)
     cbl.add(5, "ref1") { called1 = true }
-    assert(1, cbl.length)
+    assert_equal(1, cbl.length)
     cbl.add(7, "ref2") { |e| called2 = true ; e.consume }
-    assert(2, cbl.length)
+    assert_equal(2, cbl.length)
     cbl.delete("ref2")
-    assert(1, cbl.length)
+    assert_equal(1, cbl.length)
     cbl.add(9, "ref3") { called3 = true }
-    assert(2, cbl.length)
+    assert_equal(2, cbl.length)
   end
 
   def test_callbacklist4
