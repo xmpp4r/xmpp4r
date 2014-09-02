@@ -26,7 +26,7 @@ which can be enabled in your code with:
 
 === Present Maintainer
 
-  Harisankar P S (hsps@rubykitchen.org)
+  Harisankar P S (@coderhs)
 
 === List of Contributors
   
@@ -45,37 +45,6 @@ You can install the current release of the xmpp4r library via rubygems:
   sudo gem install xmpp4r
 
 The latest stable version is 0.5.6
-
-=== Install from local source code (Developers Only)
-
-If you have a local Git clone of the source repository or a tarball
-you can install xmpp4r using several methods.  First you'll
-need to get a local copy.
-
-Clone the Git repository (recommended):
-
-  git clone git://github.com/xmpp4r/xmpp4r.git
-
-OR download a snapshot of the latest source in .tar.gz format from:
-
-  http://github.com/xmpp4r/xmpp4r/tarball/master
-
-==== Install : Using Rake
-
-  # Show all available rake tasks
-  cd xmpp4r/
-  rake -T
-
-  # Package up the gem file and install it
-  rake gem:install
-
-==== Install : Using setup.rb
-
-This will install a copy of the library in your Ruby path and does not
-require RubyGems to be installed.
-
-  cd xmpp4r/
-  ./setup.rb
 
 
 == Contributing
