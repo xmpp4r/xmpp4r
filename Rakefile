@@ -140,6 +140,7 @@ begin
     s.summary = SUMMARY
     s.description = s.summary
     s.platform = Gem::Platform::RUBY
+    s.licenses = ["Ruby", "GPL"]
     s.require_path = 'lib'
     s.executables = []
     s.files = PKG_FILES
