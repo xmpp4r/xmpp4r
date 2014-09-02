@@ -12,7 +12,7 @@ require "xmpp4r"
 
 PKG_NAME      = 'xmpp4r'
 PKG_VERSION   = Jabber::XMPP4R_VERSION
-AUTHORS       = ['Lucas Nussbaum', 'Stephan Maka', 'Glenn Rempe', 'Kaoru Maeda', 'Harisankar P S']
+AUTHORS       = ['Lucas Nussbaum', 'Stephan Maka', 'Glenn Rempe', 'Harisankar P S', 'Jeremy']
 EMAIL         = "mailme@hsps.in"
 HOMEPAGE      = "http://xmpp4r.github.io"
 SUMMARY       = "XMPP/Jabber library for ruby"
