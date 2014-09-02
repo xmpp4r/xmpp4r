@@ -2,7 +2,8 @@
 # RUN : 'rake gem:update_gemspec'
 
 Gem::Specification.new do |s|
-  s.authors = ["Lucas Nussbaum", "Stephan Maka", "Glenn Rempe", "Kaoru Maeda", "Harisankar P S"]
+  s.activated = false
+  s.authors = ["Lucas Nussbaum", "Stephan Maka", "Glenn Rempe", "Harisankar P S", "Jeremy"]
   s.bindir = "bin"
   s.description = "XMPP/Jabber library for ruby"
   s.email = "mailme@hsps.in"
@@ -232,6 +233,7 @@ Gem::Specification.new do |s|
  "tools/gen_requires.bash",
  "tools/xmpp4r-gemspec-test.rb",
  "xmpp4r.gemspec"]
+  s.full_name = "xmpp4r-0.5.7"
   s.has_rdoc = true
   s.homepage = "http://xmpp4r.github.io"
   s.name = "xmpp4r"
@@ -241,8 +243,8 @@ Gem::Specification.new do |s|
   s.required_ruby_version = ">= 1.8.7"
   s.required_rubygems_version = ">= 0"
   s.rubyforge_project = "xmpp4r"
-  s.rubygems_version = "1.6.2"
-  s.specification_version = 3
+  s.rubygems_version = "2.4.1"
+  s.specification_version = 4
   s.summary = "XMPP/Jabber library for ruby"
-  s.version = "0.5.6"
+  s.version = "0.5.7"
 end
