@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    xmpp4r (0.5.6)
+    xmpp4r (0.5.7)
 
 GEM
   remote: https://rubygems.org/
