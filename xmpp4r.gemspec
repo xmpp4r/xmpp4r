@@ -7,12 +7,11 @@ Gem::Specification.new do |s|
   s.bindir = "bin"
   s.description = "XMPP/Jabber library for ruby"
   s.email = "mailme@hsps.in"
-  s.extra_rdoc_files = ["CHANGELOG", "COPYING", "LICENSE", "README.rdoc", "README_ruby19.txt"]
+  s.extra_rdoc_files = ["CHANGELOG", "COPYING", "LICENSE", "README.rdoc"]
   s.files = ["CHANGELOG",
  "COPYING",
  "LICENSE",
  "README.rdoc",
- "README_ruby19.txt",
  "Rakefile",
  "data/doc/xmpp4r/examples/advanced/adventure/README",
  "data/doc/xmpp4r/examples/advanced/adventure/adventure.rb",
