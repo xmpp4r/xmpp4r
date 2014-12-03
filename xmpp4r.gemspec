@@ -233,7 +233,6 @@ Gem::Specification.new do |s|
  "tools/gen_requires.bash",
  "tools/xmpp4r-gemspec-test.rb",
  "xmpp4r.gemspec"]
-  s.full_name = "xmpp4r-0.5.7"
   s.has_rdoc = true
   s.homepage = "http://xmpp4r.github.io"
   s.name = "xmpp4r"
