@@ -203,6 +203,7 @@ module Jabber
           when 'features'
             stanza = element
             element.each { |e|
+              next unless e.class.to_s.split("::").last == "Element"
               if e.name == 'mechanisms' and e.namespace == 'urn:ietf:params:xml:ns:xmpp-sasl'
                 e.each_element('mechanism') { |mech|
                   @stream_mechanisms.push(mech.text)
