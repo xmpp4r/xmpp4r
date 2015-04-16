@@ -430,7 +430,7 @@ module Jabber
       # set options for a subscription
       # node:: [String]
       # jid:: [Jabber::JID] or [String]
-      # options:: [Jabber::PubSub::SubscriptionConfig} specifying configuration options
+      # options:: [Hash] specifying configuration options
       # subid:: [String] or nil
       # return:: true
       def set_options_for(node, jid, options, subid = nil)
