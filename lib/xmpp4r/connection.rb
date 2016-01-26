@@ -14,6 +14,7 @@ module Jabber
   #
   class Connection  < Stream
     attr_reader :host, :port
+    attr_accessor :bind_address
 
     # How many seconds to wait for <stream:features/>
     # before proceeding
@@ -73,7 +74,7 @@ module Jabber
       @tls = false
 
       Jabber::debuglog("CONNECTING:\n#{@host}:#{@port}")
-      @socket = TCPSocket.new(@host, @port)
+      @socket = TCPSocket.new(@host, @port, @bind_address)
 
       # We want to use the old and deprecated SSL protocol (usually on port 5223)
       if @use_ssl
