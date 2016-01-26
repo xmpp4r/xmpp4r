@@ -9,6 +9,7 @@ end
 require 'xmpp4r/stream'
 
 module Jabber
+  class ProxyConnectionError < StandardError; end
   ##
   # The connection class manages the TCP connection to the Jabber server
   #
@@ -67,7 +68,7 @@ module Jabber
     # start the Jabber parser,
     # invoke to accept_features to wait for TLS,
     # start the keep-alive thread
-    def connect(host, port)
+    def connect(host, port, proxy_host=nil, proxy_port=nil)
       @host = host
       @port = port
       # Reset is_tls?, so that it works when reconnecting
@@ -75,6 +76,17 @@ module Jabber
 
       Jabber::debuglog("CONNECTING:\n#{@host}:#{@port}")
       @socket = TCPSocket.new(@host, @port, @bind_address)
+      if proxy_host and proxy_port
+        @socket = TCPSocket.new(proxy_host, proxy_port)
+        msg = "CONNECT #{host}:#{port} HTTP/1.0\r\n\r\n"
+        @socket.write msg
+        print msg
+        line = @socket.gets
+        print line, "\n"
+        raise ProxyConnectionError, line unless %r|^HTTP/1.0 200| =~ line
+      else
+        @socket = TCPSocket.new(@host, @port)
+      end
 
       # We want to use the old and deprecated SSL protocol (usually on port 5223)
       if @use_ssl
