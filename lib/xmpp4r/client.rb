@@ -40,7 +40,7 @@ module Jabber
     # host:: [String] Optional c2s host, will be extracted from jid if nil
     # port:: [Fixnum] The server port (default: 5222)
     # return:: self
-    def connect(host = nil, port = 5222)
+    def connect(host = nil, port = 5222, proxy_host = nil, proxy_port = nil)
       if host.nil?
         begin
           srv = []
@@ -68,7 +68,7 @@ module Jabber
         # Fallback to normal connect method
       end
 
-      super(host.nil? ? jid.domain : host, port)
+      super(host.nil? ? jid.domain : host, port, proxy_host, proxy_port)
       self
     end
 
