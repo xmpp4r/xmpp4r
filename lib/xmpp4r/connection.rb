@@ -75,9 +75,8 @@ module Jabber
       @tls = false
 
       Jabber::debuglog("CONNECTING:\n#{@host}:#{@port}")
-      @socket = TCPSocket.new(@host, @port, @bind_address)
       if proxy_host and proxy_port
-        @socket = TCPSocket.new(proxy_host, proxy_port)
+        @socket = TCPSocket.new(proxy_host, proxy_port, @bind_address)
         msg = "CONNECT #{host}:#{port} HTTP/1.0\r\n\r\n"
         @socket.write msg
         print msg
@@ -85,7 +84,7 @@ module Jabber
         print line, "\n"
         raise ProxyConnectionError, line unless %r|^HTTP/1.0 200| =~ line
       else
-        @socket = TCPSocket.new(@host, @port)
+        @socket = TCPSocket.new(@host, @port, @bind_address)
       end
 
       # We want to use the old and deprecated SSL protocol (usually on port 5223)
