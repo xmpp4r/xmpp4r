@@ -121,6 +121,7 @@ module Jabber
           starttls
         rescue
           Jabber::debuglog("STARTTLS:\nFailure: #{$!}")
+          @status = DISCONNECTED
         end
       end
     end
@@ -166,13 +167,19 @@ module Jabber
         sslsocket = SSLSocketUTF8.new(@socket, ctx)
         sslsocket.sync_close = true
         Jabber::debuglog("TLSv1: OpenSSL handshake in progress")
-        sslsocket.connect
+        begin
+          Timeout::timeout(@features_timeout) {
+            sslsocket.connect
 
-        # Make REXML believe it's a real socket
-        class << sslsocket
-          def kind_of?(o)
-            o == IO ? true : super
-          end
+            # Make REXML believe it's a real socket
+            class << sslsocket
+              def kind_of?(o)
+                o == IO ? true : super
+              end
+            end
+          }
+        rescue
+          @status = DISCONNECTED
         end
 
         # We're done and will use it
@@ -182,7 +189,15 @@ module Jabber
         error = $!
       ensure
         Jabber::debuglog("TLSv1: restarting parser")
-        start
+        if @status == DISCONNECTED
+          raise "sslsocket error"
+        else
+          begin
+            Timeout::timeout(@features_timeout) do
+              start
+            end
+          end
+        end
         accept_features
         raise error if error
       end
