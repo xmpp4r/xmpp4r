@@ -34,6 +34,8 @@ module Jabber
       if not type.nil?
         set_type(type)
       end
+
+      self.id = IdGenerator.instance.generate_id + ':sendIQ'
     end
 
     ##
