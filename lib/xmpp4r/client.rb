@@ -39,8 +39,9 @@ module Jabber
     # of the jid.
     # host:: [String] Optional c2s host, will be extracted from jid if nil
     # port:: [Fixnum] The server port (default: 5222)
+    # timeout:: [Fixnum] Socket timeout in seconds (default: 5)
     # return:: self
-    def connect(host = nil, port = 5222)
+    def connect(host = nil, port = 5222, timeout = 5)
       if host.nil?
         begin
           srv = []
@@ -55,7 +56,7 @@ module Jabber
 
           srv.each { |record|
             begin
-              connect(record.target.to_s, record.port)
+              connect(record.target.to_s, record.port, timeout)
               # Success
               return self
             rescue SocketError, Errno::ECONNREFUSED
@@ -68,7 +69,7 @@ module Jabber
         # Fallback to normal connect method
       end
 
-      super(host.nil? ? jid.domain : host, port)
+      super(host.nil? ? jid.domain : host, port, timeout)
       self
     end
 
