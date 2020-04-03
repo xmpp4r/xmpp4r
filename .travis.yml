@@ -13,3 +13,8 @@ matrix:
       jdk: openjdk8
   allow_failures:
     - rvm: ruby-head
+
+env:
+  global:
+    JRUBY_OPTS: "--debug"
+
