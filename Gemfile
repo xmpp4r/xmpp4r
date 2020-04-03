@@ -1,8 +1,8 @@
 source "https://rubygems.org"
 
-group :test do
-  gem "rake", ">= 10.0"
-  gem "rdoc", "~> 3.0"
-end
-
 gemspec
+
+gem "rake", ">= 10.0"
+gem "rdoc", ">= 5.1"
+gem "json", ">= 2.3.0"
+
