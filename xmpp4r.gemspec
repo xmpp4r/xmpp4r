@@ -232,15 +232,13 @@ Gem::Specification.new do |s|
  "tools/gen_requires.bash",
  "tools/xmpp4r-gemspec-test.rb",
  "xmpp4r.gemspec"]
-  s.has_rdoc = true
-  s.homepage = "http://xmpp4r.github.io"
+  s.homepage = "https://xmpp4r.github.io"
   s.name = "xmpp4r"
   s.platform = "ruby"
   s.rdoc_options = ["--quiet", "--title", "XMPP/Jabber library for ruby", "--opname", "index.html", "--main", "lib/xmpp4r.rb", "--line-numbers", "--inline-source"]
   s.require_paths = ["lib"]
   s.required_ruby_version = ">= 1.8.7"
   s.required_rubygems_version = ">= 0"
-  s.rubyforge_project = "xmpp4r"
   s.rubygems_version = "2.4.1"
   s.specification_version = 4
   s.summary = "XMPP/Jabber library for ruby"
