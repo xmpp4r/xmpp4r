@@ -1,12 +1,15 @@
 language: ruby
+
 rvm:
-  - 1.8.7
   - 1.9.3
   - 2.0.0
   - ruby-head
-  - jruby-18mode
-  - jruby-19mode
 
 matrix:
+  include:
+    - rvm: jruby-9.2.11.1
+      jdk: openjdk11
+    - rvm: jruby-9.1.17.0
+      jdk: openjdk8
   allow_failures:
     - rvm: ruby-head
