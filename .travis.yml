@@ -6,7 +6,7 @@ matrix:
       gemfile: gemfiles/Gemfile_20
     - rvm: 1.9.3
       gemfile: gemfiles/Gemfile_19
-    - rvm: jruby-9.2.11.1
+    - rvm: jruby-9.2.17.0
       jdk: openjdk11
     - rvm: jruby-9.1.17.0
       jdk: openjdk8
