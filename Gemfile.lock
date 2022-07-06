@@ -6,15 +6,13 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    json (1.8.1)
     rake (10.3.2)
-    rdoc (3.12.2)
-      json (~> 1.4)
+    rdoc (6.3.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   rake (>= 10.0)
-  rdoc (~> 3.0)
+  rdoc (~> 6.3)
   xmpp4r!
