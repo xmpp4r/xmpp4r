@@ -175,6 +175,7 @@ module Jabber
     #
     # element:: [REXML::Element] The received element
     def receive(element)
+      threadblocks = nil
       @tbcbmutex.synchronize { @processing += 1 }
       Jabber::debuglog("RECEIVED:\n#{element.to_s}")
 
@@ -212,6 +213,14 @@ module Jabber
               end
             }
             Jabber::debuglog("FEATURES: received")
+
+            # dup the threadblocks before unblocking @features_sem.
+            # Otherwise another thread may add a new threadblock
+            # before the processing starts below.  The new threadblock
+            # would then get the features stanza.
+            @tbcbmutex.synchronize do
+              threadblocks = @threadblocks.dup
+            end
             @features_sem.run
           else
             stanza = element
@@ -236,9 +245,10 @@ module Jabber
       # endless loop if Stream#send is being nested. That means, the nested
       # threadblock won't receive the stanza currently processed, but the next
       # one.
-      threadblocks = nil
       @tbcbmutex.synchronize do
-        threadblocks = @threadblocks.dup
+        unless threadblocks
+          threadblocks = @threadblocks.dup
+        end
       end
       threadblocks.each { |threadblock|
         exception = nil
@@ -369,7 +379,7 @@ module Jabber
       begin
         # Temporarily remove stanza's namespace to
         # reduce bandwidth consumption
-        if xml.kind_of? XMPPStanza and xml.namespace == 'jabber:client' and
+        if xml.kind_of? XMPPStanza and xml.namespace == @streamns and
             xml.prefix != 'stream' and xml.name != 'stream'
           xml.delete_namespace
           send_data(xml.to_s)
